@@ -46,9 +46,9 @@ const store = new Vuex.Store({
     jwt: localStorage.getItem('token'),
     endpoints: {
       // TODO: Remove hardcoding of dev endpoints
-      obtainJWT: 'http://127.0.0.1:8000/api-token-auth/',
-      refreshJWT: 'http://127.0.0.1:8000/api-token-refresh/',
-      baseUrl: 'http://127.0.0.1:8000/'
+      obtainJWT: 'http://127.0.0.1:8000/api/api-token-auth/',
+      refreshJWT: 'http://127.0.0.1:8000/api/api-token-refresh/',
+      baseUrl: 'http://127.0.0.1:8000/api/'
     },
     pageOptions: {
       landing: {
