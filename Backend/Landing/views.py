@@ -131,6 +131,7 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         auth = self.request.query_params.get('auth', None)
         auth_code = self.request.query_params.get('auth_code', None)
         main = self.request.query_params.get('main', None)
+        auto = self.request.query_params.get('auto', None)
 
         # Search params
         manager = self.request.query_params.get('manager', None)
@@ -389,8 +390,18 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         # Add company name and manager name in list
         final_result = []
-        for tem in dynamo_obj:
-            if tem['LandingInfo']['landing']['name'] is not None:
+        if auto is None:
+            for tem in dynamo_obj:
+                if tem['LandingInfo']['landing']['name'] is not None:
+                    get_manger = self.get_manager(tem['LandingInfo']['landing']['manager'])
+                    get_company = self.get_company(tem['LandingInfo']['landing']['company'])['name']
+                    collection_amount = len(tem['LandingInfo']['landing']['collections'])
+                    tem['LandingInfo']['landing']['manager_name'] = get_manger
+                    tem['LandingInfo']['landing']['company_name'] = get_company
+                    tem['LandingInfo']['landing']['collection_amount'] = collection_amount
+                    final_result.append(tem)
+        else:
+            for tem in dynamo_obj:
                 get_manger = self.get_manager(tem['LandingInfo']['landing']['manager'])
                 get_company = self.get_company(tem['LandingInfo']['landing']['company'])['name']
                 collection_amount = len(tem['LandingInfo']['landing']['collections'])
@@ -1068,7 +1079,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                   <div class="list_wrap">
                                             '''
                                         order_obj += f'''
-                                                <span style="white-space: nowrap;">
+                                                <span>
                                                   <input type="checkbox" 
                                                          value="true" 
                                                          id="form_{order['sign']}_{field['sign']}">
@@ -1095,7 +1106,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                   <div class="list_wrap" style="text-align: right;">
                                             '''
                                         order_obj += f'''
-                                                <span style="white-space: nowrap;">
+                                                <span>
                                                   <input type="checkbox" 
                                                          value="true" 
                                                          id="form_{order['sign']}_{field['sign']}">
@@ -1105,7 +1116,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
                                         if landing_info['is_term'] is True:
                                             order_obj += f'''
-                                                <button class="term_button" type="button">
+                                                <button class="term_button" type="button" id="show_term">
                                                     [{field['name']}]
                                                 </button>
                                             '''
@@ -1181,7 +1192,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                             <div class="term_close" id="term_close">&times;</div>
                         </div>
                         <div class="term_content">
-                            <figure>
+                            <figure style="position: relative;">
                                 <img 
                                     src="https://s3.ap-northeast-2.amazonaws.com/lcventures-image-cdn/images/home_main.jpg" 
                                     alt="Top_bg_big">
@@ -1212,13 +1223,16 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             term_script = '''
             // Show term element.
             document.getElementById('show_term').addEventListener('click', function() {
-                $("#term_bg").css('visibility', 'visible');
+                // $("#term_bg").css('visibility', 'visible');
+                document.getElementById('term_bg').style.visibility = 'visible';
             });
             document.getElementById('term_bg').addEventListener('click', function() {
-                $("#term_bg").css('visibility', 'hidden');
+                // $("#term_bg").css('visibility', 'hidden');
+                document.getElementById('term_bg').style.visibility = 'hidden';
             });
             document.getElementById('term_close').addEventListener('click', function() {
-                $("#term_bg").css('visibility', 'hidden');
+                // $("#term_bg").css('visibility', 'hidden');
+                document.getElementById('term_bg').style.visibility = 'hidden';
             });
             '''
         else:
@@ -1565,11 +1579,13 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     transition: 200ms visibility ease-in-out;
                     cursor: pointer;
                 }
-        
+
                 .term {
                     position: relative;
                     width: 80%;
                     height: 80%;
+                    max-width: 1000px;
+                    min-width: 340px;
                     margin: auto;
                     top: 50%;
                     transform: translateY(-50%);
@@ -1577,7 +1593,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     border-radius: 8px;
                     overflow: auto;
                 }
-        
+
                 .term_header {
                     position: fixed;
                     width: 100%;
@@ -1585,15 +1601,15 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     background: #ffffff;
                     border-bottom: 2px solid #777777;
                 }
-        
+
                 .term_title {
                     display: inline-block;
                     font-size: 20px;
                     padding: 15px 15px;
-                    width: calc(100% - 100px);
+                    width: calc(100% - 65px);
                     vertical-align: top;
                 }
-        
+
                 .term_close {
                     display: inline-block;
                     width: 50px;
@@ -1602,7 +1618,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     text-align: center;
                     cursor: pointer;
                 }
-        
+
                 .term_content{
                     position: relative;
                     margin-top: 50px;
@@ -1613,7 +1629,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     font-size: 14px;
                     overflow: auto;
                 }
-        
+
                 .term_content pre {
                     white-space: pre-line;
                 }
@@ -1625,10 +1641,10 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                 function form_submit(group) {
                     console.log('test');
                     console.log('form_group number is ', group);
-                    
-                    if (document.getElementById('form_(group)_sign').value == '') {
-                        alert('(name)'의 );
-                    }
+
+                    // if (document.getElementById('form_(group)_sign').value == '') {
+                    //     alert('(name)');
+                    // }
                 }
             '''
 
@@ -1690,4 +1706,4 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         # s3 = session.resource('s3')
         # s3 = boto3.client('s3')
-        s3.upload_file('./temp.html', 'lcventures-web', f'''preview_{landing_num}.html''')
+        s3.upload_file('./temp.html', 'infomagazine', f'''landings/{landing_num}_preview.html''')
