@@ -608,6 +608,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
     def create_html(self, landing):
         company_num = landing['CompanyNum']
         landing_num = landing['LandingNum']
+        updated_num = landing['UpdatedTime']
         landing_info = landing['LandingInfo']['landing']
         landing_term = landing['LandingInfo']['term']
         landing_form = landing['LandingInfo']['form']
@@ -1686,16 +1687,9 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                 </html>
             '''
 
-        preview_html = open('./temp.html', 'w')
+        preview_html = open(f'./Preview/preview_{landing_num}.html', 'w')
         preview_html.write(contents)
         preview_html.close()
-
-        session = boto3.session.Session(
-            aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
-            aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
-            # aws_session_token=config('AWS_SESSION_TOKEN'),
-            region_name='ap-northeast-2'
-        )
 
         s3 = boto3.client(
             's3',
@@ -1704,6 +1698,8 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             region_name='ap-northeast-2'
         )
 
-        # s3 = session.resource('s3')
-        # s3 = boto3.client('s3')
-        s3.upload_file('./temp.html', 'infomagazine', f'''landings/{landing_num}_preview.html''')
+        s3.upload_file(
+            f'./Preview/preview_{landing_num}.html',
+            'infomagazine',
+            f'''landings/{landing_num}/preview_{updated_num}.html'''
+        )
