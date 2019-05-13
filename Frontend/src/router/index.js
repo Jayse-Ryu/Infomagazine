@@ -276,7 +276,7 @@ router.beforeEach((to, from, next) => {
   }
   // Set let user go rightly or not
   let intro = () => {
-    if (to.path === '/' || to.path === '' || to.name === 'page' || to.name === 'A404') {
+    if (to.path === '/' || to.path === '' || to.name === 'sign_up' || to.name === 'page' || to.name === 'A404') {
       next()
     } else {
       work()
