@@ -5,5 +5,9 @@
 *.iml
 out
 gen
+.env
 
 Backend/settings.ini
+
+Frontend/node_modules
+Frontend/dist

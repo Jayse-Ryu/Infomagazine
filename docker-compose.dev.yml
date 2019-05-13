@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  WebServer:
+    image: "infomagazine_web_server:dev_v${VERSION}"
+    build:
+      context: .
+      dockerfile: ./docker/dev/nginx/Dockerfile
+    volumes:
+      - ./Frontend:/home/webapp
+
+  APIService:
+    image: "infomagazine_api_service:dev_v${VERSION}"
+    build:
+      context: .
+      dockerfile: ./docker/dev/web/Dockerfile
+    ports:
+      - '3032:3032'
+    volumes:
+      - ./Backend:/home/api

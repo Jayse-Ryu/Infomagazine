@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+  WebServer:
+    ports:
+      - '80:80'
+    networks:
+      - backend
+    restart: on-failure
+    links:
+      - APIService
+    depends_on:
+      - APIService
+
+  APIService:
+    networks:
+      - backend
+    tty: true
+
+networks:
+  backend:
+    driver: 'bridge'

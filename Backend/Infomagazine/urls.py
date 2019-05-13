@@ -17,13 +17,13 @@ router.register('organization', OrganizationViewSet, base_name='organization')
 router.register('preview', PreviewViewSet, base_name='preview')
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include(router.urls)),
-    path('landing/', include('Landing.urls')),
+    path('api/admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+    path('api/landing/', include('Landing.urls')),
 
     # JWT auth
     # path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
-    path('api-token-auth/', obtain_jwt_token),
+    path('api/api-token-auth/', obtain_jwt_token),
     # path('api-token-verify', verify_jwt_token),
-    path('api-token-refresh/', refresh_jwt_token),
+    path('api/api-token-refresh/', refresh_jwt_token),
 ]
