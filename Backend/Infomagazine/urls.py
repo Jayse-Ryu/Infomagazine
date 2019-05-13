@@ -25,5 +25,5 @@ urlpatterns = [
     # path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
     path('api/api-token-auth/', obtain_jwt_token),
     # path('api-token-verify', verify_jwt_token),
-    path('api/api-token-refresh/', refresh_jwt_token)
+    path('api/api-token-refresh/', refresh_jwt_token),
 ]
