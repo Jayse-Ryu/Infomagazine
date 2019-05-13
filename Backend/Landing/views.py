@@ -1701,5 +1701,5 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         s3.upload_file(
             f'./Preview/preview_{landing_num}.html',
             'infomagazine',
-            f'''landings/{landing_num}/preview_{updated_num}.html'''
+            f'''landings/{landing_num}/preview_{landing_num}.html'''
         )
