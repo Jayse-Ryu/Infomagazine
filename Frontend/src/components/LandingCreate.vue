@@ -1818,6 +1818,7 @@
         // Check temporary saved landings
         let this_url = 'landing/api/'
         this.auto_saved = []
+        this.$store.state.pageOptions.loading = true
         axios.get(this.$store.state.endpoints.baseUrl + this_url + '?auth=staff' + '&manager=' + this.access_obj.user_name + '&auto=true')
           .then((response) => {
             let auto_flag = false
@@ -1849,6 +1850,10 @@
               this.auto_flag = auto_flag
               this.company_flag = true
             }
+            this.$store.state.pageOptions.loading = false
+          })
+          .catch(() => {
+            this.$store.state.pageOptions.loading = false
           })
       },
       auto_saved_delete() {
