@@ -513,97 +513,97 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         return Response(status=status.HTTP_200_OK)
 
-    def get(self, request, *args, **kwargs):
-        print('Get function activated')
+    # def get(self, request, *args, **kwargs):
+    #     print('Get function activated')
+    #
+    #     session = boto3.session.Session(
+    #         aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+    #         aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+    #         # aws_session_token=config('AWS_SESSION_TOKEN'),
+    #         region_name='ap-northeast-2'
+    #     )
+    #
+    #     dynamo_db = session.resource('dynamodb')
+    #     table = dynamo_db.Table('Infomagazine')
+    #
+    #     dynamo_db_res = json.dumps(table.scan(), cls=DecimalEncoder)
+    #
+    #     return Response(json.loads(dynamo_db_res), status=status.HTTP_200_OK)
 
-        session = boto3.session.Session(
-            aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
-            aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
-            # aws_session_token=config('AWS_SESSION_TOKEN'),
-            region_name='ap-northeast-2'
-        )
+    # def retrieve(self, request, *args, **kwargs):
+    #     print('Retrieve function activated')
+    #
+    #     sign_param = str(json.loads(kwargs['pk']))
+    #
+    #     session = boto3.session.Session(
+    #         aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+    #         aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+    #         # aws_session_token=config('AWS_SESSION_TOKEN'),
+    #         region_name='ap-northeast-2'
+    #     )
+    #
+    #     dynamo_db = session.resource('dynamodb')
+    #     table = dynamo_db.Table('Infomagazine')
+    #
+    #     dynamo_db_res = \
+    #         table.query(
+    #             IndexName='LandingNum-index',
+    #             KeyConditionExpression=Key('LandingNum').eq(sign_param),
+    #             ScanIndexForward=False
+    #         )
+    #
+    #     dynamo_obj = dynamo_db_res['Items'][0]
+    #
+    #     print('ret by obj', dynamo_obj['LandingInfo']['landing']['name'])
+    #
+    #     get_manger = self.get_manager(dynamo_obj['LandingInfo']['landing']['manager'])
+    #     get_company = self.get_company(dynamo_obj['LandingInfo']['landing']['company'])['name']
+    #     collection_amount = len(dynamo_obj['LandingInfo']['landing']['collections'])
+    #     dynamo_obj['LandingInfo']['landing']['manager_name'] = get_manger
+    #     dynamo_obj['LandingInfo']['landing']['company_name'] = get_company
+    #     dynamo_obj['LandingInfo']['landing']['collection_amount'] = collection_amount
+    #
+    #     preview = self.request.query_params.get('preview', None)
+    #     if preview is not None:
+    #         self.create_html(json.loads(json.dumps(dynamo_obj, cls=DecimalEncoder)))
+    #         return Response(status=status.HTTP_200_OK)
+    #
+    #     return Response(dynamo_obj, status=status.HTTP_200_OK)
 
-        dynamo_db = session.resource('dynamodb')
-        table = dynamo_db.Table('Infomagazine')
+    # def get_manager(self, *args):
+    #     manager_queryset = UserAccess.objects.all()
+    #     manager_serializer_class = UserAccessSerializer
+    #
+    #     manager_queryset = manager_queryset.filter(user__exact=args[0])
+    #     manager_serializer = manager_serializer_class(manager_queryset, many=True)
+    #     for item in manager_serializer.data:
+    #         return item['user_name']
 
-        dynamo_db_res = json.dumps(table.scan(), cls=DecimalEncoder)
+    # def get_company(self, *args):
+    #     company_queryset = Company.objects.all()
+    #     company_serializer_class = CompanySerializer
+    #
+    #     company_queryset = company_queryset.filter(id__exact=args[0])
+    #     company_serializer = company_serializer_class(company_queryset, many=True)
+    #     for item in company_serializer.data:
+    #         return item
 
-        return Response(json.loads(dynamo_db_res), status=status.HTTP_200_OK)
-
-    def retrieve(self, request, *args, **kwargs):
-        print('Retrieve function activated')
-
-        sign_param = str(json.loads(kwargs['pk']))
-
-        session = boto3.session.Session(
-            aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
-            aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
-            # aws_session_token=config('AWS_SESSION_TOKEN'),
-            region_name='ap-northeast-2'
-        )
-
-        dynamo_db = session.resource('dynamodb')
-        table = dynamo_db.Table('Infomagazine')
-
-        dynamo_db_res = \
-            table.query(
-                IndexName='LandingNum-index',
-                KeyConditionExpression=Key('LandingNum').eq(sign_param),
-                ScanIndexForward=False
-            )
-
-        dynamo_obj = dynamo_db_res['Items'][0]
-
-        print('ret by obj', dynamo_obj['LandingInfo']['landing']['name'])
-
-        get_manger = self.get_manager(dynamo_obj['LandingInfo']['landing']['manager'])
-        get_company = self.get_company(dynamo_obj['LandingInfo']['landing']['company'])['name']
-        collection_amount = len(dynamo_obj['LandingInfo']['landing']['collections'])
-        dynamo_obj['LandingInfo']['landing']['manager_name'] = get_manger
-        dynamo_obj['LandingInfo']['landing']['company_name'] = get_company
-        dynamo_obj['LandingInfo']['landing']['collection_amount'] = collection_amount
-
-        preview = self.request.query_params.get('preview', None)
-        if preview is not None:
-            self.create_html(json.loads(json.dumps(dynamo_obj, cls=DecimalEncoder)))
-            return Response(status=status.HTTP_200_OK)
-
-        return Response(dynamo_obj, status=status.HTTP_200_OK)
-
-    def get_manager(self, *args):
-        manager_queryset = UserAccess.objects.all()
-        manager_serializer_class = UserAccessSerializer
-
-        manager_queryset = manager_queryset.filter(user__exact=args[0])
-        manager_serializer = manager_serializer_class(manager_queryset, many=True)
-        for item in manager_serializer.data:
-            return item['user_name']
-
-    def get_company(self, *args):
-        company_queryset = Company.objects.all()
-        company_serializer_class = CompanySerializer
-
-        company_queryset = company_queryset.filter(id__exact=args[0])
-        company_serializer = company_serializer_class(company_queryset, many=True)
-        for item in company_serializer.data:
-            return item
-
-    def bubble_sort(self, list):
-        def swap(i, j):
-            list[i], list[j] = list[j], list[i]
-
-        n = len(list)
-        swapped = True
-
-        x = -1
-        while swapped:
-            swapped = False
-            x = x + 1
-            for i in range(1, n - x):
-                if list[i - 1]['LandingNum'] < list[i]['LandingNum']:
-                    swap(i - 1, i)
-                    swapped = True
-        return list
+    # def bubble_sort(self, list):
+    #     def swap(i, j):
+    #         list[i], list[j] = list[j], list[i]
+    #
+    #     n = len(list)
+    #     swapped = True
+    #
+    #     x = -1
+    #     while swapped:
+    #         swapped = False
+    #         x = x + 1
+    #         for i in range(1, n - x):
+    #             if list[i - 1]['LandingNum'] < list[i]['LandingNum']:
+    #                 swap(i - 1, i)
+    #                 swapped = True
+    #     return list
 
     def create_html(self, landing):
         company_num = landing['CompanyNum']
