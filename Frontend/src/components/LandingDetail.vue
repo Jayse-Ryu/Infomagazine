@@ -438,12 +438,12 @@
                   trigger: 'click',
                   }">?</span>
           </label>
-          <div class="col-sm-9 col-form-label-sm mt-3 text-right">
+          <div class="col-sm-9 col-form-label-sm mt-3 text-right" v-if="window_width > 999">
             <button type="button" class="btn btn-primary btn-sm p-1" @click.prevent="order_add">객체 추가</button>
             <button type="button" class="btn btn-danger btn-sm p-1" @click.prevent="order_delete">선택 삭제</button>
           </div>
           <div class="col-sm-12">
-            <div class="main_layout" id="main_layout">
+            <div class="main_layout" v-if="window_width > 999" id="main_layout">
               <div class="basket" :style="{'height': order_wrap_height + 'px'}">
                 <vue-draggable-resizable v-for="item in dynamo_obj.LandingInfo.order"
                                          @activated="order_activated(item.sign)"
@@ -1124,7 +1124,7 @@
       msg: {
         base_url: '기본 주소를 지정합니다.',
         title: '사이트 내부 제목입니다.',
-        order: '랜딩페이지를 커스터마이징 합니다. 1000px 이상의 화면에서 작업을 추천합니다.',
+        order: '랜딩페이지를 커스터마이징 합니다. 1000px 이상의 화면에서 작업대가 활성화됩니다.',
         in_db: '레이아웃 내부에 DB 폼 그룹을 위치시키거나 하단 팝업으로 대체합니다.',
         in_company: '랜딩 페이지에 하단 Footer로 해당 고객업체의 정보를 자동 기입합니다.',
         hijack: '사용자가 뒤로 가기 시 해당 링크로 강제 이동시킵니다.',
@@ -1798,9 +1798,11 @@
     },
     mounted() {
       // Window width calculator
+      // Window width calculator
+      let that = this
       this.$nextTick(function () {
         window.addEventListener('resize', function (e) {
-          this.window_width = window.innerWidth
+          that.window_width = window.innerWidth
         })
       })
       // Get company, manager
