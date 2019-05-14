@@ -187,6 +187,7 @@
           // Emergency break
           def = '&organization=f'
         }
+        this.$store.state.pageOptions.loading = true
         axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&sort=1' + '&' + this.search_option + '=' + this.search_text + def)
           .then((response) => {
             if (response.data.count % this.page_chunk === 0) {
@@ -195,9 +196,11 @@
               this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
             }
             this.content_obj = response.data.results
+            this.$store.state.pageOptions.loading = false
           })
           .catch((error) => {
             console.log(error)
+            this.$store.state.pageOptions.loading = false
           })
       }
     },
@@ -250,6 +253,7 @@
         // Emergency break
         def = '&organization=f'
       }
+      this.$store.state.pageOptions.loading = true
       axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text + '&sort=1' + def)
         .then((response) => {
           if (response.data.count % this.page_chunk === 0) {
@@ -258,9 +262,11 @@
             this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
           }
           this.content_obj = response.data.results
+          this.$store.state.pageOptions.loading = false
         })
         .catch((error) => {
           console.log(error)
+          this.$store.state.pageOptions.loading = false
         })
     },
     update() {

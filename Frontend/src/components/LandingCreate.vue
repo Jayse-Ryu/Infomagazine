@@ -1755,16 +1755,19 @@
 
         // console.log('axios temporary disabled')
         // console.log(this.dynamo_obj)
+        this.$store.state.pageOptions.loading = true
         axios.post(this.$store.state.endpoints.baseUrl + 'landing/api/', this.dynamo_obj, config)
           .then(() => {
             if (option == 'checked') {
               alert('랜딩이 생성되었습니다.')
+              this.$store.state.pageOptions.loading = false
               this.bye()
             }
           })
           .catch((error) => {
             if (option == 'checked') {
               alert('랜딩 생성이 실패하였습니다.')
+              this.$store.state.pageOptions.loading = false
             }
             console.log(error)
           })

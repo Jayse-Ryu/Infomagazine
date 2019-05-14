@@ -1725,16 +1725,19 @@
 
         // console.log('axios temporary disabled')
         // console.log(this.dynamo_obj)
+        this.$store.state.pageOptions.loading = true
         axios.post(this.$store.state.endpoints.baseUrl + 'landing/api/', this.dynamo_obj, config)
           .then(() => {
             if (option == 'checked') {
               alert('랜딩이 수정되었습니다.')
+              this.$store.state.pageOptions.loading = false
               this.bye()
             }
           })
           .catch((error) => {
             if (option == 'checked') {
               alert('랜딩 수정이 실패하였습니다.')
+              this.$store.state.pageOptions.loading = false
             }
             console.log(error)
           })
@@ -1804,12 +1807,15 @@
       let axios = this.$axios
       // Get landing obj from Landing Num
       this.epoch_time = this.$route.params.landing_id
+      this.$store.state.pageOptions.loading = true
       axios.get(this.$store.state.endpoints.baseUrl + 'landing/api/' + this.$route.params.landing_id)
         .then((response) => {
           this.dynamo_obj = response.data
+          this.$store.state.pageOptions.loading = false
         })
         .catch((error) => {
           console.log(error)
+          this.$store.state.pageOptions.loading = false
         })
       // Get companies from logged in user's organization
       let this_url = 'company/'

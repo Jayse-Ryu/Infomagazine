@@ -182,6 +182,7 @@
         let axios = this.$axios
         let this_url = 'organization/'
         let offset = page
+        this.$store.state.pageOptions.loading = true
         axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text)
           .then((response) => {
             // Calculation for page_max
@@ -191,6 +192,10 @@
               this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
             }
             this.content_obj = response.data.results
+            this.$store.state.pageOptions.loading = false
+          })
+          .catch(() => {
+            this.$store.state.pageOptions.loading = false
           })
       }
     },
@@ -229,6 +234,7 @@
         this.temp_option = 2
       }
       // Axios get landings
+      this.$store.state.pageOptions.loading = true
       axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text)
         .then((response) => {
           // Calculation for page_max
@@ -238,6 +244,10 @@
             this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
           }
           this.content_obj = response.data.results
+          this.$store.state.pageOptions.loading = false
+        })
+        .catch(() => {
+          this.$store.state.pageOptions.loading = false
         })
     },
     destroyed() {

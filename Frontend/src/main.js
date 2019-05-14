@@ -50,6 +50,7 @@ const store = new Vuex.Store({
       baseUrl: 'http://localhost/api/'
     },
     pageOptions: {
+      loading: false,
       landing: {
         page: 1,
         option: 0,

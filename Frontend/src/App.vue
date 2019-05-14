@@ -4,7 +4,7 @@
     <!-- Header component -->
     <transition name="fade">
       <div v-if="header_flag === 0" key="no_header"></div>
-      <app-header v-else-if="header_flag === 1" key="header" />
+      <app-header v-else-if="header_flag === 1" key="header"/>
     </transition>
 
     <!-- Router component -->
@@ -12,20 +12,28 @@
       <router-view/>
     </transition>
 
-
+    <div v-if="loading" class="loading">
+      <div class="lds-hourglass"></div>
+    </div>
 
   </div>
 </template>
 
 <script>
-export default {
-  name: 'App',
-  data: () => ({
-    // Header options
-    header_flag: 1,
-    auth_user: '',
-  })
-}
+  export default {
+    name: 'App',
+    data: () => ({
+      // Header options
+      header_flag: 1,
+      auth_user: ''
+    }),
+    computed: {
+      loading() {
+        let loading = this.$store.state.pageOptions.loading
+        return loading
+      }
+    }
+  }
 </script>
 
 <style lang="scss">
@@ -468,6 +476,7 @@ export default {
   th {
     padding: 0;
   }
+
   /*
   =========================================================================
   Add more personal normalize.
@@ -520,9 +529,11 @@ export default {
     font: 1rem/1.1 'Avenir', Helvetica, Arial, "Montserrat", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    -webkit-text-stroke: 0.15px rgba(0,0,0,0.3);
+    -webkit-text-stroke: 0.15px rgba(0, 0, 0, 0.3);
     /*overflow-x: hidden;*/
-  } /* body normalize more */
+  }
+
+  /* body normalize more */
 
   select {
     -webkit-appearance: none;
@@ -604,6 +615,7 @@ export default {
       height: 60%;
     }
   }
+
   /* Search box ended */
 
 
@@ -702,6 +714,7 @@ export default {
   .list_body {
     li {
       word-break: break-all;
+
       div {
         word-break: break-all;
       }
@@ -879,6 +892,7 @@ export default {
     // box-model: border-box;
     transition: all 300ms linear;
   }
+
   .drag_handle-tl {
     top: -14px;
     left: -14px;
@@ -938,5 +952,55 @@ export default {
     background-color: red;
     transform: scale(1.4);
   }
+
+  .loading {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+
+  /**/
+
+  .lds-hourglass {
+    display: inline-block;
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .lds-hourglass:after {
+    content: " ";
+    display: block;
+    border-radius: 50%;
+    width: 0;
+    height: 0;
+    margin: 6px;
+    box-sizing: border-box;
+    border: 26px solid #fff;
+    border-color: #fff transparent #fff transparent;
+    animation: lds-hourglass 1.2s infinite;
+  }
+
+  @keyframes lds-hourglass {
+    0% {
+      transform: rotate(0);
+      animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    }
+    50% {
+      transform: rotate(900deg);
+      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    100% {
+      transform: rotate(1800deg);
+    }
+  }
+
 
 </style>

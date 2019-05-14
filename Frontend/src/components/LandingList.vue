@@ -212,13 +212,16 @@
         } else {
           searcher = ''
         }
+        this.$store.state.pageOptions.loading = true
         axios.get(this.$store.state.endpoints.baseUrl + 'landing/api/' + auth + auth_code + searcher)
           .then((response) => {
             // console.log('response', response)
             this.content_obj = response.data
+            this.$store.state.pageOptions.loading = false
           })
           .catch((error) => {
             console.log('api error', error)
+            this.$store.state.pageOptions.loading = false
           })
       }
     },

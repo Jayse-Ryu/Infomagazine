@@ -186,6 +186,7 @@
         if (!this.user_obj.is_staff && this.access_obj.access == 1) {
           def = '&organization=' + this.access_obj.organization
         }
+        this.$store.state.pageOptions.loading = true
         axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text + def)
           .then((response) => {
             // Calculation for page_max
@@ -196,6 +197,10 @@
             }
             this.content_obj = response.data.results
             console.log(this.content_obj)
+            this.$store.state.pageOptions.loading = false
+          })
+          .catch(() => {
+            this.$store.state.pageOptions.loading = false
           })
       }
     },
@@ -238,6 +243,7 @@
       if (!this.user_obj.is_staff && this.access_obj.access == 1) {
         def = '&organization=' + this.access_obj.organization
       }
+      this.$store.state.pageOptions.loading = true
       axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text + def)
         .then((response) => {
           // Calculation for page_max
@@ -247,6 +253,10 @@
             this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
           }
           this.content_obj = response.data.results
+          this.$store.state.pageOptions.loading = false
+        })
+        .catch(() => {
+          this.$store.state.pageOptions.loading = false
         })
     },
     destroyed() {
