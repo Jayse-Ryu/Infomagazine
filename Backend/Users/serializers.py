@@ -13,11 +13,10 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'full_name',
             'phone',
-            'password',
             'is_superuser',
             'is_active',
             'is_staff',
-            'last_login',
+            # 'last_login',
             'created_date',
             'updated_date'
         )

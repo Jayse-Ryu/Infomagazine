@@ -235,15 +235,6 @@
 <script>
   export default {
     name: "gateway",
-    // LogIn check
-    // created() {
-      // if (!this.$store.state.authUser) {
-      //   alert('로그인이 필요합니다.')
-      //   this.$router.push({
-      //     name: 'sign_in'
-      //   })
-      // }
-    // },
     mounted() {
       if (!this.$store.state.authUser) {
         alert('로그인이 필요합니다.')
@@ -449,7 +440,7 @@
             formData.append('access', '1')
             return axios.patch(this.$store.state.endpoints.baseUrl + 'user_access/' + this.user_obj.id + '/', formData)
           })
-          .then((response) => {
+          .then(() => {
             // Done! Go to langind list.
             alert('업체가 생성되었습니다!')
             this.$router.push({
@@ -462,11 +453,11 @@
           })
       }
     },
-    update() {
-      if (this.$store.state.jwt !== null) {
-        this.$store.dispatch('getAuthUser')
-      }
-    },
+    // update() {
+    //   if (this.$store.state.jwt !== null) {
+    //     this.$store.dispatch('getAuthUser')
+    //   }
+    // },
     computed: {
       user_obj() {
         // Get user information

@@ -195,7 +195,8 @@ const router = new Router({
     }
   ],
   mode: 'history',
-  scrollBehavior () {
+  // eslint-disable-next-line
+  scrollBehavior() {
     return {
       x: 0,
       y: 0
@@ -206,80 +207,89 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   // Check authentication by token
   let work = () => {
-    Store.dispatch('inspectToken')
-      .then(() => {
-        // eslint-disable-next-line
-        if (!to.name || to.name == null || to.name == '') {
-          next({name: 'A404'})
-        } else {
-          if (to.path === '/' || to.path === '') {
-            next()
-          } else {
-            if (to.meta.signed) {
-              if (window.localStorage.token || Store.state.authUser.id) {
-                if (to.meta.auth_grade) {
-                  // Auth grade filter
-                  let auth = to.meta.auth_grade
-                  if (auth === 'superuser') {
-                    if (Store.state.authUser.is_superuser) {
+    // eslint-disable-next-line
+    if (!to.name || to.name == null || to.name == '') {
+      // If user try to access 'none' page.
+      next({name: 'A404'})
+    } else {
+      if (to.path === '/' || to.path === '') {
+        next()
+      } else {
+        if (to.meta.signed) {
+          if (window.localStorage.token || Store.state.authUser.id) {
+            if (to.meta.auth_grade) {
+              // Auth grade filter
+              let auth = to.meta.auth_grade
+              if (auth === 'superuser') {
+                if (Store.state.authUser.is_superuser) {
+                  next()
+                } else {
+                  next({name: 'gateway'})
+                }
+              } else if (auth === 'staff') {
+                if (Store.state.authUser.is_staff) {
+                  next()
+                } else {
+                  next({name: 'gateway'})
+                }
+              } else if (auth === 'manager') {
+                if (Store.state.userAccess.access === 1) {
+                  if (to.name === 'organization_detail') {
+                    // eslint-disable-next-line
+                    if (Store.state.userAccess.organization == to.params.organization_id || Store.state.authUser.is_staff) {
                       next()
+                      // eslint-disable-next-line
+                    } else if (Store.state.userAccess.organization != to.params.organization_id && !Store.state.authUser.is_staff) {
+                      next({name: 'organization_list'})
                     } else {
-                      next({name: 'gateway'})
-                    }
-                  } else if (auth === 'staff') {
-                    if (Store.state.authUser.is_staff) {
                       next()
-                    } else {
-                      next({name: 'gateway'})
-                    }
-                  } else if (auth === 'manager') {
-                    if (Store.state.userAccess.access === 1) {
-                      if (to.name === 'organization_detail') {
-                        // eslint-disable-next-line
-                        if (Store.state.userAccess.organization == to.params.organization_id || Store.state.authUser.is_staff) {
-                          next()
-                          // eslint-disable-next-line
-                        } else if (Store.state.userAccess.organization != to.params.organization_id && !Store.state.authUser.is_staff) {
-                          next({name: 'organization_list'})
-                        } else {
-                          next()
-                        }
-                      }
-                    } else {
-                      next({name: 'gateway'})
-                    }
-                  } else if (auth === 'customer') {
-                    if (Store.state.userAccess.access >= 1) {
-                      next()
-                    } else {
-                      next({name: 'gateway'})
                     }
                   }
+                } else {
+                  next({name: 'gateway'})
                 }
-                // /Auth grade filter
-              } else {
-                // Store has not token or Auth user not exist
-                next({name: 'sign_in'})
+              } else if (auth === 'customer') {
+                if (Store.state.userAccess.access >= 1) {
+                  next()
+                } else {
+                  next({name: 'gateway'})
+                }
               }
-            } else {
-              // If no sign meta, Let them go to next.
-              next()
             }
+            // /Auth grade filter
+          } else {
+            // Store has not token or Auth user not exist
+            next({name: 'sign_in'})
           }
-          // The last next work for router default (NECESSARY)
+        } else {
+          // If no sign meta, Let them go to next.
           next()
         }
-      }) // /inspectToken .then
-      .catch((error) => {
-        console.log('Router Inspect error => ', error)
-      })
+      }
+      // The last next work for router default (NECESSARY)
+      next()
+    }
   }
   // Set let user go rightly or not
   let intro = () => {
     if (to.path === '/' || to.path === '' || to.name === 'sign_up' || to.name === 'page' || to.name === 'A404') {
       next()
     } else {
-      work()
+      if (from.name == null && to.name !== 'gateway') {
+        // When user randomly access to not public page, gateway page.
+        work()
+      } else {
+        // If not but still don't have authentication
+        if (Store.state.authUser.id == null) {
+          Store.dispatch('inspectToken')
+            .then(() => {
+              work()
+            })
+        } else {
+          // Or user have authentication
+          work()
+        }
+      }
     }
   }
   // Check meta(from.leave) first
@@ -288,8 +298,7 @@ router.beforeEach((to, from, next) => {
       // Are you sure to leave this page?
       // eslint-disable-next-line
       if (from.meta.forced == 'yes') {
-        // eslint-disable-next-line
-        from.meta.forced == 'no'
+        from.meta.forced = 'no'
         intro()
       } else {
         if (confirm('정말 떠나시겠습니까?')) {
