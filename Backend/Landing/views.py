@@ -620,6 +620,8 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         date_picker_head = ''
         date_picker_body = ''
 
+        form_submit = ''
+
         temp = {
             # 'manager': 4,
             # 'manager_name': 'Manager2',
@@ -755,7 +757,8 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                      left: {order['position']['x'] / 10}%; 
                                      width: {order['position']['w'] / 10}%; 
                                      padding-bottom: {order['position']['h'] / 10}%;
-                                     z-index: {order['position']['z']};">'''
+                                     z-index: {order['position']['z']};">\
+                    '''
 
                     order_obj += '''
                             <figure>
@@ -763,11 +766,11 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                 src="https://s3.ap-northeast-2.amazonaws.com/lcventures-image-cdn/images/home_main.jpg" 
                                 alt="Top_bg_big">
                             </figure>
-                        '''
+                    '''
 
                     order_obj += '''
                             </section>
-                        '''
+                    '''
                 # Order is form-group
                 elif order['type'] is 2:
                     # order['form_group']
@@ -787,6 +790,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                             break
 
                     if form_exist_flag is True:
+
                         order_obj += f'''
                             <section id="section_{order['sign']}" 
                                      style="margin-top: {order['position']['y'] / 10}%; 
@@ -796,7 +800,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                      z-index: {order['position']['z']};
                                      background-color: rgba({bg_color['r']},{bg_color['g']},{bg_color['b']},{opacity});
                                      color: #{tx_color};">
-                                <form onsubmit = "event.preventDefault(); form_submit({order['form_group']});">
+                                <form onsubmit = "event.preventDefault(); form_submit_{order['form_group']}();">
                                     <div class="form_wrap">
                         '''
                         for field in landing_field:
@@ -1164,6 +1168,15 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                             </div>
                                             '''
 
+                        form_submit += f'''
+                            var form_submit_{order['form_group']} = (function ()
+                        '''
+                        form_submit += '{'
+                        form_submit += '''
+                            console.log('temp');
+                        '''
+                        form_submit += '});'
+
                     order_obj += '''
                                     </div>
                                     <!-- /form_wrap -->
@@ -1281,6 +1294,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             if order_lowest is 0:
                 footer = '''
                         <footer style="margin-top: 0;">
+                            <p class="footer_content">
                     '''
             else:
                 footer = f'''
@@ -1317,6 +1331,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     footer += ' | '
 
             footer += '''
+                        </p>
                     </footer>
                 '''
         else:
@@ -1352,6 +1367,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                   padding: 0;
                   margin: 0;
                   font-size: 1.2em;
+                  overflow-x: hidden;
                 }
                 main {
                   position: absolute;
@@ -1694,15 +1710,8 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
               </style>
             '''
 
-        form_submit = '''
-                function form_submit(group) {
-                    console.log('test');
-                    console.log('form_group number is ', group);
-
-                    // if (document.getElementById('form_(group)_sign').value == '') {
-                    //     alert('(name)');
-                    // }
-                }
+        form_submit += '''
+                
             '''
 
         if date_flag is True:
