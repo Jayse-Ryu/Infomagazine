@@ -620,6 +620,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         date_picker_head = ''
         date_picker_body = ''
 
+        form_validate = ''
         form_submit = ''
 
         temp = {
@@ -790,6 +791,8 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                             break
 
                     if form_exist_flag is True:
+                        validate_form = ''
+                        submit_form = ''
 
                         order_obj += f'''
                             <section id="section_{order['sign']}" 
@@ -800,7 +803,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                      z-index: {order['position']['z']};
                                      background-color: rgba({bg_color['r']},{bg_color['g']},{bg_color['b']},{opacity});
                                      color: #{tx_color};">
-                                <form onsubmit = "event.preventDefault(); form_submit_{order['form_group']}();">
+                                <form onsubmit = "event.preventDefault(); form_validate_{order['form_group']}();">
                                     <div class="form_wrap">
                         '''
                         for field in landing_field:
@@ -828,6 +831,16 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                          maxlength="25">
                                                 </div>
                                             '''
+                                    validate_form += f'''
+                                    if (document.getElementById('form_{order['sign']}_{field['sign']}').value == '') {{
+                                        alert('{field['name']}의 값을 입력해주세요!');
+                                        document.getElementById('form_{order['sign']}_{field['sign']}').focus();
+                                        work_flag = false;
+                                    }}
+                                    '''
+                                    submit_form += f'''
+                                        
+                                    '''
                                 elif field['type'] is 2:
                                     # 2 num, same
                                     if field['label'] is True:
@@ -1168,12 +1181,70 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                             </div>
                                             '''
 
-                        form_submit += f'''
-                            var form_submit_{order['form_group']} = (function ()
+                        # ## Form check validate
+                        form_validate += f'''
+                            var form_validate_{order['form_group']} = (function () {{
                         '''
-                        form_submit += '{'
+                        form_validate += f'''
+                            console.log('validate');
+                            var work_flag = true;
+                            {validate_form}
+
+                            if (work_flag) {{
+                                form_submit_{order['form_group']}();
+                            }}
+                        '''
+                        form_validate += '});'
+
+                        # ## Form submit form
+                        form_submit += f'''
+                            var form_submit_{order['form_group']} = (function () {{
+                        '''
+                        form_submit += f'''
+                            console.log('submit');
+                            var result = {{}};
+                            {submit_form}
+                        '''
                         form_submit += '''
-                            console.log('temp');
+                        $.ajax({
+                            type: 'post',
+                            url: '',
+                            data: formData,
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data) {
+                                    $('<iframe id="db_script_iframe"/>').appendTo('body');
+                                    var $db_script_iframe = $('#db_script_iframe');
+                                    $db_script_iframe.contents().find('head').append(db_script_text);
+                                    alert('신청이 완료되었습니다.');
+                                    $("#usrname_top").val("");
+                                    $("#tel_top").val("");
+                                    $("#age_top").val("");
+                                    $("#weight_top").val("");
+                                    $("#ask_top").val("");
+                                    // $("[name=type_top]").prop("checked", false);
+        
+                                    // $("#ask_top").val("");
+                                    // $("#ans1_top").prop("checked", true);
+                                    // $("#ans1_top").prop("checked", false);
+                                } else {
+                                    alert("이미 신청하셨습니다.");
+                                    $("#usrname_top").val("");
+                                    $("#tel_top").val("");
+                                    $("#age_top").val("");
+                                    $("#weight_top").val("");
+                                    $("#ask_top").val("");
+                                    // $("[name=type_top]").prop("checked", false);
+        
+                                    // $("#ask_top").val("");
+                                    // $("#ans1_top").prop("checked", true);
+                                    // $("#ans1_top").prop("checked", false);
+                                }
+                            },
+                            error: function (data) {
+                                alert('일시적인 오류로 신청이 안 되었습니다.');
+                            }
+                        });
                         '''
                         form_submit += '});'
 
@@ -1716,10 +1787,10 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         if date_flag is True:
             date_picker_head += '''
-            <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+            <!--<script src="https://code.jquery.com/jquery-2.2.4.min.js"
                     integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
                     crossorigin="anonymous">
-            </script>
+            </script>-->
             <link href="http://assets.infomagazine.xyz/css/datepicker.min.css"rel="stylesheet">
             <script src="http://assets.infomagazine.xyz/js/datepicker.min.js"></script>
             <script src="http://assets.infomagazine.xyz/js/datepicker.ko-KR.js"></script>
@@ -1738,6 +1809,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     {is_mobile}
                     {header_script}
                   </script>
+                  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
                   {date_picker_head}
                   {style_sheet}
                 </head>
@@ -1757,6 +1829,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                         {hijack}
                         {body_script}
                         {term_script}
+                        {form_validate}
                         {form_submit}
                     </script>
                     {date_picker_body}
