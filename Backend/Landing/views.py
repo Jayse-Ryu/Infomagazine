@@ -1639,7 +1639,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     transform: translateY(-50%);
                     background: #ffffff;
                     border-radius: 8px;
-                    overflow: auto;
+                    overflow: hidden;
                 }
 
                 .term_header {
@@ -1673,7 +1673,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     padding: 20px;
                     box-sizing: border-box;
                     width: 100%;
-                    height: 100%;
+                    height: calc(100% - 50px);
                     font-size: 14px;
                     overflow: auto;
                 }
