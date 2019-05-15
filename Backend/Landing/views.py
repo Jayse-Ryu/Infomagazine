@@ -1224,15 +1224,12 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             term_script = '''
             // Show term element.
             document.getElementById('show_term').addEventListener('click', function() {
-                // $("#term_bg").css('visibility', 'visible');
                 document.getElementById('term_bg').style.visibility = 'visible';
             });
             document.getElementById('term_bg').addEventListener('click', function() {
-                // $("#term_bg").css('visibility', 'hidden');
                 document.getElementById('term_bg').style.visibility = 'hidden';
             });
             document.getElementById('term_close').addEventListener('click', function() {
-                // $("#term_bg").css('visibility', 'hidden');
                 document.getElementById('term_bg').style.visibility = 'hidden';
             });
             '''

@@ -12,9 +12,11 @@
       <router-view/>
     </transition>
 
-    <div v-if="loading" class="loading">
-      <div class="lds-hourglass"></div>
-    </div>
+    <transition name="loading">
+      <div v-if="loading" class="loading">
+        <div class="lds-hourglass"></div>
+      </div>
+    </transition>
 
   </div>
 </template>
@@ -751,8 +753,26 @@
     transition: none;
   }
 
-  .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
-  {
+  /* .fade-leave-active below version 2.1.8 */
+  .fade-enter, .fade-leave-to {
+    opacity: 0;
+    // transform: translateY(10px);
+    position: absolute;
+    width: 100%;
+    margin: auto;
+  }
+
+  // About transition name=fade
+  .loading-enter-active {
+    transition: all 200ms ease-out;
+  }
+
+  .loading-leave-active {
+    transition: all 150ms ease;
+  }
+
+  /* .fade-leave-active below version 2.1.8 */
+  .loading-enter, .loading-leave-to {
     opacity: 0;
     // transform: translateY(10px);
     position: absolute;
