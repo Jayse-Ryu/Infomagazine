@@ -579,14 +579,14 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
     #     for item in manager_serializer.data:
     #         return item['user_name']
 
-    # def get_company(self, *args):
-    #     company_queryset = Company.objects.all()
-    #     company_serializer_class = CompanySerializer
-    #
-    #     company_queryset = company_queryset.filter(id__exact=args[0])
-    #     company_serializer = company_serializer_class(company_queryset, many=True)
-    #     for item in company_serializer.data:
-    #         return item
+    def get_company(self, *args):
+        company_queryset = Company.objects.all()
+        company_serializer_class = CompanySerializer
+
+        company_queryset = company_queryset.filter(id__exact=args[0])
+        company_serializer = company_serializer_class(company_queryset, many=True)
+        for item in company_serializer.data:
+            return item
 
     # def bubble_sort(self, list):
     #     def swap(i, j):
@@ -616,11 +616,16 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         landing_order = landing['LandingInfo']['order']
         order_lowest = 0
 
+        date_flag = False
+        date_picker_head = ''
+        date_picker_body = ''
+
         temp = {
-            'manager': 4,
-            'manager_name': 'Manager2',
-            'company': 4,
-            'company_name': 'up2 customer',
+            # 'manager': 4,
+            # 'manager_name': 'Manager2',
+            # 'company': 4,
+            # 'company_name': 'up2 customer',
+
             # 'show_company': False,
             # 'name': 'mana2lan',
             # 'title': None,
@@ -630,17 +635,16 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             # 'header_script': None,
             # 'body_script': None,
 
-            'inner_db': True,
-
             # 'is_hijack': False,
             # 'hijack_url': None,
 
+            'inner_db': True,
             'is_banner': False,
             'banner_url': None,
             'banner_image': None,
 
-            'is_term': False,
-            'image_term': False,
+            # 'is_term': False,
+            # 'image_term': False,
 
             'collections': [],
             'collection_amount': 0,
@@ -655,8 +659,10 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         # ## Page Title
         if landing_info['title'] is not None:
             title = (landing_info['title'])
+        elif landing_info['name'] is not None:
+            title = landing_info['name']
         else:
-            title = '페이지'
+            title = ''
 
         # ## Landing activated
         if landing_info['is_active'] is True:
@@ -972,23 +978,54 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
                                 elif field['type'] is 6:
                                     # 6 date, ?
+                                    date_flag = True
+                                    date_picker_body += f'''
+                                        <script>
+                                            $('[data-toggle="datepicker_{field['sign']}"]').datepicker'''
+                                    date_picker_body += '''({
+                                                format: 'yyyy-mm-dd',
+                                                date: new Date(1992, 6, 23),
+                                                yearFirst: true,
+                                                language: 'ko-KR',
+                                                autoHide: true
+                                            });
+                                        </script>
+                                    '''
                                     if field['label'] is True:
-                                        order_obj += f'''
+                                        order_obj += f'''                                                
                                                 <div class="field_wrap box_with_label" style="width: 100%;">
                                                   <label class="field_label" for="form_{order['sign']}_{field['sign']}">
                                                       {field['name']}
                                                   </label>
-                                                  <input type="date" 
+                                                  <!--<input type="date" 
                                                          id="form_{order['sign']}_{field['sign']}" 
-                                                         placeholder="{field['holder']}">
+                                                         placeholder="{field['holder']}">-->
+                                                  
+                                                  <!-- id="first_user_birthday" -->
+                                                  
+                                                  <input type="text" 
+                                                      id="form_{order['sign']}_{field['sign']}" 
+                                                      class="type_text" 
+                                                      data-toggle="datepicker_{field['sign']}"
+                                                      placeholder="{field['holder']}" 
+                                                      readonly>
+
                                                 </div>
                                             '''
                                     else:
                                         order_obj += f'''
                                                 <div class="field_wrap box_without_label" style="width: 100%;">
-                                                  <input type="date" 
+                                                  <!--<input type="date" 
                                                          id="form_{order['sign']}_{field['sign']}" 
-                                                         placeholder="{field['holder']}">
+                                                         placeholder="{field['holder']}">-->
+
+                                                  <input type="text" 
+                                                      id="form_{order['sign']}_{field['sign']}" 
+                                                      class="type_text" 
+                                                      data-toggle="datepicker_{field['sign']}"
+                                                      placeholder="{field['holder']}" 
+                                                      readonly>
+
                                                 </div>
                                             '''
 
@@ -1437,6 +1474,19 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                   font-size: .875rem;
                   line-height: 1.5;
                 }
+                form .e-date-wrapper {
+                  position: relative;
+                  display: inline-block;
+                  height: calc(2.25rem + 2px);
+                  padding: .375rem .75rem;
+                  font-size: 1em;
+                  vertical-align: middle;
+                  line-height: 1.5;
+                  color: #495057;
+                  background-color: #fff;
+                  border: 1px solid #ced4da;
+                  border-radius: .25rem;
+                }
                 figure {
                   position: absolute;
                   width: 100%;
@@ -1631,7 +1681,16 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                 .term_content pre {
                     white-space: pre-line;
                 }
-
+                
+                .datepicker-panel > ul > li[data-view="month current"], 
+                .datepicker-panel > ul > li[data-view="year current"], 
+                .datepicker-panel > ul > li[data-view="years current"] {
+                    background-color: #efefef;
+                    box-sizing: border-box;
+                    border: 1px solid #000;
+                    border-radius: 10px;
+                }
+                
               </style>
             '''
 
@@ -1644,6 +1703,17 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     //     alert('(name)');
                     // }
                 }
+            '''
+
+        if date_flag is True:
+            date_picker_head += '''
+            <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+                    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+                    crossorigin="anonymous">
+            </script>
+            <link href="http://assets.infomagazine.xyz/css/datepicker.min.css"rel="stylesheet">
+            <script src="http://assets.infomagazine.xyz/js/datepicker.min.js"></script>
+            <script src="http://assets.infomagazine.xyz/js/datepicker.ko-KR.js"></script>
             '''
 
         # ## Render HTML file
@@ -1659,6 +1729,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     {is_mobile}
                     {header_script}
                   </script>
+                  {date_picker_head}
                   {style_sheet}
                 </head>
                 <body>
@@ -1679,6 +1750,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                         {term_script}
                         {form_submit}
                     </script>
+                    {date_picker_body}
                     <!-- /Body script -->
                 </body>
                 </html>
