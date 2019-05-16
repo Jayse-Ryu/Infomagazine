@@ -276,7 +276,7 @@ router.beforeEach((to, from, next) => {
       next()
     } else {
       if (from.name == null && to.name !== 'gateway') {
-        // When user randomly access to not public page, gateway page.
+        // When user randomly access to not public page and gateway page.
         work()
       } else {
         // If not but still don't have authentication

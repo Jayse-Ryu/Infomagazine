@@ -36,14 +36,28 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         dynamo_db = session.resource('dynamodb')
         table = dynamo_db.Table('Infomagazine')
 
-        dynamo_db_res = table.put_item(
-            Item={
-                "CompanyNum": req['CompanyNum'],
-                "LandingNum": req['LandingNum'],
-                "LandingInfo": req['LandingInfo'],
-                "UpdatedTime": req['UpdatedTime']
-            }
-        )
+        if req['Append'] is not None:
+            dynamo_db_res = table.update_item(
+                Key={
+                    "CompanyNum": req['CompanyNum'],
+                    "LandingNum": req['LandingNum']
+                },
+                UpdateExpression="ADD LandingInfo.landing.collections = :list",
+                ExpressionAttributeValues={
+                    ':list': req['Collection']
+                },
+                ReturnValues="UPDATED_Collection"
+            )
+
+        else:
+            dynamo_db_res = table.put_item(
+                Item={
+                    "CompanyNum": req['CompanyNum'],
+                    "LandingNum": req['LandingNum'],
+                    "LandingInfo": req['LandingInfo'],
+                    "UpdatedTime": req['UpdatedTime']
+                }
+            )
 
         if dynamo_db_res['ResponseMetadata']['HTTPStatusCode'] == 200:
             return Response(req, status=status.HTTP_200_OK)
@@ -620,8 +634,10 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
         date_picker_head = ''
         date_picker_body = ''
 
+        form_flag = False
         form_validate = ''
         form_submit = ''
+        form_gather = ''
 
         temp = {
             # 'manager': 4,
@@ -787,10 +803,11 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                             }
                             tx_color = form['tx_color'].lstrip('#')
                             opacity = int(form['opacity']) / 10
-                            form_collector = ''
                             break
 
                     if form_exist_flag is True:
+                        form_flag = True
+                        field_flag = False
                         validate_form = ''
                         submit_form = ''
 
@@ -808,6 +825,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                         '''
                         for field in landing_field:
                             if field['form_group_id'] is order['form_group']:
+                                field_flag = True
                                 if field['type'] is 1:
                                     # 1 text, name, holder, label(t,f)
                                     if field['label'] is True:
@@ -839,7 +857,8 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     }}
                                     '''
                                     submit_form += f'''
-                                        
+                                        console.log(document.getElementById('form_{order['sign']}_{field['sign']}').value);
+                                        collections['{field['name']}'] = document.getElementById('form_{order['sign']}_{field['sign']}').value
                                     '''
                                 elif field['type'] is 2:
                                     # 2 num, same
@@ -1182,71 +1201,38 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                             '''
 
                         # ## Form check validate
-                        form_validate += f'''
-                            var form_validate_{order['form_group']} = (function () {{
-                        '''
-                        form_validate += f'''
-                            console.log('validate');
-                            var work_flag = true;
-                            {validate_form}
+                        if field_flag is True:
+                            form_validate += f'''
+                                var form_validate_{order['form_group']} = (function () {{
+                            '''
+                            form_validate += f'''
+                                console.log('validate');
+                                var work_flag = true;
+                                {validate_form}
+    
+                                if (work_flag) {{
+                                    form_submit_{order['form_group']}();
+                                }}
+                            '''
+                            form_validate += '});'
 
-                            if (work_flag) {{
-                                form_submit_{order['form_group']}();
-                            }}
-                        '''
-                        form_validate += '});'
-
-                        # ## Form submit form
-                        form_submit += f'''
-                            var form_submit_{order['form_group']} = (function () {{
-                        '''
-                        form_submit += f'''
-                            console.log('submit');
-                            var result = {{}};
-                            {submit_form}
-                        '''
-                        form_submit += '''
-                        $.ajax({
-                            type: 'post',
-                            url: '',
-                            data: formData,
-                            dataType: 'json',
-                            success: function (data) {
-                                if (data) {
-                                    $('<iframe id="db_script_iframe"/>').appendTo('body');
-                                    var $db_script_iframe = $('#db_script_iframe');
-                                    $db_script_iframe.contents().find('head').append(db_script_text);
-                                    alert('신청이 완료되었습니다.');
-                                    $("#usrname_top").val("");
-                                    $("#tel_top").val("");
-                                    $("#age_top").val("");
-                                    $("#weight_top").val("");
-                                    $("#ask_top").val("");
-                                    // $("[name=type_top]").prop("checked", false);
-        
-                                    // $("#ask_top").val("");
-                                    // $("#ans1_top").prop("checked", true);
-                                    // $("#ans1_top").prop("checked", false);
-                                } else {
-                                    alert("이미 신청하셨습니다.");
-                                    $("#usrname_top").val("");
-                                    $("#tel_top").val("");
-                                    $("#age_top").val("");
-                                    $("#weight_top").val("");
-                                    $("#ask_top").val("");
-                                    // $("[name=type_top]").prop("checked", false);
-        
-                                    // $("#ask_top").val("");
-                                    // $("#ans1_top").prop("checked", true);
-                                    // $("#ans1_top").prop("checked", false);
-                                }
-                            },
-                            error: function (data) {
-                                alert('일시적인 오류로 신청이 안 되었습니다.');
-                            }
-                        });
-                        '''
-                        form_submit += '});'
+                            # ## Form submit form
+                            form_submit += f'''
+                                var form_submit_{order['form_group']} = (function () {{
+                            '''
+                            form_submit += f'''
+                                console.log('submit');
+                                var collections = {{}};
+                                {submit_form}
+                                if (Object.keys(collections).length === 0 && collections.constructor === Object) {{
+                                    console.log('obj has no length');
+                                    alert('collection is empty');
+                                }} else {{
+                                    console.log('obj has length');
+                                    form_gather(collections);
+                                }}
+                            '''
+                            form_submit += '});'
 
                     order_obj += '''
                                     </div>
@@ -1796,6 +1782,42 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             <script src="http://assets.infomagazine.xyz/js/datepicker.ko-KR.js"></script>
             '''
 
+        if form_flag is True:
+            form_gather += f'''
+                var form_gather = (function (collections) {{
+                    
+                    console.log('Form gather get result?', collections);
+                    
+                    var result = {{
+                        Append: 1,
+                        CompanyNum: 0,
+                        LandingNum: 0,
+                        Collection: [] 
+                    }};
+                    
+                    result['CompanyNum'] = ({company_num}).toString();
+                    result['LandingNum'] = ({landing_num}).toString();
+                    result['Collection'].push(collections);
+                    
+                    console.log('result obj is = ', result);
+                    
+                    $.ajax({{
+                        type: 'POST',
+                        url: '{config('STORE_BASE_URL')}landing/api/',
+                        data: result,
+                        // processData: false,
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (data) {{
+                            console.log(data);
+                        }},
+                        error: function (data) {{
+                            alert('신청 중 오류가 발생하였습니다.');
+                        }}
+                    }});
+                }});
+            '''
+
         # ## Render HTML file
         contents = f'''
                 <!DOCTYPE html>
@@ -1831,6 +1853,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                         {term_script}
                         {form_validate}
                         {form_submit}
+                        {form_gather}
                     </script>
                     {date_picker_body}
                     <!-- /Body script -->
