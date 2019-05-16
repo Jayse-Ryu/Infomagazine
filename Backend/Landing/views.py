@@ -864,7 +864,6 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     }}
                                     '''
                                     submit_form += f'''
-                                        console.log(document.getElementById('form_{order['sign']}_{field['sign']}').value);
                                         collections['{field['name']}'] = document.getElementById('form_{order['sign']}_{field['sign']}').value
                                     '''
                                 elif field['type'] is 2:
@@ -900,7 +899,6 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     }}
                                     '''
                                     submit_form += f'''
-                                        console.log(document.getElementById('form_{order['sign']}_{field['sign']}').value);
                                         collections['{field['name']}'] = document.getElementById('form_{order['sign']}_{field['sign']}').value
                                     '''
                                 elif field['type'] is 3:
@@ -946,7 +944,6 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     }}
                                     '''
                                     submit_form += f'''
-                                        console.log(document.getElementById('form_{order['sign']}_{field['sign']}').value);
                                         collections['{field['name']}'] = document.getElementById('form_{order['sign']}_{field['sign']}').value
                                     '''
                                 elif field['type'] is 4:
@@ -1158,7 +1155,6 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     }}
                                     '''
                                     submit_form += f'''
-                                        console.log(document.getElementById('form_{order['sign']}_{field['sign']}').value);
                                         collections['{field['name']}'] = document.getElementById('form_{order['sign']}_{field['sign']}').value
                                     '''
 
@@ -1313,7 +1309,6 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                 var form_validate_{order['form_group']} = (function () {{
                             '''
                             form_validate += f'''
-                                console.log('validate');
                                 var work_flag = true;
                                 {validate_form}
     
@@ -1328,14 +1323,11 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                 var form_submit_{order['form_group']} = (function () {{
                             '''
                             form_submit += f'''
-                                console.log('submit');
                                 var collections = {{}};
                                 {submit_form}
                                 if (Object.keys(collections).length === 0 && collections.constructor === Object) {{
-                                    console.log('obj has no length');
-                                    alert('collection is empty');
+                                    console.error('Submit object is empty!');
                                 }} else {{
-                                    console.log('obj has length');
                                     form_gather(collections);
                                 }}
                             '''
@@ -1889,8 +1881,6 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
             form_gather += f'''
                 var form_gather = (function (collections) {{
                     
-                    console.log('Form gather get result?', collections);
-                    
                     var result = {{
                         Append: 1,
                         CompanyNum: 0,
@@ -1912,10 +1902,10 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (data) {{
-                            console.log('data', data);
+                            console.log('ajax data', data);
                         }},
-                        error: function (data) {{
-                            console.log('result', result);
+                        error: function (error) {{
+                            console.log('ajax error', error);
                             alert('신청 중 오류가 발생하였습니다.');
                         }}
                     }});
