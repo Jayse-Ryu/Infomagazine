@@ -855,10 +855,12 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                 </div>
                                             '''
                                     validate_form += f'''
-                                    if (document.getElementById('form_{order['sign']}_{field['sign']}').value == '') {{
-                                        alert('{field['name']}의 값을 입력해주세요!');
-                                        document.getElementById('form_{order['sign']}_{field['sign']}').focus();
-                                        work_flag = false;
+                                    if (work_flag) {{
+                                        if (document.getElementById('form_{order['sign']}_{field['sign']}').value == '') {{
+                                            alert('{field['name']}의 값을 입력해주세요!');
+                                            document.getElementById('form_{order['sign']}_{field['sign']}').focus();
+                                            work_flag = false;
+                                        }}
                                     }}
                                     '''
                                     submit_form += f'''
@@ -889,10 +891,12 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                 </div>
                                             '''
                                     validate_form += f'''
-                                    if (document.getElementById('form_{order['sign']}_{field['sign']}').value == '') {{
-                                        alert('{field['name']}의 값을 입력해주세요!');
-                                        document.getElementById('form_{order['sign']}_{field['sign']}').focus();
-                                        work_flag = false;
+                                    if (work_flag) {{
+                                        if (document.getElementById('form_{order['sign']}_{field['sign']}').value == '') {{
+                                            alert('{field['name']}의 값을 입력해주세요!');
+                                            document.getElementById('form_{order['sign']}_{field['sign']}').focus();
+                                            work_flag = false;
+                                        }}
                                     }}
                                     '''
                                     submit_form += f'''
@@ -933,10 +937,12 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                             </div>
                                             '''
                                     validate_form += f'''
-                                    if (document.getElementById('form_{order['sign']}_{field['sign']}').value == '0') {{
-                                        alert('{field['name']}의 값을 선택해주세요!');
-                                        document.getElementById('form_{order['sign']}_{field['sign']}').focus();
-                                        work_flag = false;
+                                    if (work_flag) {{
+                                        if (document.getElementById('form_{order['sign']}_{field['sign']}').value == '0') {{
+                                            alert('{field['name']}의 값을 선택해주세요!');
+                                            document.getElementById('form_{order['sign']}_{field['sign']}').focus();
+                                            work_flag = false;
+                                        }}
                                     }}
                                     '''
                                     submit_form += f'''
@@ -971,7 +977,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                     else:
                                         order_obj += f'''
                                                 <div class="field_wrap list_without_label" style="width: 100%;">
-                                                  <div class="list_wrap">
+                                                  <div class="list_wrap" id="form_{order['sign']}_{field['sign']}">
                                             '''
                                         for index, list_item in enumerate(field['list']):
                                             order_obj += f'''
@@ -991,15 +997,33 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                 </div>
                                             '''
                                     validate_form += f'''
-                                    if ($('[name="radio_{field['sign']}"]').prop.is(':checked') == false) {{
-                                        alert('{field['name']}의 값을 선택해주세요!');
-                                        document.getElementByName('radio_{field['sign']}').focus();
-                                        work_flag = false;
+                                    if (work_flag) {{
+                                        var radio_validate_{field['sign']} = false;
+                                        var radios_{field['sign']} = document.getElementsByName('radio_{field['sign']}');
+                                        
+                                        for (var i_{field['sign']} = 0; i_{field['sign']} < radios_{field['sign']}.length; i_{field['sign']} ++) {{
+                                            if (radios_{field['sign']}[i_{field['sign']}].checked) {{
+                                                radio_validate_{field['sign']} = true;
+                                            }}
+                                        }}
+                                        
+                                        if (!radio_validate_{field['sign']}) {{
+                                            alert('{field['name']}의 값을 선택해주세요!');
+                                            document.getElementById('form_{order['sign']}_{field['sign']}_0').focus();
+                                            work_flag = false;
+                                        }}
                                     }}
                                     '''
                                     submit_form += f'''
-                                        console.log($('input[name="radio_{field['sign']}"]:checked').val());
-                                        collections['{field['name']}'] = $('input[name="radio_{field['sign']}"]:checked').val()
+                                        var radios_{field['sign']} = document.getElementsByName('radio_{field['sign']}');
+                                        
+                                        for (var i_{field['sign']} = 0; i_{field['sign']} < radios_{field['sign']}.length; i_{field['sign']}++) {{
+                                            if (radios_{field['sign']}[i_{field['sign']}].checked) {{
+                                                var radio_value_{field['sign']} = radios_{field['sign']}[i_{field['sign']}].value;
+                                            }}
+                                        }}
+
+                                        collections['{field['name']}'] = radio_value_{field['sign']};
                                     '''
 
                                 elif field['type'] is 5:
@@ -1008,7 +1032,7 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                         order_obj += f'''
                                                 <div class="field_wrap list_with_label" style="width: 100%;">
                                                   <label class="field_label">{field['name']}</label>
-                                                  <div class="list_wrap">
+                                                  <div class="list_wrap" id="form_{order['sign']}_{field['sign']}">
                                             '''
                                         for index, list_item in enumerate(field['list']):
                                             order_obj += f'''
@@ -1050,26 +1074,36 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                 </div>
                                             '''
                                     validate_form += f'''
-                                    if ($('[name="radio_{field['sign']}"]').prop.is(':checked') == false) {{
-                                        alert('{field['name']}의 값을 선택해주세요!');
-                                        document.getElementByName('radio_{field['sign']}').focus();
-                                        work_flag = false;
+                                    if (work_flag) {{
+                                        var check_validate_{field['sign']} = false;
+                                        var checks_{field['sign']} = document.getElementsByName('radio_{field['sign']}');
+                                        
+                                        for (var i_{field['sign']} = 0; i_{field['sign']} < checks_{field['sign']}.length; i_{field['sign']} ++) {{
+                                            if (checks_{field['sign']}[i_{field['sign']}].checked) {{
+                                                check_validate_{field['sign']} = true;
+                                            }}
+                                        }}
+                                        
+                                        if (!check_validate_{field['sign']}) {{
+                                            alert('{field['name']}의 값을 선택해주세요!');
+                                            document.getElementById('form_{order['sign']}_{field['sign']}_0').focus();
+                                            work_flag = false;
+                                        }}
                                     }}
                                     '''
 
                                     submit_form += f'''
-                                        check_list = [];
+                                        var check_list_{field['sign']} = [];
                                         
-                                        var checks = document.getElementsByName('radio_{field['sign']}');
+                                        var checks_{field['sign']} = document.getElementsByName('radio_{field['sign']}');
                                         
-                                        for (var i = 0, i < checks.length; i++) {{
-                                            if (checks[i].checked) {{
-                                                check_list.append(checks[i].value);
+                                        for (var i_{field['sign']} = 0; i_{field['sign']} < checks_{field['sign']}.length; i_{field['sign']}++) {{
+                                            if (checks_{field['sign']}[i_{field['sign']}].checked) {{
+                                                check_list_{field['sign']}.push(checks_{field['sign']}[i_{field['sign']}].value);
                                             }}
                                         }}
 
-                                        collections['{field['name']}'] = check_list;
-                                        
+                                        collections['{field['name']}'] = check_list_{field['sign']};
                                     '''
 
                                 elif field['type'] is 6:
@@ -1093,11 +1127,6 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                   <label class="field_label" for="form_{order['sign']}_{field['sign']}">
                                                       {field['name']}
                                                   </label>
-                                                  <!--<input type="date" 
-                                                         id="form_{order['sign']}_{field['sign']}" 
-                                                         placeholder="{field['holder']}">-->
-                                                  
-                                                  <!-- id="first_user_birthday" -->
                                                   
                                                   <input type="text" 
                                                       id="form_{order['sign']}_{field['sign']}" 
@@ -1105,15 +1134,11 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                       data-toggle="datepicker_{field['sign']}"
                                                       placeholder="{field['holder']}" 
                                                       readonly>
-
                                                 </div>
                                             '''
                                     else:
                                         order_obj += f'''
                                                 <div class="field_wrap box_without_label" style="width: 100%;">
-                                                  <!--<input type="date" 
-                                                         id="form_{order['sign']}_{field['sign']}" 
-                                                         placeholder="{field['holder']}">-->
 
                                                   <input type="text" 
                                                       id="form_{order['sign']}_{field['sign']}" 
@@ -1121,14 +1146,15 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                       data-toggle="datepicker_{field['sign']}"
                                                       placeholder="{field['holder']}" 
                                                       readonly>
-
                                                 </div>
                                             '''
                                     validate_form += f'''
-                                    if (document.getElementById('form_{order['sign']}_{field['sign']}').value == '') {{
-                                        alert('{field['name']}의 값을 입력해주세요!');
-                                        document.getElementById('form_{order['sign']}_{field['sign']}').focus();
-                                        work_flag = false;
+                                    if (work_flag) {{
+                                        if (document.getElementById('form_{order['sign']}_{field['sign']}').value == '') {{
+                                            alert('{field['name']}의 값을 입력해주세요!');
+                                            document.getElementById('form_{order['sign']}_{field['sign']}').focus();
+                                            work_flag = false;
+                                        }}
                                     }}
                                     '''
                                     submit_form += f'''
@@ -1272,10 +1298,12 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                             '''
 
                                     validate_form += f'''
-                                    if ($('#form_{field['sign']}').prop.is(':checked') == false) {{
-                                        alert('약관에 동의해주세요!');
-                                        document.getElementById('form_{field['sign']}').focus();
-                                        work_flag = false;
+                                    if (work_flag) {{
+                                        if (document.getElementById('form_{order['sign']}_{field['sign']}').checked == false) {{
+                                            alert('약관에 동의해주세요!');
+                                            document.getElementById('form_{order['sign']}_{field['sign']}').focus();
+                                            work_flag = false;
+                                        }}
                                     }}
                                     '''
 
@@ -1852,10 +1880,6 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
         if date_flag is True:
             date_picker_head += '''
-            <!--<script src="https://code.jquery.com/jquery-2.2.4.min.js"
-                    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-                    crossorigin="anonymous">
-            </script>-->
             <link href="http://assets.infomagazine.xyz/css/datepicker.min.css"rel="stylesheet">
             <script src="http://assets.infomagazine.xyz/js/datepicker.min.js"></script>
             <script src="http://assets.infomagazine.xyz/js/datepicker.ko-KR.js"></script>
