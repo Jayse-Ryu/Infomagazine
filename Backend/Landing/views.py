@@ -42,9 +42,14 @@ class LandingViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                     "CompanyNum": req['CompanyNum'],
                     "LandingNum": req['LandingNum']
                 },
-                UpdateExpression="ADD LandingInfo.landing.collections = :list",
+                UpdateExpression="SET list = list_append(:my_value)",
                 ExpressionAttributeValues={
-                    ':list': req['Collection']
+                    "LandingInfo": {
+                        "landing": {
+                            "collections": []
+                        }
+                    }
+                    # ":my_value": [{"S": "test"}], ":empty_list": []
                 },
                 ReturnValues="UPDATED_Collection"
             )
@@ -883,6 +888,17 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                          maxlength="25">
                                                 </div>
                                             '''
+                                    validate_form += f'''
+                                    if (document.getElementById('form_{order['sign']}_{field['sign']}').value == '') {{
+                                        alert('{field['name']}의 값을 입력해주세요!');
+                                        document.getElementById('form_{order['sign']}_{field['sign']}').focus();
+                                        work_flag = false;
+                                    }}
+                                    '''
+                                    submit_form += f'''
+                                        console.log(document.getElementById('form_{order['sign']}_{field['sign']}').value);
+                                        collections['{field['name']}'] = document.getElementById('form_{order['sign']}_{field['sign']}').value
+                                    '''
                                 elif field['type'] is 3:
                                     # 3 scr, list
                                     if field['label'] is True:
@@ -916,6 +932,17 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                 </select>
                                             </div>
                                             '''
+                                    validate_form += f'''
+                                    if (document.getElementById('form_{order['sign']}_{field['sign']}').value == '0') {{
+                                        alert('{field['name']}의 값을 선택해주세요!');
+                                        document.getElementById('form_{order['sign']}_{field['sign']}').focus();
+                                        work_flag = false;
+                                    }}
+                                    '''
+                                    submit_form += f'''
+                                        console.log(document.getElementById('form_{order['sign']}_{field['sign']}').value);
+                                        collections['{field['name']}'] = document.getElementById('form_{order['sign']}_{field['sign']}').value
+                                    '''
                                 elif field['type'] is 4:
                                     # 4 radio, list
                                     if field['label'] is True:
@@ -963,6 +990,17 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                   </div>
                                                 </div>
                                             '''
+                                    validate_form += f'''
+                                    if ($('[name="radio_{field['sign']}"]').prop.is(':checked') == false) {{
+                                        alert('{field['name']}의 값을 선택해주세요!');
+                                        document.getElementByName('radio_{field['sign']}').focus();
+                                        work_flag = false;
+                                    }}
+                                    '''
+                                    submit_form += f'''
+                                        console.log($('input[name="radio_{field['sign']}"]:checked').val());
+                                        collections['{field['name']}'] = $('input[name="radio_{field['sign']}"]:checked').val()
+                                    '''
 
                                 elif field['type'] is 5:
                                     # 5 chk, list
@@ -1011,6 +1049,28 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                                   </div>
                                                 </div>
                                             '''
+                                    validate_form += f'''
+                                    if ($('[name="radio_{field['sign']}"]').prop.is(':checked') == false) {{
+                                        alert('{field['name']}의 값을 선택해주세요!');
+                                        document.getElementByName('radio_{field['sign']}').focus();
+                                        work_flag = false;
+                                    }}
+                                    '''
+
+                                    submit_form += f'''
+                                        check_list = [];
+                                        
+                                        var checks = document.getElementsByName('radio_{field['sign']}');
+                                        
+                                        for (var i = 0, i < checks.length; i++) {{
+                                            if (checks[i].checked) {{
+                                                check_list.append(checks[i].value);
+                                            }}
+                                        }}
+
+                                        collections['{field['name']}'] = check_list;
+                                        
+                                    '''
 
                                 elif field['type'] is 6:
                                     # 6 date, ?
@@ -1064,6 +1124,17 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
 
                                                 </div>
                                             '''
+                                    validate_form += f'''
+                                    if (document.getElementById('form_{order['sign']}_{field['sign']}').value == '') {{
+                                        alert('{field['name']}의 값을 입력해주세요!');
+                                        document.getElementById('form_{order['sign']}_{field['sign']}').focus();
+                                        work_flag = false;
+                                    }}
+                                    '''
+                                    submit_form += f'''
+                                        console.log(document.getElementById('form_{order['sign']}_{field['sign']}').value);
+                                        collections['{field['name']}'] = document.getElementById('form_{order['sign']}_{field['sign']}').value
+                                    '''
 
                                 elif field['type'] is 7:
                                     # 7 link, url
@@ -1199,6 +1270,14 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                                               </div>
                                             </div>
                                             '''
+
+                                    validate_form += f'''
+                                    if ($('#form_{field['sign']}').prop.is(':checked') == false) {{
+                                        alert('약관에 동의해주세요!');
+                                        document.getElementById('form_{field['sign']}').focus();
+                                        work_flag = false;
+                                    }}
+                                    '''
 
                         # ## Form check validate
                         if field_flag is True:
@@ -1805,13 +1884,14 @@ class PreviewViewSet(ViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, 
                         type: 'POST',
                         url: '{config('STORE_BASE_URL')}landing/api/',
                         data: result,
-                        // processData: false,
+                        processData: false,
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (data) {{
-                            console.log(data);
+                            console.log('data', data);
                         }},
                         error: function (data) {{
+                            console.log('result', result);
                             alert('신청 중 오류가 발생하였습니다.');
                         }}
                     }});
