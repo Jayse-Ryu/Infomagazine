@@ -40,7 +40,8 @@
 
 <style lang="scss">
   /* Import Nanum square font here. */
-  /*@import url(https://cdn.rawgit.com/moonspam/NanumSquare/master/nanumsquare.css);*/
+  @import url(https://cdn.rawgit.com/moonspam/NanumSquare/master/nanumsquare.css);
+  @import url(https://fonts.googleapis.com/css?family=Nanum+Gothic&display=swap);
 
   /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
@@ -50,14 +51,14 @@
    *    user zoom.
    */
 
-  @font-face {
-    src: url('assets/common/fonts/Nanums_regular.ttf') format('ttf'),
-    url('assets/common/fonts/Nanums_regular.woff') format('woff'),
-    url('assets/common/fonts/Nanums_bold.ttf') format('ttf'),
-    url('assets/common/fonts/Nanums_bold.woff') format('woff'),
-    url('assets/common/fonts/Nanums_light.ttf') format('ttf'),
-    url('assets/common/fonts/Nanums_light.woff') format('woff');
-  }
+  /*@font-face {*/
+  /*  src: url('assets/common/fonts/Nanums_regular.ttf') format('ttf'),*/
+  /*  url('assets/common/fonts/Nanums_regular.woff') format('woff'),*/
+  /*  url('assets/common/fonts/Nanums_bold.ttf') format('ttf'),*/
+  /*  url('assets/common/fonts/Nanums_bold.woff') format('woff'),*/
+  /*  url('assets/common/fonts/Nanums_light.ttf') format('ttf'),*/
+  /*  url('assets/common/fonts/Nanums_light.woff') format('woff');*/
+  /*}*/
 
   html {
     font-family: Impact, 'Nanums_regular', 'Nanums_bold', 'Nanums_light', sans-serif; /* 1 */

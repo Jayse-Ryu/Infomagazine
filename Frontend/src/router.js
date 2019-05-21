@@ -1,66 +1,26 @@
-// Main imports
 import Vue from 'vue'
 import Router from 'vue-router'
-import Axios from 'axios'
-import Store from '@/main.js'
+import Store from './store'
 
-// 404 Page
-import A404 from '@/components/A404'
-
-// User Login SignUp
-import Signin from '@/components/Signin'
-import Signup from '@/components/Signup'
-
-// Browser Access filter page
-import Gateway from '@/components/Gateway'
-
-// About landing pages
-import LandingList from '@/components/LandingList'
-import LandingCreate from '@/components/LandingCreate'
-import LandingDetail from '@/components/LandingDetail'
-
-// About Organization for staff or superuser
-import Organization from '@/components/OrganizationList'
-import OrganizationDetail from '@/components/OrganizationDetail'
-
-// About Company for marketer
-import CompanyList from '@/components/CompanyList'
-import CompanyCreate from '@/components/CompanyCreate'
-import CompanyDetail from '@/components/CompanyDetail'
-
-// DBs in langings
-import DBDetail from '@/components/DBDetail'
-
-// Manage users for marketer
-import UserDetail from '@/components/UserDetail'
-import UserList from '@/components/UserList'
-
-// Update my information
-import MyInfo from '@/components/MyInfo'
-
-// Actual Landing page
-import Page from '@/components/Page'
-
-// use like this.$xx
 Vue.use(Router)
-Vue.use(Axios)
 
 const router = new Router({
+// export default new Router({
   routes: [
     {
       path: 'error',
       name: 'A404',
-      component: A404
+      component: () => import(/* webpackChunkName: "A404" */ './views/A404.vue')
     },
     {
       path: '/',
       name: 'sign_in',
-      component: Signin
+      component: () => import('./views/Signin.vue')
     },
     {
       path: '/signup',
       name: 'sign_up',
-      component: Signup,
+      component: () => import('./views/Signup.vue'),
       meta: {
         protect_leave: 'yes'
       }
@@ -68,7 +28,7 @@ const router = new Router({
     {
       path: '/gateway',
       name: 'gateway',
-      component: Gateway,
+      component: () => import('./views/Gateway.vue'),
       meta: {
         signed: true
       }
@@ -76,7 +36,7 @@ const router = new Router({
     {
       path: '/landing',
       name: 'landing_list',
-      component: LandingList,
+      component: () => import('./views/LandingList.vue'),
       meta: {
         signed: true,
         auth_grade: 'customer'
@@ -85,7 +45,7 @@ const router = new Router({
     {
       path: '/landing/create',
       name: 'landing_create',
-      component: LandingCreate,
+      component: () => import('./views/LandingCreate.vue'),
       meta: {
         signed: true,
         auth_grade: 'manager',
@@ -95,7 +55,7 @@ const router = new Router({
     {
       path: '/landing/detail/:landing_id',
       name: 'landing_detail',
-      component: LandingDetail,
+      component: () => import('./views/LandingDetail.vue'),
       meta: {
         signed: true,
         auth_grade: 'customer',
@@ -105,7 +65,7 @@ const router = new Router({
     {
       path: '/organization',
       name: 'organization_list',
-      component: Organization,
+      component: () => import('./views/OrganizationList.vue'),
       meta: {
         signed: true,
         auth_grade: 'manager'
@@ -114,7 +74,7 @@ const router = new Router({
     {
       path: '/organization/detail/:organization_id',
       name: 'organization_detail',
-      component: OrganizationDetail,
+      component: () => import('./views/OrganizationDetail.vue'),
       meta: {
         signed: true,
         auth_grade: 'manager',
@@ -124,7 +84,7 @@ const router = new Router({
     {
       path: '/company',
       name: 'company_list',
-      component: CompanyList,
+      component: () => import('./views/CompanyList.vue'),
       meta: {
         signed: true,
         auth_grade: 'customer'
@@ -133,7 +93,7 @@ const router = new Router({
     {
       path: '/company/create',
       name: 'company_create',
-      component: CompanyCreate,
+      component: () => import('./views/CompanyCreate.vue'),
       meta: {
         signed: true,
         auth_grade: 'manager',
@@ -143,7 +103,7 @@ const router = new Router({
     {
       path: '/company/detail/:company_id',
       name: 'company_detail',
-      component: CompanyDetail,
+      component: () => import('./views/CompanyDetail.vue'),
       meta: {
         signed: true,
         auth_grade: 'customer',
@@ -153,7 +113,7 @@ const router = new Router({
     {
       path: '/db/detail/:landing_id',
       name: 'db_detail',
-      component: DBDetail,
+      component: () => import('./views/DBDetail.vue'),
       meta: {
         signed: true,
         auth_grade: 'customer'
@@ -163,7 +123,7 @@ const router = new Router({
     {
       path: '/users',
       name: 'user_list',
-      component: UserList,
+      component: () => import('./views/UserList.vue'),
       meta: {
         signed: true,
         auth_grade: 'manager'
@@ -172,7 +132,7 @@ const router = new Router({
     {
       path: '/users/detail/:user_id',
       name: 'user_detail',
-      component: UserDetail,
+      component: () => import('./views/UserDetail.vue'),
       meta: {
         signed: true,
         auth_grade: 'manager'
@@ -181,7 +141,7 @@ const router = new Router({
     {
       path: '/myinfo',
       name: 'my_info',
-      component: MyInfo,
+      component: () => import('./views/MyInfo.vue'),
       meta: {
         signed: true,
         protect_leave: 'yes'
@@ -190,10 +150,11 @@ const router = new Router({
     {
       path: '/page/:base',
       name: 'page',
-      component: Page,
+      component: () => import('./views/Page.vue'),
       alias: '/page/:base/:url'
     }
   ],
+  base: process.env.BASE_URL,
   mode: 'history',
   // eslint-disable-next-line
   scrollBehavior() {
@@ -282,9 +243,9 @@ router.beforeEach((to, from, next) => {
         // If not but still don't have authentication
         if (Store.state.authUser.id == null) {
           Store.dispatch('inspectToken')
-            .then(() => {
-              work()
-            })
+              .then(() => {
+                work()
+              })
         } else {
           // Or user have authentication
           work()
