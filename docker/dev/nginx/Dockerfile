@@ -1,7 +1,7 @@
 FROM nginx:latest
 MAINTAINER skkim <ikks06luck@gmail.com>
 
-COPY ./Frontend /home/webapp
+COPY ./frontend /home/webapp
 COPY ./docker/dev /home/docker
 
 WORKDIR /home
