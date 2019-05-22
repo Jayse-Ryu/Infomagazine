@@ -15,6 +15,7 @@ django-cors-headers = "*"
 django-storages = "*"
 boto3 = "*"
 pymongo = "*"
+django-enumfield = "*"
 
 [requires]
 python_version = "3.7"
