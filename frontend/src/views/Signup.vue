@@ -13,6 +13,25 @@
         <form class="login_form form-horizontal" id="LoginForm" @submit.prevent="sign_up">
 
           <div class="form-group block">
+            <label for="email" class="col-sm-12 control-label">이메일*
+              <!--<div class="error_label" v-if="errors.has('email')">{{errors.first('email')}}</div>-->
+              <div class="error_label" v-if="errors.has('email')">이메일 형식을 확인해주세요!</div>
+            </label>
+            <div class="col-sm-12">
+              <input class="form-control"
+                     required
+                     v-model="email"
+                     type="email"
+                     placeholder="이메일을 입력하세요."
+                     autofocus="autofocus"
+                     maxlength="100"
+                     v-validate="'email'"
+                     name="email"
+                     id="email">
+            </div>
+          </div>
+
+          <!--<div class="form-group block">
             <label for="id_username" class="col-sm-12 control-label">아이디*
               <div class="error_label" v-if="errors.has('username')">{{errors.first('id_username')}}</div>
             </label>
@@ -29,13 +48,11 @@
                      id="id_username"
                      @keyup="check_duplicate">
             </div>
-          </div>
+          </div>-->
 
           <div class="form-group row col-md-12 password_form block">
             <div class="col-md-6 password_area">
-              <label for="id_password" class="control-label">비밀번호*
-                <div class="error_label" v-if="errors.has('password')">{{errors.first('id_password')}}</div>
-              </label>
+              <label for="id_password" class="control-label">비밀번호*</label>
               <div>
                 <input :class="matched_class"
                        required
@@ -51,9 +68,7 @@
             </div>
 
             <div class="col-md-6 password_area">
-              <label for="re_password" class="control-label">비밀번호 재입력*
-                <div class="error_label" v-if="errors.has('re_pass')">{{errors.first('re_password')}}</div>
-              </label>
+              <label for="re_password" class="control-label">비밀번호 재입력*</label>
               <div>
                 <input :class="matched_class"
                        required
@@ -71,12 +86,12 @@
 
           <div class="form-group block">
             <label for="full_name" class="col-sm-12 control-label">사용자 이름*
-              <div class="error_label" v-if="errors.has('full_name')">{{errors.first('full_name')}}</div>
+              <div class="error_label" v-if="errors.has('full_name')">이름을 확인해주세요. (30자 미만)</div>
             </label>
             <div class="col-sm-12">
               <input class="form-control"
                      required
-                     v-model="full_name"
+                     v-model="username"
                      type="text"
                      placeholder="이름을 입력하세요."
                      autofocus="autofocus"
@@ -87,41 +102,8 @@
           </div>
 
           <div class="form-group block">
-            <label for="email" class="col-sm-12 control-label">이메일*
-              <div class="error_label" v-if="errors.has('email')">{{errors.first('email')}}</div>
-            </label>
-            <div class="col-sm-12">
-              <input class="form-control"
-                     required
-                     v-model="email"
-                     type="email"
-                     placeholder="이메일을 입력하세요."
-                     autofocus="autofocus"
-                     maxlength="100"
-                     v-validate="'email'"
-                     name="email"
-                     id="email">
-            </div>
-          </div>
-
-          <!--
-                    <div class="form-group block">
-                      <label for="organization" class="col-sm-3 control-label">소속</label>
-                      <div class="col-sm-12">
-                        <input class="form-control"
-                               v-model="organization"
-                               type="text"
-                               placeholder="소속회사를 입력하세요."
-                               autofocus="autofocus"
-                               maxlength="50"
-                               id="organization">
-                      </div>
-                    </div>
-          -->
-
-          <div class="form-group block">
             <label for="phone" class="col-sm-12 control-label">전화번호
-              <div class="error_label" v-if="errors.has('phone')">{{errors.first('phone')}}</div>
+              <div class="error_label" v-if="error_label.phone">전화번호를 확인해주세요.</div>
             </label>
             <div class="col-sm-12">
               <input class="form-control"
@@ -132,33 +114,16 @@
                      maxlength="16"
                      v-validate="'numeric|max:16'"
                      name="phone"
-                     id="phone">
+                     id="phone"
+                     @keyup="error_check('phone')">
             </div>
           </div>
 
           <div class="form-group block">
-            <label for="access" class="col-sm-12 control-label">소속*</label>
-            <div class="col-sm-12 pt-2 pb-2" id="access">
-              <div class="form-check-inline">
-                <input type="radio" id="access_marketer" name="access" v-model="access" value="-1"
-                       class="form-check-input">
-                <label for="access_marketer" class="form-check-label">마케터</label>
-              </div>
-              <div class="form-check-inline">
-                <input type="radio" id="access_client" name="access" v-model="access" value="-2"
-                       class="form-check-input">
-                <label for="access_client" class="form-check-label">고객(클라이언트)</label>
-              </div>
-            </div>
+            <label for="select_org" class="col-sm-12 control-label">소속*</label>
             <div class="col-sm-12 pt-1">
-              <select v-if="access == -1" name="select_org" id="select_org" class="form-control" v-model="organization">
+              <select name="select_org" id="select_org" class="form-control" v-model="organization">
                 <option value="-1">조직을 선택하세요..</option>
-                <option value="-2">조직을 생성하겠습니다.</option>
-                <option v-for="item in select_options" :value="item.id">{{ item.name }}</option>
-              </select>
-              <select v-else-if="access == -2" name="select_company" id="select_company" class="form-control"
-                      v-model="company">
-                <option value="-1">업체를 선택하세요..</option>
                 <option v-for="item in select_options" :value="item.id">{{ item.name }}</option>
               </select>
             </div>
@@ -189,35 +154,52 @@
       account: '',
       password: '',
       re_pass: '',
-      full_name: '',
+      username: '',
       email: '',
       phone: '',
-      access: 0,
       organization: -1,
-      company: -1,
       select_options: [],
+      error_label: {
+        phone: false
+      }
     }),
     methods: {
-      check_duplicate() {
-        let axios = this.$axios
-        if(this.account == '') {
-          this.duplicated_class = 'form-control'
-          this.duplicated = false
-        } else {
-          axios.get(this.$store.state.endpoints.baseUrl + 'user/')
-            .then((response) => {
-              for (let i = 0; i < response.data.results.length; i++) {
-                if ((this.account).toLowerCase() == (response.data.results[i].account).toLowerCase()) {
-                  this.duplicated_class = 'form-control alert-danger'
-                  this.duplicated = true
-                  return false
-                }
-              }
-              this.duplicated_class = 'form-control alert-success'
-              this.duplicated = false
-            })
+      error_check(param) {
+        if (param === 'phone') {
+          if (this.phone !== '') {
+            let rgTel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
+            let strValue = this.phone
+            let test_flag = rgTel.test(strValue)
+            if (!test_flag) {
+              this.error_label.phone = true
+            } else {
+              this.error_label.phone = false
+            }
+          } else {
+            this.error_label.phone = false
+          }
         }
       },
+      // check_duplicate() {
+      //   let axios = this.$axios
+      //   if(this.account == '') {
+      //     this.duplicated_class = 'form-control'
+      //     this.duplicated = false
+      //   } else {
+      //     axios.get(this.$store.state.endpoints.baseUrl + 'user/')
+      //       .then((response) => {
+      //         for (let i = 0; i < response.data.results.length; i++) {
+      //           if ((this.account).toLowerCase() == (response.data.results[i].account).toLowerCase()) {
+      //             this.duplicated_class = 'form-control alert-danger'
+      //             this.duplicated = true
+      //             return false
+      //           }
+      //         }
+      //         this.duplicated_class = 'form-control alert-success'
+      //         this.duplicated = false
+      //       })
+      //   }
+      // },
       check_matched() {
         if (this.password == '' || this.re_pass == '') {
           this.matched = false
@@ -234,22 +216,26 @@
       },
       sign_up() {
         this.$validator.validateAll()
+
         if (this.matched != true) {
           alert('비밀번호를 확인해주세요.')
           document.getElementById('re_password').focus()
+        } else if (this.error_label.phone) {
+          alert('전화번호 형식을 확인해주세요.')
+          document.getElementById('phone').focus()
         } else if (this.duplicated == true) {
           alert('이미 존재하는 아이디입니다.')
           document.getElementById('id_username').focus()
-        } else if (this.access === 0 || this.organization === -1 && this.company === -1) {
+        } else if (this.organization === -1) {
           alert('소속을 확인해주세요.')
         } else {
           let axios = this.$axios
           ///////
           let formData = new FormData()
-          formData.append('account', this.account)
-          formData.append('password', this.password)
-          formData.append('full_name', this.full_name)
           formData.append('email', this.email)
+          // formData.append('account', this.account)
+          formData.append('password', this.password)
+          formData.append('full_name', this.username)
           formData.append('phone', this.phone)
           const baseURI = this.$store.state.endpoints.baseUrl
           const config = {
@@ -259,7 +245,7 @@
           }
 
           /* Do axios post */
-          axios.post(`${baseURI}user/`, formData, config)
+          axios.post(this.$store.state.endpoints.baseUrl + 'user/', formData, config)
             .then((response) => {
               let get_id = response.data.id
               let formData = new FormData()
@@ -295,40 +281,23 @@
       go_back() {
         // if (confirm('취소하시겠습니까?')) {
         this.$router.push({
-            name: 'sign_in',
-          })
+          name: 'sign_in',
+        })
         // }
       }
     },
-    watch: {
-      access() {
-        this.organization = -1
-        this.company = -1
-        if (this.access == -1) {
-          let axios = this.$axios
-          let this_url = 'organization/'
-          axios.get(this.$store.state.endpoints.baseUrl + this_url)
-            .then((response) => {
-              this.select_options = response.data.results
-            })
-            .catch((error) => {
-              console.log(error)
-            })
-        } else if (this.access == -2) {
-          let axios = this.$axios
-          let this_url = 'company/'
-          axios.get(this.$store.state.endpoints.baseUrl + this_url)
-            .then((response) => {
-              this.select_options = response.data.results
-            })
-            .catch((error) => {
-              console.log(error)
-            })
-        }
-      }
-    },
     mounted() {
+      let axios = this.$axios
       this.$parent.$data.header_flag = 0
+      let this_url = 'organization/'
+
+      axios.get(this.$store.state.endpoints.baseUrl + this_url)
+        .then((response) => {
+          this.select_options = response.data.results
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
     destroyed() {
       this.$parent.$data.header_flag = 1
@@ -356,7 +325,7 @@
     // min-height: 100vh;
     overflow: auto;
     background-color: rgba(255, 255, 255, 0.4);
-    padding: 10vh 30px 30px;
+    padding: 10vh 30px 55px;
     margin-bottom: 10vh;
     font-family: 'Nanum Gothic', 'sans-serif';
     // font-weight: bold;

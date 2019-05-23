@@ -5,9 +5,12 @@ module.exports = {
   },
   extends: [
     'plugin:vue/essential',
-    '@vue/airbnb',
+    '@vue/standard',
   ],
   rules: {
+    'space-before-function-paren': 'off',
+    'generator-star-spacing': 'off',
+    'indent': 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
   },
