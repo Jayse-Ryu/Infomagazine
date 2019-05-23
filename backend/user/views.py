@@ -2,21 +2,21 @@ from rest_framework import generics, permissions
 
 # Create your views here.
 from user.models import User
-from user.serializers import UserSerializer
+from user.serializers import UserSerializer, UserCreateSerializer
 
 
-class UserList(generics.ListAPIView):
-    """ View to list all users"""
-    queryset = User.objects.all().order_by('first_name')
-    serializer_class = UserSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-
-
-class UserCreate(generics.CreateAPIView):
-    """ View to create a new user. Only accepts POST requests """
+class UserListCreateAPIView(generics.ListCreateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (permissions.IsAdminUser, )
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return UserSerializer
+        return UserCreateSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
 
 
 class UserRetrieveUpdate(generics.RetrieveUpdateAPIView):
@@ -24,4 +24,4 @@ class UserRetrieveUpdate(generics.RetrieveUpdateAPIView):
     Accepts GET and PUT requests and the record id must be provided in the request """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated,)

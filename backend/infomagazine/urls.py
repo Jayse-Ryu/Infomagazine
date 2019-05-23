@@ -18,13 +18,14 @@ from django.urls import path, include
 from rest_framework_jwt.views import obtain_jwt_token
 
 api_patterns = ([
-                    path('admin/', admin.site.urls),
-                    path('auth/', obtain_jwt_token, name='auth'),
-                    path('user/', include('user.urls'), name='user'),
-                    path('organization/', include('organization.urls'), name='organization'),
-                    path('company/', include('company.urls'), name='company'),
-                ], 'api')
+    path('admin/', admin.site.urls),
+    path('auth/', obtain_jwt_token, name='auth'),
+    path('user/', include('user.urls', namespace='user'), name='user'),
+    path('organization/', include('organization.urls', namespace='organization'), name='organization'),
+    path('company/', include('company.urls', namespace='company'), name='company'),
+])
 
 urlpatterns = [
+
     path('api/', include(api_patterns))
 ]
