@@ -7,7 +7,9 @@ out
 gen
 .env
 
-Backend/settings.ini
+docker/dev/sharing
 
-Frontend/node_modules
-Frontend/dist
+backend/settings.ini
+
+frontend/node_modules
+frontend/dist

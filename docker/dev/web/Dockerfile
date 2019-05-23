@@ -1,7 +1,7 @@
 FROM python:3.7
 
-COPY ./backend/Pipfile /home
-COPY ./backend/Pipfile.lock /home
+COPY ./Pipfile /home
+COPY ./Pipfile.lock /home
 COPY ./docker/dev /home/docker
 
 WORKDIR /home

@@ -71,6 +71,8 @@ REST_FRAMEWORK = {
 }
 
 JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER':
+        'user.utils.jwt_response_payload_handler',
     'JWT_VERIFY': True,
     'JWT_VERIFY_EXPIRATION': True,
     'JWT_LEEWAY': 0,
