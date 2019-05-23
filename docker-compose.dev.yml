@@ -7,7 +7,8 @@ services:
       context: .
       dockerfile: ./docker/dev/nginx/Dockerfile
     volumes:
-      - ./Frontend:/home/webapp
+      - ./frontend:/home/webapp
+      - ./docker/dev/sharing/tmp:/tmp
 
   APIService:
     image: "infomagazine_api_service:dev_v${VERSION}"
@@ -17,4 +18,5 @@ services:
     ports:
       - '3032:3032'
     volumes:
-      - ./Backend:/home/api
+      - ./backend:/home/api
+      - ./docker/dev/sharing/tmp:/tmp
