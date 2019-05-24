@@ -5,6 +5,7 @@ from user.models import User
 from user.serializers import UserSerializer, UserCreateSerializer
 
 
+# https://gist.github.com/codephillip/03ff3831d0ada36663bed0cc7c4bba0b
 class UserListCreateAPIView(generics.ListCreateAPIView):
     queryset = User.objects.all()
 

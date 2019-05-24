@@ -16,9 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_jwt.views import obtain_jwt_token
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='Infomagzine API')
 
 api_patterns = ([
     path('admin/', admin.site.urls),
+    path('swagger/', schema_view),
     path('auth/', obtain_jwt_token, name='auth'),
     path('user/', include('user.urls', namespace='user'), name='user'),
     path('organization/', include('organization.urls', namespace='organization'), name='organization'),
@@ -26,6 +30,5 @@ api_patterns = ([
 ])
 
 urlpatterns = [
-
     path('api/', include(api_patterns))
 ]
