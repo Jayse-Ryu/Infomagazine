@@ -545,7 +545,7 @@
   }
 
   #app {
-    min-width: 320px;
+    min-width: 360px;
   }
 
   .main {

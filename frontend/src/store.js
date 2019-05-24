@@ -12,8 +12,8 @@ export default new Vuex.Store({
     isAuthenticated: false,
     jwt: localStorage.getItem('token'),
     endpoints: {
-      obtainJWT: 'http://localhost/api/api-token-auth/',
-      refreshJWT: 'http://localhost/api/api-token-refresh/',
+      obtainJWT: 'http://localhost/api/auth/',
+      refreshJWT: 'http://localhost/api/auth-refresh/',
       baseUrl: 'http://localhost/api/'
     },
     pageOptions: {
@@ -41,16 +41,10 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    setAuthUser (state, {
-      authUser,
-      isAuthenticated
-    }) {
+    setAuthUser (state, {authUser}) {
       Vue.set(state, 'authUser', authUser)
-      Vue.set(state, 'isAuthenticated', isAuthenticated)
     },
-    setAccess (state, {
-      userAccess
-    }) {
+    setAccess (state, {userAccess}) {
       Vue.set(state, 'userAccess', userAccess)
     },
     setToken (state, newToken) {
@@ -73,8 +67,11 @@ export default new Vuex.Store({
       }
       axios.post(this.state.endpoints.obtainJWT, payload)
           .then((response) => {
-            console.log('when get token, see response', response)
             this.commit('setToken', response.data.token)
+            this.commit('setAuthUser', {
+                authUser: response.data.user,
+                isAuthenticated: true
+              })
             return this.dispatch('inspectToken')
           })
           .then(() => {
@@ -149,34 +146,6 @@ export default new Vuex.Store({
                 console.log('refresh done.')
               })
         }*/
-        else {
-          // Get auth user
-          if (this.state.jwt != null) {
-            // If jwt object is really exist in local store
-            const token = this.state.jwt
-            const decoded = Decoder(token)
-            const user_id = decoded.user_id
-            axios.get(this.state.endpoints.baseUrl + 'user/' + user_id + '/')
-                .then((response) => {
-                  if (response.data) {
-                    let user_obj = response.data
-                    this.commit('setAuthUser', {
-                      authUser: user_obj,
-                      isAuthenticated: true
-                    })
-                  }
-                  // return axios.get(this.state.endpoints.baseUrl + 'user_access/' + user_id + '/')
-                })
-                // .then((response) => {
-                //   this.commit('setAccess', {
-                //     userAccess: response.data
-                //   })
-                // })
-                .catch((error) => {
-                  console.log('get Auth user failed..', error)
-                })
-          }
-        }
       } else {
         // If no token then send to login page
         this.commit('removeToken')

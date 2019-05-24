@@ -6,15 +6,21 @@
       <span>></span>
       <router-link to="/signup">회원가입</router-link>
     </div>
-    <!-- back to signin button input forms logo -->
+
+    <!-- Login container start -->
     <div class="login_box container">
       <div class="login_border">
+
+        <div class="logo_wrap">
+          <router-link to="/">
+            <div class="logo"><img src="../assets/logo3.png" alt="Logo"></div>
+          </router-link>
+        </div>
 
         <form class="login_form form-horizontal" id="LoginForm" @submit.prevent="sign_up">
 
           <div class="form-group block">
             <label for="email" class="col-sm-12 control-label">이메일*
-              <!--<div class="error_label" v-if="errors.has('email')">{{errors.first('email')}}</div>-->
               <div class="error_label" v-if="errors.has('email')">이메일 형식을 확인해주세요!</div>
             </label>
             <div class="col-sm-12">
@@ -27,28 +33,10 @@
                      maxlength="100"
                      v-validate="'email'"
                      name="email"
-                     id="email">
+                     id="email"
+                     @change="error_check('email')">
             </div>
           </div>
-
-          <!--<div class="form-group block">
-            <label for="id_username" class="col-sm-12 control-label">아이디*
-              <div class="error_label" v-if="errors.has('username')">{{errors.first('id_username')}}</div>
-            </label>
-            <div class="col-sm-12">
-              <input :class="duplicated_class"
-                     required
-                     v-model="account"
-                     type="text"
-                     placeholder="아이디를 입력하세요."
-                     autofocus="autofocus"
-                     maxlength="20"
-                     v-validate="'required'"
-                     name="id_username"
-                     id="id_username"
-                     @keyup="check_duplicate">
-            </div>
-          </div>-->
 
           <div class="form-group row col-md-12 password_form block">
             <div class="col-md-6 password_area">
@@ -63,7 +51,7 @@
                        v-validate="'required'"
                        name="id_password"
                        id="id_password"
-                       @keyup="check_matched">
+                       @keyup="error_check('password')">
               </div>
             </div>
 
@@ -79,14 +67,14 @@
                        v-validate="'required'"
                        name="re_password"
                        id="re_password"
-                       @keyup="check_matched">
+                       @keyup="error_check('password')">
               </div>
             </div>
           </div>
 
           <div class="form-group block">
-            <label for="full_name" class="col-sm-12 control-label">사용자 이름*
-              <div class="error_label" v-if="errors.has('full_name')">이름을 확인해주세요. (30자 미만)</div>
+            <label for="username" class="col-sm-12 control-label">사용자 이름*
+              <div class="error_label" v-if="errors.has('username')">이름을 확인해주세요. (30자 미만)</div>
             </label>
             <div class="col-sm-12">
               <input class="form-control"
@@ -96,8 +84,8 @@
                      placeholder="이름을 입력하세요."
                      autofocus="autofocus"
                      maxlength="30"
-                     name="full_name"
-                     id="full_name">
+                     name="username"
+                     id="username">
             </div>
           </div>
 
@@ -120,16 +108,6 @@
           </div>
 
           <div class="form-group block">
-            <label for="select_org" class="col-sm-12 control-label">소속*</label>
-            <div class="col-sm-12 pt-1">
-              <select name="select_org" id="select_org" class="form-control" v-model="organization">
-                <option value="-1">조직을 선택하세요..</option>
-                <option v-for="item in select_options" :value="item.id">{{ item.name }}</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group block">
             <div class="col-sm-offset-2 col click">
               <button type="submit" class="submit_btn btn btn-info col">회원가입</button>
               <button type="button" class="btn btn-dark col mt-2" @click="go_back">취소</button>
@@ -147,9 +125,7 @@
   export default {
     name: 'sign_up',
     data: () => ({
-      duplicated: false,
       duplicated_class: 'form-control',
-      matched: false,
       matched_class: 'form-control',
       account: '',
       password: '',
@@ -157,9 +133,10 @@
       username: '',
       email: '',
       phone: '',
-      organization: -1,
       select_options: [],
       error_label: {
+        email: false,
+        password: false,
         phone: false
       }
     }),
@@ -178,87 +155,80 @@
           } else {
             this.error_label.phone = false
           }
-        }
-      },
-      // check_duplicate() {
-      //   let axios = this.$axios
-      //   if(this.account == '') {
-      //     this.duplicated_class = 'form-control'
-      //     this.duplicated = false
-      //   } else {
-      //     axios.get(this.$store.state.endpoints.baseUrl + 'user/')
-      //       .then((response) => {
-      //         for (let i = 0; i < response.data.results.length; i++) {
-      //           if ((this.account).toLowerCase() == (response.data.results[i].account).toLowerCase()) {
-      //             this.duplicated_class = 'form-control alert-danger'
-      //             this.duplicated = true
-      //             return false
-      //           }
-      //         }
-      //         this.duplicated_class = 'form-control alert-success'
-      //         this.duplicated = false
-      //       })
-      //   }
-      // },
-      check_matched() {
-        if (this.password == '' || this.re_pass == '') {
-          this.matched = false
-          this.matched_class = 'form-control'
-        } else {
-          if (this.password === this.re_pass) {
-            this.matched = true
-            this.matched_class = 'form-control alert-success'
+        } else if (param === 'password') {
+          if (this.password == '' || this.re_pass == '') {
+            this.error_label.password = false
+            this.matched_class = 'form-control'
           } else {
-            this.matched = false
-            this.matched_class = 'form-control alert-danger'
+            if (this.password === this.re_pass) {
+              this.error_label.password = true
+              this.matched_class = 'form-control alert-success'
+            } else {
+              this.error_label.password = false
+              this.matched_class = 'form-control alert-danger'
+            }
           }
+        } else if (param === 'email') {
+          console.log('email duplication temporary disabled.')
+          // let axios = this.$axios
+          // if (this.email == '') {
+          //   this.duplicated_class = 'form-control'
+          //   this.error_label.email = false
+          // } else {
+          //   axios.get(this.$store.state.endpoints.baseUrl + 'user/')
+          //     .then((response) => {
+          //       for (let i = 0; i < response.data.results.length; i++) {
+          //         if ((this.email).toLowerCase() == (response.data.results[i].email).toLowerCase()) {
+          //           this.duplicated_class = 'form-control alert-danger'
+          //           this.error_label.email = true
+          //           return false
+          //         }
+          //       }
+          //       this.duplicated_class = 'form-control alert-success'
+          //       this.error_label.email = false
+          //     })
+          // }
         }
       },
       sign_up() {
+        // Auto validation first
         this.$validator.validateAll()
 
-        if (this.matched != true) {
+        // Custom validation
+        if (this.error_label.password != true) {
+          // Check password matched
           alert('비밀번호를 확인해주세요.')
           document.getElementById('re_password').focus()
         } else if (this.error_label.phone) {
+          // Check phone number validated
           alert('전화번호 형식을 확인해주세요.')
           document.getElementById('phone').focus()
-        } else if (this.duplicated == true) {
-          alert('이미 존재하는 아이디입니다.')
+        } else if (this.email == true) {
+          // Check duplicated email address
+          alert('이미 존재하는 이메일입니다.')
           document.getElementById('id_username').focus()
-        } else if (this.organization === -1) {
-          alert('소속을 확인해주세요.')
         } else {
+          // Else clear, create a new user.
           let axios = this.$axios
-          ///////
+
           let formData = new FormData()
           formData.append('email', this.email)
-          // formData.append('account', this.account)
           formData.append('password', this.password)
-          formData.append('full_name', this.username)
+          formData.append('username', this.username)
           formData.append('phone', this.phone)
-          const baseURI = this.$store.state.endpoints.baseUrl
+
+          // Axios config
           const config = {
             headers: {
               'Content-Type': 'application/json'
+            },
+            xhrFields: {
+              withCredentials: true
             }
           }
 
           /* Do axios post */
           axios.post(this.$store.state.endpoints.baseUrl + 'user/', formData, config)
-            .then((response) => {
-              let get_id = response.data.id
-              let formData = new FormData()
-              formData.append('user', response.data.id)
-              formData.append('access', this.access)
-              if (this.organization >= 0) {
-                formData.append('organization', this.organization)
-              }
-              if (this.company !== -1) {
-                formData.append('company', this.company)
-              }
-              return axios.patch(`${baseURI}user_access/` + get_id + '/', formData, config)
-            })
             .then(() => {
               alert('회원가입 되었습니다.')
               this.$router.currentRoute.meta.protect_leave = 'no'
@@ -271,33 +241,20 @@
               if (error.response.data.account) {
                 alert(error.response.data.account)
               } else {
-                alert('전송 중 문제가 발생하였습니다. 다시시도 해주세요.')
+                alert('회원가입 중 문제가 발생하였습니다. 다시시도 해주세요.')
               }
             })
-          ///////////////
-
+          /* /Axios post */
         }
       },
       go_back() {
-        // if (confirm('취소하시겠습니까?')) {
         this.$router.push({
           name: 'sign_in',
         })
-        // }
       }
     },
     mounted() {
-      let axios = this.$axios
       this.$parent.$data.header_flag = 0
-      let this_url = 'organization/'
-
-      axios.get(this.$store.state.endpoints.baseUrl + this_url)
-        .then((response) => {
-          this.select_options = response.data.results
-        })
-        .catch((error) => {
-          console.log(error)
-        })
     },
     destroyed() {
       this.$parent.$data.header_flag = 1
@@ -333,6 +290,20 @@
     box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.14);
   }
 
+  .logo_wrap {
+    width: 100%;
+
+    .logo {
+      width: 250px;
+      margin: 10px auto;
+      text-align: center;
+
+      img {
+        width: 100%;
+      }
+    }
+  }
+
   .password_form {
     padding-right: 0;
     margin-bottom: 0;
@@ -360,6 +331,10 @@
 
   .form-control, .btn-info {
     box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.14);
+  }
+
+  .text_navigation {
+    margin: 1% 0 8% 15px !important;
   }
 
 </style>

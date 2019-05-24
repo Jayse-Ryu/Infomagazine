@@ -274,9 +274,15 @@
               // Disengage from Organization
               let axios = this.$axios
               let this_url = 'user_access/'
+              const config = {
+                headers: {
+                  Authorization: `JWT ${this.$store.state.jwt}`,
+                  'Content-Type': 'application/json'
+                }
+              }
               let formData = new FormData()
               formData.append('organization', '')
-              axios.patch(this.$store.state.endpoints.baseUrl + this_url + this.user_obj.id + '/', formData)
+              axios.patch(this.$store.state.endpoints.baseUrl + this_url + this.user_obj.id + '/', formData, config)
                 .then((response) => {
                   return this.$store.dispatch('getAuthUser')
                 })
