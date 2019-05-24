@@ -127,7 +127,6 @@
     },
     data: () => ({
       content_obj: [],
-      access_obj: [],
       original_org: 0,
       password: '',
       re_password: '',
@@ -137,31 +136,20 @@
     mounted() {
       let axios = this.$axios
       let this_url = 'user/'
-      let decode = this.$jwt_decode
-      let decoder = decode(this.$store.state.jwt)
 
-      axios.get(this.$store.state.endpoints.baseUrl + this_url + decoder.user_id)
+      axios.get(this.$store.state.endpoints.baseUrl + this_url + this.user_obj.id + '/')
         .then((response) => {
-          // Set user data
           this.content_obj = response.data
-          // Get user access data
-          this_url = 'user_access/'
-          return axios.get(this.$store.state.endpoints.baseUrl + this_url + response.data.id + '/')
-        })
-        .then((response) => {
-          // Set access data
-          this.access_obj = response.data
-          // Get organization or company data
           let choice = 'ready/'
-          if (response.data.access === 1 || response.data.access === -1) {
+          if (this.access_obj.access === 1 || this.access_obj.access === -1) {
             choice = 'organization/'
-            if (response.data.organization) {
-              this.original_org = response.data.organization
+            if (this.access_obj.organization) {
+              this.original_org = this.access_obj.organization
             }
-          } else if (response.data.access === 2 || response.data.access === -2) {
+          } else if (this.access_obj.access === 2 || this.access_obj.access === -2) {
             choice = 'company/'
-            if (response.data.company) {
-              this.original_org = response.data.company
+            if (this.access_obj.company) {
+              this.original_org = this.access_obj.company
             }
           }
           return axios.get(this.$store.state.endpoints.baseUrl + choice)
@@ -194,38 +182,55 @@
       put() {
         // Are you sure?
         if (confirm('정보를 수정하시겠습니까?')) {
-          let decode = this.$jwt_decode
-          let decoder = decode(this.$store.state.jwt)
-          if (decoder.user_id) {
-            let axios = this.$axios
-            let this_url = 'user/'
-            axios.patch(this.$store.state.endpoints.baseUrl + this_url + decoder.user_id + '/', this.content_obj)
-              .then((response) => {
-                let formData = new FormData()
-                formData.append('access', this.access_obj.access)
-                if (this.access_obj.access === 1 || this.access_obj.access === -1) {
-                  if (this.access_obj.organization !== null && this.access_obj.organization > 0) {
-                    if (this.access_obj.organization === this.original_org) {
-                      formData.append('organization', this.access_obj.organization)
-                    } else {
-                      formData.append('access', '-1')
-                      formData.append('organization', this.access_obj.organization)
-                    }
-                  }
-                } else if (this.access_obj.access === 2 || this.access_obj.access === -2) {
-                  if (this.access_obj.company !== null && this.access_obj.company > 0) {
-                    if (this.access_obj.company === this.original_org) {
-                      formData.append('company', this.access_obj.company)
-                    } else {
-                      formData.append('access', '-2')
-                      formData.append('company', this.access_obj.company)
-                    }
+          let axios = this.$axios
+          let this_url = 'user/'
+          axios.patch(this.$store.state.endpoints.baseUrl + this_url + this.user_obj.id + '/', this.content_obj)
+            .then(() => {
+              let formData = new FormData()
+              formData.append('access', this.access_obj.access)
+              if (this.access_obj.access === 1 || this.access_obj.access === -1) {
+                if (this.access_obj.organization !== null && this.access_obj.organization > 0) {
+                  if (this.access_obj.organization === this.original_org) {
+                    formData.append('organization', this.access_obj.organization)
+                  } else {
+                    formData.append('access', '-1')
+                    formData.append('organization', this.access_obj.organization)
                   }
                 }
-                return axios.patch(this.$store.state.endpoints.baseUrl + 'user_access/' + decoder.user_id + '/', formData)
+              } else if (this.access_obj.access === 2 || this.access_obj.access === -2) {
+                if (this.access_obj.company !== null && this.access_obj.company > 0) {
+                  if (this.access_obj.company === this.original_org) {
+                    formData.append('company', this.access_obj.company)
+                  } else {
+                    formData.append('access', '-2')
+                    formData.append('company', this.access_obj.company)
+                  }
+                }
+              }
+              return axios.patch(this.$store.state.endpoints.baseUrl + 'user_access/' + this.user_obj.id + '/', formData)
+            })
+            .then(() => {
+              alert('수정되었습니다. 다시 로그인 하세요.')
+              this.$store.commit('removeToken')
+              this.$router.currentRoute.meta.protect_leave = 'no'
+              this.$router.push({
+                name: 'sign_in'
               })
-              .then((response) => {
-                alert('수정되었습니다. 다시 로그인 하세요.')
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+        }
+      },
+      bye() {
+        if (confirm('정말 탈퇴하시겠습니까?')) {
+          if (this.user_obj.id) {
+            let axios = this.$axios
+            let this_url = 'user/'
+            axios.delete(this.$store.state.endpoints.baseUrl + this_url + this.user_obj.id + '/')
+              .then(() => {
+                // Calculation for page_max
+                alert('탈퇴되었습니다.')
                 this.$store.commit('removeToken')
                 this.$router.currentRoute.meta.protect_leave = 'no'
                 this.$router.push({
@@ -237,44 +242,20 @@
               })
           }
         }
+      }
+    },
+    computed: {
+      user_obj() {
+        // Get user information
+        let user = this.$store.state.authUser
+        return user
       },
-      bye() {
-        if (confirm('정말 탈퇴하시겠습니까?')) {
-          let decode = this.$jwt_decode
-          let decoder = decode(this.$store.state.jwt)
-          if (decoder.user_id) {
-            let axios = this.$axios
-            let this_url = 'user/'
-            axios.delete(this.$store.state.endpoints.baseUrl + this_url + decoder.user_id + '/')
-              .then((response) => {
-                // Calculation for page_max
-                alert('탈퇴되었습니다.')
-                this.$store.commit('removeToken')
-                this.$router.push({
-                  name: 'sign_in'
-                })
-              })
-              .catch((error) => {
-                console.log(error)
-              })
-          }
-        }
+      access_obj() {
+        // Get access information the user
+        let access = this.$store.state.userAccess
+        return access
       }
-    },
-    update() {
-      if (this.$store.state.jwt !== null) {
-        this.$store.dispatch('getAuthUser')
-      }
-    },
-    // watch: {
-    //   access_obj(){
-    //     if (this.access_obj.access == 0) {
-    //       console.log('marketer')
-    //     } else if (this.access_obj.access == 1){
-    //       console.log('client')
-    //     }
-    //   }
-    // }
+    }
   }
 </script>
 

@@ -13,13 +13,13 @@
 
         <form class="login_form form-horizontal" id="LoginForm" @submit.prevent="login">
           <div class="form-group">
-            <label for="id_username" class="col-sm-12 control-label">아이디</label>
+            <label for="id_username" class="col-sm-12 control-label">이메일</label>
             <div class="col-sm-12">
               <input class="form-control"
                      required
-                     v-model="account"
+                     v-model="email"
                      type="text"
-                     placeholder="아이디를 입력해주세요."
+                     placeholder="이메일을 입력해주세요."
                      autofocus="autofocus"
                      maxlength="150"
                      id="id_username">
@@ -57,16 +57,16 @@
       </div>
     </div>
 
-
   </div>
 </template>
 
 <script>
+  import Decoder from 'jwt-decode'
   export default {
     name: 'sign_in',
     data: () => ({
-      account: '',
-      password: '',
+      email: '',
+      password: ''
     }),
     mounted() {
       this.$parent.$data.header_flag = 0
@@ -77,18 +77,29 @@
     },
     methods: {
       login() {
-        let axios = this.$axios
-        let decode = this.$jwt_decode
         const payload = {
-          account: this.account,
+          email: this.email,
           password: this.password
         }
-        this.$store.dispatch('obtainToken', payload)
-          .then(() => {
-            this.password = ''
+        axios.post(this.$store.state.endpoints.obtainJWT, payload)
+          .then((response) => {
+            this.$store.dispatch('obtainToken', response.data)
+
+            try {
+              this.$cookie.set('token', response.data.token, {expires: '1D'})
+              this.$cookie.set('authUser', JSON.stringify(response.data.user), {expires: '1D'})
+            } catch (error) {
+              console.log('set cookie error', error)
+            }
+
+            // const decoded = Decoder(response.data.token)
+            // console.log(decoded)
+
+            this.$router.push({name: 'gateway'})
           })
           .catch(() => {
-            this.password = ''
+            // Check the account or password
+            alert('아이디와 비밀번호를 확인해주세요.')
           })
       }
     }
@@ -169,7 +180,7 @@
 
     .warn_content {
       max-width: 630px;
-      margin:0 auto 40px;
+      margin: 0 auto 40px;
       text-align: left;
 
       ol {

@@ -4,6 +4,7 @@ import App from './App.vue'
 import store from './store'
 import router from './router'
 import './plugins/axios'
+import './plugins/vue-cookie'
 
 // Custom plugins
 import Header from './Header'

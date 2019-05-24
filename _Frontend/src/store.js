@@ -8,7 +8,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     authUser: {},
-    userAccess: {},
+    // userAccess: {},
     isAuthenticated: false,
     jwt: localStorage.getItem('token'),
     endpoints: {
@@ -48,11 +48,11 @@ export default new Vuex.Store({
       Vue.set(state, 'authUser', authUser)
       Vue.set(state, 'isAuthenticated', isAuthenticated)
     },
-    setAccess (state, {
-      userAccess
-    }) {
-      Vue.set(state, 'userAccess', userAccess)
-    },
+    // setAccess (state, {
+    //   userAccess
+    // }) {
+    //   Vue.set(state, 'userAccess', userAccess)
+    // },
     updateToken (state, newToken) {
       localStorage.setItem('token', newToken)
       state.jwt = newToken
@@ -61,7 +61,7 @@ export default new Vuex.Store({
       localStorage.removeItem('token')
       state.jwt = null
       state.authUser = {}
-      state.userAccess = {}
+      // state.userAccess = {}
       state.isAuthenticated = false
     }
   },
@@ -84,44 +84,44 @@ export default new Vuex.Store({
             alert('아이디와 비밀번호를 확인해주세요.')
           })
     },
-    refreshToken () {
-      const payload = {
-        token: this.state.jwt
-      }
-      axios.post(this.state.endpoints.refreshJWT, payload)
-          .then((response) => {
-            this.commit('updateToken', response.data.token)
-            // Get auth user
-            if (this.state.jwt != null) {
-              // If jwt object is really exist in local store
-              const token = this.state.jwt
-              const decoded = Decoder(token)
-              const user_id = decoded.user_id
-              axios.get(this.state.endpoints.baseUrl + 'user/' + user_id + '/')
-                  .then((response) => {
-                    if (response.data) {
-                      let user_obj = response.data
-                      this.commit('setAuthUser', {
-                        authUser: user_obj,
-                        isAuthenticated: true
-                      })
-                    }
-                    return axios.get(this.state.endpoints.baseUrl + 'user_access/' + user_id + '/')
-                  })
-                  .then((response) => {
-                    this.commit('setAccess', {
-                      userAccess: response.data
-                    })
-                  })
-                  .catch((error) => {
-                    console.log('get Auth user failed..', error)
-                  })
-            }
-          })
-          .catch((error) => {
-            console.log('Refresh error..', error)
-          })
-    },
+    // refreshToken () {
+    //   const payload = {
+    //     token: this.state.jwt
+    //   }
+    //   axios.post(this.state.endpoints.refreshJWT, payload)
+    //       .then((response) => {
+    //         this.commit('updateToken', response.data.token)
+    //         // Get auth user
+    //         if (this.state.jwt != null) {
+    //           // If jwt object is really exist in local store
+    //           const token = this.state.jwt
+    //           const decoded = Decoder(token)
+    //           const user_id = decoded.user_id
+    //           axios.get(this.state.endpoints.baseUrl + 'user/' + user_id + '/')
+    //               .then((response) => {
+    //                 if (response.data) {
+    //                   let user_obj = response.data
+    //                   this.commit('setAuthUser', {
+    //                     authUser: user_obj,
+    //                     isAuthenticated: true
+    //                   })
+    //                 }
+    //                 return axios.get(this.state.endpoints.baseUrl + 'user_access/' + user_id + '/')
+    //               })
+    //               .then((response) => {
+    //                 this.commit('setAccess', {
+    //                   userAccess: response.data
+    //                 })
+    //               })
+    //               .catch((error) => {
+    //                 console.log('get Auth user failed..', error)
+    //               })
+    //         }
+    //       })
+    //       .catch((error) => {
+    //         console.log('Refresh error..', error)
+    //       })
+    // },
     inspectToken () {
       const token = this.state.jwt
       if (token) {
@@ -137,13 +137,13 @@ export default new Vuex.Store({
           router.currentRoute.meta.forced = 'yes'
           router.push('/')
           return 'remove token'
-        } else if ((Date.now() / 1000) > exp - thirty_minutes && (Date.now() / 1000) < orig_iat + a_day) {
+        } /*else if ((Date.now() / 1000) > exp - thirty_minutes && (Date.now() / 1000) < orig_iat + a_day) {
           // If token expire in less than 30 minutes but still in refresh period then refresh
           this.dispatch('refreshToken')
               .then(() => {
                 console.log('refresh done.')
               })
-        } else {
+        }*/ else {
           // Get auth user
           if (this.state.jwt != null) {
             // If jwt object is really exist in local store
@@ -159,13 +159,13 @@ export default new Vuex.Store({
                       isAuthenticated: true
                     })
                   }
-                  return axios.get(this.state.endpoints.baseUrl + 'user_access/' + user_id + '/')
+                  // return axios.get(this.state.endpoints.baseUrl + 'user_access/' + user_id + '/')
                 })
-                .then((response) => {
-                  this.commit('setAccess', {
-                    userAccess: response.data
-                  })
-                })
+                // .then((response) => {
+                //   this.commit('setAccess', {
+                //     userAccess: response.data
+                //   })
+                // })
                 .catch((error) => {
                   console.log('get Auth user failed..', error)
                 })

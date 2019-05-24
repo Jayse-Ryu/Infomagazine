@@ -1,19 +1,22 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import router from "./router"
+import router from './router'
 import Decoder from 'jwt-decode'
+import VueCookie from 'vue-cookie'
 
 Vue.use(Vuex)
+Vue.use(VueCookie)
 
 export default new Vuex.Store({
   state: {
-    authUser: {},
-    userAccess: {},
+    // authUser: localStorage.getItem('authUser'),
+    authUser: Vue.cookie.get('authUser'),
     isAuthenticated: false,
-    jwt: localStorage.getItem('token'),
+    // jwt: localStorage.getItem('token'),
+    jwt: Vue.cookie.get('token'),
     endpoints: {
-      obtainJWT: 'http://localhost/api/api-token-auth/',
-      refreshJWT: 'http://localhost/api/api-token-refresh/',
+      obtainJWT: 'http://localhost/api/auth/',
+      refreshJWT: 'http://localhost/api/auth-refresh/',
       baseUrl: 'http://localhost/api/'
     },
     pageOptions: {
@@ -41,143 +44,74 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    setAuthUser (state, {
-      authUser,
-      isAuthenticated
-    }) {
+    setAuthUser(state, {authUser}) {
       Vue.set(state, 'authUser', authUser)
-      Vue.set(state, 'isAuthenticated', isAuthenticated)
+      // localStorage.setItem('authUser', JSON.stringify(authUser))
     },
-    setAccess (state, {
-      userAccess
-    }) {
-      Vue.set(state, 'userAccess', userAccess)
-    },
-    updateToken (state, newToken) {
-      localStorage.setItem('token', newToken)
+    setToken(state, newToken) {
+      // localStorage.setItem('token', newToken)
       state.jwt = newToken
     },
-    removeToken (state) {
+    removeToken(state) {
       localStorage.removeItem('token')
       state.jwt = null
       state.authUser = {}
-      state.userAccess = {}
       state.isAuthenticated = false
     }
   },
   actions: {
-    obtainToken (self, pay) {
-      const payload = {
-        account: pay.account,
-        password: pay.password
-      }
-      axios.post(this.state.endpoints.obtainJWT, payload)
-          .then((response) => {
-            this.commit('updateToken', response.data.token)
-            return this.dispatch('inspectToken')
-          })
-          .then(() => {
-            router.push('/gateway')
-          })
-          .catch(() => {
-            // Check the account or password
-            alert('아이디와 비밀번호를 확인해주세요.')
-          })
+    obtainToken(self, data) {
+      console.log('obtain token action')
+      this.commit('setToken', data.token)
+      this.commit('setAuthUser', {
+        authUser: data.user,
+        isAuthenticated: true
+      })
     },
-    refreshToken () {
-      const payload = {
-        token: this.state.jwt
-      }
-      axios.post(this.state.endpoints.refreshJWT, payload)
-          .then((response) => {
-            this.commit('updateToken', response.data.token)
-            // Get auth user
-            if (this.state.jwt != null) {
-              // If jwt object is really exist in local store
-              const token = this.state.jwt
-              const decoded = Decoder(token)
-              const user_id = decoded.user_id
-              axios.get(this.state.endpoints.baseUrl + 'user/' + user_id + '/')
-                  .then((response) => {
-                    if (response.data) {
-                      let user_obj = response.data
-                      this.commit('setAuthUser', {
-                        authUser: user_obj,
-                        isAuthenticated: true
-                      })
-                    }
-                    return axios.get(this.state.endpoints.baseUrl + 'user_access/' + user_id + '/')
-                  })
-                  .then((response) => {
-                    this.commit('setAccess', {
-                      userAccess: response.data
-                    })
-                  })
-                  .catch((error) => {
-                    console.log('get Auth user failed..', error)
-                  })
-            }
-          })
-          .catch((error) => {
-            console.log('Refresh error..', error)
-          })
-    },
-    inspectToken () {
+    // refreshToken () {
+    //   const payload = {
+    //     token: this.state.jwt
+    //   }
+    //   axios.post(this.state.endpoints.refreshJWT, payload)
+    //       .then((response) => {
+    //         this.commit('setToken', response.data.token)
+    //         // Get auth user
+    //         if (this.state.jwt != null) {
+    //           // If jwt object is really exist in local store
+    //           const token = this.state.jwt
+    //           const decoded = Decoder(token)
+    //           const user_id = decoded.user_id
+    //           axios.get(this.state.endpoints.baseUrl + 'user/' + user_id + '/')
+    //               .then((response) => {
+    //                 if (response.data) {
+    //                   let user_obj = response.data
+    //                   this.commit('setAuthUser', {
+    //                     authUser: user_obj,
+    //                     isAuthenticated: true
+    //                   })
+    //                 }
+    //               })
+    //               .catch((error) => {
+    //                 console.log('get Auth user failed..', error)
+    //               })
+    //         }
+    //       })
+    //       .catch((error) => {
+    //         console.log('Refresh error..', error)
+    //       })
+    // },
+    inspectToken() {
+      console.log('InspectToken action')
       const token = this.state.jwt
-      if (token) {
-        const decoded = Decoder(token)
-        const exp = decoded.exp
-        const orig_iat = decoded.orig_iat
-        const a_day = 86400 // 7*24*60*60
-        const thirty_minutes = 1800 // 30*60
-        if ((Date.now() / 1000) > exp) {
-          // If token expired then send to login page
-          this.commit('removeToken')
-          alert('로그인 시간이 만료되었습니다.')
-          router.currentRoute.meta.forced = 'yes'
-          router.push('/')
-          return 'remove token'
-        } else if ((Date.now() / 1000) > exp - thirty_minutes && (Date.now() / 1000) < orig_iat + a_day) {
-          // If token expire in less than 30 minutes but still in refresh period then refresh
-          this.dispatch('refreshToken')
-              .then(() => {
-                console.log('refresh done.')
-              })
-        } else {
-          // Get auth user
-          if (this.state.jwt != null) {
-            // If jwt object is really exist in local store
-            const token = this.state.jwt
-            const decoded = Decoder(token)
-            const user_id = decoded.user_id
-            axios.get(this.state.endpoints.baseUrl + 'user/' + user_id + '/')
-                .then((response) => {
-                  if (response.data) {
-                    let user_obj = response.data
-                    this.commit('setAuthUser', {
-                      authUser: user_obj,
-                      isAuthenticated: true
-                    })
-                  }
-                  return axios.get(this.state.endpoints.baseUrl + 'user_access/' + user_id + '/')
-                })
-                .then((response) => {
-                  this.commit('setAccess', {
-                    userAccess: response.data
-                  })
-                })
-                .catch((error) => {
-                  console.log('get Auth user failed..', error)
-                })
-          }
-        }
+      const authUser = this.state.authUser
+      if (token && authUser) {
+        router.push('/landing_list')
       } else {
         // If no token then send to login page
         this.commit('removeToken')
         alert('로그인 후 이용 가능합니다.')
         router.currentRoute.meta.forced = 'yes'
         router.push('/')
-        return 'remove token'
       }
     }
   }

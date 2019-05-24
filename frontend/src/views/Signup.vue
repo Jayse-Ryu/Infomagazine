@@ -6,89 +6,22 @@
       <span>></span>
       <router-link to="/signup">회원가입</router-link>
     </div>
-    <!-- back to signin button input forms logo -->
+
+    <!-- Login container start -->
     <div class="login_box container">
       <div class="login_border">
+
+        <div class="logo_wrap">
+          <router-link to="/">
+            <div class="logo"><img src="../assets/logo3.png" alt="Logo"></div>
+          </router-link>
+        </div>
 
         <form class="login_form form-horizontal" id="LoginForm" @submit.prevent="sign_up">
 
           <div class="form-group block">
-            <label for="id_username" class="col-sm-12 control-label">아이디*
-              <div class="error_label" v-if="errors.has('username')">{{errors.first('id_username')}}</div>
-            </label>
-            <div class="col-sm-12">
-              <input :class="duplicated_class"
-                     required
-                     v-model="account"
-                     type="text"
-                     placeholder="아이디를 입력하세요."
-                     autofocus="autofocus"
-                     maxlength="20"
-                     v-validate="'required'"
-                     name="id_username"
-                     id="id_username"
-                     @keyup="check_duplicate">
-            </div>
-          </div>
-
-          <div class="form-group row col-md-12 password_form block">
-            <div class="col-md-6 password_area">
-              <label for="id_password" class="control-label">비밀번호*
-                <div class="error_label" v-if="errors.has('password')">{{errors.first('id_password')}}</div>
-              </label>
-              <div>
-                <input :class="matched_class"
-                       required
-                       v-model="password"
-                       type="password"
-                       placeholder="비밀번호를 입력하세요."
-                       maxlength="20"
-                       v-validate="'required'"
-                       name="id_password"
-                       id="id_password"
-                       @keyup="check_matched">
-              </div>
-            </div>
-
-            <div class="col-md-6 password_area">
-              <label for="re_password" class="control-label">비밀번호 재입력*
-                <div class="error_label" v-if="errors.has('re_pass')">{{errors.first('re_password')}}</div>
-              </label>
-              <div>
-                <input :class="matched_class"
-                       required
-                       v-model="re_pass"
-                       type="password"
-                       placeholder="비밀번호를 재입력 하세요."
-                       maxlength="20"
-                       v-validate="'required'"
-                       name="re_password"
-                       id="re_password"
-                       @keyup="check_matched">
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group block">
-            <label for="full_name" class="col-sm-12 control-label">사용자 이름*
-              <div class="error_label" v-if="errors.has('full_name')">{{errors.first('full_name')}}</div>
-            </label>
-            <div class="col-sm-12">
-              <input class="form-control"
-                     required
-                     v-model="full_name"
-                     type="text"
-                     placeholder="이름을 입력하세요."
-                     autofocus="autofocus"
-                     maxlength="30"
-                     name="full_name"
-                     id="full_name">
-            </div>
-          </div>
-
-          <div class="form-group block">
             <label for="email" class="col-sm-12 control-label">이메일*
-              <div class="error_label" v-if="errors.has('email')">{{errors.first('email')}}</div>
+              <div class="error_label" v-if="errors.has('email')">이메일 형식을 확인해주세요!</div>
             </label>
             <div class="col-sm-12">
               <input class="form-control"
@@ -100,28 +33,65 @@
                      maxlength="100"
                      v-validate="'email'"
                      name="email"
-                     id="email">
+                     id="email"
+                     @change="error_check('email')">
             </div>
           </div>
 
-          <!--
-                    <div class="form-group block">
-                      <label for="organization" class="col-sm-3 control-label">소속</label>
-                      <div class="col-sm-12">
-                        <input class="form-control"
-                               v-model="organization"
-                               type="text"
-                               placeholder="소속회사를 입력하세요."
-                               autofocus="autofocus"
-                               maxlength="50"
-                               id="organization">
-                      </div>
-                    </div>
-          -->
+          <div class="form-group row col-md-12 password_form block">
+            <div class="col-md-6 password_area">
+              <label for="id_password" class="control-label">비밀번호*</label>
+              <div>
+                <input :class="matched_class"
+                       required
+                       v-model="password"
+                       type="password"
+                       placeholder="비밀번호를 입력하세요."
+                       maxlength="20"
+                       v-validate="'required'"
+                       name="id_password"
+                       id="id_password"
+                       @keyup="error_check('password')">
+              </div>
+            </div>
+
+            <div class="col-md-6 password_area">
+              <label for="re_password" class="control-label">비밀번호 재입력*</label>
+              <div>
+                <input :class="matched_class"
+                       required
+                       v-model="re_pass"
+                       type="password"
+                       placeholder="비밀번호를 재입력 하세요."
+                       maxlength="20"
+                       v-validate="'required'"
+                       name="re_password"
+                       id="re_password"
+                       @keyup="error_check('password')">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group block">
+            <label for="username" class="col-sm-12 control-label">사용자 이름*
+              <div class="error_label" v-if="errors.has('username')">이름을 확인해주세요. (30자 미만)</div>
+            </label>
+            <div class="col-sm-12">
+              <input class="form-control"
+                     required
+                     v-model="username"
+                     type="text"
+                     placeholder="이름을 입력하세요."
+                     autofocus="autofocus"
+                     maxlength="30"
+                     name="username"
+                     id="username">
+            </div>
+          </div>
 
           <div class="form-group block">
             <label for="phone" class="col-sm-12 control-label">전화번호
-              <div class="error_label" v-if="errors.has('phone')">{{errors.first('phone')}}</div>
+              <div class="error_label" v-if="error_label.phone">전화번호를 확인해주세요.</div>
             </label>
             <div class="col-sm-12">
               <input class="form-control"
@@ -132,35 +102,8 @@
                      maxlength="16"
                      v-validate="'numeric|max:16'"
                      name="phone"
-                     id="phone">
-            </div>
-          </div>
-
-          <div class="form-group block">
-            <label for="access" class="col-sm-12 control-label">소속*</label>
-            <div class="col-sm-12 pt-2 pb-2" id="access">
-              <div class="form-check-inline">
-                <input type="radio" id="access_marketer" name="access" v-model="access" value="-1"
-                       class="form-check-input">
-                <label for="access_marketer" class="form-check-label">마케터</label>
-              </div>
-              <div class="form-check-inline">
-                <input type="radio" id="access_client" name="access" v-model="access" value="-2"
-                       class="form-check-input">
-                <label for="access_client" class="form-check-label">고객(클라이언트)</label>
-              </div>
-            </div>
-            <div class="col-sm-12 pt-1">
-              <select v-if="access == -1" name="select_org" id="select_org" class="form-control" v-model="organization">
-                <option value="-1">조직을 선택하세요..</option>
-                <option value="-2">조직을 생성하겠습니다.</option>
-                <option v-for="item in select_options" :value="item.id">{{ item.name }}</option>
-              </select>
-              <select v-else-if="access == -2" name="select_company" id="select_company" class="form-control"
-                      v-model="company">
-                <option value="-1">업체를 선택하세요..</option>
-                <option v-for="item in select_options" :value="item.id">{{ item.name }}</option>
-              </select>
+                     id="phone"
+                     @keyup="error_check('phone')">
             </div>
           </div>
 
@@ -182,97 +125,110 @@
   export default {
     name: 'sign_up',
     data: () => ({
-      duplicated: false,
       duplicated_class: 'form-control',
-      matched: false,
       matched_class: 'form-control',
       account: '',
       password: '',
       re_pass: '',
-      full_name: '',
+      username: '',
       email: '',
       phone: '',
-      access: 0,
-      organization: -1,
-      company: -1,
       select_options: [],
+      error_label: {
+        email: false,
+        password: false,
+        phone: false
+      }
     }),
     methods: {
-      check_duplicate() {
-        let axios = this.$axios
-        if(this.account == '') {
-          this.duplicated_class = 'form-control'
-          this.duplicated = false
-        } else {
-          axios.get(this.$store.state.endpoints.baseUrl + 'user/')
-            .then((response) => {
-              for (let i = 0; i < response.data.results.length; i++) {
-                if ((this.account).toLowerCase() == (response.data.results[i].account).toLowerCase()) {
-                  this.duplicated_class = 'form-control alert-danger'
-                  this.duplicated = true
-                  return false
-                }
-              }
-              this.duplicated_class = 'form-control alert-success'
-              this.duplicated = false
-            })
-        }
-      },
-      check_matched() {
-        if (this.password == '' || this.re_pass == '') {
-          this.matched = false
-          this.matched_class = 'form-control'
-        } else {
-          if (this.password === this.re_pass) {
-            this.matched = true
-            this.matched_class = 'form-control alert-success'
+      error_check(param) {
+        if (param === 'phone') {
+          if (this.phone !== '') {
+            let rgTel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
+            let strValue = this.phone
+            let test_flag = rgTel.test(strValue)
+            if (!test_flag) {
+              this.error_label.phone = true
+            } else {
+              this.error_label.phone = false
+            }
           } else {
-            this.matched = false
-            this.matched_class = 'form-control alert-danger'
+            this.error_label.phone = false
           }
+        } else if (param === 'password') {
+          if (this.password == '' || this.re_pass == '') {
+            this.error_label.password = false
+            this.matched_class = 'form-control'
+          } else {
+            if (this.password === this.re_pass) {
+              this.error_label.password = true
+              this.matched_class = 'form-control alert-success'
+            } else {
+              this.error_label.password = false
+              this.matched_class = 'form-control alert-danger'
+            }
+          }
+        } else if (param === 'email') {
+          console.log('email duplication temporary disabled.')
+          // let axios = this.$axios
+          // if (this.email == '') {
+          //   this.duplicated_class = 'form-control'
+          //   this.error_label.email = false
+          // } else {
+          //   axios.get(this.$store.state.endpoints.baseUrl + 'user/')
+          //     .then((response) => {
+          //       for (let i = 0; i < response.data.results.length; i++) {
+          //         if ((this.email).toLowerCase() == (response.data.results[i].email).toLowerCase()) {
+          //           this.duplicated_class = 'form-control alert-danger'
+          //           this.error_label.email = true
+          //           return false
+          //         }
+          //       }
+          //       this.duplicated_class = 'form-control alert-success'
+          //       this.error_label.email = false
+          //     })
+          // }
         }
       },
       sign_up() {
+        // Auto validation first
         this.$validator.validateAll()
-        if (this.matched != true) {
+
+        // Custom validation
+        if (this.error_label.password != true) {
+          // Check password matched
           alert('비밀번호를 확인해주세요.')
           document.getElementById('re_password').focus()
-        } else if (this.duplicated == true) {
-          alert('이미 존재하는 아이디입니다.')
+        } else if (this.error_label.phone) {
+          // Check phone number validated
+          alert('전화번호 형식을 확인해주세요.')
+          document.getElementById('phone').focus()
+        } else if (this.email == true) {
+          // Check duplicated email address
+          alert('이미 존재하는 이메일입니다.')
           document.getElementById('id_username').focus()
-        } else if (this.access === 0 || this.organization === -1 && this.company === -1) {
-          alert('소속을 확인해주세요.')
         } else {
+          // Else clear, create a new user.
           let axios = this.$axios
-          ///////
+
           let formData = new FormData()
-          formData.append('account', this.account)
-          formData.append('password', this.password)
-          formData.append('full_name', this.full_name)
           formData.append('email', this.email)
+          formData.append('password', this.password)
+          formData.append('username', this.username)
           formData.append('phone', this.phone)
-          const baseURI = this.$store.state.endpoints.baseUrl
+
+          // Axios config
           const config = {
             headers: {
               'Content-Type': 'application/json'
+            },
+            xhrFields: {
+              withCredentials: true
             }
           }
 
           /* Do axios post */
-          axios.post(`${baseURI}user/`, formData, config)
-            .then((response) => {
-              let get_id = response.data.id
-              let formData = new FormData()
-              formData.append('user', response.data.id)
-              formData.append('access', this.access)
-              if (this.organization >= 0) {
-                formData.append('organization', this.organization)
-              }
-              if (this.company !== -1) {
-                formData.append('company', this.company)
-              }
-              return axios.patch(`${baseURI}user_access/` + get_id + '/', formData, config)
-            })
+          axios.post(this.$store.state.endpoints.baseUrl + 'user/', formData, config)
             .then(() => {
               alert('회원가입 되었습니다.')
               this.$router.currentRoute.meta.protect_leave = 'no'
@@ -285,46 +241,16 @@
               if (error.response.data.account) {
                 alert(error.response.data.account)
               } else {
-                alert('전송 중 문제가 발생하였습니다. 다시시도 해주세요.')
+                alert('회원가입 중 문제가 발생하였습니다. 다시시도 해주세요.')
               }
             })
-          ///////////////
-
+          /* /Axios post */
         }
       },
       go_back() {
-        // if (confirm('취소하시겠습니까?')) {
         this.$router.push({
-            name: 'sign_in',
-          })
-        // }
-      }
-    },
-    watch: {
-      access() {
-        this.organization = -1
-        this.company = -1
-        if (this.access == -1) {
-          let axios = this.$axios
-          let this_url = 'organization/'
-          axios.get(this.$store.state.endpoints.baseUrl + this_url)
-            .then((response) => {
-              this.select_options = response.data.results
-            })
-            .catch((error) => {
-              console.log(error)
-            })
-        } else if (this.access == -2) {
-          let axios = this.$axios
-          let this_url = 'company/'
-          axios.get(this.$store.state.endpoints.baseUrl + this_url)
-            .then((response) => {
-              this.select_options = response.data.results
-            })
-            .catch((error) => {
-              console.log(error)
-            })
-        }
+          name: 'sign_in',
+        })
       }
     },
     mounted() {
@@ -356,12 +282,26 @@
     // min-height: 100vh;
     overflow: auto;
     background-color: rgba(255, 255, 255, 0.4);
-    padding: 10vh 30px 30px;
+    padding: 10vh 30px 55px;
     margin-bottom: 10vh;
     font-family: 'Nanum Gothic', 'sans-serif';
     // font-weight: bold;
     border-radius: 10px;
     box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.14);
+  }
+
+  .logo_wrap {
+    width: 100%;
+
+    .logo {
+      width: 250px;
+      margin: 10px auto;
+      text-align: center;
+
+      img {
+        width: 100%;
+      }
+    }
   }
 
   .password_form {
@@ -391,6 +331,10 @@
 
   .form-control, .btn-info {
     box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.14);
+  }
+
+  .text_navigation {
+    margin: 1% 0 8% 15px !important;
   }
 
 </style>
