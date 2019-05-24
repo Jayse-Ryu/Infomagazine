@@ -61,6 +61,7 @@
 </template>
 
 <script>
+  import Decoder from 'jwt-decode'
   export default {
     name: 'sign_in',
     data: () => ({
@@ -80,12 +81,25 @@
           email: this.email,
           password: this.password
         }
-        this.$store.dispatch('obtainToken', payload)
-          .then(() => {
-            this.password = ''
+        axios.post(this.$store.state.endpoints.obtainJWT, payload)
+          .then((response) => {
+            this.$store.dispatch('obtainToken', response.data)
+
+            try {
+              this.$cookie.set('token', response.data.token, {expires: '1D'})
+              this.$cookie.set('authUser', JSON.stringify(response.data.user), {expires: '1D'})
+            } catch (error) {
+              console.log('set cookie error', error)
+            }
+
+            // const decoded = Decoder(response.data.token)
+            // console.log(decoded)
+
+            this.$router.push({name: 'gateway'})
           })
           .catch(() => {
-            this.password = ''
+            // Check the account or password
+            alert('아이디와 비밀번호를 확인해주세요.')
           })
       }
     }

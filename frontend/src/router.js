@@ -166,6 +166,8 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
+  console.log('router before from', from)
+  console.log('router before to', to)
   // Check authentication by token
   let work = () => {
     // eslint-disable-next-line

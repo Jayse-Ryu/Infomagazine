@@ -1,16 +1,19 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import router from "./router"
+import router from './router'
 import Decoder from 'jwt-decode'
+import VueCookie from 'vue-cookie'
 
 Vue.use(Vuex)
+Vue.use(VueCookie)
 
 export default new Vuex.Store({
   state: {
-    authUser: {},
-    userAccess: {},
+    // authUser: localStorage.getItem('authUser'),
+    authUser: Vue.cookie.get('authUser'),
     isAuthenticated: false,
-    jwt: localStorage.getItem('token'),
+    // jwt: localStorage.getItem('token'),
+    jwt: Vue.cookie.get('token'),
     endpoints: {
       obtainJWT: 'http://localhost/api/auth/',
       refreshJWT: 'http://localhost/api/auth-refresh/',
@@ -41,46 +44,29 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    setAuthUser (state, {authUser}) {
+    setAuthUser(state, {authUser}) {
       Vue.set(state, 'authUser', authUser)
+      // localStorage.setItem('authUser', JSON.stringify(authUser))
     },
-    setAccess (state, {userAccess}) {
-      Vue.set(state, 'userAccess', userAccess)
-    },
-    setToken (state, newToken) {
-      localStorage.setItem('token', newToken)
+    setToken(state, newToken) {
+      // localStorage.setItem('token', newToken)
       state.jwt = newToken
     },
-    removeToken (state) {
+    removeToken(state) {
       localStorage.removeItem('token')
       state.jwt = null
       state.authUser = {}
-      state.userAccess = {}
       state.isAuthenticated = false
     }
   },
   actions: {
-    obtainToken (self, pay) {
-      const payload = {
-        email: pay.email,
-        password: pay.password
-      }
-      axios.post(this.state.endpoints.obtainJWT, payload)
-          .then((response) => {
-            this.commit('setToken', response.data.token)
-            this.commit('setAuthUser', {
-                authUser: response.data.user,
-                isAuthenticated: true
-              })
-            return this.dispatch('inspectToken')
-          })
-          .then(() => {
-            router.push('/gateway')
-          })
-          .catch(() => {
-            // Check the account or password
-            alert('아이디와 비밀번호를 확인해주세요.')
-          })
+    obtainToken(self, data) {
+      console.log('obtain token action')
+      this.commit('setToken', data.token)
+      this.commit('setAuthUser', {
+        authUser: data.user,
+        isAuthenticated: true
+      })
     },
     // refreshToken () {
     //   const payload = {
@@ -104,12 +90,6 @@ export default new Vuex.Store({
     //                     isAuthenticated: true
     //                   })
     //                 }
-    //                 return axios.get(this.state.endpoints.baseUrl + 'user_access/' + user_id + '/')
-    //               })
-    //               .then((response) => {
-    //                 this.commit('setAccess', {
-    //                   userAccess: response.data
-    //                 })
     //               })
     //               .catch((error) => {
     //                 console.log('get Auth user failed..', error)
@@ -120,39 +100,18 @@ export default new Vuex.Store({
     //         console.log('Refresh error..', error)
     //       })
     // },
-    inspectToken () {
+    inspectToken() {
+      console.log('InspectToken action')
       const token = this.state.jwt
-      if (token) {
-        const decoded = Decoder(token)
-        const exp = decoded.exp
-
-        // // For refresh moment
-        // const orig_iat = decoded.orig_iat
-        // const a_day = 86400 // 7*24*60*60
-        // const thirty_minutes = 1800 // 30*60
-
-        if ((Date.now() / 1000) > exp) {
-          // If token expired then send to login page
-          this.commit('removeToken')
-          alert('로그인 시간이 만료되었습니다.')
-          router.currentRoute.meta.forced = 'yes'
-          router.push('/')
-          return 'remove token'
-        }
-        /*else if ((Date.now() / 1000) > exp - thirty_minutes && (Date.now() / 1000) < orig_iat + a_day) {
-          // If token expire in less than 30 minutes but still in refresh period then refresh
-          this.dispatch('refreshToken')
-              .then(() => {
-                console.log('refresh done.')
-              })
-        }*/
+      const authUser = this.state.authUser
+      if (token && authUser) {
+        router.push('/landing_list')
       } else {
         // If no token then send to login page
         this.commit('removeToken')
         alert('로그인 후 이용 가능합니다.')
         router.currentRoute.meta.forced = 'yes'
         router.push('/')
-        return 'remove token'
       }
     }
   }

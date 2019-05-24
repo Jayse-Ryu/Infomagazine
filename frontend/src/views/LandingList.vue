@@ -282,11 +282,6 @@
         // Get user information
         let user = this.$store.state.authUser
         return user
-      },
-      access_obj() {
-        // Get access information the user
-        let access = this.$store.state.userAccess
-        return access
       }
     }
   }
