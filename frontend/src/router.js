@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Store from './store'
+import './plugins/vue-cookie'
 
 Vue.use(Router)
 
@@ -10,18 +11,25 @@ const router = new Router({
     {
       path: 'error',
       name: 'A404',
-      component: () => import(/* webpackChunkName: "A404" */ './views/A404.vue')
+      component: () => import('./views/A404.vue'),
+      meta: {
+        signed: false
+      }
     },
     {
       path: '/',
       name: 'sign_in',
-      component: () => import('./views/Signin.vue')
+      component: () => import('./views/Signin.vue'),
+      meta: {
+        signed: false
+      }
     },
     {
       path: '/signup',
       name: 'sign_up',
       component: () => import('./views/Signup.vue'),
       meta: {
+        signed: false,
         protect_leave: 'yes'
       }
     },
@@ -30,7 +38,8 @@ const router = new Router({
       name: 'gateway',
       component: () => import('./views/Gateway.vue'),
       meta: {
-        signed: true
+        signed: true,
+        auth_grade: 'guest'
       }
     },
     {
@@ -39,7 +48,7 @@ const router = new Router({
       component: () => import('./views/LandingList.vue'),
       meta: {
         signed: true,
-        auth_grade: 'customer'
+        auth_grade: 'client'
       }
     },
     {
@@ -48,7 +57,7 @@ const router = new Router({
       component: () => import('./views/LandingCreate.vue'),
       meta: {
         signed: true,
-        auth_grade: 'manager',
+        auth_grade: 'marketer',
         protect_leave: 'yes'
       }
     },
@@ -58,7 +67,7 @@ const router = new Router({
       component: () => import('./views/LandingDetail.vue'),
       meta: {
         signed: true,
-        auth_grade: 'customer',
+        auth_grade: 'client',
         protect_leave: 'yes'
       }
     },
@@ -68,7 +77,7 @@ const router = new Router({
       component: () => import('./views/OrganizationList.vue'),
       meta: {
         signed: true,
-        auth_grade: 'manager'
+        auth_grade: 'marketer'
       }
     },
     {
@@ -77,7 +86,7 @@ const router = new Router({
       component: () => import('./views/OrganizationDetail.vue'),
       meta: {
         signed: true,
-        auth_grade: 'manager',
+        auth_grade: 'marketer',
         protect_leave: 'yes'
       }
     },
@@ -87,7 +96,7 @@ const router = new Router({
       component: () => import('./views/CompanyList.vue'),
       meta: {
         signed: true,
-        auth_grade: 'customer'
+        auth_grade: 'marketer'
       }
     },
     {
@@ -96,7 +105,7 @@ const router = new Router({
       component: () => import('./views/CompanyCreate.vue'),
       meta: {
         signed: true,
-        auth_grade: 'manager',
+        auth_grade: 'marketer',
         protect_leave: 'yes'
       }
     },
@@ -106,7 +115,7 @@ const router = new Router({
       component: () => import('./views/CompanyDetail.vue'),
       meta: {
         signed: true,
-        auth_grade: 'customer',
+        auth_grade: 'marketer',
         protect_leave: 'yes'
       }
     },
@@ -116,8 +125,7 @@ const router = new Router({
       component: () => import('./views/DBDetail.vue'),
       meta: {
         signed: true,
-        auth_grade: 'customer'
-        // protect_leave: 'no'
+        auth_grade: 'client'
       }
     },
     {
@@ -126,7 +134,7 @@ const router = new Router({
       component: () => import('./views/UserList.vue'),
       meta: {
         signed: true,
-        auth_grade: 'manager'
+        auth_grade: 'staff'
       }
     },
     {
@@ -135,7 +143,7 @@ const router = new Router({
       component: () => import('./views/UserDetail.vue'),
       meta: {
         signed: true,
-        auth_grade: 'manager'
+        auth_grade: 'staff'
       }
     },
     {
@@ -144,6 +152,7 @@ const router = new Router({
       component: () => import('./views/MyInfo.vue'),
       meta: {
         signed: true,
+        auth_grade: 'guest',
         protect_leave: 'yes'
       }
     },
@@ -151,7 +160,10 @@ const router = new Router({
       path: '/page/:base',
       name: 'page',
       component: () => import('./views/Page.vue'),
-      alias: '/page/:base/:url'
+      alias: '/page/:base/:url',
+      meta: {
+        signed: false
+      }
     }
   ],
   base: process.env.BASE_URL,
@@ -168,113 +180,115 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   console.log('router before from', from)
   console.log('router before to', to)
-  // Check authentication by token
-  let work = () => {
-    // eslint-disable-next-line
-    if (!to.name || to.name == null || to.name == '') {
-      // If user try to access 'none' page.
-      next({name: 'A404'})
+
+  // When user access_code not matched with router
+  let access_denied = () => {
+    if (from.meta.protect_leave === 'yes') {
+      alert('권한이 없는 페이지입니다.')
+      from.meta.protect_leave = 'no'
+      next({name: 'gateway'})
     } else {
-      if (to.path === '/' || to.path === '') {
+      alert('권한이 없는 페이지입니다.')
+      next({name: 'gateway'})
+    }
+    // // The last next work for router default (NECESSARY)
+    // next()
+  }
+
+  // Check authentication by token, authUser
+  let work = (authUser, token) => {
+
+    let marketer = [0, 1]
+    let client = [0, 1, 2]
+    let guest = [0, 1, 2, 3]
+
+    if (to.meta.auth_grade === 'guest') {
+      if (guest.includes(authUser.info.access_role)) {
         next()
       } else {
-        if (to.meta.signed) {
-          if (window.localStorage.token || Store.state.authUser.id) {
-            if (to.meta.auth_grade) {
-              // Auth grade filter
-              let auth = to.meta.auth_grade
-              if (auth === 'superuser') {
-                if (Store.state.authUser.is_superuser) {
-                  next()
-                } else {
-                  next({name: 'gateway'})
-                }
-              } else if (auth === 'staff') {
-                if (Store.state.authUser.is_staff) {
-                  next()
-                } else {
-                  next({name: 'gateway'})
-                }
-              } else if (auth === 'manager') {
-                if (Store.state.userAccess.access === 1) {
-                  if (to.name === 'organization_detail') {
-                    // eslint-disable-next-line
-                    if (Store.state.userAccess.organization == to.params.organization_id || Store.state.authUser.is_staff) {
-                      next()
-                      // eslint-disable-next-line
-                    } else if (Store.state.userAccess.organization != to.params.organization_id && !Store.state.authUser.is_staff) {
-                      next({name: 'organization_list'})
-                    } else {
-                      next()
-                    }
-                  }
-                } else {
-                  next({name: 'gateway'})
-                }
-              } else if (auth === 'customer') {
-                if (Store.state.userAccess.access >= 1) {
-                  next()
-                } else {
-                  next({name: 'gateway'})
-                }
-              }
-            }
-            // /Auth grade filter
-          } else {
-            // Store has not token or Auth user not exist
-            next({name: 'sign_in'})
-          }
-        } else {
-          // If no sign meta, Let them go to next.
-          next()
-        }
+        access_denied()
       }
-      // The last next work for router default (NECESSARY)
-      next()
+    } else if (to.meta.auth_grade === 'client') {
+      if (client.includes(authUser.info.access_role)) {
+        next()
+      } else {
+        access_denied()
+      }
+    } else if (to.meta.auth_grade === 'marketer') {
+      if (marketer.includes(authUser.info.access_role)) {
+        next()
+      } else {
+        access_denied()
+      }
+    } else if (to.meta.auth_grade === 'staff') {
+      if (authUser.is_superuser || authUser.is_staff) {
+        next()
+      } else {
+        access_denied()
+      }
     }
+    // The last next work for router default (NECESSARY)
+    next()
   }
+
   // Set let user go rightly or not
   let intro = () => {
-    if (to.path === '/' || to.path === '' || to.name === 'sign_up' || to.name === 'page' || to.name === 'A404') {
+    // if (to.path === '/' || to.path === '' || to.name === 'sign_up' || to.name === 'page' || to.name === 'A404') {
+    if (!to.meta.signed) {
+      // When router try to access very basic pages
       next()
+    } else if (!to.name || to.name == null || to.name == '') {
+      // If component is not exist, push to 404 page
+      next({name: 'A404'})
     } else {
-      if (from.name == null && to.name !== 'gateway') {
-        // When user randomly access to not public page and gateway page.
-        work()
-      } else {
-        // If not but still don't have authentication
-        if (Store.state.authUser.id == null) {
-          Store.dispatch('inspectToken')
-              .then(() => {
-                work()
-              })
-        } else {
-          // Or user have authentication
-          work()
-        }
-      }
+      // Remained router is Cookie check
+      Store.dispatch('inspectToken')
+        .then(() => {
+          // let authUser = JSON.parse(Vue.cookie.get('authUser'))
+          // let token = JSON.parse(Vue.cookie.get('token'))
+          let authUser = JSON.parse(Store.state.authUser)
+          let token = Store.state.jwt
+
+          if (authUser !== null && token !== null) {
+            // If all cookies available
+            work(authUser, token)
+          } else {
+            // Cookie is not available
+            if (from.meta.protect_leave === 'yes') {
+              alert('로그인이 필요합니다.')
+              from.meta.protect_leave = 'no'
+              next({name: 'sign_in'})
+            }
+          }
+        })
+        .catch((error) => {
+          console.log('Store inspect token crashed!', error)
+        })
     }
   }
-  // Check meta(from.leave) first
-  if (from.meta.protect_leave) {
-    if (from.meta.protect_leave === 'yes') {
-      // Are you sure to leave this page?
-      // eslint-disable-next-line
-      if (from.meta.forced == 'yes') {
-        from.meta.forced = 'no'
-        intro()
-      } else {
+
+  // Check meta(from.leave) first!
+  let before_check = () => {
+    if (from.meta.protect_leave) {
+      // Prevent router error with meta is undefined
+      if (from.meta.protect_leave === 'yes') {
+        // Are you sure to leave this page?
         if (confirm('정말 떠나시겠습니까?')) {
           intro()
         }
+      } else if (from.meta.protect_leave === 'no') {
+        // If request is forced
+        // Set meta as default again
+        from.meta.protect_leave = 'yes'
+        intro()
       }
-    } else if (from.meta.protect_leave === 'no') {
-      from.meta.protect_leave = 'yes'
+    } else {
+      // If leave meta is none
       intro()
     }
-  } else {
-    intro()
   }
+
+  before_check()
 })
 
 export default router
