@@ -10,10 +10,12 @@ Vue.use(VueCookie)
 export default new Vuex.Store({
   state: {
     // authUser: localStorage.getItem('authUser'),
-    authUser: Vue.cookie.get('authUser'),
+    // authUser: Vue.cookie.get('authUser'),
+    authUser: {},
     isAuthenticated: false,
     // jwt: localStorage.getItem('token'),
-    jwt: Vue.cookie.get('token'),
+    // jwt: Vue.cookie.get('token'),
+    jwt: '',
     endpoints: {
       obtainJWT: 'http://localhost/api/auth/',
       refreshJWT: 'http://localhost/api/auth-refresh/',
@@ -54,8 +56,8 @@ export default new Vuex.Store({
     },
     removeToken(state) {
       // localStorage.removeItem('token')
-      state.jwt = null
       state.authUser = {}
+      state.jwt = null
       state.isAuthenticated = false
       Vue.cookie.delete('token')
       Vue.cookie.delete('authUser')
@@ -63,12 +65,14 @@ export default new Vuex.Store({
   },
   actions: {
     obtainToken(self, data) {
-      console.log('obtainToken action')
+      // console.log('obtainToken action')
       this.commit('setToken', data.token)
       this.commit('setAuthUser', {
         authUser: data.user,
         isAuthenticated: true
       })
+      axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
+      // console.log('axios default header?', axios.defaults.headers)
     },
     // refreshToken () {
     //   const payload = {
@@ -103,31 +107,27 @@ export default new Vuex.Store({
     //       })
     // },
     inspectToken() {
-      console.log('inspectToken action')
+      // console.log('inspectToken action')
       const token = Vue.cookie.get('token')
       const authUser = Vue.cookie.get('authUser')
 
-      if (token && authUser) {
-        let store_user = JSON.parse(this.state.authUser)
+      if (token !== null && authUser !== null) {
+        let store_user = this.state.authUser
         let store_token = this.state.jwt
         if (Object.keys(store_user).length === 0 && store_user.constructor === Object && !store_token) {
-          console.log('inspectToken : filling vuex as cookie')
           this.commit('setToken', token)
           this.commit('setAuthUser', {
-            authUser: authUser,
+            authUser: JSON.parse(authUser),
             isAuthenticated: true
           })
-          console.log('commit done.')
-        } else {
-          console.log('inspectToken : vuex already filled')
+          axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
+          // console.log('axios default header?', axios.defaults.headers)
         }
+        return true
       } else {
-        console.log('cookie not exist')
         // If no token then send to login page
         this.commit('removeToken')
-        alert('로그인 후 이용 가능합니다.')
-        router.currentRoute.meta.forced = 'yes'
-        router.push('/')
+        return false
       }
     }
   }

@@ -14,10 +14,8 @@
           <span class="navbar-toggler-icon"></span>
         </button>
 
-
-
+        <!-- Staff area -->
         <div v-if="user_obj && user_obj.is_staff || user_obj.is_superuser" class="collapse navbar-collapse" id="navbarCollapse">
-
           <!-- Gateway for staff -->
           <ul class="navbar-nav ml-auto">
             <li class="navbar-item">
@@ -49,10 +47,12 @@
               <input type="button" class="btn btn-dark w-100 pb-1 pt-1 text-center" @click="logout" value="로그아웃">
             </li>
           </ul>
-
         </div>
+        <!-- /Staff area -->
 
+        <!-- User area -->
         <div v-else class="collapse navbar-collapse" id="navbarCollapse">
+
           <!-- user access is marketer -->
           <ul v-if="user_obj && user_obj.info.access_role == 0 || user_obj.info.access_role == 1" class="navbar-nav ml-auto">
             <li class="navbar-item">
@@ -79,7 +79,7 @@
               <input type="button" class="btn btn-dark w-100 pb-1 pt-1 text-center" @click="logout" value="로그아웃">
             </li>
           </ul>
-
+          <!-- / -->
 
           <!-- user access is client -->
           <ul v-if="user_obj && user_obj.info.access_role == 2" class="navbar-nav ml-auto">
@@ -97,7 +97,7 @@
               <input type="button" class="btn btn-dark w-100 pb-1 pt-1 text-center" @click="logout" value="로그아웃">
             </li>
           </ul>
-
+          <!-- / -->
 
           <!-- user access is guest -->
           <ul v-if="user_obj && user_obj.info.access_role == 3" class="navbar-nav ml-auto">
@@ -115,8 +115,7 @@
               <input type="button" class="btn btn-dark w-100 pb-1 pt-1 text-center" @click="logout" value="로그아웃">
             </li>
           </ul>
-
-          <!---->
+          <!-- / -->
 
           <!-- If user access is none -->
           <ul v-else class="navbar-nav ml-auto">
@@ -131,8 +130,9 @@
               </router-link>
             </li>
           </ul>
-
+          <!-- / -->
         </div>
+        <!-- /User area -->
 
       </nav>
     </div>
@@ -172,21 +172,29 @@
       })
     },
     computed: {
-      header_name: function () {
-        let user_json = JSON.parse(this.$store.state.authUser)
+      header_name() {
+        let store_user = this.$store.state.authUser
         let username = ''
-        if (user_json.username == '') {
-          username = '이름없음'
+        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+          username = 'none'
         } else {
-          username = user_json.username
+          if (JSON.parse(store_user).username == '') {
+            username = '이름없음'
+          } else {
+            username = JSON.parse(store_user).username
+          }
         }
         return username
       },
       user_obj() {
-        if (this.$store.state.authUser) {
-          let user_json = JSON.parse(this.$store.state.authUser)
-          return user_json
+        let store_user = this.$store.state.authUser
+        let user_json = {}
+        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+          user_json = {'is_staff' : false, 'is_superuser': false, 'info': {'access_role': 3}}
+        } else {
+          user_json = JSON.parse(this.$store.state.authUser)
         }
+        return user_json
       }
     }
   }
