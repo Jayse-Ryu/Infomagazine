@@ -6,7 +6,6 @@
       <router-link to="/landing">랜딩 리스트</router-link>
     </div>
 
-
     <form class="container m-auto justify-content-between row"
           v-on:submit.prevent="search(temp_option, temp_text)">
       <router-link to="/landing/create/" v-if="access_obj.access == 1" class="form-group btn btn-primary p-0 col-sm-12 col-md-1">
@@ -131,6 +130,24 @@
       search_text: '',
     }),
     methods: {
+      page_init() {
+        // Init other pages options
+        this.$store.state.pageOptions.company.page = 1
+        this.$store.state.pageOptions.company.option = 0
+        this.$store.state.pageOptions.company.text = ''
+        this.$store.state.pageOptions.user.page = 1
+        this.$store.state.pageOptions.user.option = 0
+        this.$store.state.pageOptions.user.text = ''
+        this.$store.state.pageOptions.organization.page = 1
+        this.$store.state.pageOptions.organization.option = 0
+        this.$store.state.pageOptions.organization.text = ''
+
+        // Check Vuex store page values
+        this.page_current = this.$store.state.pageOptions.landing.page
+        this.search_option = this.$store.state.pageOptions.landing.option
+        this.temp_text = this.$store.state.pageOptions.landing.text
+        this.search_text = this.$store.state.pageOptions.landing.text
+      },
       pagination: function (pageNum) {
         // when page is first, max ~ max-(chunk*current)+1
         // when page is max, max-(chunk*(current-1)) ~ 1
@@ -176,8 +193,6 @@
 
         const config = {
           headers: {
-            // Set your Authorization to 'JWT', not Bearer!!!
-            // Authorization: `JWT ${this.state.jwt}`,
             'Content-Type': 'application/json'
           },
           xhrFields: {
@@ -226,30 +241,19 @@
       }
     },
     mounted() {
+      console.log('axios default header in landinglist?', axios.defaults.headers)
       // Init other pages options
-      this.$store.state.pageOptions.company.page = 1
-      this.$store.state.pageOptions.company.option = 0
-      this.$store.state.pageOptions.company.text = ''
-      this.$store.state.pageOptions.user.page = 1
-      this.$store.state.pageOptions.user.option = 0
-      this.$store.state.pageOptions.user.text = ''
-      this.$store.state.pageOptions.organization.page = 1
-      this.$store.state.pageOptions.organization.option = 0
-      this.$store.state.pageOptions.organization.text = ''
+      this.page_init()
 
       // Window width calculator
       let that = this
-      this.$nextTick(function () {
+      that.$nextTick(function () {
         window.addEventListener('resize', function (e) {
           that.window_width = window.innerWidth
         })
       })
 
-      // Check store values
-      this.page_current = this.$store.state.pageOptions.landing.page
-      this.search_option = this.$store.state.pageOptions.landing.option
-      this.temp_text = this.$store.state.pageOptions.landing.text
-      this.search_text = this.$store.state.pageOptions.landing.text
+
       let offset = (this.$store.state.pageOptions.landing.page - 1) * this.page_chunk
       if(this.search_option == 'name') {
         this.temp_option = 1
@@ -280,8 +284,22 @@
     computed: {
       user_obj() {
         // Get user information
-        let user = this.$store.state.authUser
-        return user
+        let store_user = this.$store.state.authUser
+        let user_json = {}
+        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+          // dummy auth
+          user_json = {
+            'is_staff': false,
+            'is_superuser': false,
+            'info': {
+              'access_role': 3
+            },
+            'failed': true
+          }
+        } else {
+          user_json = JSON.parse(this.$store.state.authUser)
+        }
+        return user_json
       }
     }
   }

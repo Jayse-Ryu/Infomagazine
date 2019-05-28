@@ -233,14 +233,16 @@ router.beforeEach((to, from, next) => {
     next()
   }
 
-  // Set let user go rightly or not
+  // Check access needs or router exist
   let intro = () => {
     if (!to.meta.signed) {
       // When router try to access very basic pages
-      if (to.name == 'sign_in') {
+      // But, Excluding logged user access to sign-in page
+      if (to.name === 'sign_in') {
+        // Inspect return is set True or false
         Store.dispatch('inspectToken')
           .then((response) => {
-            if (response == true) {
+            if (response === true) {
               next({name: 'gateway'})
             } else {
               next()
@@ -253,7 +255,7 @@ router.beforeEach((to, from, next) => {
         // If not 'to' sign_in, signed meta is null
         next()
       }
-    } else if (!to.name || to.name == null || to.name == '') {
+    } else if (!to.name || to.name === null || to.name === '') {
       // If component is not exist, push to 404 page
       next({name: 'A404'})
     } else {
@@ -280,7 +282,7 @@ router.beforeEach((to, from, next) => {
     }
   }
 
-  // Check meta(from.leave) first!
+  // Check first before meta
   let before_check = () => {
     if (from.meta.protect_leave) {
       // Prevent router error with meta is undefined
@@ -301,6 +303,7 @@ router.beforeEach((to, from, next) => {
     }
   }
 
+  // Router Before each starts with 'before check'
   before_check()
 })
 
