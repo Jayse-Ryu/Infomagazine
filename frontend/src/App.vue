@@ -736,6 +736,7 @@
 
   .text_navigation span {
     font-size: 14px;
+    padding: 0 4px;
     color: #818181;
   }
 

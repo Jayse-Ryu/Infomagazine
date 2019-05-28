@@ -21,10 +21,12 @@
 
           <div class="form-group block">
             <label for="email" class="col-sm-12 control-label">이메일*
-              <div class="error_label" v-if="errors.has('email')">이메일 형식을 확인해주세요!</div>
+              {{ error_label.email }}
+              <div class="error_label" v-if="error_label.email">이미 존재하는 이메일입니다!</div>
+              <div class="error_label" v-else-if="errors.has('email')">이메일 형식을 확인해주세요!</div>
             </label>
             <div class="col-sm-12">
-              <input class="form-control"
+              <input :class="error_label.class.email"
                      required
                      v-model="email"
                      type="email"
@@ -42,7 +44,7 @@
             <div class="col-md-6 password_area">
               <label for="id_password" class="control-label">비밀번호*</label>
               <div>
-                <input :class="matched_class"
+                <input :class="error_label.class.password"
                        required
                        v-model="password"
                        type="password"
@@ -58,7 +60,7 @@
             <div class="col-md-6 password_area">
               <label for="re_password" class="control-label">비밀번호 재입력*</label>
               <div>
-                <input :class="matched_class"
+                <input :class="error_label.class.password"
                        required
                        v-model="re_pass"
                        type="password"
@@ -79,6 +81,7 @@
             <div class="col-sm-12">
               <input class="form-control"
                      required
+                     v-validate="'required'"
                      v-model="username"
                      type="text"
                      placeholder="이름을 입력하세요."
@@ -125,8 +128,6 @@
   export default {
     name: 'sign_up',
     data: () => ({
-      duplicated_class: 'form-control',
-      matched_class: 'form-control',
       account: '',
       password: '',
       re_pass: '',
@@ -135,9 +136,13 @@
       phone: '',
       select_options: [],
       error_label: {
-        email: false,
         password: false,
-        phone: false
+        phone: false,
+        email: false,
+        class: {
+          email: 'form-control',
+          password: 'form-control'
+        }
       }
     }),
     methods: {
@@ -158,36 +163,70 @@
         } else if (param === 'password') {
           if (this.password == '' || this.re_pass == '') {
             this.error_label.password = false
-            this.matched_class = 'form-control'
+            this.error_label.class.password = 'form-control'
           } else {
             if (this.password === this.re_pass) {
               this.error_label.password = true
-              this.matched_class = 'form-control alert-success'
+              this.error_label.class.password = 'form-control alert-success'
             } else {
               this.error_label.password = false
-              this.matched_class = 'form-control alert-danger'
+              this.error_label.class.password = 'form-control alert-danger'
             }
           }
         } else if (param === 'email') {
-          console.log('email duplication temporary disabled.')
-          // let axios = this.$axios
-          // if (this.email == '') {
-          //   this.duplicated_class = 'form-control'
-          //   this.error_label.email = false
-          // } else {
-          //   axios.get(this.$store.state.endpoints.baseUrl + 'user/')
-          //     .then((response) => {
-          //       for (let i = 0; i < response.data.results.length; i++) {
-          //         if ((this.email).toLowerCase() == (response.data.results[i].email).toLowerCase()) {
-          //           this.duplicated_class = 'form-control alert-danger'
-          //           this.error_label.email = true
-          //           return false
-          //         }
-          //       }
-          //       this.duplicated_class = 'form-control alert-success'
-          //       this.error_label.email = false
-          //     })
-          // }
+          // Duplicated function has to add
+          if (this.email !== '') {
+            let users = []
+            let email_flag = true
+            let validate_result = 0
+            axios.get(this.$store.state.endpoints.baseUrl + 'user/')
+              .then((response) => {
+                console.log('user get response', response)
+                users = response.data.results
+
+                if (users.length !== 0) {
+                  console.log('users length is not 0')
+                  for (let i = 0; i < users.length; i++) {
+                    console.log('users i? ', users[i])
+                    if (users[i].email == this.email) {
+                      this.error_label.email = true
+                      // this.error_label.class.email = 'form-control alert-danger'
+                      validate_result--
+                      email_flag = false
+                    } else {
+                      email_flag = true
+                      this.error_label.email = false
+                      validate_result++
+                      // this.error_label.class.email = 'form-control alert-success'
+                    }
+                  }
+                }
+
+                if (email_flag) {
+                  if (this.$validator.errors.has('email')) {
+                    validate_result--
+                    // this.error_label.email = true
+                    // this.error_label.class.email = 'form-control alert-danger'
+                  } else {
+                    validate_result++
+                    // this.error_label.email = false
+                    // this.error_label.class.email = 'form-control alert-success'
+                  }
+                }
+                if (validate_result > 0) {
+                  this.error_label.class.email = 'form-control alert-success'
+                } else {
+                  this.error_label.class.email = 'form-control alert-danger'
+                }
+              })
+              .catch((error) => {
+                console.log('Email duplicated check fail', error)
+              })
+
+          } else {
+            // this.error_label.email = false
+            this.error_label.class.email = 'form-control'
+          }
         }
       },
       sign_up() {

@@ -91,6 +91,16 @@ const router = new Router({
       }
     },
     {
+      path: '/organization/create',
+      name: 'organization_create',
+      component: () => import('./views/OrganizationCreate.vue'),
+      meta: {
+        signed: true,
+        auth_grade: 'staff',
+        protect_leave: 'yes'
+      }
+    },
+    {
       path: '/company',
       name: 'company_list',
       component: () => import('./views/CompanyList.vue'),
