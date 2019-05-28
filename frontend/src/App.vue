@@ -728,7 +728,7 @@
   // Navigation
   .text_navigation {
     display: inline-block;
-    margin: 1% 0 3% 15px;
+    margin: 1% 0 8% 15px;
     background-color: rgba(255, 255, 255, 0.6);
     border-radius: 5px;
     padding: 8px;

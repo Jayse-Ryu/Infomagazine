@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import router from './router'
-import Decoder from 'jwt-decode'
+// import Decoder from 'jwt-decode'
 import VueCookie from 'vue-cookie'
 
 Vue.use(Vuex)
@@ -10,10 +10,12 @@ Vue.use(VueCookie)
 export default new Vuex.Store({
   state: {
     // authUser: localStorage.getItem('authUser'),
-    authUser: Vue.cookie.get('authUser'),
+    // authUser: Vue.cookie.get('authUser'),
+    authUser: {},
     isAuthenticated: false,
     // jwt: localStorage.getItem('token'),
-    jwt: Vue.cookie.get('token'),
+    // jwt: Vue.cookie.get('token'),
+    jwt: '',
     endpoints: {
       obtainJWT: 'http://localhost/api/auth/',
       refreshJWT: 'http://localhost/api/auth-refresh/',
@@ -45,7 +47,7 @@ export default new Vuex.Store({
   },
   mutations: {
     setAuthUser(state, {authUser}) {
-      Vue.set(state, 'authUser', authUser)
+      Vue.set(state, 'authUser', JSON.stringify(authUser))
       // localStorage.setItem('authUser', JSON.stringify(authUser))
     },
     setToken(state, newToken) {
@@ -53,20 +55,24 @@ export default new Vuex.Store({
       state.jwt = newToken
     },
     removeToken(state) {
-      localStorage.removeItem('token')
-      state.jwt = null
+      // localStorage.removeItem('token')
       state.authUser = {}
+      state.jwt = null
       state.isAuthenticated = false
+      Vue.cookie.delete('token')
+      Vue.cookie.delete('authUser')
     }
   },
   actions: {
     obtainToken(self, data) {
-      console.log('obtain token action')
+      // console.log('obtainToken action')
       this.commit('setToken', data.token)
       this.commit('setAuthUser', {
         authUser: data.user,
         isAuthenticated: true
       })
+      axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
+      // console.log('axios default header?', axios.defaults.headers)
     },
     // refreshToken () {
     //   const payload = {
@@ -101,17 +107,27 @@ export default new Vuex.Store({
     //       })
     // },
     inspectToken() {
-      console.log('InspectToken action')
-      const token = this.state.jwt
-      const authUser = this.state.authUser
-      if (token && authUser) {
-        router.push('/landing_list')
+      // console.log('inspectToken action')
+      const token = Vue.cookie.get('token')
+      const authUser = Vue.cookie.get('authUser')
+
+      if (token !== null && authUser !== null) {
+        let store_user = this.state.authUser
+        let store_token = this.state.jwt
+        if (Object.keys(store_user).length === 0 && store_user.constructor === Object && !store_token) {
+          this.commit('setToken', token)
+          this.commit('setAuthUser', {
+            authUser: JSON.parse(authUser),
+            isAuthenticated: true
+          })
+          axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
+          // console.log('axios default header?', axios.defaults.headers)
+        }
+        return true
       } else {
         // If no token then send to login page
         this.commit('removeToken')
-        alert('로그인 후 이용 가능합니다.')
-        router.currentRoute.meta.forced = 'yes'
-        router.push('/')
+        return false
       }
     }
   }
