@@ -9,94 +9,100 @@
     </div>
 
     <div class="container">
-      <form class="m-auto" v-on:submit.prevent="create_organization">
+      <form class="m-auto" v-on:submit.prevent="create_company">
         <div class="form-group row">
-
-          <label for="org_name" class="col-form-label-sm col-sm-3 mt-3">
+          <label for="corp_name" class="col-form-label-sm col-sm-3 mt-3">
             <span>업체 이름*</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
-            <div class="error_label" v-if="errors.has('org_name')">{{errors.first('org_name')}}</div>
-            <input class="form-control" id="org_name" name="org_name" type="text" v-model="create_obj.name"
+            <input :class="error_label.class.name" id="corp_name" name="corp_name" type="text"
+                   v-model="create_obj.corp_name"
                    required
+                   v-validate="'required'"
                    placeholder="업체 이름을 입력하세요"
                    autofocus="autofocus"
-                   maxlength="100"
-                   v-validate="'required'">
+                   maxlength="100">
           </div>
 
-          <label for="org_sub" class="col-form-label-sm col-sm-3 mt-3">
-            <span>상호명</span>
+          <label for="corp_sub" class="col-form-label-sm col-sm-3 mt-3">
+            <span>상호명 (마케팅명)</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
-            <div class="error_label" v-if="errors.has('org_sub')">{{errors.first('org_sub')}}</div>
-            <input class="form-control" id="org_sub" name="org_sub" type="text" v-model="create_obj.sub_name"
+            <div class="error_label" v-if="errors.has('corp_sub')">{{errors.first('corp_sub')}}</div>
+            <input class="form-control" id="corp_sub" name="corp_sub" type="text"
+                   v-model="create_obj.corp_sub_name"
                    placeholder="상호명을 입력하세요"
                    autofocus="autofocus"
                    maxlength="100"
             >
           </div>
 
-          <label for="org_header" class="col-form-label-sm col-sm-3 mt-3">
-            <span>대표자</span>
+          <label for="corp_header" class="col-form-label-sm col-sm-3 mt-3">
+            <span>업체 대표</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
-            <input class="form-control" id="org_header" name="org_header" type="text" v-model="create_obj.header"
+            <input class="form-control" id="corp_header" name="corp_header" type="text"
+                   v-model="create_obj.corp_header"
                    placeholder="업체 대표를 입력하세요"
                    autofocus="autofocus"
-                   maxlength="20">
+                   maxlength="30">
           </div>
 
-          <label for="org_addr" class="col-form-label-sm col-sm-3 mt-3">
+          <label for="corp_addr" class="col-form-label-sm col-sm-3 mt-3">
             <span>주소</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
-            <input class="form-control" id="org_addr" name="org_addr" type="text" v-model="create_obj.address"
+            <input class="form-control" id="corp_addr" name="corp_addr" type="text"
+                   v-model="create_obj.corp_address"
                    placeholder="주소를 입력하세요"
                    autofocus="autofocus"
                    maxlength="200">
           </div>
 
-          <label for="org_corp" class="col-form-label-sm col-sm-3 mt-3">
+          <label for="corp_crn" class="col-form-label-sm col-sm-3 mt-3">
             <span>사업자 번호</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
-            <input class="form-control" id="org_corp" name="org_corp" type="text" v-model="create_obj.corp_num"
+            <input class="form-control" id="corp_crn" name="corp_crn" type="text"
+                   v-model="create_obj.corp_crn"
                    placeholder="사업자 번호를 입력하세요"
                    autofocus="autofocus"
                    maxlength="50">
           </div>
 
-          <label for="org_phone" class="col-form-label-sm col-sm-3 mt-3">
+          <label for="corp_phone" class="col-form-label-sm col-sm-3 mt-3">
             <span>연락처</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
-            <div class="error_label" v-if="errors.has('org_phone')">{{errors.first('org_phone')}}</div>
-            <input class="form-control" id="org_phone" name="org_phone" type="number" v-model="create_obj.phone"
+            <input :class="error_label.class.tel_num" id="corp_phone" name="corp_phone"
+                   type="number"
+                   v-model="create_obj.corp_tel_num"
                    placeholder="연락처를 입력하세요"
                    autofocus="autofocus"
                    maxlength="16"
-                   v-validate="'numeric|max:16'">
+                   @keyup="error_check('phone')">
           </div>
 
-          <label for="org_email" class="col-form-label-sm col-sm-3 mt-3">
+          <label for="corp_email" class="col-form-label-sm col-sm-3 mt-3">
             <span>이메일</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
-            <div class="error_label" v-if="errors.has('org_email')">{{errors.first('org_email')}}</div>
-            <input class="form-control" id="org_email" name="org_email" type="email" v-model="create_obj.email"
+            <input :class="error_label.class.email" id="corp_email" name="corp_email" type="email"
+                   v-model="create_obj.corp_email"
                    placeholder="이메일을 입력하세요"
                    maxlength="50"
                    autofocus="autofocus"
-                   v-validate="'email'">
+                   v-validate="'email'"
+                   @keyup="error_check('email')">
           </div>
 
-          <label for="org_desc" class="col-form-label-sm col-sm-3 mt-3">
-            <span>업체설명</span>
+          <label for="corp_desc" class="col-form-label-sm col-sm-3 mt-3">
+            <span>조직설명</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
-            <input class="form-control" id="org_desc" type="text" v-model="create_obj.desc"
-                   placeholder="업체 설명을 적어주세요"
+            <input class="form-control" id="corp_desc" type="text"
+                   v-model="create_obj.corp_desc"
+                   placeholder="조직 설명을 적어주세요"
                    autofocus="autofocus"
                    maxlength="200">
           </div>
@@ -118,50 +124,83 @@
     name: "company_create",
     data: () => ({
       // For organization create
-      create_obj: []
+      // For organization create
+      error_label:{
+        corp_name: false,
+        corp_tel_num: false,
+        corp_email: false,
+        class: {
+          name: 'form-control',
+          tel_num: 'form-control',
+          email: 'form-control'
+        }
+      },
+      create_obj: {
+        corp_name: '',
+        corp_sub_name: '',
+        corp_header: '',
+        corp_address: '',
+        corp_crn: '',
+        corp_tel_num: '',
+        corp_email: '',
+        corp_desc: ''
+      },
     }),
     methods: {
-      create_organization() {
+      error_check(param) {
+        if (param === 'phone') {
+          // Phone validate
+          console.log('param is phone')
+          if (this.create_obj.corp_tel_num !== '') {
+            let rgTel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
+            let strValue = this.create_obj.corp_tel_num
+            let test_flag = rgTel.test(strValue)
+            if (!test_flag) {
+              this.error_label.corp_tel_num = true
+              this.error_label.class.tel_num = 'form-control alert-danger'
+            } else {
+              this.error_label.corp_tel_num = false
+              this.error_label.class.tel_num = 'form-control alert-success'
+            }
+          } else {
+            this.error_label.corp_tel_num = false
+            this.error_label.class.tel_num = 'form-control'
+          }
+        // /Phone validate
+        } else if (param === 'email') {
+          // Email validate
+          if (this.create_obj.corp_email !== '') {
+            if(this.$validator.errors.has('corp_email')) {
+              this.error_label.corp_email = true
+              this.error_label.class.email = 'form-control alert-danger'
+            } else {
+              this.error_label.corp_email = false
+              this.error_label.class.email = 'form-control alert-success'
+            }
+          } else {
+            this.error_label.corp_email = false
+            this.error_label.class.email = 'form-control'
+          }
+          // /Email validate
+        }
+      },
+      create_company() {
         // Create an organization myself
         this.$validator.validateAll()
-        if(confirm('업체를 생성하시겠습니까?')) {
-          let axios = this.$axios
-          let this_url = 'company/'
-          let formData = new FormData()
-          formData.append('organization', this.access_obj.organization)
-          formData.append('name', this.create_obj.name)
-          if (this.create_obj.sub_name) {
-            formData.append('sub_name', this.create_obj.sub_name)
-          }
-          if (this.create_obj.header) {
-            formData.append('header', this.create_obj.header)
-          }
-          if (this.create_obj.address) {
-            formData.append('address', this.create_obj.address)
-          }
-          if (this.create_obj.corp_num) {
-            formData.append('corp_num', this.create_obj.corp_num)
-          }
-          if (this.create_obj.phone) {
-            formData.append('phone', this.create_obj.phone)
-          }
-          if (this.create_obj.email) {
-            formData.append('email', this.create_obj.email)
-          }
-          if (this.create_obj.desc) {
-            formData.append('desc', this.create_obj.desc)
-          }
-          // console.log(this.create_obj.corp_num)
-          // console.log('create formdata is? ', formData)
-          axios.post(this.$store.state.endpoints.baseUrl + this_url, formData)
+        if(confirm('조직을 생성하시겠습니까?')) {
+          this.$store.state.pageOptions.loading = true
+          axios.post(this.$store.state.endpoints.baseUrl + 'organization/', this.create_obj)
             .then(() => {
-              alert('업체가 생성되었습니다.')
+              alert('조직이 생성되었습니다.')
+              this.$store.state.pageOptions.loading = false
               this.$router.currentRoute.meta.protect_leave = 'no'
               this.$router.push({
-                name: 'company_list'
+                name: 'organization_list'
               })
             })
             .catch((error) => {
+              alert('조직 생성 중 오류가 발생하였습니다.')
+              this.$store.state.pageOptions.loading = false
               console.log(error)
             })
         }

@@ -282,6 +282,7 @@
           .then((response) => {
             this.$store.state.pageOptions.loading = false
             console.log('get landing response', response)
+            this.content_obj = response.data.results
           })
           .catch((error) => {
             this.$store.state.pageOptions.loading = false

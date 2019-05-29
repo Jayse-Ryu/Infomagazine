@@ -6,11 +6,11 @@
       <router-link to="/company">업체 리스트</router-link>
     </div>
 
-    <div v-if="user_obj.is_staff == true || access_obj.access == 1">
+    <div v-if="user_obj.is_staff || user_obj.is_superuser || [0,1].includes(user_obj.info.access_role)">
       <form class="container m-auto justify-content-between row"
             v-on:submit.prevent="search(temp_option, temp_text)">
 
-        <router-link to="/company/create/" v-if="access_obj.access == 1" class="form-group btn btn-primary p-0 col-sm-12 col-md-1">
+        <router-link to="/company/create/" class="form-group btn btn-primary p-0 col-sm-12 col-md-1">
           <div class="create_btn_text">생성</div>
         </router-link>
 
@@ -123,24 +123,6 @@
 <script>
   export default {
     name: "company_list",
-    created() {
-      if (this.$store.state.authUser) {
-        if (this.$store.state.userAccess.access !== 1 && this.$store.state.userAccess.access === -2) {
-          this.$router.push({
-            name: 'gateway'
-          })
-        } else if (this.$store.state.userAccess.access == 2) {
-          this.$router.push({
-            path: '/company/detail/' + this.$store.state.userAccess.company
-          })
-        }
-      } else {
-        alert('로그인이 필요합니다.')
-        this.$router.push({
-          name: 'gateway'
-        })
-      }
-    },
     data: () => ({
       window_width: window.innerWidth,
       // Page = options, contents
@@ -154,110 +136,123 @@
       search_text: '',
     }),
     methods: {
-      pagination: function (pageNum) {
+      page_init() {
+        let option = this.$store.state.pageOptions
+
+        // Init other pages options
+        option.landing.page = 1
+        option.landing.option = 0
+        option.landing.text = ''
+        option.user.page = 1
+        option.user.option = 0
+        option.user.text = ''
+        option.organization.page = 1
+        option.organization.option = 0
+        option.organization.text = ''
+
+        // Check Vuex store for this page values
+        this.page_current = option.company.page
+        this.temp_option = option.company.option
+        this.temp_text = option.company.text
+        this.search_option = option.company.option
+        this.search_text = option.company.text
+
+        // Follow inited search options
+        let offset = (this.$store.state.pageOptions.company.page - 1) * this.page_chunk
+        if (this.search_option == 1) {
+          this.temp_option = 1
+        } else if (this.search_option == 2) {
+          this.temp_option = 2
+        } else if (this.search_option == 3) {
+          this.temp_option = 3
+        }
+
+      },
+      pagination(pageNum) {
         // when page is first, max ~ max-(chunk*current)+1
         // when page is max, max-(chunk*(current-1)) ~ 1
         // when page is middle, max-(chunk*(current-1)) ~ max-(chunk*current)+1
         let offset = (pageNum - 1) * this.page_chunk
         this.calling_all_unit(offset)
       },
-      search: function (option, text) {
-        if (option !== 0 || text !== '') {
-          let option_val
+      search(option, text) {
+        if (option !== 0 && text !== '') {
           this.page_current = 1
-          if (option === '1') {
-            option_val = 'name'
-          } else if (option === '2') {
-            option_val = 'org_name'
-          } else {
-            console.log('Option not catched')
-          }
-          this.search_option = option_val
+          this.search_option = this.temp_option
           this.search_text = text
+          this.calling_all_unit()
+        } else {
+          this.search_option = 0
+          this.search_text = ''
           this.calling_all_unit()
         }
       },
-      calling_all_unit: function (page) {
+      calling_all_unit(offset) {
         // Calling landings with new values
-        let axios = this.$axios
-        let this_url = 'company/'
-        let offset = page
-        let def = ''
-        if (!this.user_obj.is_staff && this.access_obj.access == 1) {
-          def = '&organization=' + this.access_obj.organization
+        console.log('Calling all unit - called')
+        let auth_filter = ''
+        let search_param = ''
+
+        // (For Pagination check)
+        // axios.get(this.$store.state.endpoints.baseUrl + 'landing/' + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text)
+        //   .then((response) => {
+        //     // Calculation for page_max
+        //     if (response.data.count % this.page_chunk === 0) {
+        //       this.page_max = Math.floor(response.data.count / this.page_chunk)
+        //     } else {
+        //       this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
+        //     }
+        //     this.content_obj = response.data.results
+        //   })
+
+        // const config = {
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   }
+        // }
+
+        if (this.search_option == 1) {
+          search_param = '&name=' + this.search_text
         }
+
+        if (this.user_obj.is_staff || this.user_obj.is_superuser) {
+          console.log('Staff user - Get All')
+          auth_filter = '?true'
+        } else if (this.user_obj.info.access_role == '0' || this.user_obj.info.access_role == '1') {
+          console.log('Marketer user - Get only Org')
+          auth_filter = '?organization=' + this.user_obj.info.organization
+        } else if (this.user_obj.info.access_role == '2') {
+          console.log('load about com - Get only Com')
+          auth_filter = '?company=' + this.user_obj.info.company
+        }
+
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text + def)
+        axios.get(this.$store.state.endpoints.baseUrl + 'company/list/' + auth_filter + search_param)
           .then((response) => {
-            // Calculation for page_max
-            if (response.data.count % this.page_chunk === 0) {
-              this.page_max = Math.floor(response.data.count / this.page_chunk)
-            } else {
-              this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
-            }
+            this.$store.state.pageOptions.loading = false
+            console.log('get landing response', response)
             this.content_obj = response.data.results
-            console.log(this.content_obj)
-            this.$store.state.pageOptions.loading = false
           })
-          .catch(() => {
+          .catch((error) => {
             this.$store.state.pageOptions.loading = false
+            console.log('Get landing crashed', error)
           })
       }
     },
     mounted() {
-      // Init other pages options
-      this.$store.state.pageOptions.landing.page = 1
-      this.$store.state.pageOptions.landing.option = 0
-      this.$store.state.pageOptions.landing.text = ''
-      this.$store.state.pageOptions.user.page = 1
-      this.$store.state.pageOptions.user.option = 0
-      this.$store.state.pageOptions.user.text = ''
-      this.$store.state.pageOptions.organization.page = 1
-      this.$store.state.pageOptions.organization.option = 0
-      this.$store.state.pageOptions.organization.text = ''
-
       // Window width calculator
       let that = this
-      this.$nextTick(function () {
+      that.$nextTick(function () {
         window.addEventListener('resize', function (e) {
           that.window_width = window.innerWidth
         })
       })
 
-      // Calling contents at first with store
-      let axios = this.$axios
-      let this_url = 'company/'
-      let def = ''
-      // Check store values
-      this.page_current = this.$store.state.pageOptions.company.page
-      this.search_option = this.$store.state.pageOptions.company.option
-      this.temp_text = this.$store.state.pageOptions.company.text
-      this.search_text = this.$store.state.pageOptions.company.text
-      let offset = (this.$store.state.pageOptions.company.page - 1) * this.page_chunk
-      if(this.search_option == 'name') {
-        this.temp_option = 1
-      } else if (this.search_option == 'org_name') {
-        this.temp_option = 2
-      }
-      // Axios get landings
-      if (!this.user_obj.is_staff && this.access_obj.access == 1) {
-        def = '&organization=' + this.access_obj.organization
-      }
-      this.$store.state.pageOptions.loading = true
-      axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text + def)
-        .then((response) => {
-          // Calculation for page_max
-          if (response.data.count % this.page_chunk === 0) {
-            this.page_max = Math.floor(response.data.count / this.page_chunk)
-          } else {
-            this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
-          }
-          this.content_obj = response.data.results
-          this.$store.state.pageOptions.loading = false
-        })
-        .catch(() => {
-          this.$store.state.pageOptions.loading = false
-        })
+      // Init other pages options
+      this.page_init()
+
+      // Get organization list
+      this.calling_all_unit()
     },
     destroyed() {
       // Save values in the store
@@ -268,13 +263,22 @@
     computed: {
       user_obj() {
         // Get user information
-        let user = this.$store.state.authUser
-        return user
-      },
-      access_obj() {
-        // Get access information the user
-        let access = this.$store.state.userAccess
-        return access
+        let store_user = this.$store.state.authUser
+        let user_json = {}
+        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+          // dummy block access auth
+          user_json = {
+            'is_staff': false,
+            'is_superuser': false,
+            'info': {
+              'access_role': 3
+            },
+            'failed': true
+          }
+        } else {
+          user_json = JSON.parse(this.$store.state.authUser)
+        }
+        return user_json
       }
     }
   }

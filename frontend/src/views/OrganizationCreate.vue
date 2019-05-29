@@ -1,5 +1,6 @@
 <template>
   <div class="main">
+
     <div class="text_navigation">
       <router-link to="/">홈</router-link>
       <span>></span>
@@ -25,7 +26,7 @@
           </div>
 
           <label for="org_sub" class="col-form-label-sm col-sm-3 mt-3">
-            <span>상호명</span>
+            <span>상호명 (마케팅명)</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
             <div class="error_label" v-if="errors.has('org_sub')">{{errors.first('org_sub')}}</div>
@@ -117,13 +118,12 @@
       </form>
     </div>
 
-
   </div>
 </template>
 
 <script>
   export default {
-    name: "company_create",
+    name: "organization_create",
     data: () => ({
       // For organization create
       error_label:{
@@ -203,16 +203,20 @@
       create_organization() {
         // Create an organization myself
         this.$validator.validateAll()
-        if(confirm('업체를 생성하시겠습니까?')) {
+        if(confirm('조직을 생성하시겠습니까?')) {
+          this.$store.state.pageOptions.loading = true
           axios.post(this.$store.state.endpoints.baseUrl + 'organization/', this.create_obj)
             .then(() => {
-              alert('업체가 생성되었습니다.')
+              alert('조직이 생성되었습니다.')
+              this.$store.state.pageOptions.loading = false
               this.$router.currentRoute.meta.protect_leave = 'no'
               this.$router.push({
                 name: 'organization_list'
               })
             })
             .catch((error) => {
+              alert('조직 생성 중 오류가 발생하였습니다.')
+              this.$store.state.pageOptions.loading = false
               console.log(error)
             })
         }

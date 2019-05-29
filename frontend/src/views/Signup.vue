@@ -21,7 +21,6 @@
 
           <div class="form-group block">
             <label for="email" class="col-sm-12 control-label">이메일*
-              {{ error_label.email }}
               <div class="error_label" v-if="error_label.email">이미 존재하는 이메일입니다!</div>
               <div class="error_label" v-else-if="errors.has('email')">이메일 형식을 확인해주세요!</div>
             </label>
@@ -76,7 +75,7 @@
 
           <div class="form-group block">
             <label for="username" class="col-sm-12 control-label">사용자 이름*
-              <div class="error_label" v-if="errors.has('username')">이름을 확인해주세요. (30자 미만)</div>
+              <div class="error_label" v-if="errors.has('username')">이름을 입력해주세요.</div>
             </label>
             <div class="col-sm-12">
               <input class="form-control"
@@ -94,7 +93,7 @@
 
           <div class="form-group block">
             <label for="phone" class="col-sm-12 control-label">전화번호
-              <div class="error_label" v-if="error_label.phone">전화번호를 확인해주세요.</div>
+              <div class="error_label" v-if="error_label.phone">전화번호 형식을 확인해주세요. (010~9, 070)</div>
             </label>
             <div class="col-sm-12">
               <input class="form-control"
@@ -176,55 +175,40 @@
         } else if (param === 'email') {
           // Duplicated function has to add
           if (this.email !== '') {
+            // If email is not empty
             let users = []
-            let email_flag = true
-            let validate_result = 0
             axios.get(this.$store.state.endpoints.baseUrl + 'user/')
               .then((response) => {
-                console.log('user get response', response)
+
                 users = response.data.results
+                let email_flag = false
 
                 if (users.length !== 0) {
-                  console.log('users length is not 0')
                   for (let i = 0; i < users.length; i++) {
-                    console.log('users i? ', users[i])
                     if (users[i].email == this.email) {
-                      this.error_label.email = true
-                      // this.error_label.class.email = 'form-control alert-danger'
-                      validate_result--
-                      email_flag = false
-                    } else {
                       email_flag = true
-                      this.error_label.email = false
-                      validate_result++
-                      // this.error_label.class.email = 'form-control alert-success'
                     }
                   }
                 }
 
-                if (email_flag) {
-                  if (this.$validator.errors.has('email')) {
-                    validate_result--
-                    // this.error_label.email = true
-                    // this.error_label.class.email = 'form-control alert-danger'
-                  } else {
-                    validate_result++
-                    // this.error_label.email = false
-                    // this.error_label.class.email = 'form-control alert-success'
-                  }
-                }
-                if (validate_result > 0) {
-                  this.error_label.class.email = 'form-control alert-success'
-                } else {
+                this.error_label.email = email_flag
+
+                // If has error atleast one thing of check
+                if (this.error_label.email || this.$validator.errors.has('email')) {
                   this.error_label.class.email = 'form-control alert-danger'
+                } else if (!this.error_label.email && !this.$validator.errors.has('email')){
+                  // Nor both are clear
+                  this.error_label.class.email = 'form-control alert-success'
                 }
+
               })
               .catch((error) => {
-                console.log('Email duplicated check fail', error)
+                console.log('Email check axios failed', error)
               })
 
           } else {
-            // this.error_label.email = false
+            // If email is empty
+            this.error_label.email = false
             this.error_label.class.email = 'form-control'
           }
         }

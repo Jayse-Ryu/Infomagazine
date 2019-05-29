@@ -126,6 +126,7 @@
     name: "Organization_list",
     created() {
       this.$store.state.pageOptions.loading = true
+      // Filtering non authorize users first
       if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
         alert('권한이 없습니다.')
         this.$store.state.pageOptions.loading = false
@@ -139,6 +140,7 @@
           })
         }
       }
+      this.$store.state.pageOptions.loading = false
     },
     data: () => ({
       window_width: window.innerWidth,
@@ -163,19 +165,19 @@
         option.user.page = 1
         option.user.option = 0
         option.user.text = ''
-        option.organization.page = 1
-        option.organization.option = 0
-        option.organization.text = ''
+        option.landing.page = 1
+        option.landing.option = 0
+        option.landing.text = ''
 
         // Check Vuex store for this page values
-        this.page_current = option.landing.page
-        this.temp_option = option.landing.option
-        this.temp_text = option.landing.text
-        this.search_option = option.landing.option
-        this.search_text = option.landing.text
+        this.page_current = option.organization.page
+        this.temp_option = option.organization.option
+        this.temp_text = option.organization.text
+        this.search_option = option.organization.option
+        this.search_text = option.organization.text
 
         // Follow inited search options
-        let offset = (this.$store.state.pageOptions.landing.page - 1) * this.page_chunk
+        let offset = (this.$store.state.pageOptions.organization.page - 1) * this.page_chunk
         if (this.search_option == 1) {
           this.temp_option = 1
         } else if (this.search_option == 2) {
@@ -248,6 +250,7 @@
           .then((response) => {
             this.$store.state.pageOptions.loading = false
             console.log('get landing response', response)
+            this.content_obj = response.data.results
           })
           .catch((error) => {
             this.$store.state.pageOptions.loading = false
@@ -259,7 +262,7 @@
     mounted() {
       // Window width calculator
       let that = this
-      this.$nextTick(function () {
+      that.$nextTick(function () {
         window.addEventListener('resize', function (e) {
           that.window_width = window.innerWidth
         })
