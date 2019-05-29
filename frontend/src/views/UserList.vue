@@ -6,105 +6,125 @@
       <router-link to="/users">유저 리스트</router-link>
     </div>
 
-    <form class="container m-auto justify-content-between row" v-on:submit.prevent="search(temp_option, temp_text)">
-      <!--<router-link to="/users/create" class="btn-sm h-75 btn-primary p-1 col-md-1 col-sm-2 col text-center">생성</router-link>-->
-      <div class="form-group search_group text-center ml-auto p-0 col-sm-12 col-md-4">
-        <select class="search_option" id="src_gbn" v-model="temp_option">
-          <option value="0" selected>검색 옵션</option>
-          <option value="1">이름</option>
-          <option value="2">계정</option>
-        </select>
-        <input type="text" class="search_text" v-model="temp_text" placeholder="검색">
-        <button type="submit" class="search_btn">
-          <img src="../assets/common/search.png"/>
-        </button>
-      </div>
-    </form>
+    <div v-if="user_obj.is_staff || user_obj.is_superuser">
 
-    <div class="container">
+      <div class="container">
 
-      <div v-if="window_width > 1000" class="list_area">
-        <div class="list_header">
-          <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
-               style="border-radius: 0; border-bottom: 0; width:100%;">
-            <div class="col-1 p-0">번호</div>
-            <div class="col-2 p-0text-center">계정</div>
-            <div class="col-3 p-0 text-center">이름</div>
-            <div class="col-2 p-0 text-center">등급</div>
-            <!--<div class="col-1 text-center">활성상태</div>-->
-            <div class="col-2 p-0 board_centre">연락처</div>
-            <div class="col-2 p-0 board_centre">생성일</div>
+        <!-- Search form -->
+        <form class="container m-auto justify-content-between row p-0"
+              v-on:submit.prevent="search(temp_option, temp_text)">
+
+          <div class="w-100">
+            <h4><span class="text-info">유저</span>들을 확인하세요</h4>
           </div>
-        </div>
-        <ul class="list_body list-group list-group-flush col-12 pr-0 text-center">
-          <li v-if="content_obj.length === 0"
-              class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
-            <div class="col-12 text-center">데이터가 존재하지 않습니다.</div>
-          </li>
-          <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-              v-for="content in content_obj">
-            <div class="col-1 p-0">{{ content.user }}</div>
-            <div class="col-2 p-0 text-center">
-              <router-link :to="'/users/detail/' + content.user">{{ content.account }}</router-link>
-            </div>
-            <div class="col-3 p-0 text-center">
-              <router-link :to="'/users/detail/' + content.user">{{ content.user_name }}</router-link>
-            </div>
-            <div v-if="user_obj.id == content.user" class="col-2 p-0 text-center">
-              <div class="badge badge-dark">본인</div>
-            </div>
-            <div v-else-if="content.access == 1" class="col-2 p-0 text-center">
-              <div class="badge badge-primary">마케터</div>
-            </div>
-            <div v-else-if="content.access == -1" class="col-2 p-0 text-center">
-              <div class="badge badge-danger">미인증 마케터</div>
-            </div>
-            <div v-else-if="content.access == 2" class="col-2 p-0 text-center">
-              <div class="badge badge-success">고객</div>
-            </div>
-            <div v-else-if="content.access == -2" class="col-2 p-0 text-center">
-              <div class="badge badge-danger">미인증 고객</div>
-            </div>
-            <!--<div class="col-1 text-center">{{ content.is_active }}</div>-->
-            <div v-if="content.phone" class="col-2 p-0 board_centre">{{ content.phone }}</div>
-            <div v-else class="col-2 p-0 board_centre">없음</div>
-            <div class="col-2 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
-          </li>
-        </ul>
-      </div>
 
-      <div v-else class="list_area">
-        <div class="list_header">
-          <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2"
-               style="border-radius: 0; border-bottom: 0; width:100%;">
-            <div class="col-2 p-0">번호</div>
-            <div class="col-3 p-0 text-center">계정</div>
-            <div class="col-3 p-0 text-center">이름</div>
-            <div class="col-4 p-0 board_centre">연락처</div>
+          <router-link to="/users/create/" class="form-group btn btn-primary p-0 col-sm-12 col-md-1">
+            <div class="create_btn_text">고객 생성</div>
+          </router-link>
+
+          <div class="form-group search_group text-center ml-auto p-0 col-sm-12 col-md-4">
+            <select class="search_option" id="src_gbn" v-model="temp_option">
+              <option value="0" selected>검색 옵션</option>
+              <option value="1">이름</option>
+              <option value="2">이메일</option>
+            </select>
+            <input type="text" class="search_text" v-model="temp_text" placeholder="검색">
+            <button type="submit" class="search_btn">
+              <img src="../assets/common/search.png"/>
+            </button>
           </div>
-        </div>
-        <ul class="list_body list-group list-group-flush col-12 pr-0">
-          <li v-if="content_obj.length === 0"
-              class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
-            <div class="col-12 text-center">데이터가 존재하지 않습니다.</div>
-          </li>
-          <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-              v-for="content in content_obj">
-            <div class="col-2 p-0">{{ content.user }}</div>
-            <div class="col-3 p-0 text-center">
-              <router-link :to="'/users/detail/' + content.user">{{ content.account }}</router-link>
-            </div>
-            <div class="col-3 p-0 text-center">
-              <router-link :to="'/users/detail/' + content.user">{{ content.user_name }}</router-link>
-            </div>
-            <div v-if="content.phone" class="col-4 p-0 board_centre">{{ content.phone }}</div>
-            <div v-else class="col-4 p-0 board_centre">없음</div>
-          </li>
-        </ul>
-      </div>
+        </form>
+        <!-- /Search form -->
 
+
+        <div v-if="window_width > 1000" class="list_area">
+          <div class="list_header">
+            <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
+                 style="border-radius: 0; border-bottom: 0; width:100%;">
+              <div class="col-1 p-0">번호</div>
+              <div class="col-2 p-0text-center">계정</div>
+              <div class="col-3 p-0 text-center">이름</div>
+              <div class="col-2 p-0 text-center">등급</div>
+              <!--<div class="col-1 text-center">활성상태</div>-->
+              <div class="col-2 p-0 board_centre">연락처</div>
+              <div class="col-2 p-0 board_centre">생성일</div>
+            </div>
+          </div>
+          <ul class="list_body list-group list-group-flush col-12 pr-0 text-center">
+            <li v-if="content_obj.length === 0"
+                class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
+              <div class="col-12 text-center">데이터가 존재하지 않습니다.</div>
+            </li>
+            <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
+                v-for="content in content_obj">
+              <div class="col-1 p-0">{{ content.user }}</div>
+              <div class="col-2 p-0 text-center">
+                <router-link :to="'/users/detail/' + content.user">{{ content.account }}</router-link>
+              </div>
+              <div class="col-3 p-0 text-center">
+                <router-link :to="'/users/detail/' + content.user">{{ content.user_name }}</router-link>
+              </div>
+              <div v-if="user_obj.id == content.user" class="col-2 p-0 text-center">
+                <div class="badge badge-dark">본인</div>
+              </div>
+              <div v-else-if="content.access == 1" class="col-2 p-0 text-center">
+                <div class="badge badge-primary">마케터</div>
+              </div>
+              <div v-else-if="content.access == -1" class="col-2 p-0 text-center">
+                <div class="badge badge-danger">미인증 마케터</div>
+              </div>
+              <div v-else-if="content.access == 2" class="col-2 p-0 text-center">
+                <div class="badge badge-success">고객</div>
+              </div>
+              <div v-else-if="content.access == -2" class="col-2 p-0 text-center">
+                <div class="badge badge-danger">미인증 고객</div>
+              </div>
+              <!--<div class="col-1 text-center">{{ content.is_active }}</div>-->
+              <div v-if="content.phone" class="col-2 p-0 board_centre">{{ content.phone }}</div>
+              <div v-else class="col-2 p-0 board_centre">없음</div>
+              <div class="col-2 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+            </li>
+          </ul>
+        </div>
+
+        <div v-else class="list_area">
+          <div class="list_header">
+            <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2"
+                 style="border-radius: 0; border-bottom: 0; width:100%;">
+              <div class="col-2 p-0">번호</div>
+              <div class="col-3 p-0 text-center">계정</div>
+              <div class="col-3 p-0 text-center">이름</div>
+              <div class="col-4 p-0 board_centre">연락처</div>
+            </div>
+          </div>
+          <ul class="list_body list-group list-group-flush col-12 pr-0">
+            <li v-if="content_obj.length === 0"
+                class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
+              <div class="col-12 text-center">데이터가 존재하지 않습니다.</div>
+            </li>
+            <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
+                v-for="content in content_obj">
+              <div class="col-2 p-0">{{ content.user }}</div>
+              <div class="col-3 p-0 text-center">
+                <router-link :to="'/users/detail/' + content.user">{{ content.account }}</router-link>
+              </div>
+              <div class="col-3 p-0 text-center">
+                <router-link :to="'/users/detail/' + content.user">{{ content.user_name }}</router-link>
+              </div>
+              <div v-if="content.phone" class="col-4 p-0 board_centre">{{ content.phone }}</div>
+              <div v-else class="col-4 p-0 board_centre">없음</div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+      <!-- Container end -->
     </div>
-    <!-- Container end -->
+
+    <!-- If no one try to access to this list -->
+    <div v-else>
+      <div class="m-auto text-center pt-3">권한이 없습니다.</div>
+    </div>
 
     <paginate class="pagination"
               v-model="page_current"
@@ -142,137 +162,117 @@
       search_text: '',
     }),
     methods: {
-      pagination: function (pageNum) {
+      page_init() {
+        let option = this.$store.state.pageOptions
+
+        // Init other pages options
+        option.company.page = 1
+        option.company.option = 0
+        option.company.text = ''
+        option.organization.page = 1
+        option.organization.option = 0
+        option.organization.text = ''
+        option.landing.page = 1
+        option.landing.option = 0
+        option.landing.text = ''
+
+        // Check Vuex store for this page values
+        this.page_current = option.user.page
+        this.temp_option = option.user.option
+        this.temp_text = option.user.text
+        this.search_option = option.user.option
+        this.search_text = option.user.text
+
+        // Follow inited search options
+        let offset = (this.$store.state.pageOptions.user.page - 1) * this.page_chunk
+        this.temp_option = this.search_option
+
+      },
+      pagination(pageNum) {
         // when page is first, max ~ max-(chunk*current)+1
         // when page is max, max-(chunk*(current-1)) ~ 1
         // when page is middle, max-(chunk*(current-1)) ~ max-(chunk*current)+1
         let offset = (pageNum - 1) * this.page_chunk
         this.calling_all_unit(offset)
       },
-      search: function (option, text) {
-        if (option !== 0 || text !== '') {
-          let option_val
+      search(option, text) {
+        if (option !== 0 && text !== '') {
           this.page_current = 1
-          if (option === '1') {
-            option_val = 'name'
-          } else if (option === '2') {
-            option_val = 'account'
-          } else {
-            alert('검색 옵션이 없습니다.')
-          }
-          this.search_option = option_val
+          this.search_option = this.temp_option
           this.search_text = text
           this.calling_all_unit()
-        } else if (text == '') {
-          this.search_option = '0'
+        } else {
+          this.search_option = 0
+          this.search_text = ''
+          this.calling_all_unit()
         }
       },
-      calling_all_unit: function (page) {
+      calling_all_unit(offset) {
         // Calling landings with new values
-        let axios = this.$axios
-        let this_url = 'user_access/'
-        let offset = page
-        let def = ''
+        console.log('Calling all unit - called')
+        let auth_filter = ''
+        let search_param = ''
 
-        // filter
-        if (this.user_obj.is_staff) {
-          // collect all
-        } else if (this.access_obj.access == 1) {
-          // organization == access
-          def = '&organization=' + this.access_obj.organization
-        } else if (this.access_obj.access == 2) {
-          // company === company
-          def = '&company=' + this.access_obj.company
-        } else {
-          // Emergency break
-          def = '&organization=f'
+        // (For Pagination check)
+        // axios.get(this.$store.state.endpoints.baseUrl + 'landing/' + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text)
+        //   .then((response) => {
+        //     // Calculation for page_max
+        //     if (response.data.count % this.page_chunk === 0) {
+        //       this.page_max = Math.floor(response.data.count / this.page_chunk)
+        //     } else {
+        //       this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
+        //     }
+        //     this.content_obj = response.data.results
+        //   })
+
+        // const config = {
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   }
+        // }
+
+        if (this.search_option == 1) {
+          search_param = '&name=' + this.search_text
         }
+
+        if (this.user_obj.is_staff || this.user_obj.is_superuser) {
+          console.log('Staff user - Get All')
+          auth_filter = '?true'
+        } else if (this.user_obj.info.access_role == '0' || this.user_obj.info.access_role == '1') {
+          console.log('Marketer user - Get only Org')
+          auth_filter = '?organization=' + this.user_obj.info.organization
+        } else if (this.user_obj.info.access_role == '2') {
+          console.log('load about com - Get only Com')
+          auth_filter = '?company=' + this.user_obj.info.company
+        }
+
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&sort=1' + '&' + this.search_option + '=' + this.search_text + def)
+        axios.get(this.$store.state.endpoints.baseUrl + 'user/list/' + auth_filter + search_param)
           .then((response) => {
-            if (response.data.count % this.page_chunk === 0) {
-              this.page_max = Math.floor(response.data.count / this.page_chunk)
-            } else {
-              this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
-            }
-            this.content_obj = response.data.results
             this.$store.state.pageOptions.loading = false
+            console.log('get landing response', response)
+            this.content_obj = response.data.results
           })
           .catch((error) => {
-            console.log(error)
             this.$store.state.pageOptions.loading = false
+            console.log('Get landing crashed', error)
           })
       }
     },
     mounted() {
-      // Init other pages options
-      this.$store.state.pageOptions.company.page = 1
-      this.$store.state.pageOptions.company.option = 0
-      this.$store.state.pageOptions.company.text = ''
-      this.$store.state.pageOptions.landing.page = 1
-      this.$store.state.pageOptions.landing.option = 0
-      this.$store.state.pageOptions.landing.text = ''
-      this.$store.state.pageOptions.organization.page = 1
-      this.$store.state.pageOptions.organization.option = 0
-      this.$store.state.pageOptions.organization.text = ''
-
       // Window width calculator
       let that = this
-      this.$nextTick(function () {
+      that.$nextTick(function () {
         window.addEventListener('resize', function (e) {
           that.window_width = window.innerWidth
         })
       })
 
-      // Calling contents at first with store
-      let axios = this.$axios
-      let this_url = 'user_access/'
-      let def = ''
-      // Check store values
-      this.page_current = this.$store.state.pageOptions.user.page
-      this.search_option = this.$store.state.pageOptions.user.option
-      this.temp_text = this.$store.state.pageOptions.user.text
-      this.search_text = this.$store.state.pageOptions.user.text
-      let offset = (this.$store.state.pageOptions.user.page - 1) * (this.page_chunk)
+      // Init other pages options
+      this.page_init()
 
-      if(this.search_option == 'name') {
-        this.temp_option = 1
-      } else if (this.search_option == 'account') {
-        this.temp_option = 2
-      }
-      // filter
-      if (this.user_obj.is_staff) {
-        // collect all
-      } else if (this.access_obj.access == 1) {
-        // organization == access
-        def = '&all_organization=' + this.access_obj.organization
-      } else if (this.access_obj.access == 2) {
-        // company === company
-        def = '&company=' + this.access_obj.company
-      } else {
-        // Emergency break
-        def = '&organization=f'
-      }
-      this.$store.state.pageOptions.loading = true
-      axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text + '&sort=1' + def)
-        .then((response) => {
-          if (response.data.count % this.page_chunk === 0) {
-            this.page_max = Math.floor(response.data.count / this.page_chunk)
-          } else {
-            this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
-          }
-          this.content_obj = response.data.results
-          this.$store.state.pageOptions.loading = false
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$store.state.pageOptions.loading = false
-        })
-    },
-    update() {
-      if (this.$store.state.jwt !== null) {
-        this.$store.dispatch('getAuthUser')
-      }
+      // Get organization list
+      this.calling_all_unit()
     },
     destroyed() {
       // Save values in the store
@@ -283,13 +283,22 @@
     computed: {
       user_obj() {
         // Get user information
-        let user = this.$store.state.authUser
-        return user
-      },
-      access_obj() {
-        // Get access information the user
-        let access = this.$store.state.userAccess
-        return access
+        let store_user = this.$store.state.authUser
+        let user_json = {}
+        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+          // dummy block access auth
+          user_json = {
+            'is_staff': false,
+            'is_superuser': false,
+            'info': {
+              'access_role': 3
+            },
+            'failed': true
+          }
+        } else {
+          user_json = JSON.parse(this.$store.state.authUser)
+        }
+        return user_json
       }
     }
   }

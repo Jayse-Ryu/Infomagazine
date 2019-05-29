@@ -10,6 +10,10 @@
     <form class="container m-auto justify-content-between row"
           v-on:submit.prevent="search(temp_option, temp_text)">
 
+      <div class="w-100">
+        <h4><span class="text-info">랜딩페이지</span>를 확인하세요</h4>
+      </div>
+
       <!-- Create button -->
       <router-link to="/landing/create/"
                    v-if="[0, 1].includes(user_obj.info.access_role) || user_obj.is_staff || user_obj.is_superuser"
@@ -206,13 +210,7 @@
 
         // Follow inited search options
         let offset = (this.$store.state.pageOptions.landing.page - 1) * this.page_chunk
-        if (this.search_option == 1) {
-          this.temp_option = 1
-        } else if (this.search_option == 2) {
-          this.temp_option = 2
-        } else if (this.search_option == 3) {
-          this.temp_option = 3
-        }
+        this.temp_option = this.search_option
       },
       pagination(pageNum) {
         // when page is first, /// max ~ max-(chunk*current)+1

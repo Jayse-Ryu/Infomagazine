@@ -153,11 +153,14 @@
             let test_flag = rgTel.test(strValue)
             if (!test_flag) {
               this.error_label.phone = true
+              this.error_label.class.phone = 'form-control alert-danger'
             } else {
               this.error_label.phone = false
+              this.error_label.class.phone = 'form-control alert-success'
             }
           } else {
             this.error_label.phone = false
+            this.error_label.class.phone = 'form-control'
           }
         } else if (param === 'password') {
           if (this.password == '' || this.re_pass == '') {

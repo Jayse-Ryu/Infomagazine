@@ -4,12 +4,14 @@
     <div class="text_navigation">
       <router-link to="/">홈</router-link>
       <span>></span>
-      <router-link to="/company">업체 리스트</router-link>
+      <router-link to="/organization">조직 리스트</router-link>
       <span>></span>
-      <router-link to="/company/create">조직 생성</router-link>
+      <router-link to="/organization/create">조직 생성</router-link>
     </div>
 
     <div class="container">
+      <h4>마케팅 회사를 위한 <span class="text-info">조직</span>을 생성합니다</h4>
+
       <form class="m-auto" v-on:submit.prevent="create_organization">
         <div class="form-group row">
           <label for="org_name" class="col-form-label-sm col-sm-3 mt-3">

@@ -9,6 +9,7 @@
     </div>
 
     <div class="container">
+      <h4>고객 회사를 위한 <span class="text-info">업체</span>를 생성합니다</h4>
       <form class="m-auto" v-on:submit.prevent="create_company">
         <div class="form-group row">
           <label for="corp_name" class="col-form-label-sm col-sm-3 mt-3">

@@ -157,6 +157,16 @@ const router = new Router({
       }
     },
     {
+      path: '/users/create',
+      name: 'user_create',
+      component: () => import('./views/UserCreate.vue'),
+      meta: {
+        signed: true,
+        auth_grade: 'marketer',
+        protect_leave: 'yes'
+      }
+    },
+    {
       path: '/myinfo',
       name: 'my_info',
       component: () => import('./views/MyInfo.vue'),

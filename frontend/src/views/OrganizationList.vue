@@ -3,15 +3,21 @@
     <div class="text_navigation">
       <router-link to="/">홈</router-link>
       <span>></span>
-      <router-link to="/organization">소속 리스트</router-link>
+      <router-link to="/organization">조직 리스트</router-link>
     </div>
 
     <div v-if="user_obj.is_staff || user_obj.is_superuser">
       <form class="container m-auto row"
             v-on:submit.prevent="search(temp_option, temp_text)">
-        <router-link to="/organization/create/" class="btn-sm h-75 btn-primary p-1 col-md-1 col-sm-2 col text-center">
-          생성
+
+        <div class="w-100">
+          <h4><span class="text-info">마케팅</span> 회사들을 확인하세요</h4>
+        </div>
+
+        <router-link to="/organization/create/" class="form-group btn btn-primary p-0 col-sm-12 col-md-1">
+          <div class="create_btn_text">생성</div>
         </router-link>
+
         <div class="form-group search_group ml-auto text-center p-0 col-sm-12 col-md-4">
           <select class="search_option" id="src_gbn" v-model="temp_option">
             <option value="0" selected>검색 옵션</option>
@@ -178,13 +184,7 @@
 
         // Follow inited search options
         let offset = (this.$store.state.pageOptions.organization.page - 1) * this.page_chunk
-        if (this.search_option == 1) {
-          this.temp_option = 1
-        } else if (this.search_option == 2) {
-          this.temp_option = 2
-        } else if (this.search_option == 3) {
-          this.temp_option = 3
-        }
+        this.temp_option = this.search_option
 
       },
       pagination(pageNum) {

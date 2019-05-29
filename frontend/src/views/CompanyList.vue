@@ -10,6 +10,10 @@
       <form class="container m-auto justify-content-between row"
             v-on:submit.prevent="search(temp_option, temp_text)">
 
+        <div class="w-100">
+          <h4><span class="text-info">고객</span> 회사들을 확인하세요</h4>
+        </div>
+
         <router-link to="/company/create/" class="form-group btn btn-primary p-0 col-sm-12 col-md-1">
           <div class="create_btn_text">생성</div>
         </router-link>
@@ -159,13 +163,7 @@
 
         // Follow inited search options
         let offset = (this.$store.state.pageOptions.company.page - 1) * this.page_chunk
-        if (this.search_option == 1) {
-          this.temp_option = 1
-        } else if (this.search_option == 2) {
-          this.temp_option = 2
-        } else if (this.search_option == 3) {
-          this.temp_option = 3
-        }
+        this.temp_option = this.search_option
 
       },
       pagination(pageNum) {
