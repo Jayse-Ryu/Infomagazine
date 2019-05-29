@@ -161,7 +161,7 @@
               this.error_label.class.tel_num = 'form-control alert-danger'
             } else {
               this.error_label.corp_tel_num = false
-              this.error_label.class.tel_num = 'form-control alert-success'
+              this.error_label.class.tel_num = 'form-control alert-info'
             }
           } else {
             this.error_label.corp_tel_num = false
@@ -176,7 +176,7 @@
               this.error_label.class.email = 'form-control alert-danger'
             } else {
               this.error_label.corp_email = false
-              this.error_label.class.email = 'form-control alert-success'
+              this.error_label.class.email = 'form-control alert-info'
             }
           } else {
             this.error_label.corp_email = false
@@ -210,13 +210,22 @@
     computed: {
       user_obj() {
         // Get user information
-        let user = this.$store.state.authUser
-        return user
-      },
-      access_obj() {
-        // Get access information the user
-        let access = this.$store.state.userAccess
-        return access
+        let store_user = this.$store.state.authUser
+        let user_json = {}
+        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+          // dummy block access auth
+          user_json = {
+            'is_staff': false,
+            'is_superuser': false,
+            'info': {
+              'access_role': 3
+            },
+            'failed': true
+          }
+        } else {
+          user_json = JSON.parse(this.$store.state.authUser)
+        }
+        return user_json
       }
     }
   }

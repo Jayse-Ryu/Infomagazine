@@ -178,7 +178,7 @@
               this.error_label.class.tel_num = 'form-control alert-danger'
             } else {
               this.error_label.org_tel_num = false
-              this.error_label.class.tel_num = 'form-control alert-success'
+              this.error_label.class.tel_num = 'form-control alert-info'
             }
           } else {
             this.error_label.org_tel_num = false
@@ -193,7 +193,7 @@
               this.error_label.class.email = 'form-control alert-danger'
             } else {
               this.error_label.org_email = false
-              this.error_label.class.email = 'form-control alert-success'
+              this.error_label.class.email = 'form-control alert-info'
             }
           } else {
             this.error_label.org_email = false

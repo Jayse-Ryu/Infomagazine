@@ -27,7 +27,7 @@
             <div class="col-sm-12">
               <input :class="error_label.class.email"
                      required
-                     v-model="email"
+                     v-model="content_obj.email"
                      type="email"
                      placeholder="이메일을 입력하세요."
                      autofocus="autofocus"
@@ -45,7 +45,7 @@
               <div>
                 <input :class="error_label.class.password"
                        required
-                       v-model="password"
+                       v-model="content_obj.password"
                        type="password"
                        placeholder="비밀번호를 입력하세요."
                        maxlength="20"
@@ -81,7 +81,7 @@
               <input class="form-control"
                      required
                      v-validate="'required'"
-                     v-model="username"
+                     v-model="content_obj.username"
                      type="text"
                      placeholder="이름을 입력하세요."
                      autofocus="autofocus"
@@ -96,8 +96,8 @@
               <div class="error_label" v-if="error_label.phone">전화번호 형식을 확인해주세요. (010~9, 070)</div>
             </label>
             <div class="col-sm-12">
-              <input class="form-control"
-                     v-model="phone"
+              <input :class="error_label.class.phone"
+                     v-model="content_obj.info.phone_num"
                      type="number"
                      placeholder="연락처를 입력하세요."
                      autofocus="autofocus"
@@ -127,49 +127,52 @@
   export default {
     name: 'sign_up',
     data: () => ({
-      account: '',
-      password: '',
       re_pass: '',
-      username: '',
-      email: '',
-      phone: '',
-      select_options: [],
       error_label: {
         password: false,
         phone: false,
         email: false,
         class: {
           email: 'form-control',
-          password: 'form-control'
+          password: 'form-control',
+          phone: 'form-control'
+        }
+      },
+      content_obj: {
+        email: '',
+        username: '',
+        password: '',
+        info: {
+          phone_num: '',
         }
       }
     }),
     methods: {
       error_check(param) {
         if (param === 'phone') {
-          if (this.phone !== '') {
+          if (this.content_obj.info.phone_num !== '') {
             let rgTel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
-            let strValue = this.phone
+            let strValue = this.content_obj.info.phone_num
             let test_flag = rgTel.test(strValue)
             if (!test_flag) {
               this.error_label.phone = true
               this.error_label.class.phone = 'form-control alert-danger'
             } else {
               this.error_label.phone = false
-              this.error_label.class.phone = 'form-control alert-success'
+              this.error_label.class.phone = 'form-control alert-info'
             }
           } else {
             this.error_label.phone = false
             this.error_label.class.phone = 'form-control'
           }
         } else if (param === 'password') {
-          if (this.password == '' || this.re_pass == '') {
+          if (this.content_obj.password == '' || this.re_pass == '') {
             this.error_label.password = false
             this.error_label.class.password = 'form-control'
           } else {
-            if (this.password === this.re_pass) {
+            if (this.content_obj.password === this.re_pass) {
               this.error_label.password = true
-              this.error_label.class.password = 'form-control alert-success'
+              this.error_label.class.password = 'form-control alert-info'
             } else {
               this.error_label.password = false
               this.error_label.class.password = 'form-control alert-danger'
@@ -177,7 +180,7 @@
           }
         } else if (param === 'email') {
           // Duplicated function has to add
-          if (this.email !== '') {
+          if (this.content_obj.email !== '') {
             // If email is not empty
             let users = []
             axios.get(this.$store.state.endpoints.baseUrl + 'user/')
@@ -188,7 +191,7 @@
 
                 if (users.length !== 0) {
                   for (let i = 0; i < users.length; i++) {
-                    if (users[i].email == this.email) {
+                    if (users[i].email == this.content_obj.email) {
                       email_flag = true
                     }
                   }
@@ -201,7 +204,7 @@
                   this.error_label.class.email = 'form-control alert-danger'
                 } else if (!this.error_label.email && !this.$validator.errors.has('email')){
                   // Nor both are clear
-                  this.error_label.class.email = 'form-control alert-success'
+                  this.error_label.class.email = 'form-control alert-info'
                 }
 
               })
@@ -229,32 +232,22 @@
           // Check phone number validated
           alert('전화번호 형식을 확인해주세요.')
           document.getElementById('phone').focus()
-        } else if (this.email == true) {
+        } else if (this.error_label.email == true) {
           // Check duplicated email address
           alert('이미 존재하는 이메일입니다.')
-          document.getElementById('id_username').focus()
+          document.getElementById('email').focus()
         } else {
           // Else clear, create a new user.
-          let axios = this.$axios
-
-          let formData = new FormData()
-          formData.append('email', this.email)
-          formData.append('password', this.password)
-          formData.append('username', this.username)
-          formData.append('phone', this.phone)
 
           // Axios config
           const config = {
             headers: {
               'Content-Type': 'application/json'
-            },
-            xhrFields: {
-              withCredentials: true
             }
           }
 
           /* Do axios post */
-          axios.post(this.$store.state.endpoints.baseUrl + 'user/', formData, config)
+          axios.post(this.$store.state.endpoints.baseUrl + 'user/', this.content_obj, config)
             .then(() => {
               alert('회원가입 되었습니다.')
               this.$router.currentRoute.meta.protect_leave = 'no'

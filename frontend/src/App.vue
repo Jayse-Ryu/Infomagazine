@@ -600,6 +600,9 @@
     border: 1px solid #c1c1c1;
     padding: 10px;
     margin-left: -6px;
+    &:focus {
+      outline: none !important;
+    }
   }
 
   .search_btn {

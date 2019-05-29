@@ -83,7 +83,9 @@
                 <div class="badge badge-success">고객</div>
               </div>
 
-              <div v-if="content.phone" class="col-2 p-0 board_centre">{{ content.phone }}</div>
+              <div v-if="content.info.phone_num" class="col-2 p-0 board_centre">
+                {{ content.info.phone_num }}
+              </div>
               <div v-else class="col-2 p-0 board_centre">없음</div>
               <div class="col-2 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
             </li>
@@ -95,7 +97,7 @@
           <div class="list_header">
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2"
                  style="border-radius: 0; border-bottom: 0; width:100%;">
-              <div class="col-2 p-0">번호</div>
+              <!--<div class="col-2 p-0">번호</div>-->
               <div class="col-3 p-0 text-center">계정</div>
               <div class="col-3 p-0 text-center">이름</div>
               <div class="col-4 p-0 board_centre">연락처</div>
@@ -108,14 +110,19 @@
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
                 v-for="content in content_obj">
-              <div class="col-2 p-0">{{ content.user }}</div>
+              <!--<div class="col-2 p-0">{{ content.user }}</div>-->
               <div class="col-3 p-0 text-center">
-                <router-link :to="'/users/detail/' + content.user">{{ content.account }}</router-link>
+                <router-link :to="'/users/detail/' + content.id">{{ content.email }}</router-link>
               </div>
-              <div class="col-3 p-0 text-center">
-                <router-link :to="'/users/detail/' + content.user">{{ content.user_name }}</router-link>
+
+              <div v-if="content.username" class="col-3 p-0 text-center">
+                <router-link :to="'/users/detail/' + content.id">{{ content.username }}</router-link>
               </div>
-              <div v-if="content.phone" class="col-4 p-0 board_centre">{{ content.phone }}</div>
+              <div v-else class="col-3 p-0 text-center">
+                <router-link :to="'/users/detail/' + content.id">이름없음</router-link>
+              </div>
+
+              <div v-if="content.info.phone_num" class="col-4 p-0 board_centre">{{ content.info.phone_num }}</div>
               <div v-else class="col-4 p-0 board_centre">없음</div>
             </li>
           </ul>
@@ -190,7 +197,6 @@
         // Follow inited search options
         let offset = (this.$store.state.pageOptions.user.page - 1) * this.page_chunk
         this.temp_option = this.search_option
-
       },
       pagination(pageNum) {
         // when page is first, max ~ max-(chunk*current)+1
@@ -301,6 +307,7 @@
         } else {
           user_json = JSON.parse(this.$store.state.authUser)
         }
+        console.log('user json?', user_json)
         return user_json
       }
     }

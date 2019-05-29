@@ -82,7 +82,7 @@
           <div class="col-sm-9 mt-sm-3">
             <input :class="error_label.class.phone" id="user_phone" name="user_phone"
                    type="number"
-                   v-model="create_obj.phone"
+                   v-model="create_obj.info.phone_num"
                    placeholder="연락처를 입력하세요"
                    autofocus="autofocus"
                    maxlength="16"
@@ -122,11 +122,11 @@
         email: '',
         username: '',
         password: '',
-        phone: '',
         info: {
           access_role: 2,
           organization: null,
-          company: null
+          company: null,
+          phone_num: '',
         }
       }
     }),
@@ -136,16 +136,16 @@
     methods: {
       error_check(param) {
         if (param === 'phone') {
-          if (this.create_obj.phone !== '') {
+          if (this.create_obj.info.phone_num !== '') {
             let rgTel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
-            let strValue = this.create_obj.phone
+            let strValue = this.create_obj.info.phone_num
             let test_flag = rgTel.test(strValue)
             if (!test_flag) {
               this.error_label.phone = true
               this.error_label.class.phone = 'form-control alert-danger'
             } else {
               this.error_label.phone = false
-              this.error_label.class.phone = 'form-control alert-success'
+              this.error_label.class.phone = 'form-control alert-info'
             }
           } else {
             this.error_label.phone = false
@@ -158,7 +158,7 @@
           } else {
             if (this.create_obj.password === this.re_pass) {
               this.error_label.password = true
-              this.error_label.class.password = 'form-control alert-success'
+              this.error_label.class.password = 'form-control alert-info'
             } else {
               this.error_label.password = false
               this.error_label.class.password = 'form-control alert-danger'
@@ -190,7 +190,7 @@
                   this.error_label.class.email = 'form-control alert-danger'
                 } else if (!this.error_label.email && !this.$validator.errors.has('email')) {
                   // Nor both are clear
-                  this.error_label.class.email = 'form-control alert-success'
+                  this.error_label.class.email = 'form-control alert-info'
                 }
               })
               .catch((error) => {
