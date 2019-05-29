@@ -273,7 +273,11 @@ router.beforeEach((to, from, next) => {
           })
       } else {
         // If not 'to' sign_in, signed meta is null
-        next()
+        if (!to.name || to.name === null || to.name === '') {
+          next({name: 'A404'})
+        } else {
+          next()
+        }
       }
     } else if (!to.name || to.name === null || to.name === '') {
       // If component is not exist, push to 404 page

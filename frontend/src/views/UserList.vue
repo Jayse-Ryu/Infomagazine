@@ -41,8 +41,8 @@
           <div class="list_header">
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
                  style="border-radius: 0; border-bottom: 0; width:100%;">
-              <div class="col-1 p-0">번호</div>
-              <div class="col-2 p-0text-center">계정</div>
+              <!--<div class="col-1 p-0">번호</div>-->
+              <div class="col-3 p-0text-center">계정</div>
               <div class="col-3 p-0 text-center">이름</div>
               <div class="col-2 p-0 text-center">등급</div>
               <!--<div class="col-1 text-center">활성상태</div>-->
@@ -51,39 +51,43 @@
             </div>
           </div>
           <ul class="list_body list-group list-group-flush col-12 pr-0 text-center">
+
             <li v-if="content_obj.length === 0"
                 class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
               <div class="col-12 text-center">데이터가 존재하지 않습니다.</div>
             </li>
+
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
                 v-for="content in content_obj">
-              <div class="col-1 p-0">{{ content.user }}</div>
-              <div class="col-2 p-0 text-center">
-                <router-link :to="'/users/detail/' + content.user">{{ content.account }}</router-link>
-              </div>
+              <!--<div class="col-1 p-0">{{ content.id }}</div>-->
               <div class="col-3 p-0 text-center">
-                <router-link :to="'/users/detail/' + content.user">{{ content.user_name }}</router-link>
+                <router-link :to="'/users/detail/' + content.id">{{ content.email }}</router-link>
               </div>
-              <div v-if="user_obj.id == content.user" class="col-2 p-0 text-center">
+              <div v-if="content.username" class="col-3 p-0 text-center">
+                <router-link :to="'/users/detail/' + content.id">{{ content.username }}</router-link>
+              </div>
+              <div v-else class="col-3 p-0 text-center">
+                <router-link :to="'/users/detail/' + content.id">이름없음</router-link>
+              </div>
+
+              <div v-if="user_obj.id == content.id" class="col-2 p-0 text-center">
                 <div class="badge badge-dark">본인</div>
               </div>
-              <div v-else-if="content.access == 1" class="col-2 p-0 text-center">
+              <div v-else-if="[0,1].includes(content.info.access_role)" class="col-2 p-0 text-center">
                 <div class="badge badge-primary">마케터</div>
               </div>
-              <div v-else-if="content.access == -1" class="col-2 p-0 text-center">
+              <div v-else-if="content.info.access_role == 3" class="col-2 p-0 text-center">
                 <div class="badge badge-danger">미인증 마케터</div>
               </div>
               <div v-else-if="content.access == 2" class="col-2 p-0 text-center">
                 <div class="badge badge-success">고객</div>
               </div>
-              <div v-else-if="content.access == -2" class="col-2 p-0 text-center">
-                <div class="badge badge-danger">미인증 고객</div>
-              </div>
-              <!--<div class="col-1 text-center">{{ content.is_active }}</div>-->
+
               <div v-if="content.phone" class="col-2 p-0 board_centre">{{ content.phone }}</div>
               <div v-else class="col-2 p-0 board_centre">없음</div>
               <div class="col-2 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
             </li>
+
           </ul>
         </div>
 
@@ -250,7 +254,6 @@
         axios.get(this.$store.state.endpoints.baseUrl + 'user/list/' + auth_filter + search_param)
           .then((response) => {
             this.$store.state.pageOptions.loading = false
-            console.log('get landing response', response)
             this.content_obj = response.data.results
           })
           .catch((error) => {
