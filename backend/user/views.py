@@ -15,9 +15,9 @@ class UserListCreateAPIView(generics.ListCreateAPIView):
         return UserCreateSerializer
 
     def get_permissions(self):
-        if self.request.method == 'GET':
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
+        if self.request.method == 'POST':
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
 
 
 class UserRetrieveUpdate(generics.RetrieveUpdateAPIView):

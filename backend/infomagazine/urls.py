@@ -15,15 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework_swagger.views import get_swagger_view
+
+from infomagazine.views import custom_token_obtain_sliding, custom_token_refresh_sliding
 
 schema_view = get_swagger_view(title='Infomagzine API')
 
 api_patterns = ([
     path('admin/', admin.site.urls),
     path('swagger/', schema_view),
-    path('auth/', obtain_jwt_token, name='auth'),
+    path('auth/', custom_token_obtain_sliding, name='token_obtain_sliding'),
+    path('auth/refresh/', custom_token_refresh_sliding, name='token_refresh_sliding'),
     path('user/', include('user.urls', namespace='user'), name='user'),
     path('organization/', include('organization.urls', namespace='organization'), name='organization'),
     path('company/', include('company.urls', namespace='company'), name='company'),

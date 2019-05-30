@@ -80,7 +80,7 @@
         const payload = {
           email: this.email,
           password: this.password
-        }
+        })
         axios.post(this.$store.state.endpoints.obtainJWT, payload)
           .then((response) => {
             this.$store.dispatch('obtainToken', response.data)

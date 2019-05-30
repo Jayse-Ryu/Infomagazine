@@ -65,7 +65,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
@@ -73,21 +73,12 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
-JWT_AUTH = {
-    'JWT_RESPONSE_PAYLOAD_HANDLER':
-        'user.utils.jwt_response_payload_handler',
-    'JWT_VERIFY': True,
-    'JWT_VERIFY_EXPIRATION': True,
-    'JWT_LEEWAY': 0,
-    'JWT_EXPIRATION_DELTA': timedelta(seconds=86400),
-    'JWT_ALLOW_REFRESH': True,
-    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
-    # 'JWT_AUTH_COOKIE': 'sibal'
-}
+SECURE_BROWSER_XSS_FILTER = True
 
 # CORS_ALLOW_CREDENTIALS = True
-
+#
 SESSION_COOKIE_SAMESITE = 'Strict'
+# SESSION_COOKIE_SAMESITE = None
 
 CSRF_COOKIE_NAME = 'XSRF-TOKEN'
 
@@ -105,6 +96,7 @@ CORS_ALLOW_HEADERS = (
     'x-requested-with',
 )
 
+# TODO prod상에서 꼭 명시 - 서브도메인 지원을 위해
 # CSRF_COOKIE_DOMAIN = config('CSRF_COOKIE_DOMAIN')
 
 CORS_ORIGIN_WHITELIST = tuple(config('CORS_ORIGIN_WHITELIST', cast=Csv()))
@@ -204,5 +196,5 @@ AWS_DEFAULT_ACL = None
 AWS_LOCATION = 'static'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 AWS_S3_CUSTOM_DOMAIN = 'assets.infomagazine.xyz'
-# STATIC_URL = 'http://%s/%s/' % ('assets.infomagazine.xyz', 'static')
+STATIC_URL = 'http://%s/%s/' % ('assets.infomagazine.xyz', 'static')
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)

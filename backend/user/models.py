@@ -31,7 +31,7 @@ class UserInfo(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='info')
     access_role = enum.EnumField(AccessRole, default=AccessRole.GUEST)
     organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.SET_NULL)
-    phone_num = models.CharField(max_length=11, blank=True)
+    phone_num = models.CharField(max_length=11)
     updated_date = models.DateTimeField(auto_now=True)
 
     class Meta:
