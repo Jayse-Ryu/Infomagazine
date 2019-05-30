@@ -6,92 +6,149 @@
       <router-link to="/landing">랜딩 리스트</router-link>
     </div>
 
+    <!-- Search form -->
     <form class="container m-auto justify-content-between row"
           v-on:submit.prevent="search(temp_option, temp_text)">
-      <router-link to="/landing/create/" v-if="access_obj.access == 1" class="form-group btn btn-primary p-0 col-sm-12 col-md-1">
+
+      <div class="w-100">
+        <h4><span class="text-info">랜딩페이지</span>를 확인하세요</h4>
+      </div>
+
+      <!-- Create button -->
+      <router-link to="/landing/create/"
+                   v-if="[0, 1].includes(user_obj.info.access_role) || user_obj.is_staff || user_obj.is_superuser"
+                   class="form-group btn btn-primary p-0 col-sm-12 col-md-1">
         <div class="create_btn_text">생성</div>
       </router-link>
+
       <div class="form-group search_group ml-auto text-center p-0 col-sm-12 col-md-4">
-        <select class="search_option" id="src_gbn" v-model="temp_option">
+
+        <select v-if="[0, 1].includes(user_obj.info.access_role) || user_obj.is_staff || user_obj.is_superuser"
+                class="search_option" id="src_gbn" v-model="temp_option">
           <option value="0" selected>검색 옵션</option>
           <option value="1">랜딩 이름</option>
           <option value="2">업체</option>
-          <option value="3">관리자</option>
+          <option value="3">마케터</option>
         </select>
+
+        <select v-else-if="user_obj.info.access_role == 2"
+                class="search_option" id="src_gbn" v-model="temp_option">
+          <option value="0" selected>검색 옵션</option>
+          <option value="1">랜딩 이름</option>
+        </select>
+
         <input type="text" class="search_text" v-model="temp_text" placeholder="검색">
         <button type="submit" class="search_btn">
           <img src="../assets/common/search.png"/>
         </button>
       </div>
     </form>
+    <!-- /Search form -->
+
+
+    <!-- Landing List -->
     <div class="container">
+
+      <!-- List with Big width -->
       <div v-if="window_width > 1000" class="list_area">
+
+        <!-- List table header -->
         <div class="list_header">
           <div class="list-group-item text-center d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
                style="border-radius: 0; border-bottom: 0; width:100%;">
-            <!--<div class="col-1 p-0">번호</div>-->
             <div class="col-3 p-0">업체</div>
             <div class="col-4 p-0">페이지</div>
-            <div class="col-3 p-0">담당자</div>
+            <div class="col-3 p-0">마케터</div>
             <div class="col-1 p-0 board_centre">조회수</div>
             <div class="col-1 p-0 board_centre">DB</div>
           </div>
         </div>
+        <!-- /List table header -->
+
+        <!-- List table body -->
         <ul class="list_body text-center list-group list-group-flush col-12 pr-0 text-center">
+
           <li v-if="content_obj.length === 0"
               class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
             <div class="col-12 text-center">데이터가 존재하지 않습니다.</div>
           </li>
-          <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-              v-for="content in content_obj">
-            <!--<div class="col-1 p-0 col-sm-1">{{ content.id }}</div>-->
+
+          <li v-else v-for="content in content_obj"
+              class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
             <div class="col-3 p-0 col-sm-3">{{ content.LandingInfo.landing.company_name }}</div>
-            <div v-if="access_obj.access == 1" class="col-3 p-0 col-sm-4">
-              <router-link :to="'/landing/detail/' + content.LandingNum">{{ content.LandingInfo.landing.name }}</router-link>
+            <div v-if="[0, 1].includes(user_obj.info.access_role) || user_obj.is_staff || user_obj.is_superuser"
+                 class="col-3 p-0 col-sm-4">
+              <router-link :to="'/landing/detail/' + content.LandingNum">
+                {{ content.LandingInfo.landing.name }}
+              </router-link>
             </div>
             <div v-else class="col-3 p-0 col-sm-4">
-              <router-link :to="'/db/detail/' + content.LandingNum">{{ content.LandingInfo.landing.name }}</router-link>
+              <router-link :to="'/db/detail/' + content.LandingNum">
+                {{ content.LandingInfo.landing.name }}
+              </router-link>
             </div>
             <div class="col-3 p-0">{{ content.LandingInfo.landing.manager_name }}</div>
             <div class="col-1 p-0 board_centre">{{ content.LandingInfo.landing.views }}</div>
             <div class="col-1 p-0 board_centre">
-              <router-link :to="'/db/detail/' + content.LandingNum">{{ content.LandingInfo.landing.collection_amount }}</router-link>
+              <router-link :to="'/db/detail/' + content.LandingNum">
+                {{ content.LandingInfo.landing.collection_amount }}
+              </router-link>
             </div>
           </li>
         </ul>
+        <!-- /List table body -->
       </div>
+      <!-- /List with Big width -->
 
+      <!-- List with Small width -->
       <div v-else class="list_area">
+
+        <!-- List table header -->
         <div class="list_header">
           <div class="list-group-item text-center d-inline-flex justify-content-between p-1 pt-2 pb-2"
                style="border-radius: 0; border-bottom: 0; width:100%;">
             <div class="col-2 p-0">업체</div>
             <div class="col-5 p-0">페이지</div>
-            <div class="col-3 p-0">담당자</div>
+            <div class="col-3 p-0">마케터</div>
             <div class="col-2 p-0">DB</div>
           </div>
         </div>
+        <!-- /List table header -->
+
+        <!-- List table body -->
         <ul class="list_body text-center list-group list-group-flush col-12 pr-0">
+
           <li v-if="content_obj.length === 0"
               class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
             <div class="col-12 p-0 text-center">데이터가 존재하지 않습니다.</div>
           </li>
+
           <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
               v-for="content in content_obj">
             <div class="col-2 p-0">{{ content.LandingInfo.landing.company_name }}</div>
-            <div v-if="access_obj.access == 1" class="col-5 p-0">
-              <router-link :to="'/landing/detail/' + content.LandingNum">{{ content.LandingInfo.landing.name }}</router-link>
+            <div v-if="[0, 1].includes(user_obj.info.access_role) || user_obj.is_staff || user_obj.is_superuser"
+                 class="col-5 p-0">
+              <router-link :to="'/landing/detail/' + content.LandingNum">
+                {{ content.LandingInfo.landing.name }}
+              </router-link>
             </div>
             <div v-else class="col-5 p-0">
-              <router-link :to="'/landing/detail/' + content.LandingNum">{{ content.LandingInfo.landing.name }}</router-link>
+              <router-link :to="'/landing/detail/' + content.LandingNum">
+                {{ content.LandingInfo.landing.name }}
+              </router-link>
             </div>
             <div class="col-3 p-0">{{ content.LandingInfo.landing.manager_name }}</div>
             <div class="col-2 p-0">
-              <router-link :to="'/db/detail/' + content.LandingNum">{{ content.LandingInfo.landing.collection_amount }}</router-link>
+              <router-link :to="'/db/detail/' + content.LandingNum">
+                {{ content.LandingInfo.landing.collection_amount }}
+              </router-link>
             </div>
           </li>
+
         </ul>
+        <!-- /List table body -->
       </div>
+      <!-- /List with Small width -->
 
     </div>
 
@@ -131,56 +188,58 @@
     }),
     methods: {
       page_init() {
-        // Init other pages options
-        this.$store.state.pageOptions.company.page = 1
-        this.$store.state.pageOptions.company.option = 0
-        this.$store.state.pageOptions.company.text = ''
-        this.$store.state.pageOptions.user.page = 1
-        this.$store.state.pageOptions.user.option = 0
-        this.$store.state.pageOptions.user.text = ''
-        this.$store.state.pageOptions.organization.page = 1
-        this.$store.state.pageOptions.organization.option = 0
-        this.$store.state.pageOptions.organization.text = ''
+        let option = this.$store.state.pageOptions
 
-        // Check Vuex store page values
-        this.page_current = this.$store.state.pageOptions.landing.page
-        this.search_option = this.$store.state.pageOptions.landing.option
-        this.temp_text = this.$store.state.pageOptions.landing.text
-        this.search_text = this.$store.state.pageOptions.landing.text
+        // Init other pages options
+        option.company.page = 1
+        option.company.option = 0
+        option.company.text = ''
+        option.user.page = 1
+        option.user.option = 0
+        option.user.text = ''
+        option.organization.page = 1
+        option.organization.option = 0
+        option.organization.text = ''
+
+        // Check Vuex store for this page values
+        this.page_current = option.landing.page
+        this.temp_option = option.landing.option
+        this.temp_text = option.landing.text
+        this.search_option = option.landing.option
+        this.search_text = option.landing.text
+
+        // Follow inited search options
+        let offset = (this.$store.state.pageOptions.landing.page - 1) * this.page_chunk
+        this.temp_option = this.search_option
       },
-      pagination: function (pageNum) {
-        // when page is first, max ~ max-(chunk*current)+1
-        // when page is max, max-(chunk*(current-1)) ~ 1
-        // when page is middle, max-(chunk*(current-1)) ~ max-(chunk*current)+1
+      pagination(pageNum) {
+        // when page is first, /// max ~ max-(chunk*current)+1
+        // when page is max, /// max-(chunk*(current-1)) ~ 1
+        // when page is middle, /// max-(chunk*(current-1)) ~ max-(chunk*current)+1
         let offset = (pageNum - 1) * this.page_chunk
         this.calling_all_unit(offset)
       },
-      search: function (option, text) {
-        if (option !== 0 || text !== '') {
-          let option_val
+      search(option, text) {
+        // option, text from data temp_x
+        if (option !== 0 && text !== '') {
           this.page_current = 1
-          if (option == 1) {
-            option_val = 'name'
-          } else if (option == 2) {
-            option_val = 'company'
-          } else if (option == 3) {
-            option_val = 'manager'
-          } else {
-            // console.log('Option not catched')
-            alert('검색 옵션을 선택하세요.')
-          }
-          this.search_option = option_val
+          this.search_option = this.temp_option
           this.search_text = text
+          this.calling_all_unit()
+        } else {
+          this.search_option = 0
+          this.search_text = ''
           this.calling_all_unit()
         }
       },
-      calling_all_unit(page) {
+      calling_all_unit(offset) {
         // Calling landings with new values
-        let axios = this.$axios
-        let this_url = 'landing/api/'
-        let offset = page
+        console.log('Calling all unit - called')
+        let auth_filter = ''
+        let search_param = ''
+
         // (For Pagination check)
-        // axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text)
+        // axios.get(this.$store.state.endpoints.baseUrl + 'landing/' + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text)
         //   .then((response) => {
         //     // Calculation for page_max
         //     if (response.data.count % this.page_chunk === 0) {
@@ -191,57 +250,46 @@
         //     this.content_obj = response.data.results
         //   })
 
-        const config = {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          xhrFields: {
-            withCredentials: true
-          }
+        // const config = {
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   }
+        // }
+
+        if (this.search_option == 1) {
+          search_param = '&name=' + this.search_text
+        } else if (this.search_option == 2) {
+          search_param = '&com_name=' + this.search_text
+        } else if (this.search_option == 3) {
+          search_param = '&marketer=' + this.search_text
         }
 
-        let auth = ''
-        let auth_code = ''
-        //
-        if (this.access_obj.user_staff == true) {
-          auth = '?auth=staff'
-        } else if (this.access_obj.access == 1) {
-          auth = '?auth=manager'
-          auth_code = '&auth_code=' + this.access_obj.organization
-        } else if (this.access_obj.access == 2) {
-          auth = '?auth=customer'
-          auth_code = '&auth_code=' + this.access_obj.company
-        } else {
-          auth = '?auth=none'
+        if (this.user_obj.is_staff || this.user_obj.is_superuser) {
+          console.log('Staff user - Get All')
+          auth_filter = '?true'
+        } else if (this.user_obj.info.access_role == '0' || this.user_obj.info.access_role == '1') {
+          console.log('Marketer user - Get only Org')
+          auth_filter = '?organization=' + this.user_obj.info.organization
+        } else if (this.user_obj.info.access_role == '2') {
+          console.log('load about com - Get only Com')
+          auth_filter = '?company=' + this.user_obj.info.company
         }
-        //
-        let searcher = ''
-        if (this.search_text != '') {
-          if(this.temp_option == 1) {
-            searcher = '&name=' + this.search_text
-          } else if (this.temp_option == 2) {
-            searcher = '&company=' + this.search_text
-          } else if (this.temp_option == 3) {
-            searcher = '&manager=' + this.search_text
-          }
-        } else {
-          searcher = ''
-        }
+
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'landing/api/' + auth + auth_code + searcher)
+        axios.get(this.$store.state.endpoints.baseUrl + 'landing/list/' + auth_filter + search_param)
           .then((response) => {
-            // console.log('response', response)
-            this.content_obj = response.data
             this.$store.state.pageOptions.loading = false
+            console.log('get landing response', response)
+            this.content_obj = response.data.results
           })
           .catch((error) => {
-            console.log('api error', error)
             this.$store.state.pageOptions.loading = false
+            console.log('Get landing crashed', error)
           })
+
       }
     },
     mounted() {
-      console.log('axios default header in landinglist?', axios.defaults.headers)
       // Init other pages options
       this.page_init()
 
@@ -253,30 +301,11 @@
         })
       })
 
-
-      let offset = (this.$store.state.pageOptions.landing.page - 1) * this.page_chunk
-      if(this.search_option == 'name') {
-        this.temp_option = 1
-      } else if (this.search_option == 'company') {
-        this.temp_option = 2
-      } else if (this.search_option == 'manager') {
-        this.temp_option = 3
-      }
-      if(this.access_obj.access != 1 || this.access_obj.access != 2) {
-        // If access obj not called before mounted
-        while(true) {
-          if (this.access_obj.access == 1 || this.access_obj.access == 2) {
-            this.calling_all_unit()
-            break
-          }
-        }
-      } else {
-        // console.log('else!')
-        this.calling_all_unit()
-      }
+      // Get landing list
+      this.calling_all_unit()
     },
     destroyed() {
-      // Save values in the store
+      // Save page option values in the store
       this.$store.state.pageOptions.landing.page = this.page_current
       this.$store.state.pageOptions.landing.option = this.search_option
       this.$store.state.pageOptions.landing.text = this.search_text
@@ -287,7 +316,7 @@
         let store_user = this.$store.state.authUser
         let user_json = {}
         if (Object.keys(store_user).length === 0 && store_user.constructor) {
-          // dummy auth
+          // dummy block access auth
           user_json = {
             'is_staff': false,
             'is_superuser': false,

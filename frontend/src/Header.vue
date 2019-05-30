@@ -25,7 +25,7 @@
             </li>
             <li class="navbar-item">
               <router-link to="/organization">
-                <div class="nav-link text-center">관리소속</div>
+                <div class="nav-link text-center">관리조직</div>
               </router-link>
             </li>
             <li class="navbar-item">

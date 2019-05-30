@@ -91,6 +91,16 @@ const router = new Router({
       }
     },
     {
+      path: '/organization/create',
+      name: 'organization_create',
+      component: () => import('./views/OrganizationCreate.vue'),
+      meta: {
+        signed: true,
+        auth_grade: 'staff',
+        protect_leave: 'yes'
+      }
+    },
+    {
       path: '/company',
       name: 'company_list',
       component: () => import('./views/CompanyList.vue'),
@@ -144,6 +154,16 @@ const router = new Router({
       meta: {
         signed: true,
         auth_grade: 'staff'
+      }
+    },
+    {
+      path: '/users/create',
+      name: 'user_create',
+      component: () => import('./views/UserCreate.vue'),
+      meta: {
+        signed: true,
+        auth_grade: 'marketer',
+        protect_leave: 'yes'
       }
     },
     {
@@ -253,7 +273,11 @@ router.beforeEach((to, from, next) => {
           })
       } else {
         // If not 'to' sign_in, signed meta is null
-        next()
+        if (!to.name || to.name === null || to.name === '') {
+          next({name: 'A404'})
+        } else {
+          next()
+        }
       }
     } else if (!to.name || to.name === null || to.name === '') {
       // If component is not exist, push to 404 page
