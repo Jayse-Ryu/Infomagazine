@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+
+from corsheaders.defaults import default_headers
 from decouple import config, Csv
 import csv
 from datetime import timedelta
@@ -28,7 +30,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = True
 
 # ALLOWED_HOSTS = tuple(config('ALLOWED_HOSTS', cast=Csv()))
-ALLOWED_HOSTS = '*'
+ALLOWED_HOSTS = tuple(config('ALLOWED_HOSTS', cast=Csv()))
 
 # Application definition
 
@@ -80,9 +82,34 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': timedelta(seconds=86400),
     'JWT_ALLOW_REFRESH': True,
     'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
+    # 'JWT_AUTH_COOKIE': 'sibal'
 }
 
+# CORS_ALLOW_CREDENTIALS = True
+
+SESSION_COOKIE_SAMESITE = 'Strict'
+
+CSRF_COOKIE_NAME = 'XSRF-TOKEN'
+
+CSRF_HEADER_NAME = 'HTTP_X_XSRF_TOKEN'
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-xsrf-token',
+    'x-requested-with',
+)
+
+# CSRF_COOKIE_DOMAIN = config('CSRF_COOKIE_DOMAIN')
+
 CORS_ORIGIN_WHITELIST = tuple(config('CORS_ORIGIN_WHITELIST', cast=Csv()))
+
+CSRF_TRUSTED_ORIGINS = tuple(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
 
 # Changes the built-in user model to mine
 AUTH_USER_MODEL = 'user.User'

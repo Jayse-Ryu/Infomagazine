@@ -9,7 +9,6 @@ verify_ssl = true
 django = "*"
 python-decouple = "*"
 djangorestframework = "*"
-djangorestframework-jwt = "*"
 mysqlclient = "*"
 django-cors-headers = "*"
 django-storages = "*"
@@ -17,6 +16,8 @@ boto3 = "*"
 pymongo = "*"
 django-enumfield = "*"
 django-rest-swagger = "*"
+djangorestframework-simplejwt = "*"
+djangorestframework-jwt = "*"
 
 [requires]
 python_version = "3.7"

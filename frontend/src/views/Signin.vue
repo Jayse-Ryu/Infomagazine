@@ -62,6 +62,7 @@
 
 <script>
   import Decoder from 'jwt-decode'
+
   export default {
     name: 'sign_in',
     data: () => ({
@@ -81,6 +82,13 @@
           email: this.email,
           password: this.password
         }
+        console.log(this.$cookie.get('csrftoken'))
+        console.log(axios.defaults.withCredentials)
+        console.log(axios.defaults.xsrfCookieName)
+        console.log(axios.defaults.xsrfHeaderName)
+        // axios.defaults.withCredentials = true
+        // axios.defaults.xsrfCookieName = 'csrftoken'
+        // axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN'
         axios.post(this.$store.state.endpoints.obtainJWT, payload)
           .then((response) => {
             this.$store.dispatch('obtainToken', response.data)
