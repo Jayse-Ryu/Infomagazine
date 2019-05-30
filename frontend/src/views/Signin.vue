@@ -80,14 +80,14 @@
         const payload = {
           email: this.email,
           password: this.password
-        })
+        }
         axios.post(this.$store.state.endpoints.obtainJWT, payload)
           .then((response) => {
             this.$store.dispatch('obtainToken', response.data)
 
             try {
-              this.$cookie.set('token', response.data.token, {expires: '1D'})
-              this.$cookie.set('authUser', JSON.stringify(response.data.user), {expires: '1D'})
+              this.$cookie.set('token', response.data.token, {expires: '5m'})
+              this.$cookie.set('authUser', JSON.stringify(response.data.user), {expires: '5m'})
             } catch (error) {
               console.log('set cookie error', error)
             }

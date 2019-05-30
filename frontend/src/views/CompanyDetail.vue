@@ -11,9 +11,10 @@
     <!---->
 
     <div class="container">
-      <!-- 1. If user is this company's organization's manager or staff, superuser -->
-      <!--<form v-if="original_manager == user_obj.id" class="m-auto" v-on:submit.prevent="check_organization">-->
-      <form v-if="access_obj.organization == content_obj.organization || user_obj.is_staff == true" class="m-auto" v-on:submit.prevent="check_organization">
+      <!-- 1. If user is this company's organization's marketer or staff, superuser -->
+      <form v-if="user_obj.is_staff || user_obj.is_superuser || [0,1].includes(user_obj.info.access_role)"
+            class="m-auto" v-on:submit.prevent="check_organization">
+
         <div class="form-group row">
 
           <label for="org_id" class="col-form-label-sm col-sm-3 mt-3">업체 번호</label>
@@ -23,18 +24,14 @@
 
           <label for="org_name" class="col-form-label-sm col-sm-3 mt-3">관리조직</label>
           <div class="col-sm-9 mt-sm-3">
-            <!--<div class="form-control" id="org_manager">{{ content_obj.manager_name }}</div>-->
-            <div class="form-control border-0" id="org_name">{{ content_obj.organization_name }}</div>
-            <!--<select class="form-control" name="org_manager" id="org_manager" v-model="content_obj.manager">
-              <option v-for="item in marketer" :value="item.user">{{ item.user_name }}</option>
-            </select>-->
+            <div class="form-control border-0" id="org_name">{{ content_obj.org_name }}</div>
           </div>
 
           <label for="com_name" class="col-form-label-sm col-sm-3 mt-3">업체 이름*</label>
           <div class="col-sm-9 mt-sm-3">
             <!--<div class="error_label" v-if="errors.has('org_name')">{{errors.first('org_name')}}</div>-->
             <div class="error_label" v-if="errors.has('com_name')">이름은 필수 항목입니다.</div>
-            <input type="text" class="form-control" id="com_name" name="com_name" v-model="content_obj.name"
+            <input type="text" class="form-control" id="com_name" name="com_name" v-model="content_obj.corp_name"
                    required
                    placeholder="업체 이름을 입력하세요"
                    autofocus="autofocus"
@@ -45,7 +42,7 @@
           <label for="org_sub" class="col-form-label-sm col-sm-3 mt-3">업체 상호명</label>
           <div class="col-sm-9 mt-sm-3">
             <div class="error_label" v-if="errors.has('org_sub')">{{errors.first('org_sub')}}</div>
-            <input type="text" class="form-control" id="org_sub" name="org_sub" v-model="content_obj.sub_name"
+            <input type="text" class="form-control" id="org_sub" name="org_sub" v-model="content_obj.corp_sub_name"
                    placeholder="상호명을 입력하세요"
                    autofocus="autofocus"
                    maxlength="100">
@@ -53,7 +50,7 @@
 
           <label for="org_header" class="col-form-label-sm col-sm-3 mt-3">대표자</label>
           <div class="col-sm-9 mt-sm-3">
-            <input type="text" class="form-control" id="org_header" v-model="content_obj.header"
+            <input type="text" class="form-control" id="org_header" v-model="content_obj.corp_header"
                    placeholder="업체 대표를 입력하세요"
                    autofocus="autofocus"
                    maxlength="20">
@@ -61,7 +58,7 @@
 
           <label for="org_address" class="col-form-label-sm col-sm-3 mt-3">주소</label>
           <div class="col-sm-9 mt-sm-3">
-            <input type="text" class="form-control" id="org_address" v-model="content_obj.address"
+            <input type="text" class="form-control" id="org_address" v-model="content_obj.corp_address"
                    placeholder="주소를 입력하세요"
                    autofocus="autofocus"
                    maxlength="200">
@@ -69,7 +66,7 @@
 
           <label for="org_corp" class="col-form-label-sm col-sm-3 mt-3">사업자번호</label>
           <div class="col-sm-9 mt-sm-3">
-            <input type="text" class="form-control" id="org_corp" v-model="content_obj.corp_num"
+            <input type="text" class="form-control" id="org_corp" v-model="content_obj.corp_crn"
                    placeholder="사업자 번호를 입력하세요"
                    autofocus="autofocus"
                    maxlength="50">
@@ -78,7 +75,7 @@
           <label for="org_phone" class="col-form-label-sm col-sm-3 mt-3">연락처</label>
           <div class="col-sm-9 mt-sm-3">
             <div class="error_label" v-if="errors.has('org_phone')">전화번호는 16자 이하입니다</div>
-            <input type="number" class="form-control" id="org_phone" name="org_phone" v-model="content_obj.phone"
+            <input type="number" class="form-control" id="org_phone" name="org_phone" v-model="content_obj.corp_tel_num"
                    placeholder="연락처를 입력하세요"
                    autofocus="autofocus"
                    maxlength="16"
@@ -88,7 +85,7 @@
           <label for="org_email" class="col-form-label-sm col-sm-3 mt-3">이메일</label>
           <div class="col-sm-9 mt-sm-3">
             <div class="error_label" v-if="errors.has('org_email')">이메일 형식을 확인하세요</div>
-            <input type="email" class="form-control" id="org_email" name="org_email" v-model="content_obj.email"
+            <input type="email" class="form-control" id="org_email" name="org_email" v-model="content_obj.corp_email"
                    placeholder="이메일을 입력하세요"
                    maxlength="50"
                    autofocus="autofocus"
@@ -97,7 +94,7 @@
 
           <label for="org_desc" class="col-form-label-sm col-sm-3 mt-3">설명</label>
           <div class="col-sm-9 mt-sm-3">
-            <input type="text" class="form-control" id="org_desc" v-model="content_obj.desc"
+            <input type="text" class="form-control" id="org_desc" v-model="content_obj.corp_desc"
                    placeholder="업체 설명을 적어주세요"
                    autofocus="autofocus"
                    maxlength="200">
@@ -105,8 +102,8 @@
 
           <label for="org_create" class="col-form-label-sm col-sm-3 mt-3">생성일</label>
           <div v-if="content_obj.created_date" class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0" id="org_create">{{ (content_obj.created_date).substring(0,
-              10) }}
+            <div type="text" class="form-control border-0" id="org_create">
+              {{ (content_obj.created_date).substring(0, 10) }}
             </div>
           </div>
           <div v-else class="col-sm-9 mt-sm-3">
@@ -115,8 +112,8 @@
 
           <label for="org_update" class="col-form-label-sm col-sm-3 mt-3">수정일</label>
           <div v-if="content_obj.updated_date" class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0" id="org_update">{{ (content_obj.updated_date).substring(0,
-              10) }}
+            <div type="text" class="form-control border-0" id="org_update">
+              {{ (content_obj.updated_date).substring(0, 10) }}
             </div>
           </div>
           <div v-else class="col-sm-9 mt-sm-3">
@@ -125,7 +122,7 @@
 
         </div>
 
-        <!-- 2. If width is big -->
+        <!-- Section 2. If width is big -->
         <div v-if="window_width > 1000" class="list_area">
           <div>
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
@@ -173,7 +170,7 @@
           </ul>
         </div>
 
-        <!-- 2. Else if width is small -->
+        <!-- Section 2. Else if width is small -->
         <div v-else class="list_area text-center">
           <div>
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2"
@@ -247,158 +244,6 @@
         </div>
       </form>
 
-      <!-- 1. If user is company member -->
-      <div v-else-if="access_obj.company == page_id && access_obj.access == 2" class="m-auto">
-        <!-- Show detail of company but prevent submit -->
-        <div class="form-group row">
-
-          <label for="org_id2" class="col-form-label-sm col-sm-3 mt-3">업체 번호</label>
-          <div class="col-sm-9 mt-sm-3">
-            <div class="form-control border-0" id="org_id2">{{ content_obj.id }}</div>
-          </div>
-
-          <label for="org_name2" class="col-form-label-sm col-sm-3 mt-3">관리소속</label>
-          <div class="col-sm-9 mt-sm-3">
-            <div class="form-control border-0" id="org_name2">{{ content_obj.organization_name }}</div>
-          </div>
-
-          <label for="com_name2" class="col-form-label-sm col-sm-3 mt-3">업체 이름</label>
-          <div class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control" id="com_name2">{{ content_obj.name }}</div>
-          </div>
-
-          <label for="org_sub2" class="col-form-label-sm col-sm-3 mt-3">업체 상호명</label>
-          <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.sub_name == null" type="text" class="form-control">비어있음</div>
-            <div v-else type="text" class="form-control" id="org_sub2">{{ content_obj.sub_name }}</div>
-          </div>
-
-          <label for="org_header2" class="col-form-label-sm col-sm-3 mt-3">대표자</label>
-          <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.header == null" type="text" class="form-control">비어있음</div>
-            <div v-else type="text" class="form-control" id="org_header2">{{ content_obj.header }}</div>
-          </div>
-
-          <label for="org_address2" class="col-form-label-sm col-sm-3 mt-3">주소</label>
-          <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.address == null" type="text" class="form-control">비어있음</div>
-            <div v-else type="text" class="form-control" id="org_address2">{{ content_obj.address }}</div>
-          </div>
-
-          <label for="org_corp2" class="col-form-label-sm col-sm-3 mt-3">사업자번호</label>
-          <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.corp_num == null" type="text" class="form-control">비어있음</div>
-            <div v-else type="text" class="form-control" id="org_corp2">{{ content_obj.corp_num }}</div>
-          </div>
-
-          <label for="org_phone2" class="col-form-label-sm col-sm-3 mt-3">연락처</label>
-          <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.phone == null" type="number" class="form-control">비어있음</div>
-            <div v-else type="number" class="form-control" id="org_phone2">{{ content_obj.phone }}</div>
-          </div>
-
-          <label for="org_email2" class="col-form-label-sm col-sm-3 mt-3">이메일</label>
-          <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.email == null" type="email" class="form-control">비어있음</div>
-            <div v-else type="email" class="form-control" id="org_email2">{{ content_obj.email }}</div>
-          </div>
-
-          <label for="org_desc2" class="col-form-label-sm col-sm-3 mt-3">설명</label>
-          <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.desc == null" type="text" class="form-control">비어있음</div>
-            <div v-else type="text" class="form-control" id="org_desc2">{{ content_obj.desc }}</div>
-          </div>
-
-          <label for="org_create2" class="col-form-label-sm col-sm-3 mt-3">생성일</label>
-          <div v-if="content_obj.created_date" class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0" id="org_create2">{{ (content_obj.created_date).substring(0,
-              10) }}
-            </div>
-          </div>
-          <div v-else class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0">비어있음</div>
-          </div>
-
-          <label for="org_update2" class="col-form-label-sm col-sm-3 mt-3">수정일</label>
-          <div v-if="content_obj.updated_date" class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0" id="org_update2">{{ (content_obj.updated_date).substring(0,
-              10) }}
-            </div>
-          </div>
-          <div v-else class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0">비어있음</div>
-          </div>
-        </div>
-
-        <!-- 2. If width is big -->
-        <div v-if="window_width > 1000" class="list_area">
-          <div>
-            <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
-                 style="border-radius: 0; border-bottom: 0; width:100%;">
-              <div class="col-2 col-sm-2">번호</div>
-              <div class="col-3 col-sm-3">아이디</div>
-              <div class="col-4 col-sm-4">이름</div>
-              <div class="col-3">연락처</div>
-              <!--<div class="col-2 col-sm-3">관리</div>-->
-            </div>
-          </div>
-          <ul class="list-group list-group-flush col-12 pr-0 text-center">
-            <li v-if="user_list.length === 0"
-                class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
-              <div class="col-12 text-center">데이터가 존재하지 않습니다.</div>
-            </li>
-            <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-                v-for="content in user_list">
-              <div class="col-2 col-sm-2">{{ content.user }}</div>
-              <div class="col-3 col-sm-3" style="color: #287bff">{{ content.account }}</div>
-              <div class="col-4 col-sm-4" style="color: #287bff">{{ content.user_name }}</div>
-              <div class="col-3">{{ content.phone }}</div>
-            </li>
-          </ul>
-        </div>
-
-        <!-- 2. If width is small -->
-        <div v-else class="list_area text-center">
-          <div>
-            <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2"
-                 style="border-radius: 0; border-bottom: 0; width:100%;">
-              <div class="col-4">아이디</div>
-              <div class="col-4">이름</div>
-              <div class="col-4">연락처</div>
-            </div>
-          </div>
-          <ul class="list-group list-group-flush col-12 pr-0">
-            <li v-if="user_list.length === 0"
-                class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
-              <div class="col-12 text-center">데이터가 존재하지 않습니다.</div>
-            </li>
-            <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-                v-for="content in user_list">
-              <div class="col-4">{{ content.account }}</div>
-              <div class="col-4" style="color: #287bff">{{ content.user_name }}</div>
-              <div class="col-4">{{ content.phone }}</div>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Pagination buttons -->
-        <paginate class="pagination"
-                  v-model="page_current"
-                  :page-count="page_max"
-                  :page-range="5"
-                  :margin-pages="1"
-                  :click-handler="pagination"
-                  :prev-text="'<'"
-                  :next-text="'>'"
-                  :container-class="'page-item'"
-                  :page-class="'page-link'"
-                  :prev-class="'page-link prev'"
-                  :next-class="'page-link next'"
-                  :active-class="'active'"
-                  :disabled-class="'disabled'">
-        </paginate>
-      </div>
-
       <!-- If no one try to access to this company -->
       <div v-else>
         <div class="m-auto text-center pt-3">권한이 없습니다.</div>
@@ -425,7 +270,7 @@
     mounted() {
       // Window width calculator
       let that = this
-      this.$nextTick(function () {
+      that.$nextTick(function () {
         window.addEventListener('resize', function (e) {
           that.window_width = window.innerWidth
         })
@@ -441,35 +286,22 @@
         })
       }
 
-      // get object
-      let axios = this.$axios
-      let this_url = 'company/'
-      // Get Comapyn by page_id
-      axios.get(this.$store.state.endpoints.baseUrl + this_url + this.page_id)
+      // Get Company by page_id
+      axios.get(this.$store.state.endpoints.baseUrl + 'company/' + this.page_id)
         .then((response) => {
           this.content_obj = response.data
-          let this_url = 'user_access/'
-          let offset = (this.page_current - 1) * this.page_chunk
-          return axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + 'company' + '=' + this.$route.params.company_id * 1)
+          return axios.get(this.$store.state.endpoints.baseUrl + 'user/list/' + this.page_id)
         })
+        .catch((error) => {
+          console.log('Mount Get company error', error)
+        })
+
         .then((response) => {
-          // this.pagination by using company users
-          if (response.data.count % this.page_chunk === 0) {
-            this.page_max = Math.floor(response.data.count / this.page_chunk)
-          } else {
-            this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
-          }
-          // Get all of users in this company whatever allowed or not
           this.user_list = response.data.results
         })
         .catch((error) => {
-          console.log(error)
+          console.log('Mount Get user list error', error)
         })
-    },
-    update() {
-      if (this.$store.state.jwt !== null) {
-        this.$store.dispatch('getAuthUser')
-      }
     },
     methods: {
       refresh_organization() {
@@ -631,13 +463,22 @@
     computed: {
       user_obj() {
         // Get user information
-        let user = this.$store.state.authUser
-        return user
-      },
-      access_obj() {
-        // Get access information the user
-        let access = this.$store.state.userAccess
-        return access
+        let store_user = this.$store.state.authUser
+        let user_json = {}
+        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+          // dummy block access auth
+          user_json = {
+            'is_staff': false,
+            'is_superuser': false,
+            'info': {
+              'access_role': 3
+            },
+            'failed': true
+          }
+        } else {
+          user_json = JSON.parse(this.$store.state.authUser)
+        }
+        return user_json
       }
     }
   }

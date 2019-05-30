@@ -219,7 +219,6 @@
       },
       calling_all_unit(offset) {
         // Calling landings with new values
-        console.log('Calling all unit - called')
         let auth_filter = ''
         let search_param = ''
 
@@ -307,7 +306,6 @@
         } else {
           user_json = JSON.parse(this.$store.state.authUser)
         }
-        console.log('user json?', user_json)
         return user_json
       }
     }

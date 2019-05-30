@@ -208,7 +208,6 @@
       },
       calling_all_unit(offset) {
         // Calling landings with new values
-        console.log('Calling all unit - called')
         let auth_filter = ''
         let search_param = ''
 

@@ -12,6 +12,19 @@
       <h4>고객 회사를 위한 <span class="text-info">업체</span>를 생성합니다</h4>
       <form class="m-auto" v-on:submit.prevent="before_create_company">
         <div class="form-group row">
+          <label v-if="user_obj.is_staff || user_obj.is_superuser" for="set_org"
+            class="col-form-label-sm col-sm-3 mt-3">
+            <span>관리 조직 <span class="alert alert-danger p-0">(Staff Only)</span></span>
+          </label>
+          <div class="col-sm-9 mt-sm-3">
+            <select name="set_org" id="set_org" class="form-control" v-model="create_obj.org_id">
+              <option value="0" selected>선택하세요</option>
+              <option v-for="item in organization_list" :value="item.id">
+                {{ item.org_name }} / {{ item.org_sub_name }}
+              </option>
+            </select>
+          </div>
+
           <label for="corp_name" class="col-form-label-sm col-sm-3 mt-3">
             <span>업체 이름*</span>
           </label>
@@ -127,6 +140,7 @@
     data: () => ({
       // For organization create
       // For organization create
+      organization_list: [],
       error_label:{
         corp_name: true,
         corp_tel_num: false,
@@ -138,6 +152,7 @@
         }
       },
       create_obj: {
+        org_id: 0,
         corp_name: '',
         corp_sub_name: '',
         corp_header: '',
@@ -148,6 +163,19 @@
         corp_desc: ''
       },
     }),
+    mounted() {
+      if (this.user_obj.is_staff || this.user_obj.is_superuser) {
+        axios.get(this.$store.state.endpoints.baseUrl + 'organization/')
+          .then((response) => {
+            this.organization_list = response.data.results
+          })
+          .catch((error) => {
+            console.log('Staff get organization is failed', error)
+          })
+      } else if ([0,1].includes(this.user_obj.info.access_role)) {
+        this.create_obj.org_id = this.user_obj.info.organization
+      }
+    },
     methods: {
       error_check(param) {
         if (param === 'phone') {

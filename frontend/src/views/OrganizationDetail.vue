@@ -10,8 +10,8 @@
 
     <div class="container">
       <!-- 1. If user is creator -->
-      <form v-if="original_manager == user_obj.id || user_obj.is_staff == true" class="m-auto"
-            v-on:submit.prevent="check_organization">
+      <form v-if="user_obj.is_staff || user_obj.is_superuser || user_obj.info.access_role == 0"
+            class="m-auto" v-on:submit.prevent="check_organization">
         <div class="form-group row">
 
           <label for="org_id" class="col-form-label-sm col-sm-3 mt-3">소속 번호</label>
@@ -102,8 +102,8 @@
 
           <label for="org_create" class="col-form-label-sm col-sm-3 mt-3">생성일</label>
           <div v-if="content_obj.created_date" class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0" id="org_create">{{ (content_obj.created_date).substring(0,
-              10) }}
+            <div type="text" class="form-control border-0" id="org_create">
+              {{ (content_obj.created_date).substring(0, 10) }}
             </div>
           </div>
           <div v-else class="col-sm-9 mt-sm-3">
@@ -112,8 +112,8 @@
 
           <label for="org_update" class="col-form-label-sm col-sm-3 mt-3">수정일</label>
           <div v-if="content_obj.updated_date" class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0" id="org_update">{{ (content_obj.updated_date).substring(0,
-              10) }}
+            <div type="text" class="form-control border-0" id="org_update">
+              {{ (content_obj.updated_date).substring(0, 10) }}
             </div>
           </div>
           <div v-else class="col-sm-9 mt-sm-3">
@@ -322,8 +322,8 @@
 
           <label for="org_create2" class="col-form-label-sm col-sm-3 mt-3">생성일</label>
           <div v-if="content_obj.created_date" class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0" id="org_create2">{{ (content_obj.created_date).substring(0,
-              10) }}
+            <div type="text" class="form-control border-0" id="org_create2">
+              {{ (content_obj.created_date).substring(0, 10) }}
             </div>
           </div>
           <div v-else class="col-sm-9 mt-sm-3">
@@ -332,8 +332,8 @@
 
           <label for="org_update2" class="col-form-label-sm col-sm-3 mt-3">수정일</label>
           <div v-if="content_obj.updated_date" class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0" id="org_update2">{{ (content_obj.updated_date).substring(0,
-              10) }}
+            <div type="text" class="form-control border-0" id="org_update2">
+              {{ (content_obj.updated_date).substring(0, 10) }}
             </div>
           </div>
           <div v-else class="col-sm-9 mt-sm-3">
@@ -629,19 +629,17 @@
             console.log(error)
           })
       },
-      pagination: function (pageNum) {
+      pagination(pageNum) {
         // when page is first, max ~ max-(chunk*current)+1
         // when page is max, max-(chunk*(current-1)) ~ 1
         // when page is middle, max-(chunk*(current-1)) ~ max-(chunk*current)+1
         let offset = (pageNum - 1) * this.page_chunk
         this.calling_all_unit(offset)
       },
-      calling_all_unit: function (page) {
+      calling_all_unit(page) {
         // Calling landings with new values
-        let axios = this.$axios
-        let this_url = 'user_access/'
         let offset = page
-        axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + 'organization' + '=' + this.$route.params.organization_id * 1)
+        axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + '?offset=' + offset + '&' + 'organization' + '=' + this.$route.params.organization_id * 1)
           .then((response) => {
             // Calculation for page_max
             if (response.data.count % this.page_chunk === 0) {
@@ -696,22 +694,25 @@
         }
       }
     },
-    update() {
-      console.log('Updated?')
-      if (this.$store.state.jwt !== null) {
-        this.$store.dispatch('getAuthUser')
-      }
-    },
     computed: {
       user_obj() {
         // Get user information
-        let user = this.$store.state.authUser
-        return user
-      },
-      access_obj() {
-        // Get access information the user
-        let access = this.$store.state.userAccess
-        return access
+        let store_user = this.$store.state.authUser
+        let user_json = {}
+        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+          // dummy block access auth
+          user_json = {
+            'is_staff': false,
+            'is_superuser': false,
+            'info': {
+              'access_role': 3
+            },
+            'failed': true
+          }
+        } else {
+          user_json = JSON.parse(this.$store.state.authUser)
+        }
+        return user_json
       }
     }
   }
