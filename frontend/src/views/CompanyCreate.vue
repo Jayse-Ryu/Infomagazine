@@ -10,7 +10,7 @@
 
     <div class="container">
       <h4>고객 회사를 위한 <span class="text-info">업체</span>를 생성합니다</h4>
-      <form class="m-auto" v-on:submit.prevent="create_company">
+      <form class="m-auto" v-on:submit.prevent="before_create_company">
         <div class="form-group row">
           <label for="corp_name" class="col-form-label-sm col-sm-3 mt-3">
             <span>업체 이름*</span>
@@ -22,7 +22,8 @@
                    v-validate="'required'"
                    placeholder="업체 이름을 입력하세요"
                    autofocus="autofocus"
-                   maxlength="100">
+                   maxlength="100"
+                   @keyup="error_check('name')">
           </div>
 
           <label for="corp_sub" class="col-form-label-sm col-sm-3 mt-3">
@@ -127,7 +128,7 @@
       // For organization create
       // For organization create
       error_label:{
-        corp_name: false,
+        corp_name: true,
         corp_tel_num: false,
         corp_email: false,
         class: {
@@ -182,7 +183,30 @@
             this.error_label.corp_email = false
             this.error_label.class.email = 'form-control'
           }
-          // /Email validate
+        } else if (param === 'name') {
+          // Org name validate
+          if (this.create_obj.corp_name === '') {
+            this.error_label.corp_name = true
+            this.error_label.class.name = 'form-control alert-danger'
+          } else {
+            this.error_label.corp_name = false
+            this.error_label.class.name = 'form-control alert-info'
+          }
+        }
+      },
+      before_create_company() {
+        this.$validator.validateAll()
+        if (this.error_label.corp_email || this.$validator.errors.has('corp_email')) {
+          alert('이메일을 확인해주세요')
+          document.getElementById('corp_email').focus()
+        } else if (this.error_label.corp_tel_num) {
+          alert('전화번호 형식을 확인해주세요!')
+          document.getElementById('corp_phone').focus()
+        } else if (this.error_label.name) {
+          alert('업체 이름을 입력하세요!')
+          document.getElementById('corp_name').focus()
+        } else {
+          this.create_company()
         }
       },
       create_company() {
