@@ -600,6 +600,9 @@
     border: 1px solid #c1c1c1;
     padding: 10px;
     margin-left: -6px;
+    &:focus {
+      outline: none !important;
+    }
   }
 
   .search_btn {
@@ -728,7 +731,7 @@
   // Navigation
   .text_navigation {
     display: inline-block;
-    margin: 1% 0 8% 15px;
+    margin: 1% 0 5% 15px;
     background-color: rgba(255, 255, 255, 0.6);
     border-radius: 5px;
     padding: 8px;
@@ -736,6 +739,7 @@
 
   .text_navigation span {
     font-size: 14px;
+    padding: 0 4px;
     color: #818181;
   }
 
@@ -783,12 +787,12 @@
 
   .error_label {
     font-family: 'Nanums_regular', sans-serif;
-    font-size: 14px;
+    font-size: 12px;
     display: inline-block;
     padding: 1px 5px;
     color: #ee5151;
     border-radius: 5px;
-    margin: 5px 0;
+    margin: 1px 3px;
     border: 1px solid #ee5151;
     box-sizing: border-box;
   }

@@ -62,7 +62,6 @@
 
 <script>
   import Decoder from 'jwt-decode'
-
   export default {
     name: 'sign_in',
     data: () => ({
@@ -82,13 +81,6 @@
           email: this.email,
           password: this.password
         }
-        console.log(this.$cookie.get('csrftoken'))
-        console.log(axios.defaults.withCredentials)
-        console.log(axios.defaults.xsrfCookieName)
-        console.log(axios.defaults.xsrfHeaderName)
-        // axios.defaults.withCredentials = true
-        // axios.defaults.xsrfCookieName = 'csrftoken'
-        // axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN'
         axios.post(this.$store.state.endpoints.obtainJWT, payload)
           .then((response) => {
             this.$store.dispatch('obtainToken', response.data)
@@ -100,14 +92,13 @@
               console.log('set cookie error', error)
             }
 
-            // const decoded = Decoder(response.data.token)
-            // console.log(decoded)
-
+            this.$store.state.pageOptions.loading = false
             this.$router.push({name: 'gateway'})
           })
           .catch(() => {
             // Check the account or password
             alert('아이디와 비밀번호를 확인해주세요.')
+            this.$store.state.pageOptions.loading = false
           })
       }
     }
