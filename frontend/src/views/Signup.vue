@@ -17,7 +17,7 @@
           </router-link>
         </div>
 
-        <form class="login_form form-horizontal" id="LoginForm" @submit.prevent="sign_up">
+        <form class="login_form form-horizontal" id="LoginForm" @submit.prevent="before_sign_up">
 
           <div class="form-group block">
             <label for="email" class="col-sm-12 control-label">이메일*
@@ -75,10 +75,10 @@
 
           <div class="form-group block">
             <label for="username" class="col-sm-12 control-label">사용자 이름*
-              <div class="error_label" v-if="errors.has('username')">이름을 입력해주세요.</div>
+              <!--<div class="error_label" v-if="errors.has('username')">이름을 입력해주세요.</div>-->
             </label>
             <div class="col-sm-12">
-              <input class="form-control"
+              <input :class="error_label.class.username"
                      required
                      v-validate="'required'"
                      v-model="content_obj.username"
@@ -87,7 +87,8 @@
                      autofocus="autofocus"
                      maxlength="30"
                      name="username"
-                     id="username">
+                     id="username"
+                     @keyup="error_check('name')">
             </div>
           </div>
 
@@ -132,10 +133,12 @@
         password: false,
         phone: false,
         email: false,
+        username: true,
         class: {
           email: 'form-control',
           password: 'form-control',
-          phone: 'form-control'
+          phone: 'form-control',
+          username: 'form-control'
         }
       },
       content_obj: {
@@ -167,14 +170,14 @@
           }
         } else if (param === 'password') {
           if (this.content_obj.password == '' || this.re_pass == '') {
-            this.error_label.password = false
+            this.error_label.password = true
             this.error_label.class.password = 'form-control'
           } else {
             if (this.content_obj.password === this.re_pass) {
-              this.error_label.password = true
+              this.error_label.password = false
               this.error_label.class.password = 'form-control alert-info'
             } else {
-              this.error_label.password = false
+              this.error_label.password = true
               this.error_label.class.password = 'form-control alert-danger'
             }
           }
@@ -202,7 +205,7 @@
                 // If has error atleast one thing of check
                 if (this.error_label.email || this.$validator.errors.has('email')) {
                   this.error_label.class.email = 'form-control alert-danger'
-                } else if (!this.error_label.email && !this.$validator.errors.has('email')){
+                } else if (!this.error_label.email && !this.$validator.errors.has('email')) {
                   // Nor both are clear
                   this.error_label.class.email = 'form-control alert-info'
                 }
@@ -217,54 +220,60 @@
             this.error_label.email = false
             this.error_label.class.email = 'form-control'
           }
+        } else if (param === 'name') {
+          if (this.content_obj.username === '') {
+            this.error_label.username = true
+            this.error_label.class.username = 'form-control alert-danger'
+          } else {
+            this.error_label.username = false
+            this.error_label.class.username = 'form-control alert-info'
+          }
+        }
+      },
+      before_sign_up() {
+        // check validate first
+        this.$validator.validateAll()
+        if (this.error_label.email || this.$validator.errors.has('email')) {
+          alert('이메일을 확인해주세요!')
+          document.getElementById('email').focus()
+        } else if (this.error_label.password) {
+          alert('비밀번호를 확인해주세요!')
+          document.getElementById('re_password').focus()
+        } else if (this.error_label.phone) {
+          alert('전화번호 형식을 확인해주세요!')
+          document.getElementById('phone').focus()
+        } else if (this.error_label.username) {
+          alert('이름을 입력하세요!')
+          document.getElementById('username').focus()
+        } else {
+          this.sign_up()
         }
       },
       sign_up() {
-        // Auto validation first
-        this.$validator.validateAll()
-
-        // Custom validation
-        if (this.error_label.password != true) {
-          // Check password matched
-          alert('비밀번호를 확인해주세요.')
-          document.getElementById('re_password').focus()
-        } else if (this.error_label.phone) {
-          // Check phone number validated
-          alert('전화번호 형식을 확인해주세요.')
-          document.getElementById('phone').focus()
-        } else if (this.error_label.email == true) {
-          // Check duplicated email address
-          alert('이미 존재하는 이메일입니다.')
-          document.getElementById('email').focus()
-        } else {
-          // Else clear, create a new user.
-
-          // Axios config
-          const config = {
-            headers: {
-              'Content-Type': 'application/json'
-            }
+        // Axios config
+        const config = {
+          headers: {
+            'Content-Type': 'application/json'
           }
-
-          /* Do axios post */
-          axios.post(this.$store.state.endpoints.baseUrl + 'user/', this.content_obj, config)
-            .then(() => {
-              alert('회원가입 되었습니다.')
-              this.$router.currentRoute.meta.protect_leave = 'no'
-              this.$router.push({
-                name: 'sign_in',
-              })
-            })
-            .catch((error) => {
-              console.log(error)
-              if (error.response.data.account) {
-                alert(error.response.data.account)
-              } else {
-                alert('회원가입 중 문제가 발생하였습니다. 다시시도 해주세요.')
-              }
-            })
-          /* /Axios post */
         }
+        /* Do axios post */
+        axios.post(this.$store.state.endpoints.baseUrl + 'user/', this.content_obj, config)
+          .then(() => {
+            alert('회원가입 되었습니다.')
+            this.$router.currentRoute.meta.protect_leave = 'no'
+            this.$router.push({
+              name: 'sign_in',
+            })
+          })
+          .catch((error) => {
+            console.log(error)
+            if (error.response.data.account) {
+              alert(error.response.data.account)
+            } else {
+              alert('회원가입 중 문제가 발생하였습니다. 다시시도 해주세요.')
+            }
+          })
+        /* /Axios post */
       },
       go_back() {
         this.$router.push({

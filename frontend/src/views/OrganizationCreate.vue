@@ -12,7 +12,7 @@
     <div class="container">
       <h4>마케팅 회사를 위한 <span class="text-info">조직</span>을 생성합니다</h4>
 
-      <form class="m-auto" v-on:submit.prevent="create_organization">
+      <form class="m-auto" v-on:submit.prevent="before_create_organization">
         <div class="form-group row">
           <label for="org_name" class="col-form-label-sm col-sm-3 mt-3">
             <span>조직 이름*</span>
@@ -24,7 +24,8 @@
                    v-validate="'required'"
                    placeholder="조직 이름을 입력하세요"
                    autofocus="autofocus"
-                   maxlength="100">
+                   maxlength="100"
+                   @keyup="error_check('name')">
           </div>
 
           <label for="org_sub" class="col-form-label-sm col-sm-3 mt-3">
@@ -129,7 +130,7 @@
     data: () => ({
       // For organization create
       error_label:{
-        org_name: false,
+        org_name: true,
         org_tel_num: false,
         org_email: false,
         class: {
@@ -199,12 +200,34 @@
             this.error_label.org_email = false
             this.error_label.class.email = 'form-control'
           }
-          // /Email validate
+        } else if (param === 'name') {
+          // Org name validate
+          if (this.create_obj.org_name === '') {
+            this.error_label.org_name = true
+            this.error_label.class.name = 'form-control alert-danger'
+          } else {
+            this.error_label.org_name = false
+            this.error_label.class.name = 'form-control alert-info'
+          }
+        }
+      },
+      before_create_organization() {
+        this.$validator.validateAll()
+        if (this.error_label.org_email || this.$validator.errors.has('org_email')) {
+          alert('이메일을 확인해주세요')
+          document.getElementById('org_email').focus()
+        } else if (this.error_label.org_tel_num) {
+          alert('전화번호 형식을 확인해주세요!')
+          document.getElementById('org_phone').focus()
+        } else if (this.error_label.name) {
+          alert('조직 이름을 입력하세요!')
+          document.getElementById('org_name').focus()
+        } else {
+          this.create_organization()
         }
       },
       create_organization() {
         // Create an organization myself
-        this.$validator.validateAll()
         if(confirm('조직을 생성하시겠습니까?')) {
           this.$store.state.pageOptions.loading = true
           axios.post(this.$store.state.endpoints.baseUrl + 'organization/', this.create_obj)

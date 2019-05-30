@@ -12,7 +12,7 @@
     <div class="container">
       <h4>고객용 <span class="text-info">계정</span>을 생성합니다</h4>
 
-      <form class="m-auto" v-on:submit.prevent="create_user">
+      <form class="m-auto" v-on:submit.prevent="before_create_user">
         <div class="form-group row">
 
           <label for="email" class="col-form-label-sm col-sm-3 mt-3">
@@ -34,7 +34,6 @@
           <label for="user_password" class="col-form-label-sm col-sm-3 mt-3">
             <span>비밀번호*</span>
           </label>
-
           <div class="col-sm-9 mt-sm-3 row pr-0">
             <div class="col-md-6 password_area">
               <input :class="error_label.class.password"
@@ -48,7 +47,6 @@
                      id="user_password"
                      @keyup="error_check('password')">
             </div>
-
             <div class="col-md-6 password_area">
               <input :class="error_label.class.password"
                      required
@@ -68,12 +66,13 @@
           </label>
           <div class="col-sm-9 mt-sm-3">
             <input :class="error_label.class.name" id="user_name" name="user_name" type="text"
-                   v-model="create_obj.user_name"
+                   v-model="create_obj.username"
                    required
                    v-validate="'required'"
                    placeholder="사용자 이름을 입력하세요"
                    autofocus="autofocus"
-                   maxlength="100">
+                   maxlength="100"
+                   @keyup="error_check('name')">
           </div>
 
           <label for="user_phone" class="col-form-label-sm col-sm-3 mt-3">
@@ -87,6 +86,19 @@
                    autofocus="autofocus"
                    maxlength="16"
                    @keyup="error_check('phone')">
+          </div>
+
+          <label for="user_company" class="col-form-label-sm col-sm-3 mt-3">
+            <span>고객업체</span>
+          </label>
+          <div class="col-sm-9 mt-sm-3">
+            <select class="form-control" name="user_company" id="user_company"
+                    v-model="create_obj.info.company">
+              <option value="0" selected>추후선택</option>
+              <option v-for="company in company_list" :value="company.id">
+                {{ company.corp_name }} / {{ company.corp_sub_name }}
+              </option>
+            </select>
           </div>
 
         </div>
@@ -106,10 +118,11 @@
     data: () => ({
       // For organization create
       re_pass: '',
+      company_list: [],
       error_label: {
         email: false,
-        password: false,
-        name: false,
+        password: true,
+        name: true,
         phone: false,
         class: {
           email: 'form-control',
@@ -124,14 +137,20 @@
         password: '',
         info: {
           access_role: 2,
-          organization: null,
-          company: null,
+          // organization: null,
+          company: 0,
           phone_num: '',
         }
       }
     }),
     mounted() {
-
+      axios.get(this.$store.state.endpoints.baseUrl + 'company/')
+        .then((response) => {
+          this.company_list = response.data.results
+        })
+        .catch((error) => {
+          console.log('Get company error', error)
+        })
     },
     methods: {
       error_check(param) {
@@ -153,14 +172,14 @@
           }
         } else if (param === 'password') {
           if (this.create_obj.password == '' || this.re_pass == '') {
-            this.error_label.password = false
+            this.error_label.password = true
             this.error_label.class.password = 'form-control'
           } else {
             if (this.create_obj.password === this.re_pass) {
-              this.error_label.password = true
+              this.error_label.password = false
               this.error_label.class.password = 'form-control alert-info'
             } else {
-              this.error_label.password = false
+              this.error_label.password = true
               this.error_label.class.password = 'form-control alert-danger'
             }
           }
@@ -202,13 +221,42 @@
             this.error_label.email = false
             this.error_label.class.email = 'form-control'
           }
+        } else if (param === 'name') {
+          if (this.create_obj.username === '') {
+            this.error_label.name = true
+            this.error_label.class.name = 'form-control alert-danger'
+          } else {
+            this.error_label.name = false
+            this.error_label.class.name = 'form-control alert-info'
+          }
+        }
+      },
+      before_create_user() {
+        // Create an organization myself
+        this.$validator.validateAll()
+
+        if (this.error_label.email || this.$validator.errors.has('email')) {
+          alert('이메일을 확인해주세요')
+          document.getElementById('email').focus()
+        } else if (this.error_label.password) {
+          alert('비밀번호를 확인해주세요!')
+          document.getElementById('re_password').focus()
+        } else if (this.error_label.phone) {
+          alert('전화번호 형식을 확인해주세요!')
+          document.getElementById('user_phone').focus()
+        } else if (this.error_label.name) {
+          alert('이름을 입력하세요!')
+          document.getElementById('user_name').focus()
+        } else {
+          this.create_user()
         }
       },
       create_user() {
-        // Create an organization myself
-        this.$validator.validateAll()
         if (confirm('고객 계정을 생성하시겠습니까?')) {
           this.$store.state.pageOptions.loading = true
+
+          // console.log('it will send', this.create_obj)
+
           axios.post(this.$store.state.endpoints.baseUrl + 'user/', this.create_obj)
             .then(() => {
               alert('고객 계정이 생성되었습니다.')
@@ -219,11 +267,12 @@
               })
             })
             .catch((error) => {
-              alert('조직 생성 중 오류가 발생하였습니다.')
+              alert('고객 생성 중 오류가 발생하였습니다.')
               this.$store.state.pageOptions.loading = false
               console.log(error)
             })
         }
+
       }
     },
     computed: {
