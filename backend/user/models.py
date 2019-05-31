@@ -7,6 +7,9 @@ from organization.models import Organization
 
 
 class User(AbstractUser):
+    class Meta:
+        db_table = 'user'
+
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=30, blank=True)
 
@@ -16,8 +19,8 @@ class User(AbstractUser):
     def __str__(self):
         return "{}".format(self.email)
 
-    class Meta:
-        db_table = 'user'
+    def get_access_role(self):
+        return str(AccessRole.get(self.info.access_role))
 
 
 class AccessRole(enum.Enum):
@@ -27,6 +30,7 @@ class AccessRole(enum.Enum):
     GUEST = 3
 
 
+# TODO 슈퍼 유저 생성 시 one to one 자동 생성되도록
 class UserInfo(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='info')
     access_role = enum.EnumField(AccessRole, default=AccessRole.GUEST)
