@@ -15,7 +15,8 @@
         </button>
 
         <!-- Staff area -->
-        <div v-if="user_obj && user_obj.is_staff || user_obj.is_superuser" class="collapse navbar-collapse" id="navbarCollapse">
+        <div v-if="user_obj && user_obj.is_staff || user_obj.is_superuser" class="collapse navbar-collapse"
+             id="navbarCollapse">
           <!-- Gateway for staff -->
           <ul class="navbar-nav ml-auto">
             <li class="navbar-item">
@@ -54,7 +55,8 @@
         <div v-else class="collapse navbar-collapse" id="navbarCollapse">
 
           <!-- user access is marketer -->
-          <ul v-if="user_obj && user_obj.info.access_role == 0 || user_obj.info.access_role == 1" class="navbar-nav ml-auto">
+          <ul v-if="user_obj && user_obj.info.access_role == 0 || user_obj.info.access_role == 1"
+              class="navbar-nav ml-auto">
             <li class="navbar-item">
               <router-link to="/landing">
                 <div class="nav-link text-center">랜딩페이지</div>
@@ -90,7 +92,7 @@
             </li>
             <li class="navbar-item">
               <!--<router-link to="/myinfo">-->
-                <div class="nav-link current_user font text-center" v-model="header_name">{{ header_name }}</div>
+              <div class="nav-link current_user font text-center" v-model="header_name">{{ header_name }}</div>
               <!--</router-link>-->
             </li>
             <li class="navbar-item">
@@ -144,17 +146,20 @@
     name: 'app-header',
     methods: {
       logout() {
-        this.$store.commit('removeToken')
-        if (this.$router.currentRoute.meta.protect_leave === 'yes') {
-          this.$router.currentRoute.meta.protect_leave = 'no'
+        if (confirm('로그아웃 하시겠습니까?')) {
+          this.$store.commit('removeToken')
+          if (this.$router.currentRoute.meta.protect_leave === 'yes') {
+            this.$router.currentRoute.meta.protect_leave = 'no'
+          }
+          this.$router.push({
+            name: 'sign_in'
+          })
         }
-        this.$router.push({
-          name: 'sign_in'
-        })
       }
     },
     mounted() {
       let block = [
+        '',
         'A404',
         'page',
         'sign_in',
@@ -164,7 +169,7 @@
       that.$nextTick(function () {
         if (block.includes(this.$route.name)) {
           // document.getElementById('nav_king').style.display = 'none'
-          document.getElementById('nav_king').setAttribute('style', 'display: nonw;')
+          document.getElementById('nav_king').setAttribute('style', 'display: none;')
         } else {
           // document.getElementById('nav_king').style.display = 'block'
           document.getElementById('nav_king').setAttribute('style', 'display: block;')
@@ -190,7 +195,7 @@
         let store_user = this.$store.state.authUser
         let user_json = {}
         if (Object.keys(store_user).length === 0 && store_user.constructor) {
-          user_json = {'is_staff' : false, 'is_superuser': false, 'info': {'access_role': 3}}
+          user_json = {'is_staff': false, 'is_superuser': false, 'info': {'access_role': 3}}
         } else {
           user_json = JSON.parse(this.$store.state.authUser)
         }
