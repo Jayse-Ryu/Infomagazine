@@ -136,9 +136,9 @@
       if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
         alert('권한이 없습니다.')
         this.$store.state.pageOptions.loading = false
-        if ([0,1].includes(this.user_obj.info.access_role)) {
+        if ([0, 1].includes(this.user_obj.access_role)) {
           this.$router.push({
-            path: '/organization/detail/' + this.user_obj.info.organization
+            path: '/organization/detail/' + this.user_obj.organization
           })
         } else {
           this.$router.push({
@@ -236,12 +236,12 @@
         if (this.user_obj.is_staff || this.user_obj.is_superuser) {
           console.log('Staff user - Get All')
           auth_filter = '?true'
-        } else if (this.user_obj.info.access_role == '0' || this.user_obj.info.access_role == '1') {
+        } else if (this.user_obj.access_role == '0' || this.user_obj.access_role == '1') {
           console.log('Marketer user - Get only Org')
-          auth_filter = '?organization=' + this.user_obj.info.organization
-        } else if (this.user_obj.info.access_role == '2') {
+          auth_filter = '?organization=' + this.user_obj.organization
+        } else if (this.user_obj.access_role == '2') {
           console.log('load about com - Get only Com')
-          auth_filter = '?company=' + this.user_obj.info.company
+          auth_filter = '?company=' + this.user_obj.company
         }
 
         this.$store.state.pageOptions.loading = true
@@ -282,9 +282,10 @@
     computed: {
       user_obj() {
         // Get user information
-        let store_user = this.$store.state.authUser
+        let local_user = localStorage.getItem('authUser')
         let user_json = {}
-        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+
+        if (!local_user) {
           // dummy block access auth
           user_json = {
             'is_staff': false,
@@ -295,8 +296,9 @@
             'failed': true
           }
         } else {
-          user_json = JSON.parse(this.$store.state.authUser)
+          user_json = JSON.parse(local_user)
         }
+
         return user_json
       }
     }

@@ -1837,13 +1837,24 @@
     computed: {
       user_obj() {
         // Get user information
-        let user = this.$store.state.authUser
-        return user
-      },
-      access_obj() {
-        // Get access information the user
-        let access = this.$store.state.userAccess
-        return access
+        let local_user = localStorage.getItem('authUser')
+        let user_json = {}
+
+        if (!local_user) {
+          // dummy block access auth
+          user_json = {
+            'is_staff': false,
+            'is_superuser': false,
+            'info': {
+              'access_role': 3
+            },
+            'failed': true
+          }
+        } else {
+          user_json = JSON.parse(local_user)
+        }
+
+        return user_json
       },
       order_wrap_height() {
         let highest = 450

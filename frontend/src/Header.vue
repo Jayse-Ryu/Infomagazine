@@ -55,7 +55,7 @@
         <div v-else class="collapse navbar-collapse" id="navbarCollapse">
 
           <!-- user access is marketer -->
-          <ul v-if="user_obj && user_obj.info.access_role == 0 || user_obj.info.access_role == 1"
+          <ul v-if="user_obj && user_obj.access_role == 0 || user_obj.access_role == 1"
               class="navbar-nav ml-auto">
             <li class="navbar-item">
               <router-link to="/landing">
@@ -84,7 +84,7 @@
           <!-- / -->
 
           <!-- user access is client -->
-          <ul v-if="user_obj && user_obj.info.access_role == 2" class="navbar-nav ml-auto">
+          <ul v-if="user_obj && user_obj.access_role == 2" class="navbar-nav ml-auto">
             <li class="navbar-item">
               <router-link to="/landing">
                 <div class="nav-link text-center">랜딩페이지</div>
@@ -102,7 +102,7 @@
           <!-- / -->
 
           <!-- user access is guest -->
-          <ul v-if="user_obj && user_obj.info.access_role == 3" class="navbar-nav ml-auto">
+          <ul v-if="user_obj && user_obj.access_role == 3" class="navbar-nav ml-auto">
             <li class="navbar-item">
               <router-link to="/gateway">
                 <div class="nav-link text-center">홈페이지</div>
@@ -178,27 +178,31 @@
     },
     computed: {
       header_name() {
-        let store_user = this.$store.state.authUser
+        let local_user = localStorage.getItem('authUser')
         let username = ''
-        if (Object.keys(store_user).length === 0 && store_user.constructor) {
-          username = 'none'
+
+        if (!local_user) {
+          username = 'None'
         } else {
-          if (JSON.parse(store_user).username == '') {
+          if (JSON.parse(local_user).username == '') {
             username = '이름없음'
           } else {
-            username = JSON.parse(store_user).username
+            username = JSON.parse(local_user).username
           }
         }
+
         return username
       },
       user_obj() {
-        let store_user = this.$store.state.authUser
+        let local_user = localStorage.getItem('authUser')
         let user_json = {}
-        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+
+        if (!local_user) {
           user_json = {'is_staff': false, 'is_superuser': false, 'info': {'access_role': 3}}
         } else {
-          user_json = JSON.parse(this.$store.state.authUser)
+          user_json = JSON.parse(local_user)
         }
+
         return user_json
       }
     }

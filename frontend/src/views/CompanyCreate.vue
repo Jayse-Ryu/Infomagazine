@@ -138,8 +138,7 @@
   export default {
     name: "company_create",
     data: () => ({
-      // For organization create
-      // For organization create
+      // For company create
       organization_list: [],
       error_label:{
         corp_name: true,
@@ -172,8 +171,8 @@
           .catch((error) => {
             console.log('Staff get organization is failed', error)
           })
-      } else if ([0,1].includes(this.user_obj.info.access_role)) {
-        this.create_obj.org_id = this.user_obj.info.organization
+      } else if ([0,1].includes(this.user_obj.access_role)) {
+        this.create_obj.org_id = this.user_obj.organization
       }
     },
     methods: {
@@ -262,9 +261,10 @@
     computed: {
       user_obj() {
         // Get user information
-        let store_user = this.$store.state.authUser
+        let local_user = localStorage.getItem('authUser')
         let user_json = {}
-        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+
+        if (!local_user) {
           // dummy block access auth
           user_json = {
             'is_staff': false,
@@ -275,8 +275,10 @@
             'failed': true
           }
         } else {
-          user_json = JSON.parse(this.$store.state.authUser)
+          user_json = JSON.parse(user_json)
         }
+        console.log('user jsons is ', user_json)
+
         return user_json
       }
     }

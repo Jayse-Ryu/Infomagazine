@@ -215,7 +215,7 @@ router.beforeEach((to, from, next) => {
 
   // Check authentication by token, authUser
   let work = () => {
-    let authUser = JSON.parse(Store.state.authUser)
+    let authUser = JSON.parse(localStorage.getItem('authUser'))
     // let authUser = JSON.parse(localStorage.getItem('authUser'))
     // let token = Vue.cookie.get('token')
     console.log('router auth user is ', authUser)

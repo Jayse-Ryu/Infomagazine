@@ -16,14 +16,14 @@
 
       <!-- Create button -->
       <router-link to="/landing/create/"
-                   v-if="[0, 1].includes(user_obj.info.access_role) || user_obj.is_staff || user_obj.is_superuser"
+                   v-if="[0, 1].includes(user_obj.access_role) || user_obj.is_staff || user_obj.is_superuser"
                    class="form-group btn btn-primary p-0 col-sm-12 col-md-1">
         <div class="create_btn_text">생성</div>
       </router-link>
 
       <div class="form-group search_group ml-auto text-center p-0 col-sm-12 col-md-4">
 
-        <select v-if="[0, 1].includes(user_obj.info.access_role) || user_obj.is_staff || user_obj.is_superuser"
+        <select v-if="[0, 1].includes(user_obj.access_role) || user_obj.is_staff || user_obj.is_superuser"
                 class="search_option" id="src_gbn" v-model="temp_option">
           <option value="0" selected>검색 옵션</option>
           <option value="1">랜딩 이름</option>
@@ -31,7 +31,7 @@
           <option value="3">마케터</option>
         </select>
 
-        <select v-else-if="user_obj.info.access_role == 2"
+        <select v-else-if="user_obj.access_role == 2"
                 class="search_option" id="src_gbn" v-model="temp_option">
           <option value="0" selected>검색 옵션</option>
           <option value="1">랜딩 이름</option>
@@ -76,7 +76,7 @@
           <li v-else v-for="content in content_obj"
               class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
             <div class="col-3 p-0 col-sm-3">{{ content.LandingInfo.landing.company_name }}</div>
-            <div v-if="[0, 1].includes(user_obj.info.access_role) || user_obj.is_staff || user_obj.is_superuser"
+            <div v-if="[0, 1].includes(user_obj.access_role) || user_obj.is_staff || user_obj.is_superuser"
                  class="col-3 p-0 col-sm-4">
               <router-link :to="'/landing/detail/' + content.LandingNum">
                 {{ content.LandingInfo.landing.name }}
@@ -126,7 +126,7 @@
           <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
               v-for="content in content_obj">
             <div class="col-2 p-0">{{ content.LandingInfo.landing.company_name }}</div>
-            <div v-if="[0, 1].includes(user_obj.info.access_role) || user_obj.is_staff || user_obj.is_superuser"
+            <div v-if="[0, 1].includes(user_obj.access_role) || user_obj.is_staff || user_obj.is_superuser"
                  class="col-5 p-0">
               <router-link :to="'/landing/detail/' + content.LandingNum">
                 {{ content.LandingInfo.landing.name }}
@@ -266,12 +266,12 @@
         if (this.user_obj.is_staff || this.user_obj.is_superuser) {
           console.log('Staff user - Get All')
           auth_filter = '?true'
-        } else if (this.user_obj.info.access_role == '0' || this.user_obj.info.access_role == '1') {
+        } else if (this.user_obj.access_role == '0' || this.user_obj.access_role == '1') {
           console.log('Marketer user - Get only Org')
-          auth_filter = '?organization=' + this.user_obj.info.organization
-        } else if (this.user_obj.info.access_role == '2') {
+          auth_filter = '?organization=' + this.user_obj.organization
+        } else if (this.user_obj.access_role == '2') {
           console.log('load about com - Get only Com')
-          auth_filter = '?company=' + this.user_obj.info.company
+          auth_filter = '?company=' + this.user_obj.company
         }
 
         this.$store.state.pageOptions.loading = true

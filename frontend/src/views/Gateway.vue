@@ -97,42 +97,47 @@
     methods: {
       check_access() {
         if (!this.user_obj.failed) {
-        if (this.user_obj.is_staff || this.user_obj.superuser) {
-          // // Staff, Superuser push to landing list page
-          // this.$router.push({
-          //   name: 'landing_list'
-          // })
-          console.error('JAYSE - this user is staff or super so push to landing list later')
-        } else if (this.user_obj.info.access_role == '0' || this.user_obj.info.access_role == '1') {
-          // Marketer but already got access from staff.
-          this.$router.push({
-            name: 'landing_list'
-          })
+          if (this.user_obj.is_staff || this.user_obj.is_superuser) {
+            // // Staff, Superuser push to landing list page
+            // this.$router.push({
+            //   name: 'landing_list'
+            // })
+            console.error('JAYSE - this user is staff or super so push to landing list later')
+          } else if (this.user_obj.info.access_role == '0' || this.user_obj.info.access_role == '1') {
+            // Marketer but already got access from staff.
+            this.$router.push({
+              name: 'landing_list'
+            })
+          }
         }
-      }
       },
       org_select() {
         if (this.org_selected == -1) {
           alert('조직을 선택해주세요.')
           document.getElementById('org_list').focus()
         } else {
-          this.user_obj.info.organization = this.org_selected
           this.user_org = this.org_selected
+          let form = {
+            info: {
+              organization: this.org_selected
+            }
+          }
+
           // // Update actual user
-          // axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + this.user_obj.id + '/')
-          //   .then((response) => {
-          //     console.log(response.data)
-          //   })
+          axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + this.user_obj.id + '/', form)
+            .then((response) => {
+              console.log(response.data)
+            })
         }
       }
     },
     computed: {
       user_obj() {
         // Get user information
-        let store_user = this.$store.state.authUser
+        let local_user = localStorage.getItem('authUser')
         let user_json = {}
-        if (Object.keys(store_user).length === 0 && store_user.constructor) {
-          // dummy auth
+
+        if (!local_user) {
           user_json = {
             'is_staff': false,
             'is_superuser': false,
@@ -142,9 +147,19 @@
             'failed': true
           }
         } else {
-          user_json = JSON.parse(this.$store.state.authUser)
-          this.user_org = user_json.info.organization
+          user_json = JSON.parse(local_user)
+          console.log(axios.defaults.headers.common)
+          // Axios get user not done yet!
+          axios.get(this.$store.state.endpoints.baseUrl + 'user/' + user_json.id)
+            .then((response) => {
+              console.log(response)
+              this.user_org = response.data.info.organization
+            })
+            .catch((error) => {
+              console.log(error)
+            })
         }
+
         return user_json
       }
     }

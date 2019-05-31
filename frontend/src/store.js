@@ -11,11 +11,8 @@ export default new Vuex.Store({
   state: {
     // authUser: localStorage.getItem('authUser'),
     // authUser: Vue.cookie.get('authUser'),
-    authUser: {},
+    // authUser: {},
     isAuthenticated: false,
-    // jwt: localStorage.getItem('token'),
-    // jwt: Vue.cookie.get('token'),
-    jwt: '',
     endpoints: {
       obtainJWT: 'http://localhost/api/auth/',
       refreshJWT: 'http://localhost/api/auth-refresh/',
@@ -47,7 +44,7 @@ export default new Vuex.Store({
   },
   mutations: {
     setAuthUser(state, {authUser}) {
-      Vue.set(state, 'authUser', JSON.stringify(authUser))
+      // Vue.set(state, 'authUser', JSON.stringify(authUser))
       localStorage.setItem('authUser', JSON.stringify(authUser))
     },
     setToken(state, newToken) {
@@ -72,6 +69,7 @@ export default new Vuex.Store({
     obtainToken(self, data) {
       // console.log('obtainToken action')
       const decoded = Decoder(data.token)
+      console.log('when decoded obtain', decoded)
       const user = {
         id: decoded.user_id,
         email: decoded.email,
@@ -80,67 +78,63 @@ export default new Vuex.Store({
         is_staff: decoded.is_staff,
         access_role: decoded.access_role
       }
-
       this.commit('setToken', data.token)
       this.commit('setAuthUser', {
         authUser: user,
         isAuthenticated: true
       })
 
-      axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
+      // axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
+      axios.defaults.headers.common['Authorization'] = `Bearer ${this.state.jwt}`
     },
-    // refreshToken () {
-    //   const payload = {
-    //     token: this.state.jwt
-    //   }
-    //   axios.post(this.state.endpoints.refreshJWT, payload)
-    //       .then((response) => {
-    //         this.commit('setToken', response.data.token)
-    //         // Get auth user
-    //         if (this.state.jwt != null) {
-    //           // If jwt object is really exist in local store
-    //           const token = this.state.jwt
-    //           const decoded = Decoder(token)
-    //           const user_id = decoded.user_id
-    //           axios.get(this.state.endpoints.baseUrl + 'user/' + user_id + '/')
-    //               .then((response) => {
-    //                 if (response.data) {
-    //                   let user_obj = response.data
-    //                   this.commit('setAuthUser', {
-    //                     authUser: user_obj,
-    //                     isAuthenticated: true
-    //                   })
-    //                 }
-    //               })
-    //               .catch((error) => {
-    //                 console.log('get Auth user failed..', error)
-    //               })
-    //         }
-    //       })
-    //       .catch((error) => {
-    //         console.log('Refresh error..', error)
-    //       })
-    // },
+    refreshToken () {
+      // const payload = {
+      //   token: this.state.jwt
+      // }
+      // axios.post(this.state.endpoints.refreshJWT, payload)
+      //     .then((response) => {
+      //       this.commit('setToken', response.data.token)
+      //       // Get auth user
+      //       if (this.state.jwt != null) {
+      //         // If jwt object is really exist in local store
+      //         const token = this.state.jwt
+      //         const decoded = Decoder(token)
+      //         const user_id = decoded.user_id
+      //         axios.get(this.state.endpoints.baseUrl + 'user/' + user_id + '/')
+      //             .then((response) => {
+      //               if (response.data) {
+      //                 let user_obj = response.data
+      //                 this.commit('setAuthUser', {
+      //                   authUser: user_obj,
+      //                   isAuthenticated: true
+      //                 })
+      //               }
+      //             })
+      //             .catch((error) => {
+      //               console.log('get Auth user failed..', error)
+      //             })
+      //       }
+      //     })
+      //     .catch((error) => {
+      //       console.log('Refresh error..', error)
+      //     })
+    },
     inspectToken() {
       // console.log('inspectToken action')
       const token = Vue.cookie.get('token')
-      let authUser = localStorage.getItem('authUser')
+      const authUser = localStorage.getItem('authUser')
 
       if (token !== null && authUser !== null) {
-        // let store_user = this.state.authUser
-        // let store_token = this.state.jwt
-        // if (Object.keys(store_user).length === 0 && store_user.constructor === Object && !store_token) {
-        //   this.commit('setToken', token)
-        //   this.commit('setAuthUser', {
-        //     authUser: JSON.parse(authUser),
-        //     isAuthenticated: true
-        //   })
-        //   axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
-        //   // console.log('axios default header?', axios.defaults.headers)
-        // }
+        console.log('inspect both exist')
+        // Both exist
+
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
         return true
       } else if (token !== null && !authUser) {
+        console.log('inspect only token')
+        // Only token exist
+
         const decoded = Decoder(token)
         const user = {
           id: decoded.user_id,
@@ -156,9 +150,12 @@ export default new Vuex.Store({
           isAuthenticated: true
         })
 
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
         return true
       } else {
-        // If no token then send to login page
+        console.log('inspect both not')
+        // Both are null
         this.commit('removeToken')
 
         return false
