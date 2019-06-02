@@ -87,21 +87,16 @@
             // Axios then
             return this.$store.dispatch('obtainToken', response.data)
           })
-          .catch(() => {
-            // Axios catch
-            // Check the account or password
-            alert('아이디와 비밀번호를 확인해주세요.')
-            this.$store.state.pageOptions.loading = false
-          })
           .then(() => {
             // Dispatch then
             this.$store.state.pageOptions.loading = false
             this.$router.push({name: 'gateway'})
           })
           .catch((error) => {
-            // Dispatch catch
-            console.log('로그인에 문제가 생겼습니다.', error)
+            // Check the account or password
+            alert('아이디와 비밀번호를 확인해주세요.')
             this.$store.state.pageOptions.loading = false
+            console.log('로그인에 문제가 생겼습니다.', error)
           })
       }
     }

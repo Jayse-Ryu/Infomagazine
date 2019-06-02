@@ -19,7 +19,7 @@
             <div class="form-control border-0" id="org_id">{{ content_obj.id }}</div>
           </div>
 
-          <label for="org_manager" class="col-form-label-sm col-sm-3 mt-3">관리자</label>
+           <label for="org_manager" class="col-form-label-sm col-sm-3 mt-3">관리자</label>
           <div class="col-sm-9 mt-sm-3">
             <!--<div class="form-control" id="org_manager">{{ content_obj.manager_name }}</div>-->
             <select class="form-control" name="org_manager" id="org_manager" v-model="content_obj.manager">

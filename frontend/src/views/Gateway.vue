@@ -126,7 +126,7 @@
           // // Update actual user
           axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + this.user_obj.id + '/', form)
             .then((response) => {
-              console.log(response.data)
+              console.log('updated?', response.data)
             })
         }
       }
@@ -148,15 +148,13 @@
           }
         } else {
           user_json = JSON.parse(local_user)
-          console.log(axios.defaults.headers.common)
           // Axios get user not done yet!
           axios.get(this.$store.state.endpoints.baseUrl + 'user/' + user_json.id)
             .then((response) => {
-              console.log(response)
               this.user_org = response.data.info.organization
             })
             .catch((error) => {
-              console.log(error)
+              console.log('Get specific user error', error)
             })
         }
 

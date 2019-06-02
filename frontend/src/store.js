@@ -51,7 +51,7 @@ export default new Vuex.Store({
       // localStorage.setItem('token', newToken)
       // state.jwt = newToken
       try {
-        Vue.cookie.set('token', newToken, {expires: '5m'})
+        Vue.cookie.set('token', newToken, {expires: '10m'})
       } catch (error) {
         console.log('set cookie error', error)
       }
@@ -69,7 +69,6 @@ export default new Vuex.Store({
     obtainToken(self, data) {
       // console.log('obtainToken action')
       const decoded = Decoder(data.token)
-      console.log('when decoded obtain', decoded)
       const user = {
         id: decoded.user_id,
         email: decoded.email,
@@ -125,16 +124,12 @@ export default new Vuex.Store({
       const authUser = localStorage.getItem('authUser')
 
       if (token !== null && authUser !== null) {
-        console.log('inspect both exist')
         // Both exist
-
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
         return true
       } else if (token !== null && !authUser) {
-        console.log('inspect only token')
         // Only token exist
-
         const decoded = Decoder(token)
         const user = {
           id: decoded.user_id,
@@ -154,7 +149,6 @@ export default new Vuex.Store({
 
         return true
       } else {
-        console.log('inspect both not')
         // Both are null
         this.commit('removeToken')
 

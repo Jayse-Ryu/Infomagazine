@@ -218,7 +218,7 @@ router.beforeEach((to, from, next) => {
     let authUser = JSON.parse(localStorage.getItem('authUser'))
     // let authUser = JSON.parse(localStorage.getItem('authUser'))
     // let token = Vue.cookie.get('token')
-    console.log('router auth user is ', authUser)
+    // console.log('router auth user is ', authUser)
 
     let admin = authUser.is_superuser
     let staff = authUser.is_staff
