@@ -11,11 +11,11 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-
-from corsheaders.defaults import default_headers
-from decouple import config, Csv
-import csv
 from datetime import timedelta
+
+import csv
+from decouple import config, Csv
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -55,7 +55,9 @@ INSTALLED_APPS = [
     'company',
 
     # AWS Management
-    'storages'
+    'storages',
+
+    'silk',
 ]
 
 REST_FRAMEWORK = {
@@ -65,12 +67,16 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10
+}
+
+SIMPLE_JWT = {
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.SlidingToken',)
 }
 
 SECURE_BROWSER_XSS_FILTER = True
@@ -78,30 +84,35 @@ SECURE_BROWSER_XSS_FILTER = True
 # CORS_ALLOW_CREDENTIALS = True
 #
 SESSION_COOKIE_SAMESITE = 'Strict'
+CSRF_COOKIE_SAMESITE = 'Strict'
+
 # SESSION_COOKIE_SAMESITE = None
 
-CSRF_COOKIE_NAME = 'XSRF-TOKEN'
-
-CSRF_HEADER_NAME = 'HTTP_X_XSRF_TOKEN'
-
-CORS_ALLOW_HEADERS = (
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-xsrf-token',
-    'x-requested-with',
-)
+# CSRF_COOKIE_NAME = 'XSRF-TOKEN'
+#
+# CSRF_HEADER_NAME = 'HTTP_X_XSRF_TOKEN'
+#
+# CORS_ALLOW_HEADERS = (
+#     'accept',
+#     'accept-encoding',
+#     'authorization',
+#     'content-type',
+#     'dnt',
+#     'origin',
+#     'user-agent',
+#     'x-xsrf-token',
+#     'x-requested-with',
+# )
 
 # TODO prod상에서 꼭 명시 - 서브도메인 지원을 위해
 # CSRF_COOKIE_DOMAIN = config('CSRF_COOKIE_DOMAIN')
 
 CORS_ORIGIN_WHITELIST = tuple(config('CORS_ORIGIN_WHITELIST', cast=Csv()))
 
-CSRF_TRUSTED_ORIGINS = tuple(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
+# CSRF_TRUSTED_ORIGINS = tuple(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
+
+LOGIN_URL = '/api/admin/login/'
+LOGOUT_URL = '/api/admin/logout/'
 
 # Changes the built-in user model to mine
 AUTH_USER_MODEL = 'user.User'
@@ -115,6 +126,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware',
 ]
 
 ROOT_URLCONF = 'infomagazine.urls'
