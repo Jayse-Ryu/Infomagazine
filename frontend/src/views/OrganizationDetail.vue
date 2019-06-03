@@ -9,7 +9,7 @@
     </div>
 
     <div class="container">
-      <!-- 1. If user is creator -->
+      <!-- 1. Provide edit form for staff or owner -->
       <form v-if="user_obj.is_staff || user_obj.is_superuser || user_obj.info.access_role == 0"
             class="m-auto" v-on:submit.prevent="check_organization">
         <div class="form-group row">
@@ -19,7 +19,7 @@
             <div class="form-control border-0" id="org_id">{{ content_obj.id }}</div>
           </div>
 
-           <label for="org_manager" class="col-form-label-sm col-sm-3 mt-3">관리자</label>
+          <label for="org_manager" class="col-form-label-sm col-sm-3 mt-3">관리자</label>
           <div class="col-sm-9 mt-sm-3">
             <!--<div class="form-control" id="org_manager">{{ content_obj.manager_name }}</div>-->
             <select class="form-control" name="org_manager" id="org_manager" v-model="content_obj.manager">
@@ -122,7 +122,7 @@
 
         </div>
 
-        <!-- 2. If width is big -->
+        <!-- 1-1. If width is big -->
         <div v-if="window_width > 1000" class="list_area">
           <div>
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
@@ -156,7 +156,8 @@
                   </button>
                 </div>
                 <div v-else-if="Math.abs(content.access) == 1 && content.user_staff && !user_obj.is_superuser">
-                  <button type="button" class="btn btn-outline-primary p-0 disabled" @click.prevent="promote('he', content.user)">
+                  <button type="button" class="btn btn-outline-primary p-0 disabled"
+                          @click.prevent="promote('he', content.user)">
                     <div class="promote_btn">운영자</div>
                   </button>
                 </div>
@@ -180,7 +181,7 @@
           </ul>
         </div>
 
-        <!-- 2. Else if width is small -->
+        <!-- 1-2. Else if width is small -->
         <div v-else class="list_area text-center">
           <div>
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2"
@@ -208,7 +209,8 @@
                   </button>
                 </div>
                 <div v-else-if="Math.abs(content.access) == 1 && content.user_staff && !user_obj.is_superuser">
-                  <button type="button" class="btn btn-outline-primary p-0 disabled" @click.prevent="promote('he', content.user)">
+                  <button type="button" class="btn btn-outline-primary p-0 disabled"
+                          @click.prevent="promote('he', content.user)">
                     <div class="promote_btn">운영자</div>
                   </button>
                 </div>
@@ -259,8 +261,8 @@
         </div>
       </form>
 
-      <!-- 1. If user is just manager -->
-      <div v-else-if="user_obj.id != original_manager && access_obj.organization == page_id" class="m-auto">
+      <!-- 2. Provide only info for normal marketer -->
+      <div v-else-if="user_obj.info.access_role == 1 && user_obj.info.organization == page_id" class="m-auto">
         <div class="form-group row">
 
           <label for="org_id2" class="col-form-label-sm col-sm-3 mt-3">소속 번호</label>
@@ -341,7 +343,7 @@
           </div>
         </div>
 
-        <!-- 2. If width is big -->
+        <!-- 2-1. If width is big -->
         <div v-if="window_width > 1000" class="list_area">
           <div>
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
@@ -370,12 +372,14 @@
               <div class="col-2">{{ content.phone }}</div>
               <div class="col-2 col-sm-3">
                 <div v-if="content.access == 1 && content.user == original_manager">
-                  <button type="button" class="btn btn-primary p-0 disabled" @click.prevent="promote('he', content.user)">
+                  <button type="button" class="btn btn-primary p-0 disabled"
+                          @click.prevent="promote('he', content.user)">
                     <div class="promote_btn">조직관리자</div>
                   </button>
                 </div>
                 <div v-else-if="Math.abs(content.access) == 1 && content.user_staff && !user_obj.is_superuser">
-                  <button type="button" class="btn btn-outline-primary p-0 disabled" @click.prevent="promote('he', content.user)">
+                  <button type="button" class="btn btn-outline-primary p-0 disabled"
+                          @click.prevent="promote('he', content.user)">
                     <div class="promote_btn">운영자</div>
                   </button>
                 </div>
@@ -399,7 +403,7 @@
           </ul>
         </div>
 
-        <!-- 2. If width is small -->
+        <!-- 2-2. If width is small -->
         <div v-else class="list_area text-center">
           <div>
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2"
@@ -427,7 +431,8 @@
                   </button>
                 </div>
                 <div v-else-if="Math.abs(content.access) == 1 && content.user_staff && !user_obj.is_superuser">
-                  <button type="button" class="btn btn-outline-primary p-0 disabled" @click.prevent="promote('he', content.user)">
+                  <button type="button" class="btn btn-outline-primary p-0 disabled"
+                          @click.prevent="promote('he', content.user)">
                     <div class="promote_btn">운영자</div>
                   </button>
                 </div>
@@ -491,15 +496,22 @@
       page_chunk: 10,
     }),
     mounted() {
+      this.page_id = this.$route.params.organization_id * 1
+      if (!this.user_obj.is_staff || !this.user_obj.is_superuser ||
+          [0,1].includes(this.user_obj.info.access_role) || this.user_obj.info.organization != this.page_id) {
+        this.$router.currentRoute.meta.protect_leave = 'no'
+        this.$router.push({
+          name: 'organization_list'
+        })
+      }
+
       // Window width calculator
       let that = this
-      this.$nextTick(function () {
+      that.$nextTick(function () {
         window.addEventListener('resize', function (e) {
           that.window_width = window.innerWidth
         })
       })
-
-      this.page_id = this.$route.params.organization_id * 1
 
       // if page int is default, push to list page
       if (this.page_id === 0) {
@@ -507,45 +519,91 @@
           name: 'organization_list'
         })
       }
-      // get object
-      let axios = this.$axios
-      let this_url = 'organization/'
       // Get Organization by page_id
-      axios.get(this.$store.state.endpoints.baseUrl + this_url + this.page_id)
+      axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + this.page_id)
         .then((response) => {
           this.content_obj = response.data
-          this.original_manager = response.data.manager
           // Get access users by organization id
-          return axios.get(this.$store.state.endpoints.baseUrl + 'user_access/' + '?organization=' + response.data.id)
+          return axios.get(this.$store.state.endpoints.baseUrl + 'user/list/' + '?organization=' + response.data.id)
         })
         .then((response) => {
           // Filtering allowed managers
           for (let i = 0; i < response.data.results.length; i++) {
-            if (response.data.results[i].access === 1) {
+            if (response.data.results[i].info.organization == this.page_id) {
               this.marketer.push(response.data.results[i])
+              if (response.data.results[i].info.access_role == 0) {
+                this.original_manager = response.data.results[i].id
+              }
             }
           }
-          // this.pagination
-          let this_url = 'user_access/'
-          let offset = (this.page_current - 1) * this.page_chunk
-          // console.log('pagination')
-          axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + 'organization' + '=' + this.$route.params.organization_id * 1)
-            .then((response) => {
-              // Calculation for page_max
-              if (response.data.count % this.page_chunk === 0) {
-                this.page_max = Math.floor(response.data.count / this.page_chunk)
-              } else {
-                this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
-              }
-              // Get all of users in this organization whatever allowed or not
-              this.user_list = response.data.results
-            })
+          // // this.pagination
+          // let this_url = 'user_access/'
+          // let offset = (this.page_current - 1) * this.page_chunk
+          // // console.log('pagination')
+          // axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + 'organization' + '=' + this.$route.params.organization_id * 1)
+          //   .then((response) => {
+          //     // Calculation for page_max
+          //     if (response.data.count % this.page_chunk === 0) {
+          //       this.page_max = Math.floor(response.data.count / this.page_chunk)
+          //     } else {
+          //       this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
+          //     }
+          //     // Get all of users in this organization whatever allowed or not
+          //     this.user_list = response.data.results
+          //   })
         })
         .catch((error) => {
-          console.log(error)
+          console.log('Get organization info, marker list error', error)
         })
     },
     methods: {
+      // Real-Time custom validation
+      error_check(param) {
+        if (param === 'phone') {
+          // Phone validate
+          console.log('param is phone')
+          if (this.create_obj.org_tel_num !== '') {
+            // Allow mobile phone, internet wireless
+            let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
+            let tel_num = this.create_obj.org_tel_num
+            let test_flag = regular_tel.test(tel_num)
+            if (!test_flag) {
+              this.error_label.org_tel_num = true
+              this.error_label.class.tel_num = 'form-control alert-danger'
+            } else {
+              this.error_label.org_tel_num = false
+              this.error_label.class.tel_num = 'form-control alert-info'
+            }
+          } else {
+            this.error_label.org_tel_num = false
+            this.error_label.class.tel_num = 'form-control'
+          }
+          // /Phone validate
+        } else if (param === 'email') {
+          // Email validate
+          if (this.create_obj.org_email !== '') {
+            if (this.$validator.errors.has('org_email')) {
+              this.error_label.org_email = true
+              this.error_label.class.email = 'form-control alert-danger'
+            } else {
+              this.error_label.org_email = false
+              this.error_label.class.email = 'form-control alert-info'
+            }
+          } else {
+            this.error_label.org_email = false
+            this.error_label.class.email = 'form-control'
+          }
+        } else if (param === 'name') {
+          // Org name validate
+          if (this.create_obj.org_name === '') {
+            this.error_label.org_name = true
+            this.error_label.class.name = 'form-control alert-danger'
+          } else {
+            this.error_label.org_name = false
+            this.error_label.class.name = 'form-control alert-info'
+          }
+        }
+      },
       refresh_organization() {
         this.page_id = this.$route.params.organization_id * 1
 

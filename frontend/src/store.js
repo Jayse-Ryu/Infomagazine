@@ -84,39 +84,25 @@ export default new Vuex.Store({
       })
 
       // axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
-      axios.defaults.headers.common['Authorization'] = `Bearer ${this.state.jwt}`
+      axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
     },
-    refreshToken () {
-      // const payload = {
-      //   token: this.state.jwt
-      // }
-      // axios.post(this.state.endpoints.refreshJWT, payload)
-      //     .then((response) => {
-      //       this.commit('setToken', response.data.token)
-      //       // Get auth user
-      //       if (this.state.jwt != null) {
-      //         // If jwt object is really exist in local store
-      //         const token = this.state.jwt
-      //         const decoded = Decoder(token)
-      //         const user_id = decoded.user_id
-      //         axios.get(this.state.endpoints.baseUrl + 'user/' + user_id + '/')
-      //             .then((response) => {
-      //               if (response.data) {
-      //                 let user_obj = response.data
-      //                 this.commit('setAuthUser', {
-      //                   authUser: user_obj,
-      //                   isAuthenticated: true
-      //                 })
-      //               }
-      //             })
-      //             .catch((error) => {
-      //               console.log('get Auth user failed..', error)
-      //             })
-      //       }
-      //     })
-      //     .catch((error) => {
-      //       console.log('Refresh error..', error)
-      //     })
+    refreshToken() {
+      let token = Vue.cookie.get('token')
+      const payload = {
+        token: token
+      }
+      // Refresh endpoint
+      axios.post(this.state.endpoints.refreshJWT, payload)
+        .then((response) => {
+          this.dispatch('obtainToken', response.data.token)
+
+          return true
+        })
+        .catch((error) => {
+          console.log('Refresh token error.', error)
+
+          return false
+        })
     },
     inspectToken() {
       // console.log('inspectToken action')
@@ -125,35 +111,57 @@ export default new Vuex.Store({
 
       if (token !== null && authUser !== null) {
         // Both exist
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-
-        return true
+        this.dispatch('inspectProgress', token)
+          .then(() => {
+            return true
+          })
+          .catch((error) => {
+            console.log('Inspect - both exist error', error)
+            return false
+          })
       } else if (token !== null && !authUser) {
         // Only token exist
-        const decoded = Decoder(token)
-        const user = {
-          id: decoded.user_id,
-          email: decoded.email,
-          username: decoded.username,
-          is_superuser: decoded.is_superuser,
-          is_staff: decoded.is_staff,
-          access_role: decoded.access_role
-        }
-
-        this.commit('setAuthUser', {
-          authUser: user,
-          isAuthenticated: true
-        })
-
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-
-        return true
+        this.dispatch('inspectProgress', token)
+          .then(() => {
+            return true
+          })
+          .catch((error) => {
+            console.log('Inspect - only token exist error', error)
+            return false
+          })
       } else {
         // Both are null
         this.commit('removeToken')
 
         return false
       }
+    },
+    inspectProgress(token) {
+      const decoded = Decoder(token)
+      const exp = decoded.exp
+      const orig_iat = decoded.orig_iat
+      const a_day = 86400 // 24*60*60
+      const thirty_minutes = 1800 // 30*60
+
+      if ((Date.now() / 1000) > exp) {
+        // If token expired then send to login page
+        this.commit('removeToken')
+        // alert('로그인 시간이 만료되었습니다.')
+        router.currentRoute.meta.forced = 'yes'
+        router.push('/')
+        return false
+      } else if ((Date.now() / 1000) > exp - thirty_minutes && (Date.now() / 1000) < orig_iat + a_day) {
+        // If token expire in less than 30 minutes but still in refresh period then refresh
+        this.dispatch('refreshToken')
+          .then(() => {
+            return true
+          })
+          .catch((error) => {
+            console.log('Inspect token refresh await error.', error)
+            return false
+          })
+      }
+      // /if date
     }
   }
 })

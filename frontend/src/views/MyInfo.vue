@@ -223,17 +223,21 @@
 
               axios.post(this.$store.state.endpoints.obtainJWT, payload)
                 .then((response) => {
-                  this.$store.dispatch('obtainToken', response.data)
-
-                  try {
-                    this.$cookie.set('token', response.data.token, {expires: '1D'})
-                    this.$cookie.set('authUser', JSON.stringify(response.data.user), {expires: '1D'})
-                  } catch (error) {
-                    console.log('set cookie error', error)
-                  }
+                  return this.$store.dispatch('obtainToken', response.data)
+                  // try {
+                  //   this.$cookie.set('token', response.data.token, {expires: '1D'})
+                  //   this.$cookie.set('authUser', JSON.stringify(response.data.user), {expires: '1D'})
+                  // } catch (error) {
+                  //   console.log('set cookie error', error)
+                  // }
+                })
+                .then(() => {
                   alert('수정되었습니다.')
                   this.$store.state.pageOptions.loading = false
                   this.$router.push({name: 'gateway'})
+                })
+                .catch((error) => {
+                  console.log('Edit error', error)
                 })
             })
             .catch((error) => {
@@ -281,8 +285,8 @@
           }
         } else {
           user_json = JSON.parse(local_user)
-          user_json['info'] = {}
-          user_json['info']['phone_num'] = ''
+          // user_json['info'] = {}
+          // user_json['info']['phone_num'] = ''
         }
 
         console.log(user_json)

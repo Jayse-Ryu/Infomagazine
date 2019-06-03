@@ -181,9 +181,10 @@
           // Phone validate
           console.log('param is phone')
           if (this.create_obj.corp_tel_num !== '') {
-            let rgTel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
-            let strValue = this.create_obj.corp_tel_num
-            let test_flag = rgTel.test(strValue)
+            // Allow mobile phone, internet wireless only
+            let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
+            let tel_num = this.content_obj.info.phone_num
+            let test_flag = regular_tel.test(tel_num)
             if (!test_flag) {
               this.error_label.corp_tel_num = true
               this.error_label.class.tel_num = 'form-control alert-danger'

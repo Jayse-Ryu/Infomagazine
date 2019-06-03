@@ -152,12 +152,14 @@
       }
     }),
     methods: {
+      // Real-Time custom validation
       error_check(param) {
         if (param === 'phone') {
           if (this.content_obj.info.phone_num !== '') {
-            let rgTel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
-            let strValue = this.content_obj.info.phone_num
-            let test_flag = rgTel.test(strValue)
+            // Allow mobile phone, internet wireless only
+            let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
+            let tel_num = this.content_obj.info.phone_num
+            let test_flag = regular_tel.test(tel_num)
             if (!test_flag) {
               this.error_label.phone = true
               this.error_label.class.phone = 'form-control alert-danger'
@@ -187,7 +189,7 @@
           if (this.content_obj.email !== '') {
             // If email is not empty
             let users = []
-            axios.get(this.$store.state.endpoints.baseUrl + 'user/')
+            axios.get(this.$store.state.endpoints.baseUrl + 'user/list/')
               .then((response) => {
 
                 users = response.data.results
@@ -269,11 +271,8 @@
             })
           })
           .catch((error) => {
-            // if (error.response.data.account) {
-            //   alert(error.response.data.account)
-            // } else {
             alert('회원가입 중 문제가 발생하였습니다. 다시시도 해주세요.')
-            // }
+            console.log(error)
             this.$store.state.pageOptions.loading = false
           })
         /* /Axios post */

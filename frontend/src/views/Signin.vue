@@ -95,6 +95,7 @@
           .catch((error) => {
             // Check the account or password
             alert('아이디와 비밀번호를 확인해주세요.')
+            document.getElementById('id_password').focus()
             this.$store.state.pageOptions.loading = false
             console.log('로그인에 문제가 생겼습니다.', error)
           })

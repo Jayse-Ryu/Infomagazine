@@ -223,25 +223,25 @@
         //     this.content_obj = response.data.results
         //   })
 
-        // const config = {
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   }
-        // }
-
-        if (this.search_option == 1) {
-          search_param = '&name=' + this.search_text
-        }
-
+        // Get Organization by logged user's grade
         if (this.user_obj.is_staff || this.user_obj.is_superuser) {
           console.log('Staff user - Get All')
-          auth_filter = '?true'
+          auth_filter = ''
         } else if (this.user_obj.access_role == '0' || this.user_obj.access_role == '1') {
           console.log('Marketer user - Get only Org')
           auth_filter = '?organization=' + this.user_obj.organization
         } else if (this.user_obj.access_role == '2') {
           console.log('load about com - Get only Com')
           auth_filter = '?company=' + this.user_obj.company
+        }
+
+        // Set search option
+        if (this.search_option == 1 && this.search_text !== '') {
+          if (auth_filter !== '') {
+            search_param = '&name=' + this.search_text
+          } else {
+            search_param = '?name=' + this.search_text
+          }
         }
 
         this.$store.state.pageOptions.loading = true
@@ -255,7 +255,6 @@
             this.$store.state.pageOptions.loading = false
             console.log('Get landing crashed', error)
           })
-
       }
     },
     mounted() {
