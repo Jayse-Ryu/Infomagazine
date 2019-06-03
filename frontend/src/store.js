@@ -69,22 +69,31 @@ export default new Vuex.Store({
     obtainToken(self, data) {
       // console.log('obtainToken action')
       const decoded = Decoder(data.token)
-      const user = {
-        id: decoded.user_id,
-        email: decoded.email,
-        username: decoded.username,
-        is_superuser: decoded.is_superuser,
-        is_staff: decoded.is_staff,
-        access_role: decoded.access_role
-      }
-      this.commit('setToken', data.token)
-      this.commit('setAuthUser', {
-        authUser: user,
-        isAuthenticated: true
-      })
+      axios.get(this.state.endpoints.baseUrl + 'user/' + decoded.user_id)
+        .then((response) => {
+          const user = {
+            id: decoded.user_id,
+            email: decoded.email,
+            username: decoded.username,
+            is_superuser: decoded.is_superuser,
+            is_staff: decoded.is_staff,
+            access_role: decoded.access_role,
+            organization: response.data.info.organization,
+            company: response.data.info.company,
+            phone_num: response.data.info.phone_num
+          }
+          this.commit('setToken', data.token)
+          this.commit('setAuthUser', {
+            authUser: user,
+            isAuthenticated: true
+          })
 
-      // axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
-      axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+          // axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
+          axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+        })
+        .catch((error) => {
+          console.log('Obtain get user error!', error)
+        })
     },
     refreshToken() {
       let token = Vue.cookie.get('token')

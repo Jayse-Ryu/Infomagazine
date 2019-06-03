@@ -13,34 +13,36 @@
 
         <label for="user_num" class="col-form-label-sm col-sm-3 mt-3">번호</label>
         <div class="col-sm-9 mt-sm-3">
-          <div class="form-control" id="user_num">{{ content_obj.user }}</div>
+          <div class="form-control" id="user_num">{{ content_obj.id }}</div>
         </div>
 
-        <label for="user_id" class="col-form-label-sm col-sm-3 mt-3">아이디</label>
+        <label for="user_id" class="col-form-label-sm col-sm-3 mt-3">이메일</label>
         <div class="col-sm-9 mt-sm-3">
-          <div class="form-control" id="user_id">{{ content_obj.account }}</div>
+          <div class="form-control" id="user_id">{{ content_obj.email }}</div>
         </div>
 
         <label for="user_name" class="col-form-label-sm col-sm-3 mt-3">이름</label>
         <div class="col-sm-9 mt-sm-3">
-          <div class="form-control" id="user_name">{{ content_obj.user_name }}</div>
+          <div class="form-control" id="user_name">{{ content_obj.username }}</div>
         </div>
 
         <label for="user_phone" class="col-form-label-sm col-sm-3 mt-3">연락처</label>
         <div class="col-sm-9 mt-sm-3">
-          <div v-if="content_obj.phone" class="form-control" id="user_phone">{{ content_obj.phone }}</div>
+          <div v-if="content_obj.phone_num" class="form-control" id="user_phone">
+            {{ content_obj.phone_num }}
+          </div>
           <div v-else class="form-control">없음</div>
         </div>
 
-        <label for="user_mail" class="col-form-label-sm col-sm-3 mt-3">메일</label>
+        <!--<label for="user_mail" class="col-form-label-sm col-sm-3 mt-3">메일</label>
         <div class="col-sm-9 mt-sm-3">
           <div class="form-control" id="user_mail">{{ content_obj.email }}</div>
-        </div>
+        </div>-->
 
         <!-- Grade handler -->
         <label for="user_access" class="col-form-label-sm col-sm-3 mt-3">등급</label>
         <div class="col-sm-9 mt-sm-3 justify-content-between">
-          <div v-if="content_obj.access == 1">
+          <div v-if="content_obj.info.access_role == 1">
             <div class="form-control border-0 p-0" id="user_access">
               <div class="badge alert alert-primary">마케터</div>
               <button v-if="content_obj.user !== user_obj.id && !more_info.is_staff" type="button"
@@ -82,10 +84,11 @@
         <label v-else-if="content_obj.company" for="user_companion" class="col-form-label-sm col-sm-3 mt-3">업체</label>
         <label v-else for="user_companion" class="col-form-label-sm col-sm-3 mt-3">업체</label>
         <div class="col-sm-9 mt-sm-3">
-          <div v-if="content_obj.organization" class="form-control" id="user_companion">{{ content_obj.organization_name
-            }}
+          <div v-if="content_obj.organization" class="form-control" id="user_companion">
+            {{ content_obj.organization_name }}
           </div>
-          <div v-else-if="content_obj.company" class="form-control" id="user_companion">{{ content_obj.company_name }}
+          <div v-else-if="content_obj.company" class="form-control" id="user_companion">
+            {{ content_obj.company_name }}
           </div>
           <div v-else class="form-control" id="user_companion">생성예정</div>
         </div>
@@ -193,10 +196,8 @@
       more_info: []
     }),
     mounted() {
-      let axios = this.$axios
-      let this_url = 'user_access/'
       if (this.$route.params.user_id) {
-        axios.get(this.$store.state.endpoints.baseUrl + this_url + this.$route.params.user_id + '/')
+        axios.get(this.$store.state.endpoints.baseUrl + 'user/' + this.$route.params.user_id + '/')
           .then((response) => {
             this.content_obj = response.data
             this_url = 'user/'
@@ -304,10 +305,8 @@
         }
       },
       user_delete() {
-        let axios = this.$axios
-        let this_url = 'user/'
         if (confirm('이 유저를 정말 삭제하시겠습니까?')) {
-          axios.delete(this.$store.state.endpoints.baseUrl + this_url + this.more_info.id)
+          axios.delete(this.$store.state.endpoints.baseUrl + 'user/' + this.more_info.id)
             .then(() => {
               alert('삭제되었습니다.')
               this.$router.push({

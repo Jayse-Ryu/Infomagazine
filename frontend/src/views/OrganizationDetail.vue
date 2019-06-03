@@ -11,7 +11,7 @@
     <div class="container">
       <!-- 1. Provide edit form for staff or owner -->
       <form v-if="user_obj.is_staff || user_obj.is_superuser ||
-            user_obj.info.access_role == 0 || user_obj.info.organization == page_id"
+            user_obj.access_role == 0 || user_obj.organization == page_id"
             class="m-auto" v-on:submit.prevent="check_organization">
         <div class="form-group row">
 
@@ -856,9 +856,7 @@
           user_json = {
             'is_staff': false,
             'is_superuser': false,
-            'info': {
-              'access_role': 3
-            },
+            'access_role': 3,
             'failed': true
           }
         } else {
