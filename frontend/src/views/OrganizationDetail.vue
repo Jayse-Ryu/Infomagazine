@@ -10,7 +10,8 @@
 
     <div class="container">
       <!-- 1. Provide edit form for staff or owner -->
-      <form v-if="user_obj.is_staff || user_obj.is_superuser || user_obj.info.access_role == 0"
+      <form v-if="user_obj.is_staff || user_obj.is_superuser ||
+            user_obj.info.access_role == 0 || user_obj.info.organization == page_id"
             class="m-auto" v-on:submit.prevent="check_organization">
         <div class="form-group row">
 
@@ -21,28 +22,32 @@
 
           <label for="org_manager" class="col-form-label-sm col-sm-3 mt-3">관리자</label>
           <div class="col-sm-9 mt-sm-3">
-            <!--<div class="form-control" id="org_manager">{{ content_obj.manager_name }}</div>-->
-            <select class="form-control" name="org_manager" id="org_manager" v-model="content_obj.manager">
-              <option v-for="item in marketer" :value="item.user">{{ item.user_name }}</option>
+            <select class="form-control" name="org_manager" id="org_manager"
+                    v-model="changeable_manager"
+                    @change="manager_change()">
+              <option v-for="item in marketer" :value="item.user">{{ item.username }}</option>
             </select>
           </div>
 
           <label for="org_name" class="col-form-label-sm col-sm-3 mt-3">소속 이름*</label>
           <div class="col-sm-9 mt-sm-3">
             <!--<div class="error_label" v-if="errors.has('org_name')">{{errors.first('org_name')}}</div>-->
-            <div class="error_label" v-if="errors.has('org_name')">이름은 필수 항목입니다.</div>
-            <input type="text" class="form-control" id="org_name" name="org_name" v-model="content_obj.name"
+            <!--<div class="error_label" v-if="errors.has('org_name')">이름은 필수 항목입니다.</div>-->
+            <input type="text" :class="error_label.class.name" id="org_name" name="org_name"
+                   v-model="content_obj.org_name"
                    required
                    placeholder="업체 이름을 입력하세요"
                    autofocus="autofocus"
                    maxlength="100"
-                   v-validate="'required'">
+                   v-validate="'required'"
+                   @change="error_check('name')">
           </div>
 
           <label for="org_sub" class="col-form-label-sm col-sm-3 mt-3">소속 상호명</label>
           <div class="col-sm-9 mt-sm-3">
-            <div class="error_label" v-if="errors.has('org_sub')">{{errors.first('org_sub')}}</div>
-            <input type="text" class="form-control" id="org_sub" name="org_sub" v-model="content_obj.sub_name"
+            <!--<div class="error_label" v-if="errors.has('org_sub')">{{errors.first('org_sub')}}</div>-->
+            <input type="text" class="form-control" id="org_sub" name="org_sub"
+                   v-model="content_obj.org_sub_name"
                    placeholder="상호명을 입력하세요"
                    autofocus="autofocus"
                    maxlength="100">
@@ -50,7 +55,8 @@
 
           <label for="org_header" class="col-form-label-sm col-sm-3 mt-3">대표자</label>
           <div class="col-sm-9 mt-sm-3">
-            <input type="text" class="form-control" id="org_header" v-model="content_obj.header"
+            <input type="text" class="form-control" id="org_header"
+                   v-model="content_obj.org_header"
                    placeholder="업체 대표를 입력하세요"
                    autofocus="autofocus"
                    maxlength="20">
@@ -58,7 +64,8 @@
 
           <label for="org_address" class="col-form-label-sm col-sm-3 mt-3">주소</label>
           <div class="col-sm-9 mt-sm-3">
-            <input type="text" class="form-control" id="org_address" v-model="content_obj.address"
+            <input type="text" class="form-control" id="org_address"
+                   v-model="content_obj.org_address"
                    placeholder="주소를 입력하세요"
                    autofocus="autofocus"
                    maxlength="200">
@@ -66,7 +73,8 @@
 
           <label for="org_corp" class="col-form-label-sm col-sm-3 mt-3">사업자번호</label>
           <div class="col-sm-9 mt-sm-3">
-            <input type="text" class="form-control" id="org_corp" v-model="content_obj.corp_num"
+            <input type="text" class="form-control" id="org_corp"
+                   v-model="content_obj.org_crn"
                    placeholder="사업자 번호를 입력하세요"
                    autofocus="autofocus"
                    maxlength="50">
@@ -75,26 +83,31 @@
           <label for="org_phone" class="col-form-label-sm col-sm-3 mt-3">연락처</label>
           <div class="col-sm-9 mt-sm-3">
             <div class="error_label" v-if="errors.has('org_phone')">전화번호는 16자 이하입니다</div>
-            <input type="number" class="form-control" id="org_phone" name="org_phone" v-model="content_obj.phone"
+            <input type="number" :class="error_label.class.phone" id="org_phone" name="org_phone"
+                   v-model="content_obj.org_tel_num"
                    placeholder="연락처를 입력하세요"
                    autofocus="autofocus"
                    maxlength="16"
-                   v-validate="'numeric|max:16'">
+                   v-validate="'numeric|max:16'"
+                   @keyup="error_check('phone')">
           </div>
 
           <label for="org_email" class="col-form-label-sm col-sm-3 mt-3">이메일</label>
           <div class="col-sm-9 mt-sm-3">
             <div class="error_label" v-if="errors.has('org_email')">이메일 형식을 확인하세요</div>
-            <input type="email" class="form-control" id="org_email" name="org_email" v-model="content_obj.email"
+            <input type="email" :class="error_label.class.email" id="org_email" name="org_email"
+                   v-model="content_obj.org_email"
                    placeholder="이메일을 입력하세요"
                    maxlength="50"
                    autofocus="autofocus"
-                   v-validate="'email'">
+                   v-validate="'email'"
+                   @keyup="error_check('email')">
           </div>
 
           <label for="org_desc" class="col-form-label-sm col-sm-3 mt-3">설명</label>
           <div class="col-sm-9 mt-sm-3">
-            <input type="text" class="form-control" id="org_desc" v-model="content_obj.desc"
+            <input type="text" class="form-control" id="org_desc"
+                   v-model="content_obj.org_desc"
                    placeholder="업체 설명을 적어주세요"
                    autofocus="autofocus"
                    maxlength="200">
@@ -127,10 +140,10 @@
           <div>
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
                  style="border-radius: 0; border-bottom: 0; width:100%;">
-              <div class="col-2 col-sm-1">번호</div>
-              <div class="col-3 col-sm-3">아이디</div>
+              <!--<div class="col-2 col-sm-1">번호</div>-->
+              <div class="col-4 col-sm-4">이메일</div>
               <div class="col-3 col-sm-3">이름</div>
-              <div class="col-2">연락처</div>
+              <div class="col-3">연락처</div>
               <div class="col-2 col-sm-3">관리</div>
             </div>
           </div>
@@ -141,38 +154,38 @@
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
                 v-for="content in user_list">
-              <div class="col-2 col-sm-1">{{ content.user }}</div>
-              <div class="col-3 col-sm-3">
-                <router-link :to="'/users/detail/' + content.user">{{ content.account }}</router-link>
+              <!--<div class="col-2 col-sm-1">{{ content.id }}</div>-->
+              <div class="col-4 col-sm-4">
+                <router-link :to="'/users/detail/' + content.id">{{ content.email }}</router-link>
               </div>
               <div class="col-3 col-sm-3">
-                <router-link :to="'/users/detail/' + content.user">{{ content.user_name }}</router-link>
+                <router-link :to="'/users/detail/' + content.id">{{ content.username }}</router-link>
               </div>
-              <div class="col-2">{{ content.phone }}</div>
+              <div class="col-3">{{ content.info.phone_num }}</div>
               <div class="col-2 col-sm-3">
-                <div v-if="content.access == 1 && content.user == original_manager">
-                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('he', content.user)">
+                <div v-if="content.info.access_role == 0">
+                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('he', content.id)">
                     <div class="promote_btn">조직관리자</div>
                   </button>
                 </div>
-                <div v-else-if="Math.abs(content.access) == 1 && content.user_staff && !user_obj.is_superuser">
+                <div v-else-if="content.is_staff || content.is_superuser">
                   <button type="button" class="btn btn-outline-primary p-0 disabled"
-                          @click.prevent="promote('he', content.user)">
+                          @click.prevent="promote('he', content.id)">
                     <div class="promote_btn">운영자</div>
                   </button>
                 </div>
-                <div v-else-if="content.access == 1 && content.user != original_manager && content.user != user_obj.id">
-                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.user)">
+                <div v-else-if="content.info.access_role == 1">
+                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.id)">
                     <div class="promote_btn">강등</div>
                   </button>
                 </div>
-                <div v-else-if="content.access == 1 && content.user == user_obj.id">
-                  <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.user)">
+                <div v-else-if="user_obj.id == content.id">
+                  <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.id)">
                     <div class="promote_btn">본인</div>
                   </button>
                 </div>
-                <div v-if="content.access == -1">
-                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.user)">
+                <div v-if="content.info.access_obj == 3">
+                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.id)">
                     <div class="promote_btn">승인</div>
                   </button>
                 </div>
@@ -186,7 +199,7 @@
           <div>
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2"
                  style="border-radius: 0; border-bottom: 0; width:100%;">
-              <div class="col-4">아이디</div>
+              <div class="col-4">이메일</div>
               <div class="col-4">이름</div>
               <div class="col-4">관리</div>
             </div>
@@ -198,34 +211,34 @@
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
                 v-for="content in user_list">
-              <div class="col-4">{{ content.account }}</div>
+              <div class="col-4">{{ content.email }}</div>
               <div class="col-4">
-                <router-link :to="'/users/detail/' + content.user">{{ content.user_name }}</router-link>
+                <router-link :to="'/users/detail/' + content.user">{{ content.username }}</router-link>
               </div>
               <div class="col-4">
-                <div v-if="content.access == 1 && content.user == original_manager">
+                <div v-if="content.info.access_role == 0">
                   <button type="button" class="btn btn-primary p-0" @click.prevent="promote('he', content.user)">
                     <div class="promote_btn">조직관리자</div>
                   </button>
                 </div>
-                <div v-else-if="Math.abs(content.access) == 1 && content.user_staff && !user_obj.is_superuser">
+                <div v-else-if="content.is_staff || content.is_superuser">
                   <button type="button" class="btn btn-outline-primary p-0 disabled"
-                          @click.prevent="promote('he', content.user)">
+                          @click.prevent="promote('he', content.id)">
                     <div class="promote_btn">운영자</div>
                   </button>
                 </div>
-                <div v-else-if="content.access == 1 && content.user != original_manager && content.user != user_obj.id">
-                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.user)">
+                <div v-else-if="content.info.access_role == 1">
+                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.id)">
                     <div class="promote_btn">강등</div>
                   </button>
                 </div>
-                <div v-else-if="content.access == 1 && content.user == user_obj.id">
-                  <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.user)">
+                <div v-else-if="user_obj.id == content.id">
+                  <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.id)">
                     <div class="promote_btn">본인</div>
                   </button>
                 </div>
-                <div v-if="content.access == -1">
-                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.user)">
+                <div v-if="content.info.access_role == 3">
+                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.id)">
                     <div class="promote_btn">승인</div>
                   </button>
                 </div>
@@ -272,69 +285,72 @@
 
           <label for="org_manager2" class="col-form-label-sm col-sm-3 mt-3">관리자</label>
           <div class="col-sm-9 mt-sm-3">
-            <div class="form-control" id="org_manager2">{{ content_obj.manager_name }}</div>
+            <div class="form-control" id="org_manager2" v-for="user in marketer"
+                 v-if="user.info.access_role == 0">
+              <span>{{ content_obj.username }}</span>
+            </div>
           </div>
 
           <label for="org_name2" class="col-form-label-sm col-sm-3 mt-3">소속 이름*</label>
           <div class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control" id="org_name2">{{ content_obj.name }}</div>
+            <div class="form-control" id="org_name2">{{ content_obj.org_name }}</div>
           </div>
 
           <label for="org_sub2" class="col-form-label-sm col-sm-3 mt-3">소속 상호명</label>
           <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.sub_name == null" type="text" class="form-control">비어있음</div>
-            <div v-else type="text" class="form-control" id="org_sub2">{{ content_obj.sub_name }}</div>
+            <div v-if="content_obj.org_sub_name == null" class="form-control">비어있음</div>
+            <div v-else class="form-control" id="org_sub2">{{ content_obj.org_sub_name }}</div>
           </div>
 
           <label for="org_header2" class="col-form-label-sm col-sm-3 mt-3">대표자</label>
           <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.header == null" type="text" class="form-control">비어있음</div>
+            <div v-if="content_obj.org_header == null" class="form-control">비어있음</div>
             <div v-else type="text" class="form-control" id="org_header2">{{ content_obj.header }}</div>
           </div>
 
           <label for="org_address2" class="col-form-label-sm col-sm-3 mt-3">주소</label>
           <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.address == null" type="text" class="form-control">비어있음</div>
-            <div v-else type="text" class="form-control" id="org_address2">{{ content_obj.address }}</div>
+            <div v-if="content_obj.org_address == null" class="form-control">비어있음</div>
+            <div v-else type="text" class="form-control" id="org_address2">{{ content_obj.org_address }}</div>
           </div>
 
           <label for="org_corp2" class="col-form-label-sm col-sm-3 mt-3">사업자번호</label>
           <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.corp_num == null" type="text" class="form-control">비어있음</div>
-            <div v-else type="text" class="form-control" id="org_corp2">{{ content_obj.corp_num }}</div>
+            <div v-if="content_obj.org_crn == null" class="form-control">비어있음</div>
+            <div v-else class="form-control" id="org_corp2">{{ content_obj.org_crn }}</div>
           </div>
 
           <label for="org_phone2" class="col-form-label-sm col-sm-3 mt-3">연락처</label>
           <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.phone == null" type="number" class="form-control">비어있음</div>
-            <div v-else type="number" class="form-control" id="org_phone2">{{ content_obj.phone }}</div>
+            <div v-if="content_obj.org_tel_num == null" class="form-control">비어있음</div>
+            <div v-else class="form-control" id="org_phone2">{{ content_obj.org_tel_num }}</div>
           </div>
 
           <label for="org_email2" class="col-form-label-sm col-sm-3 mt-3">이메일</label>
           <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.email == null" type="email" class="form-control">비어있음</div>
-            <div v-else type="email" class="form-control" id="org_email2">{{ content_obj.email }}</div>
+            <div v-if="content_obj.org_email == null" class="form-control">비어있음</div>
+            <div v-else class="form-control" id="org_email2">{{ content_obj.org_email }}</div>
           </div>
 
           <label for="org_desc2" class="col-form-label-sm col-sm-3 mt-3">설명</label>
           <div class="col-sm-9 mt-sm-3">
-            <div v-if="content_obj.desc == null" type="text" class="form-control">비어있음</div>
-            <div v-else type="text" class="form-control" id="org_desc2">{{ content_obj.desc }}</div>
+            <div v-if="content_obj.org_desc == null" class="form-control">비어있음</div>
+            <div v-else class="form-control" id="org_desc2">{{ content_obj.org_desc }}</div>
           </div>
 
           <label for="org_create2" class="col-form-label-sm col-sm-3 mt-3">생성일</label>
           <div v-if="content_obj.created_date" class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0" id="org_create2">
+            <div class="form-control border-0" id="org_create2">
               {{ (content_obj.created_date).substring(0, 10) }}
             </div>
           </div>
           <div v-else class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0">비어있음</div>
+            <div class="form-control border-0">비어있음</div>
           </div>
 
           <label for="org_update2" class="col-form-label-sm col-sm-3 mt-3">수정일</label>
           <div v-if="content_obj.updated_date" class="col-sm-9 mt-sm-3">
-            <div type="text" class="form-control border-0" id="org_update2">
+            <div class="form-control border-0" id="org_update2">
               {{ (content_obj.updated_date).substring(0, 10) }}
             </div>
           </div>
@@ -348,10 +364,10 @@
           <div>
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
                  style="border-radius: 0; border-bottom: 0; width:100%;">
-              <div class="col-2 col-sm-1">번호</div>
-              <div class="col-3 col-sm-3">아이디</div>
+              <!--<div class="col-2 col-sm-1">번호</div>-->
+              <div class="col-4 col-sm-4">이메일</div>
               <div class="col-3 col-sm-3">이름</div>
-              <div class="col-2">연락처</div>
+              <div class="col-3">연락처</div>
               <div class="col-2 col-sm-3">관리</div>
             </div>
           </div>
@@ -362,39 +378,46 @@
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
                 v-for="content in user_list">
-              <div class="col-2 col-sm-1">{{ content.user }}</div>
-              <div class="col-3 col-sm-3">
-                <router-link :to="'/users/detail/' + content.user">{{ content.account }}</router-link>
+              <!--<div class="col-2 col-sm-1">{{ content.id }}</div>-->
+              <div class="col-4 col-sm-4">
+                <router-link :to="'/users/detail/' + content.id">
+                  {{ content.email }}
+                </router-link>
               </div>
               <div class="col-3 col-sm-3">
-                <router-link :to="'/users/detail/' + content.user">{{ content.user_name }}</router-link>
+                <router-link :to="'/users/detail/' + content.id">
+                  {{ content.username }}
+                </router-link>
               </div>
-              <div class="col-2">{{ content.phone }}</div>
+              <div class="col-3">{{ content.phone_num }}</div>
               <div class="col-2 col-sm-3">
-                <div v-if="content.access == 1 && content.user == original_manager">
+                <div v-if="content.info.access_role == 0">
                   <button type="button" class="btn btn-primary p-0 disabled"
-                          @click.prevent="promote('he', content.user)">
+                          @click.prevent="promote('he', content.id)">
                     <div class="promote_btn">조직관리자</div>
                   </button>
                 </div>
-                <div v-else-if="Math.abs(content.access) == 1 && content.user_staff && !user_obj.is_superuser">
+                <div v-else-if="content.is_staff || content.is_superuser">
                   <button type="button" class="btn btn-outline-primary p-0 disabled"
-                          @click.prevent="promote('he', content.user)">
+                          @click.prevent="promote('he', content.id)">
                     <div class="promote_btn">운영자</div>
                   </button>
                 </div>
-                <div v-else-if="content.access == 1 && content.user != original_manager && content.user != user_obj.id">
-                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.user)">
+                <div v-else-if="content.info.access_role == 1">
+                  <button type="button" class="btn btn-danger p-0"
+                          @click.prevent="promote('de', content.id)">
                     <div class="promote_btn">강등</div>
                   </button>
                 </div>
-                <div v-else-if="content.access == 1 && content.user == user_obj.id">
-                  <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.user)">
+                <div v-else-if="user_obj.id == content.id">
+                  <button type="button" class="btn btn-info p-0"
+                          @click.prevent="promote('me', content.id)">
                     <div class="promote_btn">본인</div>
                   </button>
                 </div>
-                <div v-if="content.access == -1">
-                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.user)">
+                <div v-if="content.info.access_role == 3">
+                  <button type="button" class="btn btn-success p-0"
+                          @click.prevent="promote('pr', content.id)">
                     <div class="promote_btn">승인</div>
                   </button>
                 </div>
@@ -408,7 +431,7 @@
           <div>
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2"
                  style="border-radius: 0; border-bottom: 0; width:100%;">
-              <div class="col-4">아이디</div>
+              <div class="col-4">이메일</div>
               <div class="col-4">이름</div>
               <div class="col-4">관리</div>
             </div>
@@ -420,34 +443,34 @@
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
                 v-for="content in user_list">
-              <div class="col-4">{{ content.account }}</div>
+              <div class="col-4">{{ content.email }}</div>
               <div class="col-4">
-                <router-link :to="'/users/detail/' + content.user">{{ content.user_name }}</router-link>
+                <router-link :to="'/users/detail/' + content.id">{{ content.username }}</router-link>
               </div>
               <div class="col-4">
-                <div v-if="content.access == 1 && content.user == original_manager">
-                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('he', content.user)">
+                <div v-if="content.info.access_role == 0">
+                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('he', content.id)">
                     <div class="promote_btn">조직관리자</div>
                   </button>
                 </div>
-                <div v-else-if="Math.abs(content.access) == 1 && content.user_staff && !user_obj.is_superuser">
+                <div v-else-if="content.is_staff || content.is_superuser">
                   <button type="button" class="btn btn-outline-primary p-0 disabled"
-                          @click.prevent="promote('he', content.user)">
+                          @click.prevent="promote('he', content.id)">
                     <div class="promote_btn">운영자</div>
                   </button>
                 </div>
-                <div v-else-if="content.access == 1 && content.user != original_manager && content.user != user_obj.id">
-                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.user)">
+                <div v-else-if="content.info.access_role == 1">
+                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.id)">
                     <div class="promote_btn">강등</div>
                   </button>
                 </div>
-                <div v-else-if="content.access == 1 && content.user == user_obj.id">
-                  <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.user)">
+                <div v-else-if="user_obj.id == content.id">
+                  <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.id)">
                     <div class="promote_btn">본인</div>
                   </button>
                 </div>
-                <div v-if="content.access == -1">
-                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.user)">
+                <div v-if="content.info.access_role == 3">
+                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.id)">
                     <div class="promote_btn">승인</div>
                   </button>
                 </div>
@@ -485,11 +508,23 @@
   export default {
     name: "organization_detail",
     data: () => ({
+      // For organization create
+      error_label: {
+        org_name: false,
+        org_tel_num: false,
+        org_email: false,
+        class: {
+          name: 'form-control',
+          tel_num: 'form-control',
+          email: 'form-control'
+        }
+      },
       window_width: window.innerWidth,
       page_id: 0,
       content_obj: [],
       marketer: [],
       original_manager: 0,
+      changeable_manager: 0,
       user_list: [],
       page_current: 1,
       page_max: 0,
@@ -497,64 +532,66 @@
     }),
     mounted() {
       this.page_id = this.$route.params.organization_id * 1
-      if (!this.user_obj.is_staff || !this.user_obj.is_superuser ||
-          [0,1].includes(this.user_obj.info.access_role) || this.user_obj.info.organization != this.page_id) {
-        this.$router.currentRoute.meta.protect_leave = 'no'
-        this.$router.push({
-          name: 'organization_list'
-        })
-      }
-
-      // Window width calculator
-      let that = this
-      that.$nextTick(function () {
-        window.addEventListener('resize', function (e) {
-          that.window_width = window.innerWidth
-        })
-      })
-
-      // if page int is default, push to list page
-      if (this.page_id === 0) {
-        this.$router.push({
-          name: 'organization_list'
-        })
-      }
-      // Get Organization by page_id
-      axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + this.page_id)
-        .then((response) => {
-          this.content_obj = response.data
-          // Get access users by organization id
-          return axios.get(this.$store.state.endpoints.baseUrl + 'user/list/' + '?organization=' + response.data.id)
-        })
-        .then((response) => {
-          // Filtering allowed managers
-          for (let i = 0; i < response.data.results.length; i++) {
-            if (response.data.results[i].info.organization == this.page_id) {
-              this.marketer.push(response.data.results[i])
-              if (response.data.results[i].info.access_role == 0) {
-                this.original_manager = response.data.results[i].id
-              }
-            }
-          }
-          // // this.pagination
-          // let this_url = 'user_access/'
-          // let offset = (this.page_current - 1) * this.page_chunk
-          // // console.log('pagination')
-          // axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + 'organization' + '=' + this.$route.params.organization_id * 1)
-          //   .then((response) => {
-          //     // Calculation for page_max
-          //     if (response.data.count % this.page_chunk === 0) {
-          //       this.page_max = Math.floor(response.data.count / this.page_chunk)
-          //     } else {
-          //       this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
-          //     }
-          //     // Get all of users in this organization whatever allowed or not
-          //     this.user_list = response.data.results
-          //   })
-        })
-        .catch((error) => {
-          console.log('Get organization info, marker list error', error)
-        })
+      this.refresh_organization()
+      // if (!this.user_obj.is_staff || !this.user_obj.is_superuser ||
+      //   [0, 1].includes(this.user_obj.info.access_role) || this.user_obj.info.organization != this.page_id) {
+      //   this.$router.currentRoute.meta.protect_leave = 'no'
+      //   this.$router.push({
+      //     name: 'organization_list'
+      //   })
+      // }
+      //
+      // // Window width calculator
+      // let that = this
+      // that.$nextTick(function () {
+      //   window.addEventListener('resize', function (e) {
+      //     that.window_width = window.innerWidth
+      //   })
+      // })
+      //
+      // // if page int is default, push to list page
+      // if (this.page_id === 0) {
+      //   this.$router.push({
+      //     name: 'organization_list'
+      //   })
+      // }
+      // // Get Organization by page_id
+      // axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + this.page_id)
+      //   .then((response) => {
+      //     this.content_obj = response.data
+      //     // Get access users by organization id
+      //     return axios.get(this.$store.state.endpoints.baseUrl + 'user/list/' + '?organization=' + response.data.id)
+      //   })
+      //   .then((response) => {
+      //     // Filtering allowed managers
+      //     for (let i = 0; i < response.data.results.length; i++) {
+      //       if (response.data.results[i].info.organization == this.page_id) {
+      //         this.marketer.push(response.data.results[i])
+      //         if (response.data.results[i].info.access_role == 0) {
+      //           this.original_manager = response.data.results[i].id
+      //           this.changeable_manager = this.original_manager
+      //         }
+      //       }
+      //     }
+      //     // // this.pagination
+      //     // let this_url = 'user_access/'
+      //     // let offset = (this.page_current - 1) * this.page_chunk
+      //     // // console.log('pagination')
+      //     // axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + 'organization' + '=' + this.$route.params.organization_id * 1)
+      //     //   .then((response) => {
+      //     //     // Calculation for page_max
+      //     //     if (response.data.count % this.page_chunk === 0) {
+      //     //       this.page_max = Math.floor(response.data.count / this.page_chunk)
+      //     //     } else {
+      //     //       this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
+      //     //     }
+      //     //     // Get all of users in this organization whatever allowed or not
+      //     //     this.user_list = response.data.results
+      //     //   })
+      //   })
+      //   .catch((error) => {
+      //     console.log('Get organization info, marker list error', error)
+      //   })
     },
     methods: {
       // Real-Time custom validation
@@ -605,7 +642,43 @@
         }
       },
       refresh_organization() {
-        this.page_id = this.$route.params.organization_id * 1
+        // this.page_id = this.$route.params.organization_id * 1
+
+        // let this_url = 'organization/'
+        //
+        // // Get Organization by page_id
+        // axios.get(this.$store.state.endpoints.baseUrl + this_url + this.page_id)
+        //   .then((response) => {
+        //     this.content_obj = response.data
+        //     this.original_manager = response.data.manager
+        //     // Get access users by organization id
+        //     return axios.get(this.$store.state.endpoints.baseUrl + 'user_access/' + '?organization=' + response.data.id)
+        //   })
+        //   .then((response) => {
+        //     // Filtering allowed managers
+        //     this.marketer = []
+        //     for (let i = 0; i < response.data.results.length; i++) {
+        //       if (response.data.results[i].access === 1) {
+        //         this.marketer.push(response.data.results[i])
+        //       }
+        //     }
+        //   })
+
+        if (!this.user_obj.is_staff || !this.user_obj.is_superuser ||
+          [0, 1].includes(this.user_obj.info.access_role) || this.user_obj.info.organization != this.page_id) {
+          this.$router.currentRoute.meta.protect_leave = 'no'
+          this.$router.push({
+            name: 'organization_list'
+          })
+        }
+
+        // Window width calculator
+        let that = this
+        that.$nextTick(function () {
+          window.addEventListener('resize', function (e) {
+            that.window_width = window.innerWidth
+          })
+        })
 
         // if page int is default, push to list page
         if (this.page_id === 0) {
@@ -613,78 +686,72 @@
             name: 'organization_list'
           })
         }
-        // get object
-        let axios = this.$axios
-        let this_url = 'organization/'
-
         // Get Organization by page_id
-        axios.get(this.$store.state.endpoints.baseUrl + this_url + this.page_id)
+        axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + this.page_id)
           .then((response) => {
             this.content_obj = response.data
-            this.original_manager = response.data.manager
             // Get access users by organization id
-            return axios.get(this.$store.state.endpoints.baseUrl + 'user_access/' + '?organization=' + response.data.id)
+            return axios.get(this.$store.state.endpoints.baseUrl + 'user/list/' + '?organization=' + response.data.id)
           })
           .then((response) => {
             // Filtering allowed managers
-            this.marketer = []
             for (let i = 0; i < response.data.results.length; i++) {
-              if (response.data.results[i].access === 1) {
+              if (response.data.results[i].info.organization == this.page_id) {
                 this.marketer.push(response.data.results[i])
+                if (response.data.results[i].info.access_role == 0) {
+                  this.original_manager = response.data.results[i].id
+                  this.changeable_manager = this.original_manager
+                }
               }
             }
+          })
+          .catch((error) => {
+            console.log('Get organization info, marker list error', error)
           })
       },
       check_organization() {
         // Validate for make an organization
         this.$validator.validateAll()
-        // or
+
         if (confirm('수정하시겠습니까?')) {
-          if (this.content_obj.manager !== this.original_manager) {
-            if (confirm('관리자를 교체하시겠습니까?')) {
-              this.patch_organization()
-            } else {
-              alert('수정이 취소되었습니다.')
-            }
+          if (this.error_label.org_email || this.$validator.errors.has('org_email')) {
+            alert('이메일을 확인해주세요')
+            document.getElementById('org_email').focus()
+          } else if (this.error_label.org_tel_num) {
+            alert('전화번호 형식을 확인해주세요!')
+            document.getElementById('org_phone').focus()
+          } else if (this.error_label.name) {
+            alert('조직 이름을 입력하세요!')
+            document.getElementById('org_name').focus()
           } else {
             this.patch_organization()
           }
         }
+
+        // if (confirm('수정하시겠습니까?')) {
+        //   if (this.content_obj.manager !== this.original_manager) {
+        //     if (confirm('관리자를 교체하시겠습니까?')) {
+        //       this.patch_organization()
+        //     } else {
+        //       alert('수정이 취소되었습니다.')
+        //     }
+        //   } else {
+        //     this.patch_organization()
+        //   }
+        // }
+
       },
       patch_organization() {
-        // Create an organization myself
-        let axios = this.$axios
-        let this_url = 'organization/'
-        let formData = new FormData()
-        formData.append('name', this.content_obj.name)
-        formData.append('manager', this.content_obj.manager)
-        if (this.content_obj.sub_name) {
-          formData.append('sub_name', this.content_obj.sub_name)
-        }
-        if (this.content_obj.header) {
-          formData.append('header', this.content_obj.header)
-        }
-        if (this.content_obj.address) {
-          formData.append('address', this.content_obj.address)
-        }
-        if (this.content_obj.corp_num) {
-          formData.append('corp_num', this.content_obj.corp_num)
-        }
-        if (this.content_obj.phone) {
-          formData.append('phone', this.content_obj.phone)
-        }
-        if (this.content_obj.email) {
-          formData.append('email', this.content_obj.email)
-        }
-        axios.patch(this.$store.state.endpoints.baseUrl + this_url + this.page_id + '/', formData)
+        // // Create an organization myself
+        axios.patch(this.$store.state.endpoints.baseUrl + 'organization/' + this.page_id + '/', this.content_obj)
           .then((response) => {
             alert('수정되었습니다.')
-            this.original_manager = this.content_obj.manager
-            this.$store.dispatch('getAuthUser')
+            // this.original_manager = this.content_obj.manager
+            // this.$store.dispatch('getAuthUser')
             this.refresh_organization()
           })
           .catch((error) => {
-            console.log(error)
+            console.log('Organization patch error', error)
           })
       },
       pagination(pageNum) {
@@ -709,18 +776,44 @@
             this.user_list = response.data.results
           })
       },
-      promote(option, user) {
+      manager_change() {
+        if (confirm('조직 관리자를 변경하시겠습니까?')) {
+          console.log(this.original_manager, '로 변경합니다?')
+          let deactive = {
+            info: {
+              access_role: 1
+            }
+          }
+          let activate = {
+            info: {
+              access_role: 0
+            }
+          }
+
+          axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + this.original_manager, deactive)
+            .then(() => {
+              return axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + this.changeable_manager, activate)
+            })
+            .catch((error) => {
+              console.log('Something is wrong on change manager cycle', error)
+            })
+        }
+      },
+      promote(option, user_id) {
         // head:he me:me demote:de promote:pr
-        let axios = this.$axios
-        let this_url = 'user_access/'
         if (option == 'he') {
+          // service header
         } else if (option == 'me') {
+          // it's me
         } else if (option == 'pr') {
           if (confirm('가입을 승인하시겠습니까?')) {
-            let formData = new FormData()
-            formData.append('access', '1')
-            axios.patch(this.$store.state.endpoints.baseUrl + this_url + user + '/', formData)
-              .then((response) => {
+            let set_data = {
+              info: {
+                access_role: 1
+              }
+            }
+            axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + user_id + '/', set_data)
+              .then(() => {
                 alert('유저의 가입이 승인되었습니다.')
                 this.calling_all_unit()
                 this.refresh_organization()
