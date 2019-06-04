@@ -10,7 +10,7 @@ RUN pip install --upgrade pip
 
 RUN pip install pipenv
 
-RUN pipenv install --system
+RUN pipenv install --system --dev
 
 RUN apt-get update && apt-get install -y uwsgi-plugin-python3 \
     && apt-get install -y uwsgi-plugin-python && apt-get install -y vim \

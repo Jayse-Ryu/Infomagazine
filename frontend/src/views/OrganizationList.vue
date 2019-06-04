@@ -36,7 +36,7 @@
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
                  style="border-radius: 0; border-bottom: 0; width:100%;">
               <div class="col-1 p-0">번호</div>
-              <div class="col-2 p-0">소속</div>
+              <div class="col-2 p-0">조직</div>
               <div class="col-2 p-0">상호명</div>
               <div class="col-2 p-0">담당자</div>
               <div class="col-2 p-0">연락처</div>
@@ -65,7 +65,8 @@
               <div v-if="content.phone" class="col-2 p-0">{{ content.phone }}</div>
               <div v-else-if="content.email" class="col-2 p-0">{{ content.email }}</div>
               <div v-else class="col-2 p-0">없음</div>
-              <div class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+              <div v-if="content.created_data" class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+              <div v-else class="col-3 p-0 board_centre">없음</div>
             </li>
           </ul>
         </div>
@@ -75,7 +76,7 @@
             <div class="list-group-item text-center d-inline-flex justify-content-between p-1 pt-2 pb-2"
                  style="border-radius: 0; border-bottom: 0; width:100%;">
               <div class="col-2 p-0">번호</div>
-              <div class="col-3 p-0">소속</div>
+              <div class="col-3 p-0">조직</div>
               <div class="col-4 p-0">연락처</div>
               <div class="col-3 p-0 board_centre">생성일</div>
             </div>
@@ -96,7 +97,8 @@
               <div v-if="content.phone" class="col-4 p-0">{{ content.phone }}</div>
               <div v-else-if="content.email" class="col-4 p-0">{{ content.email }}</div>
               <div v-else class="col-4 p-0">없음</div>
-              <div class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+              <div v-if="content.created_date" class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+              <div v-else class="col-3 p-0 board_centre">없음</div>
             </li>
           </ul>
         </div>
@@ -245,11 +247,12 @@
         }
 
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'organization/list/' + auth_filter + search_param)
+        axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + auth_filter + search_param)
           .then((response) => {
             this.$store.state.pageOptions.loading = false
             console.log('get landing response', response)
             this.content_obj = response.data.results
+            console.log('content obj is?', this.content_obj)
           })
           .catch((error) => {
             this.$store.state.pageOptions.loading = false

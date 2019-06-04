@@ -203,6 +203,7 @@ router.beforeEach((to, from, next) => {
 
   // When user access_code not matched with router
   let access_denied = () => {
+    // console.log('Access denied')
     if (from.meta.protect_leave === 'yes') {
       alert('권한이 없는 페이지입니다.')
       from.meta.protect_leave = 'no'
@@ -215,6 +216,7 @@ router.beforeEach((to, from, next) => {
 
   // Check authentication by token, authUser
   let work = () => {
+    // console.log('work')
     let authUser = JSON.parse(localStorage.getItem('authUser'))
     // let authUser = JSON.parse(localStorage.getItem('authUser'))
     // let token = Vue.cookie.get('token')
@@ -257,6 +259,7 @@ router.beforeEach((to, from, next) => {
 
   // Check access needs or router exist
   let intro = () => {
+    // console.log('intro')
     if (!to.meta.signed) {
       // When router try to access very basic pages
       // But, Excluding logged user access to sign-in page
@@ -311,6 +314,7 @@ router.beforeEach((to, from, next) => {
 
   // Check first before meta
   let before_check = () => {
+    // console.log('before_check')
     if (from.meta.protect_leave) {
       // Prevent router error with meta is undefined
       if (from.meta.protect_leave === 'yes') {

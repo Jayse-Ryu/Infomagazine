@@ -44,36 +44,7 @@
       user_name: '',
       org_selected: -1,
       user_org: -1,
-      organization_list: [
-        {
-          id: 1,
-          org_name: 'LCVENTURES',
-          org_sub_name: '엘씨벤처스',
-          org_crn: '사업자등록번호: 220-88-91971',
-          org_header: 'KWM',
-          org_address: '서울 성동구 뚝섬로 1길 25 한라에코밸리 206호',
-          org_tel_num: '070-8855-8390',
-          org_desc: '마케팅회사 엘씨벤처스 입니다.',
-          org_manage_email: 'biz@lcventures.co.kr',
-          org_manage_phone: '01046111111',
-          created_date: '2019-01-01',
-          updated_date: '2019-02-01'
-        },
-        {
-          id: 2,
-          org_name: 'Bad company',
-          org_sub_name: '경쟁사',
-          org_crn: '사업자번호: 22071',
-          org_header: 'Nobody',
-          org_address: '서울 성동구 뚝섬로 25길 1 한라지옥밸리 602호',
-          org_tel_num: '070-1234-4321',
-          org_desc: '경쟁사 입니다.',
-          org_manage_email: 'biz@kyunjeng.co.kr',
-          org_manage_phone: '01023111111',
-          created_date: '2019-01-02',
-          updated_date: '2019-02-02'
-        }
-      ]
+      organization_list: []
     }),
     mounted() {
       this.check_access()
@@ -84,15 +55,14 @@
         this.user_name = this.user_obj.username
       }
 
-      // // Get organization!
-      console.error('JAYSE - Get organization has to activate')
-      // axios.get(this.$store.state.endpoints.baseUrl + 'organization/')
-      //   .then((response) => {
-      //     this.organization_list = response.data
-      //   })
-      //   .catch((error) => {
-      //     console.log('Error occurred from get organization', error)
-      //   })
+      // Get organization!
+      axios.get(this.$store.state.endpoints.baseUrl + 'organization/')
+        .then((response) => {
+          this.organization_list = response.data.results
+        })
+        .catch((error) => {
+          console.log('Error occurred from get organization', error)
+        })
     },
     methods: {
       check_access() {
@@ -102,8 +72,7 @@
             // this.$router.push({
             //   name: 'landing_list'
             // })
-            console.error('JAYSE - this user is staff or super so push to landing list later')
-          } else if (this.user_obj.info.access_role == '0' || this.user_obj.info.access_role == '1') {
+          } else if (this.user_obj.access_role == 0 || this.user_obj.access_role == 1) {
             // Marketer but already got access from staff.
             this.$router.push({
               name: 'landing_list'
@@ -149,13 +118,14 @@
         } else {
           user_json = JSON.parse(local_user)
           // Axios get user not done yet!
-          axios.get(this.$store.state.endpoints.baseUrl + 'user/' + user_json.id)
-            .then((response) => {
-              this.user_org = response.data.info.organization
-            })
-            .catch((error) => {
-              console.log('Get specific user error', error)
-            })
+          // axios.get(this.$store.state.endpoints.baseUrl + 'user/' + user_json.id)
+          //   .then((response) => {
+          //     console.log('gateway response', response)
+          //     this.user_org = response.data.info.organization
+          //   })
+          //   .catch((error) => {
+          //     console.log('Get specific user error', error)
+          //   })
         }
 
         return user_json

@@ -63,7 +63,7 @@
               </router-link>
             </li>
             <li class="navbar-item">
-              <router-link :to="'/organization/detail/' + user_obj.info.organization">
+              <router-link :to="'/organization/detail/' + user_obj.organization">
                 <div class="nav-link text-center">관리소속</div>
               </router-link>
             </li>

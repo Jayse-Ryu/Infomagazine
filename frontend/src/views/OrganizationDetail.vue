@@ -664,9 +664,18 @@
         //     }
         //   })
 
-        if (!this.user_obj.is_staff || !this.user_obj.is_superuser ||
-          [0, 1].includes(this.user_obj.info.access_role) || this.user_obj.info.organization != this.page_id) {
-          this.$router.currentRoute.meta.protect_leave = 'no'
+        // Filtered page by user object
+        if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
+          if (![0, 1].includes(this.user_obj.access_role) && this.user_obj.organization != this.page_id) {
+            this.$router.currentRoute.meta.protect_leave = 'no'
+            this.$router.push({
+              name: 'organization_list'
+            })
+          }
+        }
+
+        // if page int is default, push to list page
+        if (this.page_id === 0) {
           this.$router.push({
             name: 'organization_list'
           })
@@ -680,18 +689,12 @@
           })
         })
 
-        // if page int is default, push to list page
-        if (this.page_id === 0) {
-          this.$router.push({
-            name: 'organization_list'
-          })
-        }
         // Get Organization by page_id
         axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + this.page_id)
           .then((response) => {
             this.content_obj = response.data
             // Get access users by organization id
-            return axios.get(this.$store.state.endpoints.baseUrl + 'user/list/' + '?organization=' + response.data.id)
+            return axios.get(this.$store.state.endpoints.baseUrl + 'user/list/' + '?organization=' + this.page_id)
           })
           .then((response) => {
             // Filtering allowed managers
@@ -857,6 +860,8 @@
             'is_staff': false,
             'is_superuser': false,
             'access_role': 3,
+            'organization': 0,
+            'company': 0,
             'failed': true
           }
         } else {
