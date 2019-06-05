@@ -1,73 +1,45 @@
-from rest_framework import viewsets, mixins
-from rest_framework.response import Response
-from django.db.models import Q
-from .models import Company
-from .serializers import CompanySerializer
+from rest_framework import generics, permissions
+
+from infomagazine import permissions as custom_permissions
+from company.models import Company
+from company.serializers import CompanySerializer
 
 
-class CompanyViewSet(mixins.CreateModelMixin,
-                     mixins.ListModelMixin,
-                     mixins.RetrieveModelMixin,
-                     mixins.UpdateModelMixin,
-                     mixins.DestroyModelMixin,
-                     viewsets.GenericViewSet):
-    queryset = Company.objects.all().order_by('-created_date')
+class CompanyListCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = (custom_permissions.IsMarketer,)
+    queryset = Company.objects.all()
     serializer_class = CompanySerializer
-    lookup_field = 'id'
-    # print('Basic view queryset = ', queryset)
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, headers=headers)
+    def get_queryset(self):
+        if self.request.method == 'GET':
+            get_qs = self.request.query_params.dict()
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+            filter_fields = {
+                'users__info__organization_id': self.request.user.info.organization.id,
+                'users__info__access_role__in': [0, 1]
+            }
 
-        # (name = str, manager = str,)
-        # If list searched as company name or sub_name
-        name = self.request.query_params.get('name', None)
-        if name is not None:
-            queryset = queryset.filter(Q(name__icontains=name) | Q(sub_name__icontains=name))
+            if 'limit' in get_qs:
+                limit = get_qs.pop('limit')
 
-        company = self.request.query_params.get('company', None)
-        if company is not None:
-            queryset = queryset.filter(company__exact=company)
+            if 'offset' in get_qs:
+                offset = get_qs.pop('offset')
 
-        organization = self.request.query_params.get('organization', None)
-        if organization is not None:
-            queryset = queryset.filter(organization__exact=organization)
+            if 'detail' in get_qs:
+                del get_qs['detail']
+                filter_fields.update({'users__id': self.request.user.id})
 
-        org_name = self.request.query_params.get('org_name', None)
-        if org_name is not None:
-            queryset = queryset.filter(Q(organization__name__icontains=org_name) | Q(organization__sub_name__icontains=org_name))
+            filter_fields.update({key + "__contains": value for key, value in get_qs.items()})
 
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+            return self.queryset.filter(**filter_fields)
+        return self.queryset.all()
 
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+class CompanyRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
+    queryset = Company.objects.all()
+    serializer_class = CompanySerializer
 
-    def update(self, request, *args, **kwargs):
-        # print('Update request = ', request)
-        # print('Update args = ', args)
-        # print('Update kwargs = ', kwargs)
-        partial = kwargs.pop('partial = ', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
-
-    def perform_destroy(self, instance):
-        # print('Delete instance = ', instance)
-        instance.delete()
+    def get_permissions(self):
+        if self.request.method in ['GET', 'PUT']:
+            return [custom_permissions.IsClient()]
+        return [custom_permissions.IsMarketer()]

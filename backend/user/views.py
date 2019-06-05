@@ -1,6 +1,5 @@
 from rest_framework import generics, permissions
-
-# Create your views here.
+from infomagazine import permissions as custom_permissions
 from user.models import User
 from user.serializers import UserSerializer, UserCreateSerializer
 
@@ -16,6 +15,9 @@ class UserListCreateAPIView(generics.ListCreateAPIView):
 
     def get_permissions(self):
         if self.request.method == 'POST':
+            get_qs = self.request.query_params.dict()
+            if 'register_type' in get_qs:
+                return [custom_permissions.IsMarketer(), ]
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
 

@@ -1,26 +1,32 @@
 from rest_framework import serializers
-from .models import Company
+
+from company.models import Company
 
 
 class CompanySerializer(serializers.ModelSerializer):
-    organization_name = serializers.SerializerMethodField(required=False, default='비어있음')
-
-    def get_organization_name(self, obj):
-        if obj.organization is not None:
-            return str(obj.organization.name)
-        else:
-            return '비어있음'
-
     class Meta:
         model = Company
-        fields = ('id',
-                  'organization', 'organization_name',
-                  'name', 'sub_name',
-                  'header',
-                  'address',
-                  'corp_num',
-                  'phone',
-                  'email',
-                  'desc',
-                  'created_date', 'updated_date'
-                  )
+        fields = (
+            'id', 'corp_name', 'corp_sub_name', 'corp_header', 'corp_address', 'corp_num', 'corp_desc', 'created_date',
+            'updated_date')
+        extra_kwargs = {
+            'created_date': {
+                'read_only': True
+            },
+            'updated_date': {
+                'read_only': True
+            }
+        }
+
+    def create(self, validated_data):
+        company = Company(
+            corp_name=validated_data['corp_name'],
+            corp_sub_name=validated_data['corp_sub_name'],
+            corp_header=validated_data['corp_header'],
+            corp_address=validated_data['corp_address'],
+            corp_num=validated_data['corp_num'],
+            corp_desc=validated_data['corp_desc'],
+        )
+        company.save()
+        company.users.add(self.context['request'].user)
+        return company

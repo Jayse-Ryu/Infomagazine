@@ -6,12 +6,12 @@ from user.models import User
 
 
 class Company(models.Model):
-    user = models.ManyToManyField(User)
-    corp_name = models.CharField(max_length=100)
+    users = models.ManyToManyField(User)
+    corp_name = models.CharField(max_length=100, unique=True)
     corp_sub_name = models.CharField(max_length=100, blank=True)
     corp_header = models.CharField(max_length=20, blank=True)
     corp_address = models.CharField(max_length=200, blank=True)
-    corp_num = models.CharField(max_length=50, blank=True, unique=True)
+    corp_num = models.CharField(max_length=50, blank=True)
     corp_desc = models.CharField(max_length=200, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)

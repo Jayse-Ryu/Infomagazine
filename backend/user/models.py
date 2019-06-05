@@ -20,7 +20,7 @@ class User(AbstractUser):
         return "{}".format(self.email)
 
     def get_access_role(self):
-        return str(AccessRole.get(self.info.access_role))
+        return self.info.access_role
 
 
 class AccessRole(enum.Enum):

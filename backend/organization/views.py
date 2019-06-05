@@ -25,6 +25,6 @@ class OrganizationListCreateAPIView(generics.ListCreateAPIView):
 
 
 class OrganizationRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
-    permission_classes = (permissions.IsAuthenticated, custom_permissions.IsOwner,)
+    permission_classes = (custom_permissions.IsOwner,)
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
