@@ -6,7 +6,6 @@ from organization.serializers import OrganizationSerializer
 
 
 class OrganizationListCreateAPIView(generics.ListCreateAPIView):
-    permission_classes = (permissions.IsAdminUser,)
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
 
@@ -22,6 +21,11 @@ class OrganizationListCreateAPIView(generics.ListCreateAPIView):
             filter_fields = {key + "__contains": value for key, value in get_qs.items()}
             return self.queryset.filter(**filter_fields)
         return self.queryset.all()
+
+    def get_permissions(self):
+        if self.request.method in ['GET']:
+            return [custom_permissions.IsGuest()]
+        return [permissions.IsAdminUser, ]
 
 
 class OrganizationRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):

@@ -26,3 +26,8 @@ class IsMarketer(BasePermission):
 class IsClient(BasePermission):
     def has_permission(self, request, view):
         return bool(request.user and _eval_access_role(request, AccessRole.CLIENT))
+
+
+class IsGuest(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and _eval_access_role(request, AccessRole.GUEST))

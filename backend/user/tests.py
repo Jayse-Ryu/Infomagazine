@@ -53,7 +53,6 @@ class AuthorizedUsersTests(APITestCase):
         obtain_token = self.__test_obtain_token()
         self.assertTrue('token' in obtain_token.data)
         get_owner_jwt_token = obtain_token.data['token']
-        print(get_owner_jwt_token)
         return get_owner_jwt_token
 
     def test_get_marketer_obtain_token(self):
@@ -64,7 +63,6 @@ class AuthorizedUsersTests(APITestCase):
         obtain_token = self.__test_obtain_token()
         self.assertTrue('token' in obtain_token.data)
         get_marketer_jwt_token = obtain_token.data['token']
-        print(get_marketer_jwt_token)
         return get_marketer_jwt_token
 
     def test_get_client_obtain_token(self):
@@ -75,5 +73,4 @@ class AuthorizedUsersTests(APITestCase):
         obtain_token = self.__test_obtain_token()
         self.assertTrue('token' in obtain_token.data)
         get_client_jwt_token = obtain_token.data['token']
-        print(get_client_jwt_token)
         return get_client_jwt_token
