@@ -16,29 +16,29 @@ Including another URLconf
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_swagger.views import get_swagger_view
 
 from infomagazine.views import custom_token_obtain_sliding, custom_token_refresh_sliding
 
-schema_view = get_swagger_view(title='Infomagzine API')
+api_patterns = ([
+                    path('auth/', custom_token_obtain_sliding, name='token_obtain_sliding'),
+                    path('auth/refresh/', custom_token_refresh_sliding, name='token_refresh_sliding'),
+                    path('user/', include('user.urls', namespace='user')),
+                    path('organization/', include('organization.urls', namespace='organization')),
+                    path('company/', include('company.urls', namespace='company')),
+                ], 'v1')
 
-api_patterns = [
-    path('admin/', admin.site.urls),
-    path('swagger/', schema_view),
-    path('auth/', custom_token_obtain_sliding, name='token_obtain_sliding'),
-    path('auth/refresh/', custom_token_refresh_sliding, name='token_refresh_sliding'),
-    path('user/', include('user.urls', namespace='user'), name='user'),
-    path('organization/', include('organization.urls', namespace='organization'), name='organization'),
-    path('company/', include('company.urls', namespace='company'), name='company'),
+urlpatterns = [
+    path('admin/', admin.site.urls, name='admin'),
+    path('api/v1/', include(api_patterns, namespace='v1'))
 ]
 
 if settings.DEBUG:
     from silk import urls
+    from rest_framework_swagger.views import get_swagger_view
 
-    api_patterns = [
-                       path('silk/', include(urls))
-                   ] + api_patterns
+    schema_view = get_swagger_view(title='Infomagzine API')
 
-urlpatterns = [
-    path('api/', include(api_patterns))
-]
+    urlpatterns.extend([
+        path('silk/', include(urls, namespace='silk')),
+        path('swagger/', schema_view, name='swagger'),
+    ])

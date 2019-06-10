@@ -3,6 +3,7 @@ from rest_framework import generics, permissions
 from infomagazine import permissions as custom_permissions
 from company.models import Company
 from company.serializers import CompanySerializer
+from user.models import User
 
 
 class CompanyListCreateAPIView(generics.ListCreateAPIView):
@@ -12,10 +13,12 @@ class CompanyListCreateAPIView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         if self.request.method == 'GET':
-            get_qs = self.request.query_params.dict()
+            request = self.request
+
+            get_qs = request.query_params.dict()
 
             filter_fields = {
-                'users__info__organization_id': self.request.user.info.organization.id,
+                'users__info__organization_id': request.user.info.organization_id,
                 'users__info__access_role__in': [0, 1]
             }
 
@@ -27,7 +30,7 @@ class CompanyListCreateAPIView(generics.ListCreateAPIView):
 
             if 'detail' in get_qs:
                 del get_qs['detail']
-                filter_fields.update({'users__id': self.request.user.id})
+                filter_fields.update({'users__id': request.user.id})
 
             filter_fields.update({key + "__contains": value for key, value in get_qs.items()})
 
