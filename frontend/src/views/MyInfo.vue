@@ -277,19 +277,12 @@
           user_json = {
             'is_staff': false,
             'is_superuser': false,
-            'info': {
-              'phone_num': '',
-              'access_role': 3
-            },
+            'access_role': 3,
             'failed': true
           }
         } else {
           user_json = JSON.parse(local_user)
-          // user_json['info'] = {}
-          // user_json['info']['phone_num'] = ''
         }
-
-        console.log(user_json)
 
         return user_json
       }

@@ -338,9 +338,7 @@
           user_json = {
             'is_staff': false,
             'is_superuser': false,
-            'info': {
-              'access_role': 3
-            },
+            'access_role': 3,
             'failed': true
           }
         } else {

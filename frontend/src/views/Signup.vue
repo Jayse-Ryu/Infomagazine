@@ -189,7 +189,8 @@
           if (this.content_obj.email !== '') {
             // If email is not empty
             let users = []
-            axios.get(this.$store.state.endpoints.baseUrl + 'user/list/')
+            // Temporary event!!
+            axios.get(this.$store.state.endpoints.baseUrl + 'user/')
               .then((response) => {
 
                 users = response.data.results

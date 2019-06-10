@@ -93,7 +93,8 @@
           }
 
           // // Update actual user
-          axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + this.user_obj.id + '/', form)
+          // axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + this.user_obj.id + '/', form)
+          axios.patch(this.$store.state.endpoints.baseUrl + 'user/?update_type=organization&organization_id=' + this.org_selected)
             .then((response) => {
               console.log('updated?', response.data)
             })

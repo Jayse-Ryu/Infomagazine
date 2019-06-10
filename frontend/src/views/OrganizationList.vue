@@ -49,23 +49,25 @@
               <div class="col-12 p-0 text-center">데이터가 존재하지 않습니다.</div>
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-                v-for="content in content_obj">
+                v-for="content in content_obj.slice().reverse()">
               <div class="col-1 p-0 col-sm-1">{{ content.id }}</div>
               <div class="col-2 p-0 col-sm-2">
                 <router-link :to="'/organization/detail/' + content.id">
-                  {{ content.name }}
+                  {{ content.org_name }}
                 </router-link>
               </div>
               <div class="col-2 p-0 col-sm-2">
                 <router-link :to="'/organization/detail/' + content.id">
-                  {{ content.sub_name }}
+                  {{ content.org_sub_name }}
                 </router-link>
               </div>
-              <div class="col-2 p-0">{{ content.manager_name }}</div>
-              <div v-if="content.phone" class="col-2 p-0">{{ content.phone }}</div>
-              <div v-else-if="content.email" class="col-2 p-0">{{ content.email }}</div>
+              <div class="col-2 p-0">{{ content.org_manager_name }}</div>
+              <div v-if="content.org_tel_num" class="col-2 p-0">{{ content.org_tel_num }}</div>
+              <div v-else-if="content.org_email" class="col-2 p-0">{{ content.org_email }}</div>
               <div v-else class="col-2 p-0">없음</div>
-              <div v-if="content.created_data" class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+              <div v-if="content.created_data" class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10)
+                }}
+              </div>
               <div v-else class="col-3 p-0 board_centre">없음</div>
             </li>
           </ul>
@@ -91,13 +93,15 @@
               <div class="col-2 p-0">{{ content.id }}</div>
               <div class="col-3 p-0">
                 <router-link :to="'/organization/detail/' + content.id">
-                  {{ content.name }}
+                  {{ content.org_name }}
                 </router-link>
               </div>
-              <div v-if="content.phone" class="col-4 p-0">{{ content.phone }}</div>
-              <div v-else-if="content.email" class="col-4 p-0">{{ content.email }}</div>
+              <div v-if="content.org_tel_num" class="col-4 p-0">{{ content.org_tel_num }}</div>
+              <div v-else-if="content.org_email" class="col-4 p-0">{{ content.org_email }}</div>
               <div v-else class="col-4 p-0">없음</div>
-              <div v-if="content.created_date" class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+              <div v-if="content.created_date" class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10)
+                }}
+              </div>
               <div v-else class="col-3 p-0 board_centre">없음</div>
             </li>
           </ul>
@@ -197,11 +201,14 @@
         this.calling_all_unit(offset)
       },
       search(option, text) {
-        if (option !== 0 && text !== '') {
+        if (option != 0 && text !== '') {
           this.page_current = 1
           this.search_option = this.temp_option
           this.search_text = text
           this.calling_all_unit()
+        } else if (option == 0 && text !== '') {
+          alert('검색 옵션을 선택하세요!')
+          document.getElementById('src_gbn').focus()
         } else {
           this.search_option = 0
           this.search_text = ''
@@ -210,7 +217,7 @@
       },
       calling_all_unit(offset) {
         // Calling landings with new values
-        let auth_filter = ''
+        // let auth_filter = ''
         let search_param = ''
 
         // (For Pagination check)
@@ -226,37 +233,31 @@
         //   })
 
         // Get Organization by logged user's grade
-        if (this.user_obj.is_staff || this.user_obj.is_superuser) {
-          console.log('Staff user - Get All')
-          auth_filter = ''
-        } else if (this.user_obj.access_role == '0' || this.user_obj.access_role == '1') {
-          console.log('Marketer user - Get only Org')
-          auth_filter = '?organization=' + this.user_obj.organization
-        } else if (this.user_obj.access_role == '2') {
-          console.log('load about com - Get only Com')
-          auth_filter = '?company=' + this.user_obj.company
-        }
+        // if (this.user_obj.is_staff || this.user_obj.is_superuser) {
+        //   console.log('Staff user - Get All')
+        //   auth_filter = ''
+        // } else if (this.user_obj.access_role == '0' || this.user_obj.access_role == '1') {
+        //   console.log('Marketer user - Get only Org')
+        //   auth_filter = '?organization=' + this.user_obj.organization
+        // } else if (this.user_obj.access_role == '2') {
+        //   console.log('load about com - Get only Com')
+        //   auth_filter = '?company=' + this.user_obj.company
+        // }
 
         // Set search option
         if (this.search_option == 1 && this.search_text !== '') {
-          if (auth_filter !== '') {
-            search_param = '&name=' + this.search_text
-          } else {
-            search_param = '?name=' + this.search_text
-          }
+          search_param = '?org_name=' + this.search_text
         }
 
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + auth_filter + search_param)
+        axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + search_param)
           .then((response) => {
             this.$store.state.pageOptions.loading = false
-            console.log('get landing response', response)
             this.content_obj = response.data.results
-            console.log('content obj is?', this.content_obj)
           })
           .catch((error) => {
             this.$store.state.pageOptions.loading = false
-            console.log('Get landing crashed', error)
+            console.log('Get organization crashed', error)
           })
       }
     },
@@ -292,9 +293,7 @@
           user_json = {
             'is_staff': false,
             'is_superuser': false,
-            'info': {
-              'access_role': 3
-            },
+            'access_role': 3,
             'failed': true
           }
         } else {
@@ -302,6 +301,11 @@
         }
 
         return user_json
+      }
+    },
+    filters: {
+      reverse(items) {
+        return items.slice().reverse()
       }
     }
   }

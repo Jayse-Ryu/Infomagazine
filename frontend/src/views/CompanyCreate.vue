@@ -12,8 +12,9 @@
       <h4>고객 회사를 위한 <span class="text-info">업체</span>를 생성합니다</h4>
       <form class="m-auto" v-on:submit.prevent="before_create_company">
         <div class="form-group row">
+
           <label v-if="user_obj.is_staff || user_obj.is_superuser" for="set_org"
-            class="col-form-label-sm col-sm-3 mt-3">
+                 class="col-form-label-sm col-sm-3 mt-3">
             <span>관리 조직 <span class="alert alert-danger p-0">(Staff Only)</span></span>
           </label>
           <div class="col-sm-9 mt-sm-3">
@@ -91,7 +92,7 @@
           <div class="col-sm-9 mt-sm-3">
             <input :class="error_label.class.tel_num" id="corp_phone" name="corp_phone"
                    type="number"
-                   v-model="create_obj.corp_tel_num"
+                   v-model="create_obj.corp_num"
                    placeholder="연락처를 입력하세요"
                    autofocus="autofocus"
                    maxlength="16"
@@ -112,12 +113,12 @@
           </div>
 
           <label for="corp_desc" class="col-form-label-sm col-sm-3 mt-3">
-            <span>조직설명</span>
+            <span>업체 설명</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
             <input class="form-control" id="corp_desc" type="text"
                    v-model="create_obj.corp_desc"
-                   placeholder="조직 설명을 적어주세요"
+                   placeholder="업체 설명을 적어주세요"
                    autofocus="autofocus"
                    maxlength="200">
           </div>
@@ -140,7 +141,7 @@
     data: () => ({
       // For company create
       organization_list: [],
-      error_label:{
+      error_label: {
         corp_name: true,
         corp_tel_num: false,
         corp_email: false,
@@ -157,12 +158,13 @@
         corp_header: '',
         corp_address: '',
         corp_crn: '',
-        corp_tel_num: '',
+        corp_num: '',
         corp_email: '',
         corp_desc: ''
       },
     }),
     mounted() {
+      // Get organization for admin users set org themselves
       if (this.user_obj.is_staff || this.user_obj.is_superuser) {
         axios.get(this.$store.state.endpoints.baseUrl + 'organization/')
           .then((response) => {
@@ -171,9 +173,10 @@
           .catch((error) => {
             console.log('Staff get organization is failed', error)
           })
-      } else if ([0,1].includes(this.user_obj.access_role)) {
+      } else if ([0, 1].includes(this.user_obj.access_role)) {
         this.create_obj.org_id = this.user_obj.organization
       }
+      // /Get org
     },
     methods: {
       error_check(param) {
@@ -183,7 +186,7 @@
           if (this.create_obj.corp_tel_num !== '') {
             // Allow mobile phone, internet wireless only
             let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
-            let tel_num = this.content_obj.info.phone_num
+            let tel_num = this.content_obj.corp_num
             let test_flag = regular_tel.test(tel_num)
             if (!test_flag) {
               this.error_label.corp_tel_num = true
@@ -196,11 +199,11 @@
             this.error_label.corp_tel_num = false
             this.error_label.class.tel_num = 'form-control'
           }
-        // /Phone validate
+          // /Phone validate
         } else if (param === 'email') {
           // Email validate
           if (this.create_obj.corp_email !== '') {
-            if(this.$validator.errors.has('corp_email')) {
+            if (this.$validator.errors.has('corp_email')) {
               this.error_label.corp_email = true
               this.error_label.class.email = 'form-control alert-danger'
             } else {
@@ -212,14 +215,28 @@
             this.error_label.class.email = 'form-control'
           }
         } else if (param === 'name') {
-          // Org name validate
-          if (this.create_obj.corp_name === '') {
-            this.error_label.corp_name = true
-            this.error_label.class.name = 'form-control alert-danger'
-          } else {
-            this.error_label.corp_name = false
-            this.error_label.class.name = 'form-control alert-info'
-          }
+          axios.get(this.$store.state.endpoints.baseUrl + 'company/')
+            .then((response) => {
+              let duplicated = false
+              for (let i = 0; i < response.data.results.length; i++) {
+                if (this.create_obj.corp_name == response.data.results[i].corp_name) {
+                  duplicated = true
+                }
+              }
+              if (duplicated) {
+                this.error_label.corp_name = true
+                this.error_label.class.name = 'form-control alert-danger'
+              } else if (this.create_obj.corp_name === '') {
+                this.error_label.corp_name = true
+                this.error_label.class.name = 'form-control alert-danger'
+              } else {
+                this.error_label.corp_name = false
+                this.error_label.class.name = 'form-control alert-info'
+              }
+            })
+            .catch((error) => {
+              console.log('get company error', error)
+            })
         }
       },
       before_create_company() {
@@ -240,19 +257,19 @@
       create_company() {
         // Create an organization myself
         this.$validator.validateAll()
-        if(confirm('조직을 생성하시겠습니까?')) {
+        if (confirm('업체를 생성하시겠습니까?')) {
           this.$store.state.pageOptions.loading = true
-          axios.post(this.$store.state.endpoints.baseUrl + 'organization/', this.create_obj)
+          axios.post(this.$store.state.endpoints.baseUrl + 'company/', this.create_obj)
             .then(() => {
-              alert('조직이 생성되었습니다.')
+              alert('업체가 생성되었습니다.')
               this.$store.state.pageOptions.loading = false
               this.$router.currentRoute.meta.protect_leave = 'no'
               this.$router.push({
-                name: 'organization_list'
+                name: 'company_list'
               })
             })
             .catch((error) => {
-              alert('조직 생성 중 오류가 발생하였습니다.')
+              alert('업체 생성 중 오류가 발생하였습니다.')
               this.$store.state.pageOptions.loading = false
               console.log(error)
             })
@@ -270,15 +287,12 @@
           user_json = {
             'is_staff': false,
             'is_superuser': false,
-            'info': {
-              'access_role': 3
-            },
+            'access_role': 3,
             'failed': true
           }
         } else {
-          user_json = JSON.parse(user_json)
+          user_json = JSON.parse(local_user)
         }
-        console.log('user jsons is ', user_json)
 
         return user_json
       }
