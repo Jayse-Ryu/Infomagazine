@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import router from './router'
-// import Decoder from 'jwt-decode'
+import Decoder from 'jwt-decode'
 import VueCookie from 'vue-cookie'
 
 Vue.use(Vuex)
@@ -11,14 +11,11 @@ export default new Vuex.Store({
   state: {
     // authUser: localStorage.getItem('authUser'),
     // authUser: Vue.cookie.get('authUser'),
-    authUser: {},
+    // authUser: {},
     isAuthenticated: false,
-    // jwt: localStorage.getItem('token'),
-    // jwt: Vue.cookie.get('token'),
-    jwt: '',
     endpoints: {
       obtainJWT: 'http://localhost/api/auth/',
-      refreshJWT: 'http://localhost/api/auth-refresh/',
+      refreshJWT: 'http://localhost/api/auth/refresh/',
       baseUrl: 'http://localhost/api/'
     },
     pageOptions: {
@@ -47,86 +44,125 @@ export default new Vuex.Store({
   },
   mutations: {
     setAuthUser(state, {authUser}) {
-      Vue.set(state, 'authUser', JSON.stringify(authUser))
-      // localStorage.setItem('authUser', JSON.stringify(authUser))
+      // Vue.set(state, 'authUser', JSON.stringify(authUser))
+      localStorage.setItem('authUser', JSON.stringify(authUser))
     },
     setToken(state, newToken) {
       // localStorage.setItem('token', newToken)
-      state.jwt = newToken
+      // state.jwt = newToken
+      try {
+        Vue.cookie.set('token', newToken, {expires: '10m'})
+      } catch (error) {
+        console.log('Set token cookie error', error)
+      }
     },
     removeToken(state) {
-      // localStorage.removeItem('token')
-      state.authUser = {}
-      state.jwt = null
+      localStorage.removeItem('authUser')
+      // state.authUser = {}
+      // state.jwt = null
       state.isAuthenticated = false
       Vue.cookie.delete('token')
-      Vue.cookie.delete('authUser')
+      // Vue.cookie.delete('authUser')
     }
   },
   actions: {
     obtainToken(self, data) {
-      // console.log('obtainToken action')
+      const decoded = Decoder(data.token)
+
+      const user = {
+        id: decoded.user_id,
+        email: decoded.email,
+        username: decoded.username,
+        is_superuser: decoded.is_superuser,
+        is_staff: decoded.is_staff,
+        access_role: decoded.access_role,
+      }
+
       this.commit('setToken', data.token)
       this.commit('setAuthUser', {
-        authUser: data.user,
+        authUser: user,
         isAuthenticated: true
       })
-      axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
-      // console.log('axios default header?', axios.defaults.headers)
-    },
-    // refreshToken () {
-    //   const payload = {
-    //     token: this.state.jwt
-    //   }
-    //   axios.post(this.state.endpoints.refreshJWT, payload)
-    //       .then((response) => {
-    //         this.commit('setToken', response.data.token)
-    //         // Get auth user
-    //         if (this.state.jwt != null) {
-    //           // If jwt object is really exist in local store
-    //           const token = this.state.jwt
-    //           const decoded = Decoder(token)
-    //           const user_id = decoded.user_id
-    //           axios.get(this.state.endpoints.baseUrl + 'user/' + user_id + '/')
-    //               .then((response) => {
-    //                 if (response.data) {
-    //                   let user_obj = response.data
-    //                   this.commit('setAuthUser', {
-    //                     authUser: user_obj,
-    //                     isAuthenticated: true
-    //                   })
-    //                 }
-    //               })
-    //               .catch((error) => {
-    //                 console.log('get Auth user failed..', error)
-    //               })
-    //         }
-    //       })
-    //       .catch((error) => {
-    //         console.log('Refresh error..', error)
-    //       })
-    // },
-    inspectToken() {
-      // console.log('inspectToken action')
-      const token = Vue.cookie.get('token')
-      const authUser = Vue.cookie.get('authUser')
 
-      if (token !== null && authUser !== null) {
-        let store_user = this.state.authUser
-        let store_token = this.state.jwt
-        if (Object.keys(store_user).length === 0 && store_user.constructor === Object && !store_token) {
-          this.commit('setToken', token)
+      // axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
+      axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+
+      return true
+    },
+    refreshToken(token) {
+      // console.log('refreshToken action')
+      // const payload = {
+      //   token: token
+      // }
+      //
+      // // Refresh endpoint
+      // axios.post(this.state.endpoints.refreshJWT, payload)
+      //   .then((response) => {
+      //     console.log('refresh response', response)
+      //     this.dispatch('obtainToken', response.data.token)
+      //
+      //     return true
+      //   })
+      //   .catch((error) => {
+      //     console.log('Refresh token error.', error)
+      //
+      //     return false
+      //   })
+    },
+    inspectToken() {
+
+      const token = Vue.cookie.get('token')
+
+      if (token !== null) {
+        // Token is existed
+        let decoded = Decoder(token)
+        let exp = decoded.exp
+        let three_min = 3*60
+
+        if ((Date.now() / 1000) > exp) {
+          // If token is expired
+          // console.log('If token is expired')
+          this.commit('removeToken')
+
+          return false
+        } /*else if((Date.now() / 1000) < exp && (Date.now() / 1000) > exp - three_min) {
+          console.log('If token is refresh period')
+          // this.dispatch('refreshToken', token)
+          axios.post(this.state.endpoints.refreshJWT, token)
+            .then((response) => {
+              console.log('refresh is done?', response)
+            })
+            .catch((error) => {
+              console.log('refresh is error?', error)
+            })
+        }*/ else {
+          // Token is not expired
+          // console.log('If token is nice')
+          // Forced push user data by token
+          const user = {
+            id: decoded.user_id,
+            email: decoded.email,
+            username: decoded.username,
+            is_superuser: decoded.is_superuser,
+            is_staff: decoded.is_staff,
+            access_role: decoded.access_role,
+          }
+
           this.commit('setAuthUser', {
-            authUser: JSON.parse(authUser),
+            authUser: user,
             isAuthenticated: true
           })
-          axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
-          // console.log('axios default header?', axios.defaults.headers)
+
+          // axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
+          return true
         }
-        return true
+
       } else {
-        // If no token then send to login page
+        // Token is null
         this.commit('removeToken')
+
         return false
       }
     }

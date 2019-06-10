@@ -198,11 +198,12 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  // console.log('router before from', from)
-  // console.log('router before to', to)
+  // console.log('router from', from)
+  // console.log('router to', to)
 
   // When user access_code not matched with router
   let access_denied = () => {
+    // console.log('Access denied')
     if (from.meta.protect_leave === 'yes') {
       alert('권한이 없는 페이지입니다.')
       from.meta.protect_leave = 'no'
@@ -215,8 +216,11 @@ router.beforeEach((to, from, next) => {
 
   // Check authentication by token, authUser
   let work = () => {
-    let authUser = JSON.parse(Store.state.authUser)
-    // let token = Store.state.jwt
+    // console.log('work')
+    let authUser = JSON.parse(localStorage.getItem('authUser'))
+    // let authUser = JSON.parse(localStorage.getItem('authUser'))
+    // let token = Vue.cookie.get('token')
+    // console.log('router auth user is ', authUser)
 
     let admin = authUser.is_superuser
     let staff = authUser.is_staff
@@ -225,19 +229,19 @@ router.beforeEach((to, from, next) => {
     let guest = [0, 1, 2, 3]
 
     if (to.meta.auth_grade === 'guest') {
-      if (staff || admin || guest.includes(authUser.info.access_role)) {
+      if (staff || admin || guest.includes(authUser.access_role)) {
         next()
       } else {
         access_denied()
       }
     } else if (to.meta.auth_grade === 'client') {
-      if (staff || admin || client.includes(authUser.info.access_role)) {
+      if (staff || admin || client.includes(authUser.access_role)) {
         next()
       } else {
         access_denied()
       }
     } else if (to.meta.auth_grade === 'marketer') {
-      if (staff || admin || marketer.includes(authUser.info.access_role)) {
+      if (staff || admin || marketer.includes(authUser.access_role)) {
         next()
       } else {
         access_denied()
@@ -255,6 +259,7 @@ router.beforeEach((to, from, next) => {
 
   // Check access needs or router exist
   let intro = () => {
+    // console.log('intro')
     if (!to.meta.signed) {
       // When router try to access very basic pages
       // But, Excluding logged user access to sign-in page
@@ -280,19 +285,20 @@ router.beforeEach((to, from, next) => {
         }
       }
     } else if (!to.name || to.name === null || to.name === '') {
+      // If meta signed?
       // If component is not exist, push to 404 page
       next({name: 'A404'})
     } else {
       // Remained router is Cookie check
       Store.dispatch('inspectToken')
         .then((response) => {
-          if (response == true) {
+          if (response === true) {
             work()
           } else {
             // Cookie is not available
             if (from.meta.protect_leave === 'yes') {
-              alert('로그인이 필요합니다.')
               from.meta.protect_leave = 'no'
+              alert('로그인이 필요합니다.')
               next({name: 'sign_in'})
             } else {
               alert('로그인이 필요합니다.')
@@ -308,6 +314,7 @@ router.beforeEach((to, from, next) => {
 
   // Check first before meta
   let before_check = () => {
+    // console.log('before_check')
     if (from.meta.protect_leave) {
       // Prevent router error with meta is undefined
       if (from.meta.protect_leave === 'yes') {

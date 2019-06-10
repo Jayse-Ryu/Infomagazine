@@ -93,7 +93,7 @@
           </div>
 
           <div class="form-group block">
-            <label for="phone" class="col-sm-12 control-label">전화번호
+            <label for="phone" class="col-sm-12 control-label">전화번호*
               <div class="error_label" v-if="error_label.phone">전화번호 형식을 확인해주세요. (010~9, 070)</div>
             </label>
             <div class="col-sm-12">
@@ -106,6 +106,7 @@
                      v-validate="'numeric|max:16'"
                      name="phone"
                      id="phone"
+                     required
                      @keyup="error_check('phone')">
             </div>
           </div>
@@ -151,12 +152,14 @@
       }
     }),
     methods: {
+      // Real-Time custom validation
       error_check(param) {
         if (param === 'phone') {
           if (this.content_obj.info.phone_num !== '') {
-            let rgTel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
-            let strValue = this.content_obj.info.phone_num
-            let test_flag = rgTel.test(strValue)
+            // Allow mobile phone, internet wireless only
+            let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
+            let tel_num = this.content_obj.info.phone_num
+            let test_flag = regular_tel.test(tel_num)
             if (!test_flag) {
               this.error_label.phone = true
               this.error_label.class.phone = 'form-control alert-danger'
@@ -165,8 +168,8 @@
               this.error_label.class.phone = 'form-control alert-info'
             }
           } else {
-            this.error_label.phone = false
-            this.error_label.class.phone = 'form-control'
+            this.error_label.phone = true
+            this.error_label.class.phone = 'form-control alert-danger'
           }
         } else if (param === 'password') {
           if (this.content_obj.password == '' || this.re_pass == '') {
@@ -186,7 +189,7 @@
           if (this.content_obj.email !== '') {
             // If email is not empty
             let users = []
-            axios.get(this.$store.state.endpoints.baseUrl + 'user/')
+            axios.get(this.$store.state.endpoints.baseUrl + 'user/list/')
               .then((response) => {
 
                 users = response.data.results
@@ -202,7 +205,7 @@
 
                 this.error_label.email = email_flag
 
-                // If has error atleast one thing of check
+                // If has error at least one thing of check
                 if (this.error_label.email || this.$validator.errors.has('email')) {
                   this.error_label.class.email = 'form-control alert-danger'
                 } else if (!this.error_label.email && !this.$validator.errors.has('email')) {
@@ -240,7 +243,7 @@
           alert('비밀번호를 확인해주세요!')
           document.getElementById('re_password').focus()
         } else if (this.error_label.phone) {
-          alert('전화번호 형식을 확인해주세요!')
+          alert('전화번호를 확인해주세요!')
           document.getElementById('phone').focus()
         } else if (this.error_label.username) {
           alert('이름을 입력하세요!')
@@ -256,22 +259,21 @@
             'Content-Type': 'application/json'
           }
         }
+        this.$store.state.pageOptions.loading = true
         /* Do axios post */
         axios.post(this.$store.state.endpoints.baseUrl + 'user/', this.content_obj, config)
           .then(() => {
             alert('회원가입 되었습니다.')
+            this.$store.state.pageOptions.loading = false
             this.$router.currentRoute.meta.protect_leave = 'no'
             this.$router.push({
               name: 'sign_in',
             })
           })
           .catch((error) => {
+            alert('회원가입 중 문제가 발생하였습니다. 다시시도 해주세요.')
             console.log(error)
-            if (error.response.data.account) {
-              alert(error.response.data.account)
-            } else {
-              alert('회원가입 중 문제가 발생하였습니다. 다시시도 해주세요.')
-            }
+            this.$store.state.pageOptions.loading = false
           })
         /* /Axios post */
       },

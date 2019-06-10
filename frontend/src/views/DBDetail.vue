@@ -117,7 +117,7 @@
 
       // Window width calculator
       let that = this
-      this.$nextTick(function () {
+      that.$nextTick(function () {
         window.addEventListener('resize', function (e) {
           that.window_width = window.innerWidth
         })

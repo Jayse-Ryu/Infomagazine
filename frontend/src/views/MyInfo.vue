@@ -223,17 +223,21 @@
 
               axios.post(this.$store.state.endpoints.obtainJWT, payload)
                 .then((response) => {
-                  this.$store.dispatch('obtainToken', response.data)
-
-                  try {
-                    this.$cookie.set('token', response.data.token, {expires: '1D'})
-                    this.$cookie.set('authUser', JSON.stringify(response.data.user), {expires: '1D'})
-                  } catch (error) {
-                    console.log('set cookie error', error)
-                  }
+                  return this.$store.dispatch('obtainToken', response.data)
+                  // try {
+                  //   this.$cookie.set('token', response.data.token, {expires: '1D'})
+                  //   this.$cookie.set('authUser', JSON.stringify(response.data.user), {expires: '1D'})
+                  // } catch (error) {
+                  //   console.log('set cookie error', error)
+                  // }
+                })
+                .then(() => {
                   alert('수정되었습니다.')
                   this.$store.state.pageOptions.loading = false
                   this.$router.push({name: 'gateway'})
+                })
+                .catch((error) => {
+                  console.log('Edit error', error)
                 })
             })
             .catch((error) => {
@@ -265,21 +269,28 @@
     computed: {
       user_obj() {
         // Get user information
-        let store_user = this.$store.state.authUser
+        let local_user = localStorage.getItem('authUser')
         let user_json = {}
-        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+
+        if (!local_user) {
           // dummy block access auth
           user_json = {
             'is_staff': false,
             'is_superuser': false,
             'info': {
+              'phone_num': '',
               'access_role': 3
             },
             'failed': true
           }
         } else {
-          user_json = JSON.parse(this.$store.state.authUser)
+          user_json = JSON.parse(local_user)
+          // user_json['info'] = {}
+          // user_json['info']['phone_num'] = ''
         }
+
+        console.log(user_json)
+
         return user_json
       }
     }

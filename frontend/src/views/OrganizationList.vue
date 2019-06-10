@@ -36,7 +36,7 @@
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
                  style="border-radius: 0; border-bottom: 0; width:100%;">
               <div class="col-1 p-0">번호</div>
-              <div class="col-2 p-0">소속</div>
+              <div class="col-2 p-0">조직</div>
               <div class="col-2 p-0">상호명</div>
               <div class="col-2 p-0">담당자</div>
               <div class="col-2 p-0">연락처</div>
@@ -65,7 +65,8 @@
               <div v-if="content.phone" class="col-2 p-0">{{ content.phone }}</div>
               <div v-else-if="content.email" class="col-2 p-0">{{ content.email }}</div>
               <div v-else class="col-2 p-0">없음</div>
-              <div class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+              <div v-if="content.created_data" class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+              <div v-else class="col-3 p-0 board_centre">없음</div>
             </li>
           </ul>
         </div>
@@ -75,7 +76,7 @@
             <div class="list-group-item text-center d-inline-flex justify-content-between p-1 pt-2 pb-2"
                  style="border-radius: 0; border-bottom: 0; width:100%;">
               <div class="col-2 p-0">번호</div>
-              <div class="col-3 p-0">소속</div>
+              <div class="col-3 p-0">조직</div>
               <div class="col-4 p-0">연락처</div>
               <div class="col-3 p-0 board_centre">생성일</div>
             </div>
@@ -96,7 +97,8 @@
               <div v-if="content.phone" class="col-4 p-0">{{ content.phone }}</div>
               <div v-else-if="content.email" class="col-4 p-0">{{ content.email }}</div>
               <div v-else class="col-4 p-0">없음</div>
-              <div class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+              <div v-if="content.created_date" class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+              <div v-else class="col-3 p-0 board_centre">없음</div>
             </li>
           </ul>
         </div>
@@ -136,9 +138,9 @@
       if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
         alert('권한이 없습니다.')
         this.$store.state.pageOptions.loading = false
-        if ([0,1].includes(this.user_obj.info.access_role)) {
+        if ([0, 1].includes(this.user_obj.access_role)) {
           this.$router.push({
-            path: '/organization/detail/' + this.user_obj.info.organization
+            path: '/organization/detail/' + this.user_obj.organization
           })
         } else {
           this.$router.push({
@@ -223,39 +225,39 @@
         //     this.content_obj = response.data.results
         //   })
 
-        // const config = {
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   }
-        // }
-
-        if (this.search_option == 1) {
-          search_param = '&name=' + this.search_text
-        }
-
+        // Get Organization by logged user's grade
         if (this.user_obj.is_staff || this.user_obj.is_superuser) {
           console.log('Staff user - Get All')
-          auth_filter = '?true'
-        } else if (this.user_obj.info.access_role == '0' || this.user_obj.info.access_role == '1') {
+          auth_filter = ''
+        } else if (this.user_obj.access_role == '0' || this.user_obj.access_role == '1') {
           console.log('Marketer user - Get only Org')
-          auth_filter = '?organization=' + this.user_obj.info.organization
-        } else if (this.user_obj.info.access_role == '2') {
+          auth_filter = '?organization=' + this.user_obj.organization
+        } else if (this.user_obj.access_role == '2') {
           console.log('load about com - Get only Com')
-          auth_filter = '?company=' + this.user_obj.info.company
+          auth_filter = '?company=' + this.user_obj.company
+        }
+
+        // Set search option
+        if (this.search_option == 1 && this.search_text !== '') {
+          if (auth_filter !== '') {
+            search_param = '&name=' + this.search_text
+          } else {
+            search_param = '?name=' + this.search_text
+          }
         }
 
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'organization/list/' + auth_filter + search_param)
+        axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + auth_filter + search_param)
           .then((response) => {
             this.$store.state.pageOptions.loading = false
             console.log('get landing response', response)
             this.content_obj = response.data.results
+            console.log('content obj is?', this.content_obj)
           })
           .catch((error) => {
             this.$store.state.pageOptions.loading = false
             console.log('Get landing crashed', error)
           })
-
       }
     },
     mounted() {
@@ -282,9 +284,10 @@
     computed: {
       user_obj() {
         // Get user information
-        let store_user = this.$store.state.authUser
+        let local_user = localStorage.getItem('authUser')
         let user_json = {}
-        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+
+        if (!local_user) {
           // dummy block access auth
           user_json = {
             'is_staff': false,
@@ -295,8 +298,9 @@
             'failed': true
           }
         } else {
-          user_json = JSON.parse(this.$store.state.authUser)
+          user_json = JSON.parse(local_user)
         }
+
         return user_json
       }
     }

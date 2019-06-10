@@ -152,7 +152,8 @@
       marketer_list: []
     }),
     mounted() {
-      axios.get(this.$store.state.endpoints.baseUrl + 'user')
+      // Get marketer users for set as a manager
+      axios.get(this.$store.state.endpoints.baseUrl + 'user/list/')
         .then((response) => {
           this.marketer_list = response.data.results
           for (let i = 0; i < this.marketer_list.length; i ++) {
@@ -166,14 +167,16 @@
         })
     },
     methods: {
+      // Real-Time custom validation
       error_check(param) {
         if (param === 'phone') {
           // Phone validate
           console.log('param is phone')
           if (this.create_obj.org_tel_num !== '') {
-            let rgTel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
-            let strValue = this.create_obj.org_tel_num
-            let test_flag = rgTel.test(strValue)
+            // Allow mobile phone, internet wireless
+            let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
+            let tel_num = this.create_obj.org_tel_num
+            let test_flag = regular_tel.test(tel_num)
             if (!test_flag) {
               this.error_label.org_tel_num = true
               this.error_label.class.tel_num = 'form-control alert-danger'
@@ -250,9 +253,10 @@
     computed: {
       user_obj() {
         // Get user information
-        let store_user = this.$store.state.authUser
+        let local_user = localStorage.getItem('authUser')
         let user_json = {}
-        if (Object.keys(store_user).length === 0 && store_user.constructor) {
+
+        if (!local_user) {
           // dummy block access auth
           user_json = {
             'is_staff': false,
@@ -263,8 +267,9 @@
             'failed': true
           }
         } else {
-          user_json = JSON.parse(this.$store.state.authUser)
+          user_json = JSON.parse(local_user)
         }
+
         return user_json
       }
     }

@@ -81,24 +81,23 @@
           email: this.email,
           password: this.password
         }
+        this.$store.state.pageOptions.loading = true
         axios.post(this.$store.state.endpoints.obtainJWT, payload)
           .then((response) => {
-            this.$store.dispatch('obtainToken', response.data)
-
-            try {
-              this.$cookie.set('token', response.data.token, {expires: '5m'})
-              this.$cookie.set('authUser', JSON.stringify(response.data.user), {expires: '5m'})
-            } catch (error) {
-              console.log('set cookie error', error)
-            }
-
+            // Axios then
+            return this.$store.dispatch('obtainToken', response.data)
+          })
+          .then(() => {
+            // Dispatch then
             this.$store.state.pageOptions.loading = false
             this.$router.push({name: 'gateway'})
           })
-          .catch(() => {
+          .catch((error) => {
             // Check the account or password
             alert('아이디와 비밀번호를 확인해주세요.')
+            document.getElementById('id_password').focus()
             this.$store.state.pageOptions.loading = false
+            console.log('로그인에 문제가 생겼습니다.', error)
           })
       }
     }
