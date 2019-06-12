@@ -12,10 +12,12 @@ class UserViewSets(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
     def get_permissions(self):
-        if self.request.method == 'POST':
+        if self.action in ['create', 'email_check']:
             return [permissions.AllowAny()]
-        elif self.request.method == 'PATCH':
+        elif self.action in ['update', 'partial_update']:
             return [permissions.IsAuthenticated()]
+        elif self.action in ['create_client']:
+            return [custom_permissions.IsMarketer()]
         return [permissions.IsAdminUser()]
 
     def get_serializer_context(self):
@@ -37,6 +39,15 @@ class UserViewSets(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    @action(detail=False, methods=['HEAD'], permission_classes=[permissions.AllowAny])
+    def email_check(self, request):
+        email = request.data['email']
+        email_check = User.objects.filter(email=email)
+        if email_check.exists():
+            return Response(status=status.HTTP_409_CONFLICT)
+        else:
+            return Response(status=status.HTTP_200_OK)
 
     # @action()
     # def test(self,request):
