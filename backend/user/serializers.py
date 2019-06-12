@@ -105,7 +105,10 @@ class UserSerializer(serializers.ModelSerializer):
                         setattr(field, ono_attr, ono_value)
                     field.save()
             else:
-                setattr(user_instance, attr, value)
+                if attr == 'password':
+                    user_instance.set_password(value)
+                else:
+                    setattr(user_instance, attr, value)
 
         user_instance.save()
 
