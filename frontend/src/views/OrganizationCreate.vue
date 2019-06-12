@@ -14,6 +14,19 @@
 
       <form class="m-auto" v-on:submit.prevent="before_create_organization">
         <div class="form-group row">
+          <label for="org_manager" class="col-form-label-sm col-sm-3 mt-3">
+            <span>조직 관리 마케터</span>
+          </label>
+          <div class="col-sm-9 mt-sm-3">
+            <select class="form-control col-md-12 m-auto" name="org_manager" id="org_manager"
+                    v-model="create_obj.org_manager">
+              <option value="0" selected>추후에 선택합니다</option>
+              <option v-for="item in marketer_list" :value="item.id">
+                {{ item.username }} / {{ item.email }}
+              </option>
+            </select>
+          </div>
+
           <label for="org_name" class="col-form-label-sm col-sm-3 mt-3">
             <span>조직 이름*</span>
           </label>
@@ -42,16 +55,15 @@
           </div>
 
           <label for="org_header" class="col-form-label-sm col-sm-3 mt-3">
-            <span>조직 관리자</span>
+            <span>대표자</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
-            <select class="form-control col-md-12 m-auto" name="org_header" id="org_header"
-                    v-model="create_obj.org_header">
-              <option value="0" selected>추후에 선택합니다</option>
-              <option v-for="item in marketer_list" :value="item.id">
-                {{ item.username }} / {{ item.email }}
-              </option>
-            </select>
+            <input class="form-control" id="org_header" name="org_header" type="text"
+                   v-model="create_obj.org_header"
+                   placeholder="조직 대표자를 입력하세요"
+                   autofocus="autofocus"
+                   maxlength="100"
+            >
           </div>
 
           <label for="org_addr" class="col-form-label-sm col-sm-3 mt-3">
@@ -89,19 +101,6 @@
                    @keyup="error_check('phone')">
           </div>
 
-          <label for="org_email" class="col-form-label-sm col-sm-3 mt-3">
-            <span>이메일</span>
-          </label>
-          <div class="col-sm-9 mt-sm-3">
-            <input :class="error_label.class.email" id="org_email" name="org_email" type="email"
-                   v-model="create_obj.org_email"
-                   placeholder="이메일을 입력하세요"
-                   maxlength="50"
-                   autofocus="autofocus"
-                   v-validate="'email'"
-                   @keyup="error_check('email')">
-          </div>
-
           <label for="org_desc" class="col-form-label-sm col-sm-3 mt-3">
             <span>조직설명</span>
           </label>
@@ -129,20 +128,20 @@
     name: "organization_create",
     data: () => ({
       // For organization create
-      error_label:{
+      error_label: {
         org_name: true,
         org_tel_num: false,
-        org_email: false,
+        // org_email: false,
         class: {
           name: 'form-control',
           tel_num: 'form-control',
-          email: 'form-control'
+          // email: 'form-control'
         }
       },
       create_obj: {
         org_name: '',
         org_sub_name: '',
-        org_header: 0,
+        org_header: '',
         org_address: '',
         org_crn: '',
         org_tel_num: '',
@@ -153,10 +152,10 @@
     }),
     mounted() {
       // Get marketer users for set as a manager
-      axios.get(this.$store.state.endpoints.baseUrl + 'user/list/')
+      axios.get(this.$store.state.endpoints.baseUrl + 'user/')
         .then((response) => {
           this.marketer_list = response.data.results
-          for (let i = 0; i < this.marketer_list.length; i ++) {
+          for (let i = 0; i < this.marketer_list.length; i++) {
             if (this.marketer_list[i].username == '') {
               this.marketer_list[i].username = '이름없음'
             }
@@ -188,22 +187,27 @@
             this.error_label.org_tel_num = false
             this.error_label.class.tel_num = 'form-control'
           }
-        // /Phone validate
-        } else if (param === 'email') {
-          // Email validate
-          if (this.create_obj.org_email !== '') {
-            if(this.$validator.errors.has('org_email')) {
-              this.error_label.org_email = true
-              this.error_label.class.email = 'form-control alert-danger'
-            } else {
-              this.error_label.org_email = false
-              this.error_label.class.email = 'form-control alert-info'
-            }
-          } else {
-            this.error_label.org_email = false
-            this.error_label.class.email = 'form-control'
-          }
+          // /Phone validate
         } else if (param === 'name') {
+          axios.get(this.$store.state.endpoints.baseUrl + 'organization/')
+            .then((response) => {
+              let duplicated = false
+              for (let i = 0; i < response.data.results.length; i++) {
+                if (this.create_obj.org_name == response.data.results[i].org_name) {
+                  duplicated = true
+                }
+              }
+              if (duplicated) {
+                this.error_label.org_name = true
+                this.error_label.class.name = 'form-control alert-danger'
+              } else if (this.create_obj.org_name === '') {
+                this.error_label.org_name = true
+                this.error_label.class.name = 'form-control alert-danger'
+              } else {
+                this.error_label.org_name = false
+                this.error_label.class.name = 'form-control alert-info'
+              }
+            })
           // Org name validate
           if (this.create_obj.org_name === '') {
             this.error_label.org_name = true
@@ -216,10 +220,7 @@
       },
       before_create_organization() {
         this.$validator.validateAll()
-        if (this.error_label.org_email || this.$validator.errors.has('org_email')) {
-          alert('이메일을 확인해주세요')
-          document.getElementById('org_email').focus()
-        } else if (this.error_label.org_tel_num) {
+        if (this.error_label.org_tel_num) {
           alert('전화번호 형식을 확인해주세요!')
           document.getElementById('org_phone').focus()
         } else if (this.error_label.name) {
@@ -231,7 +232,7 @@
       },
       create_organization() {
         // Create an organization myself
-        if(confirm('조직을 생성하시겠습니까?')) {
+        if (confirm('조직을 생성하시겠습니까?')) {
           this.$store.state.pageOptions.loading = true
           axios.post(this.$store.state.endpoints.baseUrl + 'organization/', this.create_obj)
             .then(() => {
@@ -261,9 +262,7 @@
           user_json = {
             'is_staff': false,
             'is_superuser': false,
-            'info': {
-              'access_role': 3
-            },
+            'access_role': 3,
             'failed': true
           }
         } else {

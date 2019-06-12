@@ -29,20 +29,21 @@
 
           <label for="com_name" class="col-form-label-sm col-sm-3 mt-3">업체 이름*</label>
           <div class="col-sm-9 mt-sm-3">
-            <!--<div class="error_label" v-if="errors.has('org_name')">{{errors.first('org_name')}}</div>-->
             <div class="error_label" v-if="errors.has('com_name')">이름은 필수 항목입니다.</div>
-            <input type="text" class="form-control" id="com_name" name="com_name" v-model="content_obj.corp_name"
+            <input type="text" :class="error_label.class.name" id="com_name" name="com_name"
+                   v-model="content_obj.corp_name"
                    required
                    placeholder="업체 이름을 입력하세요"
                    autofocus="autofocus"
                    maxlength="100"
-                   v-validate="'required'">
+                   v-validate="'required'"
+                   @keyup="error_check('name')">
           </div>
 
           <label for="org_sub" class="col-form-label-sm col-sm-3 mt-3">업체 상호명</label>
           <div class="col-sm-9 mt-sm-3">
-            <div class="error_label" v-if="errors.has('org_sub')">{{errors.first('org_sub')}}</div>
-            <input type="text" class="form-control" id="org_sub" name="org_sub" v-model="content_obj.corp_sub_name"
+            <input type="text" class="form-control" id="org_sub" name="org_sub"
+                   v-model="content_obj.corp_sub_name"
                    placeholder="상호명을 입력하세요"
                    autofocus="autofocus"
                    maxlength="100">
@@ -50,7 +51,8 @@
 
           <label for="org_header" class="col-form-label-sm col-sm-3 mt-3">대표자</label>
           <div class="col-sm-9 mt-sm-3">
-            <input type="text" class="form-control" id="org_header" v-model="content_obj.corp_header"
+            <input type="text" class="form-control" id="org_header"
+                   v-model="content_obj.corp_header"
                    placeholder="업체 대표를 입력하세요"
                    autofocus="autofocus"
                    maxlength="20">
@@ -58,7 +60,8 @@
 
           <label for="org_address" class="col-form-label-sm col-sm-3 mt-3">주소</label>
           <div class="col-sm-9 mt-sm-3">
-            <input type="text" class="form-control" id="org_address" v-model="content_obj.corp_address"
+            <input type="text" class="form-control" id="org_address"
+                   v-model="content_obj.corp_address"
                    placeholder="주소를 입력하세요"
                    autofocus="autofocus"
                    maxlength="200">
@@ -74,22 +77,26 @@
 
           <label for="org_phone" class="col-form-label-sm col-sm-3 mt-3">연락처</label>
           <div class="col-sm-9 mt-sm-3">
-            <div class="error_label" v-if="errors.has('org_phone')">전화번호는 16자 이하입니다</div>
-            <input type="number" class="form-control" id="org_phone" name="org_phone" v-model="content_obj.corp_tel_num"
+            <div class="error_label" v-if="errors.has('org_phone')">전화번호를 확인하세요</div>
+            <input type="number" :class="error_label.class.phone" id="org_phone" name="org_phone"
+                   v-model="content_obj.corp_num"
                    placeholder="연락처를 입력하세요"
                    autofocus="autofocus"
                    maxlength="16"
-                   v-validate="'numeric|max:16'">
+                   v-validate="'numeric|max:16'"
+                   @keyup="error_check('phone')">
           </div>
 
           <label for="org_email" class="col-form-label-sm col-sm-3 mt-3">이메일</label>
           <div class="col-sm-9 mt-sm-3">
             <div class="error_label" v-if="errors.has('org_email')">이메일 형식을 확인하세요</div>
-            <input type="email" class="form-control" id="org_email" name="org_email" v-model="content_obj.corp_email"
+            <input type="email" :class="error_label.class.email" id="org_email" name="org_email"
+                   v-model="content_obj.corp_email"
                    placeholder="이메일을 입력하세요"
                    maxlength="50"
                    autofocus="autofocus"
-                   v-validate="'email'">
+                   v-validate="'email'"
+                   @keyup="error_check('email')">
           </div>
 
           <label for="org_desc" class="col-form-label-sm col-sm-3 mt-3">설명</label>
@@ -141,14 +148,14 @@
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
                 v-for="content in user_list">
-              <div class="col-2 col-sm-1">{{ content.user }}</div>
+              <div class="col-2 col-sm-1">{{ content.id }}</div>
               <div class="col-3 col-sm-3">
-                <router-link :to="'/users/detail/' + content.user">{{ content.account }}</router-link>
+                <router-link :to="'/users/detail/' + content.user">{{ content.email }}</router-link>
               </div>
               <div class="col-3 col-sm-3">
-                <router-link :to="'/users/detail/' + content.user">{{ content.user_name }}</router-link>
+                <router-link :to="'/users/detail/' + content.user">{{ content.username }}</router-link>
               </div>
-              <div class="col-2">{{ content.phone }}</div>
+              <div class="col-2">{{ content.phone_num }}</div>
               <div class="col-2 col-sm-3">
                 <div v-if="content.access == 2 && content.user != user_obj.id">
                   <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.user)">
@@ -156,7 +163,7 @@
                   </button>
                 </div>
                 <div v-else-if="content.access == 2 && content.user == user_obj.id">
-                  <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.user)">
+                  <button type="button" class="btn btn-info p-0">
                     <div class="promote_btn">본인</div>
                   </button>
                 </div>
@@ -187,28 +194,28 @@
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
                 v-for="content in user_list">
-              <div class="col-4">{{ content.account }}</div>
+              <div class="col-4">{{ content.email }}</div>
               <div class="col-4">
-                <router-link :to="'/users/detail/' + content.user">{{ content.user_name }}</router-link>
+                <router-link :to="'/users/detail/' + content.id">{{ content.username }}</router-link>
               </div>
               <div class="col-4">
-                <div v-if="content.access == 1 && content.user == original_manager">
-                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('he', content.user)">
+                <div v-if="content.access == 1 && content.id == original_manager">
+                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('he', content.id)">
                     <div class="promote_btn">관리자</div>
                   </button>
                 </div>
-                <div v-else-if="content.access == 1 && content.user != original_manager && content.user != user_obj.id">
-                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.user)">
+                <div v-else-if="content.access == 1 && content.id != original_manager && content.id != user_obj.id">
+                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.id)">
                     <div class="promote_btn">강등</div>
                   </button>
                 </div>
-                <div v-else-if="content.access == 1 && content.user == user_obj.id">
-                  <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.user)">
+                <div v-else-if="content.access == 1 && content.id == user_obj.id">
+                  <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.id)">
                     <div class="promote_btn">본인</div>
                   </button>
                 </div>
                 <div v-if="content.access == -1">
-                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.user)">
+                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.id)">
                     <div class="promote_btn">승인</div>
                   </button>
                 </div>
@@ -257,6 +264,16 @@
   export default {
     name: "company_detail",
     data: () => ({
+      error_label: {
+        name: false,
+        phone: false,
+        email: false,
+        class: {
+          name: 'form-control',
+          phone: 'form-control',
+          email: 'form-control'
+        }
+      },
       page_id: 0,
       window_width: window.innerWidth,
       content_obj: [],
@@ -289,6 +306,7 @@
       // Get Company by page_id
       axios.get(this.$store.state.endpoints.baseUrl + 'company/' + this.page_id)
         .then((response) => {
+          console.log('company response is? ', response)
           this.content_obj = response.data
           return axios.get(this.$store.state.endpoints.baseUrl + 'user/list/' + this.page_id)
         })
@@ -304,6 +322,51 @@
         })
     },
     methods: {
+      error_check(param) {
+        if (param === 'phone') {
+          // Phone validate
+          if (this.content_obj.corp_num !== '') {
+            // Allow mobile phone, internet wireless
+            let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
+            let tel_num = this.content_obj.corp_num
+            let test_flag = regular_tel.test(tel_num)
+            if (!test_flag) {
+              this.error_label.phone = true
+              this.error_label.class.phone = 'form-control alert-danger'
+            } else {
+              this.error_label.phone = false
+              this.error_label.class.phone = 'form-control alert-info'
+            }
+          } else {
+            this.error_label.phone = false
+            this.error_label.class.phone = 'form-control'
+          }
+          // /Phone validate
+        } else if (param === 'email') {
+          // Email validate
+          if (this.content_obj.corp_email !== '') {
+            if (this.$validator.errors.has('org_email')) {
+              this.error_label.email = true
+              this.error_label.class.email = 'form-control alert-danger'
+            } else {
+              this.error_label.email = false
+              this.error_label.class.email = 'form-control alert-info'
+            }
+          } else {
+            this.error_label.email = false
+            this.error_label.class.email = 'form-control'
+          }
+        } else if (param === 'name') {
+          // Org name validate
+          if (this.content_obj.corp_name === '') {
+            this.error_label.name = true
+            this.error_label.class.name = 'form-control alert-danger'
+          } else {
+            this.error_label.name = false
+            this.error_label.class.name = 'form-control alert-info'
+          }
+        }
+      },
       refresh_organization() {
         this.page_id = this.$route.params.company_id * 1
 

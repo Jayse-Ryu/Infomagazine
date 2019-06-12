@@ -14,9 +14,9 @@ export default new Vuex.Store({
     // authUser: {},
     isAuthenticated: false,
     endpoints: {
-      obtainJWT: 'http://localhost/api/auth/',
-      refreshJWT: 'http://localhost/api/auth/refresh/',
-      baseUrl: 'http://localhost/api/'
+      obtainJWT: 'http://localhost/api/v1/auth/',
+      refreshJWT: 'http://localhost/api/v1/auth/refresh/',
+      baseUrl: 'http://localhost/api/v1/'
     },
     pageOptions: {
       loading: false,
