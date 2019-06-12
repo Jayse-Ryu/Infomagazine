@@ -1,30 +1,83 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from infomagazine import permissions as custom_permissions
 from user.models import User
-from user.serializers import UserSerializer, UserCreateSerializer
+from user.serializers import UserSerializer, CreateClientSerializer
 
 
-# https://gist.github.com/codephillip/03ff3831d0ada36663bed0cc7c4bba0b
-class UserListCreateAPIView(generics.ListCreateAPIView):
+class UserViewSets(viewsets.ModelViewSet):
     queryset = User.objects.all()
-
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return UserSerializer
-        return UserCreateSerializer
+    serializer_class = UserSerializer
 
     def get_permissions(self):
         if self.request.method == 'POST':
-            get_qs = self.request.query_params.dict()
-            if 'register_type' in get_qs:
-                return [custom_permissions.IsMarketer(), ]
             return [permissions.AllowAny()]
-        return [permissions.IsAuthenticated()]
+        elif self.request.method == 'PATCH':
+            return [permissions.IsAuthenticated()]
+        return [permissions.IsAdminUser()]
 
+    def get_serializer_context(self):
+        context = {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
 
-class UserRetrieveUpdate(generics.RetrieveUpdateAPIView):
-    """ Retrieve a user or update user information.
-    Accepts GET and PUT requests and the record id must be provided in the request """
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+        if self.action not in ['create', 'create_client', 'list'] and 'pk' in self.kwargs:
+            context.update({'pk': self.kwargs['pk']})
+
+        return context
+
+    @action(detail=False, methods=['POST'], permission_classes=[custom_permissions.IsMarketer])
+    def create_client(self, request):
+        serializer = CreateClientSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    # @action()
+    # def test(self,request):
+
+#
+# class UserRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
+#     """ Retrieve a user or update user information.
+#     Accepts GET and PUT requests and the record id must be provided in the request """
+#
+#     def get_queryset(self):
+#         queryset = User.objects.get(pk=self.request.user.id)
+#         return queryset
+#
+#     def get_serializer_class(self):
+#         if self.request.method == 'PATCH':
+#             get_qs = self.request.query_params.dict()
+#             if 'fields' in get_qs:
+#                 return UserOrganizationSerializer
+#         return UserSerializer
+#
+#     def get_permissions(self):
+#         if self.request.method == 'PATCH':
+#             get_qs = self.request.query_params.dict()
+#             if 'fields' in get_qs:
+#                 return [custom_permissions.IsOnlyGuest(), permissions.IsAdminUser()]
+#         return [permissions.IsAuthenticated()]
+#
+#     def check_permissions(self, request):
+#         """
+#         Check if the request should be permitted.
+#         Raises an appropriate exception if the request is not permitted.
+#         """
+#         check_permission = False
+#         permission = None
+#         for permission in self.get_permissions():
+#             if permission.has_permission(request, self):
+#                 check_permission = True
+#             else:
+#                 permission = permission
+#
+#         if not check_permission:
+#             self.permission_denied(
+#                 request, message=getattr(permission, 'message', None)
+#             )

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'rest_framework_swagger',
+    'django_filters',
 
     # Personal Apps
     'user',
@@ -78,6 +79,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10
@@ -119,8 +123,8 @@ CORS_ORIGIN_WHITELIST = tuple(config('CORS_ORIGIN_WHITELIST', cast=Csv()))
 
 # CSRF_TRUSTED_ORIGINS = tuple(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
 
-LOGIN_URL = '/api/admin/login/'
-LOGOUT_URL = '/api/admin/logout/'
+LOGIN_URL = '/admin/login/'
+LOGOUT_URL = '/admin/logout/'
 
 # Changes the built-in user model to mine
 AUTH_USER_MODEL = 'user.User'

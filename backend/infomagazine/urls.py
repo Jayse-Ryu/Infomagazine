@@ -16,16 +16,25 @@ Including another URLconf
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
+from company.views import CompanyViewSets
 from infomagazine.views import custom_token_obtain_sliding, custom_token_refresh_sliding
+from organization.views import OrganizationViewSets
+from user.views import UserViewSets
 
 api_patterns = ([
                     path('auth/', custom_token_obtain_sliding, name='token_obtain_sliding'),
                     path('auth/refresh/', custom_token_refresh_sliding, name='token_refresh_sliding'),
-                    path('user/', include('user.urls', namespace='user')),
-                    path('organization/', include('organization.urls', namespace='organization')),
-                    path('company/', include('company.urls', namespace='company')),
+                    # path('organizations/', include('organization.urls', namespace='organizations')),
+                    # path('companies/', include('company.urls', namespace='companies')),
                 ], 'v1')
+
+router = DefaultRouter()
+router.register(r'users', UserViewSets, basename='users')
+router.register(r'organizations', OrganizationViewSets, basename='organizations')
+router.register(r'companies', CompanyViewSets, basename='companies')
+api_patterns[0].extend(router.urls)
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
@@ -40,5 +49,8 @@ if settings.DEBUG:
 
     urlpatterns.extend([
         path('silk/', include(urls, namespace='silk')),
+    ])
+
+    api_patterns[0].extend([
         path('swagger/', schema_view, name='swagger'),
     ])

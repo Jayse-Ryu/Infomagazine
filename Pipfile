@@ -20,6 +20,7 @@ django-enumfield = "*"
 django-rest-swagger = "*"
 djangorestframework-simplejwt = "*"
 djangorestframework-jwt = "*"
+django-filter = "*"
 
 [requires]
 python_version = "3.7"

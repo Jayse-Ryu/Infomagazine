@@ -1,5 +1,6 @@
-from django.forms import model_to_dict
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
+from rest_framework.utils import model_meta
 
 from company.models import Company
 from user.models import User, UserInfo, AccessRole
@@ -44,38 +45,18 @@ from user.models import User, UserInfo, AccessRole
 #                 },
 #         }
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'email', 'password', 'username',)
-
-        extra_kwargs = {
-            'password':
-                {
-                    'write_only': True
-                },
-        }
-
-
-class UserInfoCreateSerializer(serializers.ModelSerializer):
+class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserInfo
-        fields = ('phone_num',)
+        fields = ('access_role', 'phone_num', 'organization',)
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
-    """ A serializer class for the User model """
-
-    info = UserInfoCreateSerializer()
+class UserSerializer(serializers.ModelSerializer):
+    info = UserInfoSerializer()
 
     class Meta:
-        # Specify the model we are using
         model = User
-        # Specify the fields that should be made accessible.
-        # Mostly it is all fields in that modesl
-        # fields = ('email', 'password', 'username', 'phone_num',)
-        fields = ('email', 'password', 'username', 'info',)
-        # related_fields = ['info']
+        fields = ('id', 'email', 'password', 'username', 'info',)
 
         extra_kwargs = {
             'password':
@@ -84,25 +65,80 @@ class UserCreateSerializer(serializers.ModelSerializer):
                 },
         }
 
-    # phone_num = serializers.CharField(source='info.phone_num')
+    def validate(self, data):
+        """
+        1. 다른 유저의 정보는 수정할 수 없다.
+        2. 관리자는 제외
+        """
+        pk = self.context['pk']
+        request = self.context['request']
+        if not request.user.is_staff:
+            if pk != request:
+                raise serializers.ValidationError("You can only edit your information.")
+        return data
+
+    def create(self, validated_data):
+        user = User(
+            email=validated_data['email'],
+            username=validated_data['username']
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+
+        user_info_column = {
+            'phone_num': validated_data['info']['phone_num']
+        }
+        UserInfo.objects.create(user=user, **user_info_column)
+
+        return user
+
+    def update(self, user_instance, validated_data):
+        info = model_meta.get_field_info(user_instance)
+
+        for attr, value in validated_data.items():
+            if attr in info.relations:
+                field = getattr(user_instance, attr)
+                if info.relations[attr].to_many:
+                    field.set(value)
+                else:
+                    for ono_attr, ono_value in value.items():
+                        setattr(field, ono_attr, ono_value)
+                    field.save()
+            else:
+                setattr(user_instance, attr, value)
+
+        user_instance.save()
+
+        return user_instance
+
+
+class CreateClientSerializer(UserSerializer):
+    info = UserInfoSerializer()
+    company_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'password', 'username', 'info', 'company_id',)
+
+        extra_kwargs = {
+            'password':
+                {
+                    'write_only': True
+                }
+        }
 
     def validate(self, data):
         """
         1. register_type이 company일 경우 반드시 company_id를 설정해야만 한다.
         2. 해당 company가 존재해야 한다.
         """
-        request = self.context['request']
-        get_qs = request.query_params.dict()
-        if 'register_type' in get_qs:
-            register_type = get_qs.pop('register_type')
-            if register_type == 'company':
-                if 'company_id' not in get_qs:
-                    raise serializers.ValidationError("You must set 'company_id'.")
-                else:
-                    company_id = get_qs.pop('company_id')
-                    company_check = Company.objects.filter(id=company_id)
-                    if not company_check.exists():
-                        raise serializers.ValidationError("The company does not exist.")
+        if 'company_id' not in data:
+            raise serializers.ValidationError("You must set 'company_id' in payload.")
+        else:
+            company_id = data['company_id']
+            company_check = Company.objects.filter(id=company_id)
+            if not company_check.exists():
+                raise serializers.ValidationError("The company does not exist.")
         return data
 
     def create(self, validated_data):
@@ -117,18 +153,17 @@ class UserCreateSerializer(serializers.ModelSerializer):
             'user': user,
             'phone_num': validated_data['info']['phone_num']
         }
-
         request = self.context['request']
-        get_qs = request.query_params.dict()
-        if 'register_type' in get_qs:
-            register_type = get_qs.pop('register_type')
-            if register_type == 'company':
-                user_info_column.update({'access_role': AccessRole.CLIENT,
-                                         'organization': request.user.info.organization})
-                company_id = get_qs.pop('company_id')
-                company = Company.objects.get(id=company_id)
-                company.users.add(user)
-
+        user_info_column.update({'access_role': AccessRole.CLIENT,
+                                 'organization': request.user.info.organization})
         UserInfo.objects.create(**user_info_column)
+
+        company_id = validated_data['company_id']
+        try:
+            company = Company.objects.get(id=company_id)
+            company.users.add(user)
+        except ObjectDoesNotExist as e:
+            user.delete()
+            raise serializers.ValidationError(e)
 
         return user

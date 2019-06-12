@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
@@ -11,7 +13,7 @@ class User(AbstractUser):
         db_table = 'user'
 
     email = models.EmailField(unique=True)
-    username = models.CharField(max_length=30, blank=True)
+    username = models.CharField(max_length=30)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
