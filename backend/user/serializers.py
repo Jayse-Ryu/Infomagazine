@@ -70,11 +70,13 @@ class UserSerializer(serializers.ModelSerializer):
         1. 다른 유저의 정보는 수정할 수 없다.
         2. 관리자는 제외
         """
-        pk = self.context['pk']
-        request = self.context['request']
-        if not request.user.is_staff:
-            if pk != request:
-                raise serializers.ValidationError("You can only edit your information.")
+
+        if 'pk' in self.context:
+            pk = self.context['pk']
+            request = self.context['request']
+            if not request.user.is_staff:
+                if pk != request:
+                    raise serializers.ValidationError("You can only edit your information.")
         return data
 
     def create(self, validated_data):
