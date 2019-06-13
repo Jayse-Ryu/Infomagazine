@@ -40,14 +40,15 @@ class UserViewSets(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    @action(detail=False, methods=['HEAD'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, methods=['GET'], permission_classes=[permissions.AllowAny])
     def email_check(self, request):
-        email = request.data['email']
-        email_check = User.objects.filter(email=email)
+        get_qs = request.query_params.dict()
+        email_check = User.objects.filter(email=get_qs['email'])
+        result = {'data': {'email_check': False}}
         if email_check.exists():
-            return Response(status=status.HTTP_409_CONFLICT)
-        else:
-            return Response(status=status.HTTP_200_OK)
+            setattr(result, 'data', {'email_check': True})
+
+        return Response(result, status=status.HTTP_200_OK)
 
     # @action()
     # def test(self,request):
