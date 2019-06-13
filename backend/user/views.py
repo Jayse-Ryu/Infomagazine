@@ -43,10 +43,22 @@ class UserViewSets(viewsets.ModelViewSet):
     @action(detail=False, methods=['GET'], permission_classes=[permissions.AllowAny])
     def email_check(self, request):
         get_qs = request.query_params.dict()
+        result = {
+            'state': False,
+            'data':
+                {
+                    'email_check': False
+                },
+            'message': 'fail'
+        }
+
+        if 'email' not in get_qs:
+            result['message'] = 'must set query string "email"'
         email_check = User.objects.filter(email=get_qs['email'])
-        result = {'data': {'email_check': False}}
+
         if email_check.exists():
-            setattr(result, 'data', {'email_check': True})
+            result['state'] = result['data']['email_check'] = True
+            result['message'] = 'success'
 
         return Response(result, status=status.HTTP_200_OK)
 
