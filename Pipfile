@@ -10,7 +10,6 @@ django-nose = "*"
 [packages]
 django = "*"
 python-decouple = "*"
-djangorestframework = "*"
 mysqlclient = "*"
 django-cors-headers = "*"
 django-storages = "*"
@@ -21,6 +20,7 @@ django-rest-swagger = "*"
 djangorestframework-simplejwt = "*"
 djangorestframework-jwt = "*"
 django-filter = "*"
+djangorestframework = "*"
 
 [requires]
 python_version = "3.7"
