@@ -1647,9 +1647,9 @@
           document.getElementById('company_id').focus()
         } else {
           this.company_flag = false
-          while (this.access_obj.user) {
-            if (this.access_obj.user) {
-              this.dynamo_obj.LandingInfo.landing.manager = this.access_obj.user
+          while (this.user_obj.id) {
+            if (this.user_obj.id) {
+              this.dynamo_obj.LandingInfo.landing.manager = this.user_obj.id
               if (this.epoch_time === 0) {
                 this.epoch_time = Date.now()
               }
@@ -1819,7 +1819,7 @@
         let this_url = 'landing/api/'
         this.auto_saved = []
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + this_url + '?auth=staff' + '&manager=' + this.access_obj.user_name + '&auto=true')
+        axios.get(this.$store.state.endpoints.baseUrl + this_url + '?auth=staff' + '&manager=' + this.user_obj.username + '&auto=true')
           .then((response) => {
             this.$store.state.pageOptions.loading = false
             let auto_flag = false
@@ -1906,7 +1906,7 @@
       this.auto_saved_get()
       // Get companies from logged in user's organization
       let this_url = 'company/'
-      axios.get(this.$store.state.endpoints.baseUrl + this_url + '?organization=' + this.access_obj.organization)
+      axios.get(this.$store.state.endpoints.baseUrl + this_url + '?organization=' + this.user_obj.organization)
         .then((response) => {
           this.landing_company = response.data.results
         })
@@ -1925,9 +1925,7 @@
           user_json = {
             'is_staff': false,
             'is_superuser': false,
-            'info': {
-              'access_role': 3
-            },
+            'access_role': 3,
             'failed': true
           }
         } else {

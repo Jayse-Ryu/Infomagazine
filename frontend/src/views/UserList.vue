@@ -42,7 +42,7 @@
             <div class="list-group-item  d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
                  style="border-radius: 0; border-bottom: 0; width:100%;">
               <!--<div class="col-1 p-0">번호</div>-->
-              <div class="col-3 p-0text-center">계정</div>
+              <div class="col-3 p-0text-center">이메일</div>
               <div class="col-3 p-0 text-center">이름</div>
               <div class="col-2 p-0 text-center">등급</div>
               <!--<div class="col-1 text-center">활성상태</div>-->
@@ -58,7 +58,7 @@
             </li>
 
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-                v-for="content in content_obj">
+                v-for="content in content_obj.slice().reverse()">
               <!--<div class="col-1 p-0">{{ content.id }}</div>-->
               <div class="col-3 p-0 text-center">
                 <router-link :to="'/users/detail/' + content.id">{{ content.email }}</router-link>
@@ -73,7 +73,7 @@
               <div v-if="user_obj.id == content.id" class="col-2 p-0 text-center">
                 <div class="badge badge-dark">본인</div>
               </div>
-              <div v-else-if="[0,1].includes(content.info.access_role)" class="col-2 p-0 text-center">
+              <!--<div v-else-if="[0,1].includes(content.info.access_role)" class="col-2 p-0 text-center">
                 <div class="badge badge-primary">마케터</div>
               </div>
               <div v-else-if="content.info.access_role == 3" class="col-2 p-0 text-center">
@@ -81,13 +81,18 @@
               </div>
               <div v-else-if="content.access == 2" class="col-2 p-0 text-center">
                 <div class="badge badge-success">고객</div>
+              </div>-->
+              <div v-else class="col-2 p-0 text-center">
+                <div class="badge badge-success">Nobody</div>
               </div>
 
-              <div v-if="content.info.phone_num" class="col-2 p-0 board_centre">
-                {{ content.info.phone_num }}
+              <div v-if="content.phone_num" class="col-2 p-0 board_centre">
+                {{ content.phone_num }}
               </div>
               <div v-else class="col-2 p-0 board_centre">없음</div>
-              <div class="col-2 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+
+              <div v-if="content.created_date" class="col-2 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+              <div v-else class="col-2 p-0 board_centre">정보 없음</div>
             </li>
 
           </ul>
@@ -109,7 +114,7 @@
               <div class="col-12 text-center">데이터가 존재하지 않습니다.</div>
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-                v-for="content in content_obj">
+                v-for="content in content_obj.slice().reverse()">
               <!--<div class="col-2 p-0">{{ content.user }}</div>-->
               <div class="col-3 p-0 text-center">
                 <router-link :to="'/users/detail/' + content.id">{{ content.email }}</router-link>
@@ -219,7 +224,7 @@
       },
       calling_all_unit(offset) {
         // Calling landings with new values
-        let auth_filter = ''
+        // let auth_filter = ''
         let search_param = ''
 
         // (For Pagination check)
@@ -244,22 +249,22 @@
           search_param = '&name=' + this.search_text
         }
 
-        if (this.user_obj.is_staff || this.user_obj.is_superuser) {
-          console.log('Staff user - Get All')
-          auth_filter = '?true'
-        } else if (this.user_obj.info.access_role == '0' || this.user_obj.info.access_role == '1') {
-          console.log('Marketer user - Get only Org')
-          auth_filter = '?organization=' + this.user_obj.info.organization
-        } else if (this.user_obj.info.access_role == '2') {
-          console.log('load about com - Get only Com')
-          auth_filter = '?company=' + this.user_obj.info.company
-        }
+        // if (this.user_obj.is_staff || this.user_obj.is_superuser) {
+        //   console.log('Staff user - Get All')
+        //   auth_filter = '?true'
+        // } else if (this.user_obj.info.access_role == '0' || this.user_obj.info.access_role == '1') {
+        //   console.log('Marketer user - Get only Org')
+        //   auth_filter = '?organization=' + this.user_obj.info.organization
+        // } else if (this.user_obj.info.access_role == '2') {
+        //   console.log('load about com - Get only Com')
+        //   auth_filter = '?company=' + this.user_obj.info.company
+        // }
 
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'user/list/' + auth_filter + search_param)
+        axios.get(this.$store.state.endpoints.baseUrl + 'users/' + search_param)
           .then((response) => {
             this.$store.state.pageOptions.loading = false
-            this.content_obj = response.data.results
+            this.content_obj = response.data.data.results
           })
           .catch((error) => {
             this.$store.state.pageOptions.loading = false

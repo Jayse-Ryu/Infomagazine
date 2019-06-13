@@ -61,7 +61,6 @@
 </template>
 
 <script>
-  import Decoder from 'jwt-decode'
   export default {
     name: 'sign_in',
     data: () => ({

@@ -51,11 +51,11 @@
         </div>
         <!-- /Staff area -->
 
-        <!-- User area -->
-        <div v-else class="collapse navbar-collapse" id="navbarCollapse">
+        <!-- Not staff User area -->
+        <div v-else-if="user_obj && !user_obj.is_staff && !user_obj.is_superuser" class="collapse navbar-collapse" id="navbarCollapse">
 
-          <!-- user access is marketer -->
-          <ul v-if="user_obj && user_obj.access_role == 0 || user_obj.access_role == 1"
+          <!-- user is marketer. 0 owner / 1 marketer -->
+          <ul v-if="[0,1].includes(user_obj.access_role)"
               class="navbar-nav ml-auto">
             <li class="navbar-item">
               <router-link to="/landing">
@@ -84,7 +84,7 @@
           <!-- / -->
 
           <!-- user access is client -->
-          <ul v-if="user_obj && user_obj.access_role == 2" class="navbar-nav ml-auto">
+          <ul v-if="user_obj.access_role == 2" class="navbar-nav ml-auto">
             <li class="navbar-item">
               <router-link to="/landing">
                 <div class="nav-link text-center">랜딩페이지</div>
@@ -102,7 +102,7 @@
           <!-- / -->
 
           <!-- user access is guest -->
-          <ul v-if="user_obj && user_obj.access_role == 3" class="navbar-nav ml-auto">
+          <ul v-if="user_obj.access_role == 3" class="navbar-nav ml-auto">
             <li class="navbar-item">
               <router-link to="/gateway">
                 <div class="nav-link text-center">홈페이지</div>
@@ -120,7 +120,7 @@
           <!-- / -->
 
           <!-- If user access is none -->
-          <ul v-else class="navbar-nav ml-auto">
+          <ul v-else-if="user_obj.failed" class="navbar-nav ml-auto">
             <li class="navbar-item">
               <router-link to="/">
                 <div class="nav-link text-center">로그인</div>
@@ -198,7 +198,15 @@
         let user_json = {}
 
         if (!local_user) {
-          user_json = {'is_staff': false, 'is_superuser': false, 'info': {'access_role': 3}}
+          user_json = {
+            'is_staff': false,
+            'is_superuser': false,
+            'info':
+              {
+                'access_role': 3
+              },
+            'failed': true
+          }
         } else {
           user_json = JSON.parse(local_user)
         }

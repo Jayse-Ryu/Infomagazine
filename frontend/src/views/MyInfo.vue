@@ -68,7 +68,7 @@
             <div v-if="content_obj.date_joined" type="text" id="my_join" class="form-control border-0">
               {{ (content_obj.date_joined).substring(0, 10) }}
             </div>
-            <div v-else type="text" class="form-control border-0">Loading..</div>
+            <div v-else type="text" class="form-control border-0">정보 없음</div>
           </div>
 
         </div>
@@ -124,7 +124,14 @@
       }
     }),
     mounted() {
-      this.content_obj = this.user_obj
+      // this.content_obj = this.user_obj
+      this.$store.state.pageOptions.loading = true
+      axios.get(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id)
+        .then((response) => {
+          console.log('mounted response is ', response)
+          this.content_obj = response.data.data
+          this.$store.state.pageOptions.loading = false
+        })
     },
     methods: {
       page_init() {
@@ -208,8 +215,9 @@
         // Are you sure?
         if (confirm('정보를 수정하시겠습니까?')) {
           this.$store.state.pageOptions.loading = true
-          axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + this.user_obj.id + '/', this.content_obj)
-            .then(() => {
+          axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id + '/', this.content_obj)
+            .then((response) => {
+              console.log('user patch response?', response)
               // alert('수정되었습니다. 다시 로그인 하세요.')
               // this.$store.commit('removeToken')
               // this.$router.currentRoute.meta.protect_leave = 'no'
@@ -249,7 +257,7 @@
         if (confirm('정말 탈퇴하시겠습니까?')) {
           if (this.user_obj.id) {
             let axios = this.$axios
-            axios.delete(this.$store.state.endpoints.baseUrl + 'user/' + this.user_obj.id + '/')
+            axios.delete(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id + '/')
               .then(() => {
                 // Calculation for page_max
                 alert('탈퇴되었습니다.')

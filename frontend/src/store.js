@@ -69,6 +69,8 @@ export default new Vuex.Store({
     obtainToken(self, data) {
       const decoded = Decoder(data.token)
 
+      console.log('obtain decoded token', decoded)
+
       const user = {
         id: decoded.user_id,
         email: decoded.email,

@@ -304,21 +304,26 @@
       }
 
       // Get Company by page_id
-      axios.get(this.$store.state.endpoints.baseUrl + 'company/' + this.page_id)
+                  this.$store.state.pageOptions.loading = true
+      axios.get(this.$store.state.endpoints.baseUrl + 'companies/' + this.page_id)
         .then((response) => {
           console.log('company response is? ', response)
-          this.content_obj = response.data
-          return axios.get(this.$store.state.endpoints.baseUrl + 'user/list/' + this.page_id)
+          this.content_obj = response.data.data
+          this.$store.state.pageOptions.loading = false
+          return axios.get(this.$store.state.endpoints.baseUrl + 'user/?company_id=' + this.page_id)
         })
         .catch((error) => {
           console.log('Mount Get company error', error)
+          this.$store.state.pageOptions.loading = false
         })
 
         .then((response) => {
           this.user_list = response.data.results
+          this.$store.state.pageOptions.loading = false
         })
         .catch((error) => {
           console.log('Mount Get user list error', error)
+          this.$store.state.pageOptions.loading = false
         })
     },
     methods: {
@@ -377,11 +382,9 @@
           })
         }
         // get object
-        let axios = this.$axios
-        let this_url = 'company/'
 
         // Get Company by page_id
-        axios.get(this.$store.state.endpoints.baseUrl + this_url + this.page_id)
+        axios.get(this.$store.state.endpoints.baseUrl + 'companies/' + this.page_id)
           .then((response) => {
             this.content_obj = response.data
             this.original_manager = response.data.manager
@@ -420,7 +423,7 @@
       patch_organization() {
         // Create an organization myself
         let axios = this.$axios
-        let this_url = 'company/'
+        let this_url = 'companies/'
         let formData = new FormData()
         formData.append('name', this.content_obj.name)
         formData.append('manager', this.content_obj.manager)
@@ -463,9 +466,8 @@
       calling_all_unit(page) {
         // Calling landings with new values
         let axios = this.$axios
-        let this_url = 'user_access/'
         let offset = page
-        axios.get(this.$store.state.endpoints.baseUrl + this_url + '?offset=' + offset + '&' + 'company' + '=' + this.$route.params.company_id * 1)
+        axios.get(this.$store.state.endpoints.baseUrl + 'user/' + '?offset=' + offset + '&' + 'company' + '=' + this.$route.params.company_id * 1)
           .then((response) => {
             // Calculation for page_max
             if (response.data.count % this.page_chunk === 0) {
@@ -483,14 +485,13 @@
       promote(option, user) {
         // head:he me:me demote:de promote:pr
         let axios = this.$axios
-        let this_url = 'user_access/'
         if (option == 'he') {
         } else if (option == 'me') {
         } else if (option == 'pr') {
           if (confirm('가입을 승인하시겠습니까?')) {
             let formData = new FormData()
             formData.append('access', '2')
-            axios.patch(this.$store.state.endpoints.baseUrl + this_url + user + '/', formData)
+            axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + user + '/', formData)
               .then((response) => {
                 alert('유저의 가입이 승인되었습니다.')
                 this.calling_all_unit()

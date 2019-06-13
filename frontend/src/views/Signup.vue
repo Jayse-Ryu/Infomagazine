@@ -188,20 +188,14 @@
           // Duplicated function has to add
           if (this.content_obj.email !== '') {
             // If email is not empty
-            let users = []
-            // Temporary event!!
-            axios.get(this.$store.state.endpoints.baseUrl + 'user/')
+            axios.get(this.$store.state.endpoints.baseUrl + 'users/email_check/?email=' + this.content_obj.email)
               .then((response) => {
-
-                users = response.data.results
                 let email_flag = false
 
-                if (users.length !== 0) {
-                  for (let i = 0; i < users.length; i++) {
-                    if (users[i].email == this.content_obj.email) {
-                      email_flag = true
-                    }
-                  }
+                if (response.data.data.email_check == true) {
+                  email_flag = true
+                } else {
+                  email_flag = false
                 }
 
                 this.error_label.email = email_flag
@@ -213,12 +207,10 @@
                   // Nor both are clear
                   this.error_label.class.email = 'form-control alert-info'
                 }
-
               })
               .catch((error) => {
                 console.log('Email check axios failed', error)
               })
-
           } else {
             // If email is empty
             this.error_label.email = false
@@ -262,7 +254,7 @@
         }
         this.$store.state.pageOptions.loading = true
         /* Do axios post */
-        axios.post(this.$store.state.endpoints.baseUrl + 'user/', this.content_obj, config)
+        axios.post(this.$store.state.endpoints.baseUrl + 'users/', this.content_obj, config)
           .then(() => {
             alert('회원가입 되었습니다.')
             this.$store.state.pageOptions.loading = false

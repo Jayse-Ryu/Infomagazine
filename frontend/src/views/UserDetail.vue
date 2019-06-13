@@ -28,8 +28,8 @@
 
         <label for="user_phone" class="col-form-label-sm col-sm-3 mt-3">연락처</label>
         <div class="col-sm-9 mt-sm-3">
-          <div v-if="content_obj.phone_num" class="form-control" id="user_phone">
-            {{ content_obj.phone_num }}
+          <div v-if="content_obj.info.phone_num" class="form-control" id="user_phone">
+            {{ content_obj.info.phone_num }}
           </div>
           <div v-else class="form-control">없음</div>
         </div>
@@ -42,25 +42,19 @@
         <!-- Grade handler -->
         <label for="user_access" class="col-form-label-sm col-sm-3 mt-3">등급</label>
         <div class="col-sm-9 mt-sm-3 justify-content-between">
-          <div v-if="content_obj.info.access_role == 1">
+
+          <div v-if="[0,1].includes(content_obj.info.access_role)">
             <div class="form-control border-0 p-0" id="user_access">
               <div class="badge alert alert-primary">마케터</div>
-              <button v-if="content_obj.user !== user_obj.id && !more_info.is_staff" type="button"
+              <button v-if="content_obj.id !== user_obj.id && user_obj.is_staff || user_obj.is_superuser" type="button"
                       class="btn btn-outline-danger" @click.prevent="grade_set(-1)">강등
               </button>
+              <div v-else-if="content_obj.id == user_obj.id" class="btn btn-primary disabled">본인</div>
               <div v-else class="btn btn-secondary disabled">변경 권한없음</div>
             </div>
           </div>
-          <div v-else-if="content_obj.access == -1">
-            <div class="form-control border-0 p-0" id="user_access">
-              <div class="badge alert alert-danger">미인증 마케터</div>
-              <button v-if="content_obj.user !== user_obj.id && !more_info.is_staff" type="button"
-                      class="btn btn-outline-primary" @click.prevent="grade_set(1)">승인
-              </button>
-              <div v-else class="btn btn-secondary disabled">변경 권한없음</div>
-            </div>
-          </div>
-          <div v-else-if="content_obj.access == 2">
+
+          <div v-else-if="content_obj.info.access_role == 2">
             <div class="form-control border-0 p-0" id="user_access">
               <div class="badge alert alert-success">고객</div>
               <button v-if="content_obj.user !== user_obj.id" type="button" class="btn btn-outline-danger"
@@ -69,7 +63,18 @@
               <div v-else class="btn btn-secondary disabled">변경 권한없음</div>
             </div>
           </div>
-          <div v-else-if="content_obj.access == -2">
+
+          <div v-else-if="content_obj.info.access_role == 3">
+            <div class="form-control border-0 p-0" id="user_access">
+              <div class="badge alert alert-danger">미인증 마케터</div>
+              <button v-if="user_obj.is_staff || user_obj.is_superuser" type="button"
+                      class="btn btn-outline-primary" @click.prevent="grade_set(1)">승인
+              </button>
+              <div v-else class="btn btn-secondary disabled">변경 권한없음</div>
+            </div>
+          </div>
+
+          <!--<div v-else-if="content_obj.access == -2">
             <div class="form-control border-0 p-0" id="user_access">
               <div class="badge alert alert-danger">미인증 고객</div>
               <button v-if="content_obj.user !== user_obj.id" type="button" class="btn btn-outline-success"
@@ -77,7 +82,8 @@
               </button>
               <div v-else class="btn btn-secondary disabled">변경 권한없음</div>
             </div>
-          </div>
+          </div>-->
+
         </div>
 
         <label v-if="content_obj.organization" for="user_companion" class="col-form-label-sm col-sm-3 mt-3">소속</label>
@@ -181,53 +187,37 @@
 <script>
   export default {
     name: "user_detail",
-    // created() {
-    //   if (this.user_obj.id == this.$route.params.user_id) {
-    //     // How to give before paramater to next? //
-    //     // this.$router.currentRoute.meta.protect_leave = 'no'
-    //     this.$router.before
-    //     this.$router.push({
-    //       name: 'my_info'
-    //     })
-    //   }
-    // },
     data: () => ({
-      content_obj: [],
+      content_obj: {
+        username: '',
+        email: '',
+        info: {
+          phone_num: ''
+        }
+      },
       more_info: []
     }),
     mounted() {
       if (this.$route.params.user_id) {
-        axios.get(this.$store.state.endpoints.baseUrl + 'user/' + this.$route.params.user_id + '/')
+        this.$store.state.pageOptions.loading = true
+        axios.get(this.$store.state.endpoints.baseUrl + 'users/' + this.$route.params.user_id + '/')
           .then((response) => {
-            this.content_obj = response.data
-            this_url = 'user/'
-            return axios.get(this.$store.state.endpoints.baseUrl + this_url + this.$route.params.user_id + '/')
-          })
-          .then((response) => {
-            let res = response.data
-            delete res.password
-            this.more_info = res
+            console.log('user response?', response.data.data)
+            this.content_obj = response.data.data
+            this.$store.state.pageOptions.loading = false
           })
           .catch((error) => {
             console.log(error)
+            this.$store.state.pageOptions.loading = false
           })
       }
     },
     methods: {
       set_refresh() {
-        let axios = this.$axios
-        let this_url = 'user_access/'
         if (this.$route.params.user_id) {
-          axios.get(this.$store.state.endpoints.baseUrl + this_url + this.$route.params.user_id + '/')
+          axios.get(this.$store.state.endpoints.baseUrl + 'users/' + this.$route.params.user_id + '/')
             .then((response) => {
               this.content_obj = response.data
-              this_url = 'user/'
-              return axios.get(this.$store.state.endpoints.baseUrl + this_url + this.$route.params.user_id + '/')
-            })
-            .then((response) => {
-              let res = response.data
-              delete res.password
-              this.more_info = res
             })
             .catch((error) => {
               console.log(error)
@@ -235,12 +225,10 @@
         }
       },
       grade_set(option) {
-        let axios = this.$axios
-        let this_url = 'user_access/'
         let formData = new FormData()
-        if(confirm('유저등급을 변경하시겠습니까?')) {
+        if (confirm('유저등급을 변경하시겠습니까?')) {
           formData.append('access', option)
-          axios.patch(this.$store.state.endpoints.baseUrl + this_url + this.more_info.id + '/', formData)
+          axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.more_info.id + '/', formData)
             .then(() => {
               this.set_refresh()
             })
@@ -251,13 +239,11 @@
         }
       },
       staff_set(option) {
-        let axios = this.$axios
-        let this_url = 'user/'
         let formData = new FormData()
         if (option == 'promote') {
           if (confirm('이 유저를 운영자로 승급 시키시겠습니까?')) {
             formData.append('is_staff', '1')
-            axios.patch(this.$store.state.endpoints.baseUrl + this_url + this.more_info.id + '/', formData)
+            axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.more_info.id + '/', formData)
               .then(() => {
                 this.set_refresh()
               })
@@ -269,7 +255,7 @@
         } else if (option == 'demote') {
           if (confirm('이 유저를 일반 유저로 강등 시키시겠습니까?')) {
             formData.append('is_staff', '0')
-            axios.patch(this.$store.state.endpoints.baseUrl + this_url + this.more_info.id + '/', formData)
+            axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.more_info.id + '/', formData)
               .then(() => {
                 this.set_refresh()
               })
@@ -282,7 +268,7 @@
       },
       user_stall(option) {
         let axios = this.$axios
-        let this_url = 'user/'
+        let this_url = 'users/'
         let formData = new FormData()
         if (option == 'stall') {
           formData.append('is_active', '0')
@@ -306,7 +292,7 @@
       },
       user_delete() {
         if (confirm('이 유저를 정말 삭제하시겠습니까?')) {
-          axios.delete(this.$store.state.endpoints.baseUrl + 'user/' + this.more_info.id)
+          axios.delete(this.$store.state.endpoints.baseUrl + 'users/' + this.more_info.id)
             .then(() => {
               alert('삭제되었습니다.')
               this.$router.push({
@@ -339,6 +325,9 @@
             'is_staff': false,
             'is_superuser': false,
             'access_role': 3,
+            'info': {
+              'phone_num': ''
+            },
             'failed': true
           }
         } else {

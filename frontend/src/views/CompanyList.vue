@@ -50,7 +50,7 @@
               <div class="col-12 p-0 text-center">데이터가 존재하지 않습니다.</div>
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-                v-for="content in content_obj">
+                v-for="content in content_obj.slice().reverse()">
               <div class="col-1 p-0">{{ content.id }}</div>
               <div class="col-3 p-0">
                 <router-link :to="'/company/detail/' + content.id">{{ content.corp_name }}</router-link>
@@ -82,7 +82,7 @@
               <div class="col-12 p-0 text-center">데이터가 존재하지 않습니다.</div>
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-                v-for="content in content_obj">
+                v-for="content in content_obj.slice().reverse()">
               <div class="col-2 p-0">{{ content.id }}</div>
               <div class="col-3 p-0">
                 <router-link :to="'/company/detail/' + content.id">{{ content.corp_name }}</router-link>
@@ -225,11 +225,10 @@
         // }
 
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'company/' + search_param)
+        axios.get(this.$store.state.endpoints.baseUrl + 'companies/' + search_param)
           .then((response) => {
             this.$store.state.pageOptions.loading = false
-            console.log('get landing response', response)
-            this.content_obj = response.data.results
+            this.content_obj = response.data.data.results
           })
           .catch((error) => {
             this.$store.state.pageOptions.loading = false

@@ -234,7 +234,7 @@
       },
       calling_all_unit(offset) {
         // Calling landings with new values
-        let auth_filter = ''
+        // let auth_filter = ''
         let search_param = ''
 
         // (For Pagination check)
@@ -263,19 +263,19 @@
           search_param = '&marketer=' + this.search_text
         }
 
-        if (this.user_obj.is_staff || this.user_obj.is_superuser) {
-          console.log('Staff user - Get All')
-          auth_filter = '?true'
-        } else if (this.user_obj.access_role == '0' || this.user_obj.access_role == '1') {
-          console.log('Marketer user - Get only Org')
-          auth_filter = '?organization=' + this.user_obj.organization
-        } else if (this.user_obj.access_role == '2') {
-          console.log('load about com - Get only Com')
-          auth_filter = '?company=' + this.user_obj.company
-        }
+        // if (this.user_obj.is_staff || this.user_obj.is_superuser) {
+        //   console.log('Staff user - Get All')
+        //   auth_filter = '?true'
+        // } else if (this.user_obj.access_role == '0' || this.user_obj.access_role == '1') {
+        //   console.log('Marketer user - Get only Org')
+        //   auth_filter = '?organization=' + this.user_obj.organization
+        // } else if (this.user_obj.access_role == '2') {
+        //   console.log('load about com - Get only Com')
+        //   auth_filter = '?company=' + this.user_obj.company
+        // }
 
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'landing/list/' + auth_filter + search_param)
+        axios.get(this.$store.state.endpoints.baseUrl + 'landing/' + search_param)
           .then((response) => {
             this.$store.state.pageOptions.loading = false
             console.log('get landing response', response)

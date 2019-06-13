@@ -56,7 +56,7 @@
       }
 
       // Get organization!
-      axios.get(this.$store.state.endpoints.baseUrl + 'organization/')
+      axios.get(this.$store.state.endpoints.baseUrl + 'organizations/')
         .then((response) => {
           this.organization_list = response.data.results
         })
@@ -69,9 +69,9 @@
         if (!this.user_obj.failed) {
           if (this.user_obj.is_staff || this.user_obj.is_superuser) {
             // // Staff, Superuser push to landing list page
-            // this.$router.push({
-            //   name: 'landing_list'
-            // })
+            this.$router.push({
+              name: 'landing_list'
+            })
           } else if (this.user_obj.access_role == 0 || this.user_obj.access_role == 1) {
             // Marketer but already got access from staff.
             this.$router.push({
@@ -94,7 +94,7 @@
 
           // // Update actual user
           // axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + this.user_obj.id + '/', form)
-          axios.patch(this.$store.state.endpoints.baseUrl + 'user/?update_type=organization&organization_id=' + this.org_selected)
+          axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.org_selected + '?organization')
             .then((response) => {
               console.log('updated?', response.data)
             })

@@ -61,7 +61,7 @@
                   {{ content.org_sub_name }}
                 </router-link>
               </div>
-              <div class="col-2 p-0">{{ content.org_manager_name }}</div>
+              <div class="col-2 p-0">{{ content.org_manage_email }}</div>
               <div v-if="content.org_tel_num" class="col-2 p-0">{{ content.org_tel_num }}</div>
               <div v-else-if="content.org_email" class="col-2 p-0">{{ content.org_email }}</div>
               <div v-else class="col-2 p-0">없음</div>
@@ -250,10 +250,10 @@
         }
 
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + search_param)
+        axios.get(this.$store.state.endpoints.baseUrl + 'organizations/' + search_param)
           .then((response) => {
             this.$store.state.pageOptions.loading = false
-            this.content_obj = response.data.results
+            this.content_obj = response.data.data.results
           })
           .catch((error) => {
             this.$store.state.pageOptions.loading = false

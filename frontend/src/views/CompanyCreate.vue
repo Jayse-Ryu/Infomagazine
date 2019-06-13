@@ -166,9 +166,9 @@
     mounted() {
       // Get organization for admin users set org themselves
       if (this.user_obj.is_staff || this.user_obj.is_superuser) {
-        axios.get(this.$store.state.endpoints.baseUrl + 'organization/')
+        axios.get(this.$store.state.endpoints.baseUrl + 'organizations/')
           .then((response) => {
-            this.organization_list = response.data.results
+            this.organization_list = response.data.data.results
           })
           .catch((error) => {
             console.log('Staff get organization is failed', error)
@@ -183,10 +183,10 @@
         if (param === 'phone') {
           // Phone validate
           console.log('param is phone')
-          if (this.create_obj.corp_tel_num !== '') {
+          if (this.create_obj.corp_num !== '') {
             // Allow mobile phone, internet wireless only
             let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
-            let tel_num = this.content_obj.corp_num
+            let tel_num = this.create_obj.corp_num
             let test_flag = regular_tel.test(tel_num)
             if (!test_flag) {
               this.error_label.corp_tel_num = true
@@ -215,7 +215,7 @@
             this.error_label.class.email = 'form-control'
           }
         } else if (param === 'name') {
-          axios.get(this.$store.state.endpoints.baseUrl + 'company/')
+          axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
             .then((response) => {
               let duplicated = false
               for (let i = 0; i < response.data.results.length; i++) {
@@ -259,7 +259,7 @@
         this.$validator.validateAll()
         if (confirm('업체를 생성하시겠습니까?')) {
           this.$store.state.pageOptions.loading = true
-          axios.post(this.$store.state.endpoints.baseUrl + 'company/', this.create_obj)
+          axios.post(this.$store.state.endpoints.baseUrl + 'companies/', this.create_obj)
             .then(() => {
               alert('업체가 생성되었습니다.')
               this.$store.state.pageOptions.loading = false

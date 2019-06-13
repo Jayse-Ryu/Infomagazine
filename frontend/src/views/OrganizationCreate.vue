@@ -146,20 +146,31 @@
         org_crn: '',
         org_tel_num: '',
         org_email: '',
-        org_desc: ''
+        org_desc: '',
+        org_manager: 0
       },
       marketer_list: []
     }),
     mounted() {
       // Get marketer users for set as a manager
-      axios.get(this.$store.state.endpoints.baseUrl + 'user/')
+      axios.get(this.$store.state.endpoints.baseUrl + 'users/')
         .then((response) => {
-          this.marketer_list = response.data.results
-          for (let i = 0; i < this.marketer_list.length; i++) {
-            if (this.marketer_list[i].username == '') {
-              this.marketer_list[i].username = '이름없음'
+          let short = response.data.data.results
+          for(let i = 0; i < short.length; i ++) {
+            if([1,3].includes(short[i].info.access_role)) {
+              // marketer or guest
+              if (short[i].username == '') {
+                short[i].username = '이름없음'
+              }
+              this.marketer_list.push(short[i])
             }
           }
+          // this.marketer_list = response.data.data.results
+          // for (let i = 0; i < this.marketer_list.length; i++) {
+          //   if (this.marketer_list[i].username == '') {
+          //     this.marketer_list[i].username = '이름없음'
+          //   }
+          // }
         })
         .catch((error) => {
           console.log('Get user is failed', error)
@@ -189,7 +200,7 @@
           }
           // /Phone validate
         } else if (param === 'name') {
-          axios.get(this.$store.state.endpoints.baseUrl + 'organization/')
+          axios.get(this.$store.state.endpoints.baseUrl + 'organizations/')
             .then((response) => {
               let duplicated = false
               for (let i = 0; i < response.data.results.length; i++) {
@@ -234,7 +245,7 @@
         // Create an organization myself
         if (confirm('조직을 생성하시겠습니까?')) {
           this.$store.state.pageOptions.loading = true
-          axios.post(this.$store.state.endpoints.baseUrl + 'organization/', this.create_obj)
+          axios.post(this.$store.state.endpoints.baseUrl + 'organizations/', this.create_obj)
             .then(() => {
               alert('조직이 생성되었습니다.')
               this.$store.state.pageOptions.loading = false

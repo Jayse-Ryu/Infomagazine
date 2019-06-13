@@ -1829,7 +1829,7 @@
           console.log(error)
         })
       // If not manager, push to db contents
-      if (this.access_obj.access != 1) {
+      if (this.user_obj.access_role != 1 || this.user_obj.access_role != 0) {
         this.$router.currentRoute.meta.protect_leave = 'no'
         this.$router.push({name: 'db_detail', params: {landing_id: this.epoch_time}})
       }
@@ -1845,9 +1845,7 @@
           user_json = {
             'is_staff': false,
             'is_superuser': false,
-            'info': {
-              'access_role': 3
-            },
+            'access_role': 3,
             'failed': true
           }
         } else {

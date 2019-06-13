@@ -522,6 +522,7 @@
       this.page_id = this.$route.params.organization_id * 1
 
       this.refresh_organization()
+
     },
     methods: {
       // Real-Time custom validation
@@ -613,12 +614,12 @@
 
         // Get Organization by page_id
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + this.page_id)
+        axios.get(this.$store.state.endpoints.baseUrl + 'organizations/' + this.page_id)
           .then((response) => {
             console.log('organization response is ', response)
-            this.content_obj = response.data
+            this.content_obj = response.data.data
             // Get access users by organization id
-            return axios.get(this.$store.state.endpoints.baseUrl + 'user/?organization=' + this.page_id)
+            return axios.get(this.$store.state.endpoints.baseUrl + 'users/?organization=' + this.page_id)
             // this.$store.state.pageOptions.loading = false
           })
           .then((response) => {
@@ -679,7 +680,7 @@
       },
       patch_organization() {
         // // Create an organization myself
-        axios.patch(this.$store.state.endpoints.baseUrl + 'organization/' + this.page_id, this.content_obj)
+        axios.patch(this.$store.state.endpoints.baseUrl + 'organizations/' + this.page_id, this.content_obj)
           .then((response) => {
             alert('수정되었습니다.')
             // this.original_manager = this.content_obj.manager
@@ -700,7 +701,7 @@
       calling_all_unit(page) {
         let org_id = this.$route.params.organization_id * 1
         let offset = page
-        axios.get(this.$store.state.endpoints.baseUrl + 'organization/' + '?offset=' + offset + '&' + 'organization' + '=' + org_id)
+        axios.get(this.$store.state.endpoints.baseUrl + 'organizations/' + '?offset=' + offset + '&' + 'organization' + '=' + org_id)
           .then((response) => {
             // Calculation for page_max
             if (response.data.count % this.page_chunk === 0) {
@@ -726,9 +727,9 @@
             }
           }
 
-          axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + this.original_manager, deactive)
+          axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.original_manager, deactive)
             .then(() => {
-              return axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + this.changeable_manager, activate)
+              return axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.changeable_manager, activate)
             })
             .catch((error) => {
               console.log('Something is wrong on change manager cycle', error)
@@ -744,7 +745,7 @@
                 access_role: 1
               }
             }
-            axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + user_id + '/', set_data)
+            axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + user_id + '/', set_data)
               .then(() => {
                 alert('유저의 가입이 승인되었습니다.')
                 this.calling_all_unit()

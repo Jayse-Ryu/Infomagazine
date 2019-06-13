@@ -81,7 +81,7 @@
           <div class="col-sm-9 mt-sm-3">
             <input :class="error_label.class.phone" id="user_phone" name="user_phone"
                    type="number"
-                   v-model="create_obj.info.phone_num"
+                   v-model="create_obj.phone_num"
                    placeholder="연락처를 입력하세요"
                    autofocus="autofocus"
                    maxlength="16"
@@ -93,8 +93,8 @@
           </label>
           <div class="col-sm-9 mt-sm-3">
             <select class="form-control" name="user_company" id="user_company"
-                    v-model="create_obj.info.company">
-              <option value="0" selected>추후선택</option>
+                    v-model="create_obj.company_id">
+              <option value="0" selected>업체를 선택하세요</option>
               <option v-for="company in company_list" :value="company.id">
                 {{ company.corp_name }} / {{ company.corp_sub_name }}
               </option>
@@ -136,17 +136,15 @@
         username: '',
         password: '',
         info: {
-          access_role: 2,
-          // organization: null,
-          company: 0,
-          phone_num: '',
-        }
+          phone_num: ''
+        },
+        company_id: 0
       }
     }),
     mounted() {
-      axios.get(this.$store.state.endpoints.baseUrl + 'company/')
+      axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
         .then((response) => {
-          this.company_list = response.data.results
+          this.company_list = response.data.data.results
         })
         .catch((error) => {
           console.log('Get company error', error)
@@ -155,10 +153,10 @@
     methods: {
       error_check(param) {
         if (param === 'phone') {
-          if (this.create_obj.info.phone_num !== '') {
+          if (this.create_obj.phone_num !== '') {
             // Allow mobile phone, internet wireless only
             let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
-            let tel_num = this.content_obj.info.phone_num
+            let tel_num = this.create_obj.phone_num
             let test_flag = regular_tel.test(tel_num)
             if (!test_flag) {
               this.error_label.phone = true
@@ -188,30 +186,26 @@
           // Duplicated function has to add
           if (this.create_obj.email !== '') {
             // If email is not empty
-            let users = []
-            axios.get(this.$store.state.endpoints.baseUrl + 'user/')
+            axios.get(this.$store.state.endpoints.baseUrl + 'users/email_check/?email=' + this.create_obj.email)
               .then((response) => {
-
-                users = response.data.results
                 let email_flag = false
 
-                if (users.length !== 0) {
-                  for (let i = 0; i < users.length; i++) {
-                    if (users[i].email == this.create_obj.email) {
-                      email_flag = true
-                    }
-                  }
+                if (response.data.data.email_check == true) {
+                  email_flag = true
+                } else {
+                  email_flag = false
                 }
 
                 this.error_label.email = email_flag
 
-                // If has error atleast one thing of check
+                // If has error at least one thing of check
                 if (this.error_label.email || this.$validator.errors.has('email')) {
                   this.error_label.class.email = 'form-control alert-danger'
                 } else if (!this.error_label.email && !this.$validator.errors.has('email')) {
                   // Nor both are clear
                   this.error_label.class.email = 'form-control alert-info'
                 }
+
               })
               .catch((error) => {
                 console.log('Email check axios failed', error)
@@ -248,6 +242,9 @@
         } else if (this.error_label.name) {
           alert('이름을 입력하세요!')
           document.getElementById('user_name').focus()
+        } else if (this.create_obj.company_id == 0) {
+          alert('업체를 선택하세요!')
+          document.getElementById('user_company').focus()
         } else {
           this.create_user()
         }
@@ -258,13 +255,13 @@
 
           // console.log('it will send', this.create_obj)
 
-          axios.post(this.$store.state.endpoints.baseUrl + 'user/', this.create_obj)
+          axios.post(this.$store.state.endpoints.baseUrl + 'users/client/', this.create_obj)
             .then(() => {
               alert('고객 계정이 생성되었습니다.')
               this.$store.state.pageOptions.loading = false
               this.$router.currentRoute.meta.protect_leave = 'no'
               this.$router.push({
-                name: 'organization_list'
+                name: 'user_list'
               })
             })
             .catch((error) => {
