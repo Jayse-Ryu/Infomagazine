@@ -1594,7 +1594,7 @@
           this.duplicated_name_class = 'form-control'
           this.duplicated_name_flag = false
         } else {
-          axios.get(this.$store.state.endpoints.baseUrl + 'landing/api/?auth=staff')
+          axios.get(this.$store.state.endpoints.baseUrl + 'landings/api/?auth=staff')
             .then((response) => {
               for (let i = 0; i < response.data.length; i++) {
                 if (response.data[i].LandingInfo['landing']['name'] !== null) {
@@ -1616,7 +1616,7 @@
           this.duplicated_url_class = 'form-control'
           this.duplicated_url_flag = false
         } else {
-          axios.get(this.$store.state.endpoints.baseUrl + 'landing/api/?auth=staff')
+          axios.get(this.$store.state.endpoints.baseUrl + 'landings/api/?auth=staff')
             .then((response) => {
               for (let i = 0; i < response.data.length; i++) {
                 if (response.data[i].LandingInfo['landing']['base_url'] !== null || response.data[i].LandingInfo['landing']['base_url'] !== '') {
@@ -1756,7 +1756,7 @@
         // console.log('axios temporary disabled')
         // console.log(this.dynamo_obj)
         this.$store.state.pageOptions.loading = true
-        axios.post(this.$store.state.endpoints.baseUrl + 'landing/api/', this.dynamo_obj, config)
+        axios.post(this.$store.state.endpoints.baseUrl + 'landings/api/', this.dynamo_obj, config)
           .then(() => {
             this.$store.state.pageOptions.loading = false
             if (option == 'checked') {
@@ -1791,7 +1791,7 @@
         if(confirm('정말 취소하시겠습니까?')) {
           let axios = this.$axios
           let landing_num = this.epoch_time
-          axios.delete(this.$store.state.endpoints.baseUrl + 'landing/api/' + landing_num)
+          axios.delete(this.$store.state.endpoints.baseUrl + 'landings/api/' + landing_num)
             .then(() => {
               alert('목록으로 돌아갑니다.')
               this.$router.currentRoute.meta.protect_leave = 'no'
@@ -1805,7 +1805,7 @@
       preview() {
         let axios = this.$axios
         let landing_num = this.$route.params.landing_id
-        axios.get(this.$store.state.endpoints.baseUrl + 'landing/api/' + landing_num + '/?preview=true')
+        axios.get(this.$store.state.endpoints.baseUrl + 'landings/api/' + landing_num + '/?preview=true')
           .then((response) => {
             console.log('preview res', response)
           })
@@ -1816,7 +1816,7 @@
       auto_saved_get() {
         let axios = this.$axios
         // Check temporary saved landings
-        let this_url = 'landing/api/'
+        let this_url = 'landings/api/'
         this.auto_saved = []
         this.$store.state.pageOptions.loading = true
         axios.get(this.$store.state.endpoints.baseUrl + this_url + '?auth=staff' + '&manager=' + this.user_obj.username + '&auto=true')
@@ -1860,7 +1860,7 @@
         if (this.recovery != -1) {
           let axios = this.$axios
           let landing_num = this.recovery
-          axios.delete(this.$store.state.endpoints.baseUrl + 'landing/api/' + landing_num)
+          axios.delete(this.$store.state.endpoints.baseUrl + 'landings/api/' + landing_num)
             .then(() => {
               this.recovery = -1
               this.auto_saved_get()
@@ -1884,7 +1884,7 @@
         if (this.recovery != -1) {
           if(confirm('수정페이지로 이동 하시겠습니까?')) {
             this.$router.currentRoute.meta.protect_leave = 'no'
-            this.$router.push({path: '/landing/detail/' + this.recovery})
+            this.$router.push({path: '/landings/detail/' + this.recovery})
           }
         } else {
           alert('수정 할 페이지를 먼저 선택하세요.')
@@ -1905,8 +1905,8 @@
       // Check if this manager has auto saved landing page
       this.auto_saved_get()
       // Get companies from logged in user's organization
-      let this_url = 'company/'
-      axios.get(this.$store.state.endpoints.baseUrl + this_url + '?organization=' + this.user_obj.organization)
+      let this_url = 'companies/'
+      axios.get(this.$store.state.endpoints.baseUrl + this_url + '?organization=' + this.user_obj.info.organization)
         .then((response) => {
           this.landing_company = response.data.results
         })

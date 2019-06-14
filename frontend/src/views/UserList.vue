@@ -58,7 +58,7 @@
             </li>
 
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-                v-for="content in content_obj.slice().reverse()">
+                v-for="content in content_obj">
               <!--<div class="col-1 p-0">{{ content.id }}</div>-->
               <div class="col-3 p-0 text-center">
                 <router-link :to="'/users/detail/' + content.id">{{ content.email }}</router-link>
@@ -73,21 +73,21 @@
               <div v-if="user_obj.id == content.id" class="col-2 p-0 text-center">
                 <div class="badge badge-dark">본인</div>
               </div>
-              <!--<div v-else-if="[0,1].includes(content.info.access_role)" class="col-2 p-0 text-center">
+              <div v-else-if="[0,1].includes(content.info.access_role)" class="col-2 p-0 text-center">
                 <div class="badge badge-primary">마케터</div>
               </div>
               <div v-else-if="content.info.access_role == 3" class="col-2 p-0 text-center">
                 <div class="badge badge-danger">미인증 마케터</div>
               </div>
-              <div v-else-if="content.access == 2" class="col-2 p-0 text-center">
+              <div v-else-if="content.info.access_role == 2" class="col-2 p-0 text-center">
                 <div class="badge badge-success">고객</div>
-              </div>-->
+              </div>
               <div v-else class="col-2 p-0 text-center">
                 <div class="badge badge-success">Nobody</div>
               </div>
 
-              <div v-if="content.phone_num" class="col-2 p-0 board_centre">
-                {{ content.phone_num }}
+              <div v-if="content.info.phone_num" class="col-2 p-0 board_centre">
+                {{ content.info.phone_num }}
               </div>
               <div v-else class="col-2 p-0 board_centre">없음</div>
 
@@ -114,7 +114,7 @@
               <div class="col-12 text-center">데이터가 존재하지 않습니다.</div>
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-                v-for="content in content_obj.slice().reverse()">
+                v-for="content in content_obj">
               <!--<div class="col-2 p-0">{{ content.user }}</div>-->
               <div class="col-3 p-0 text-center">
                 <router-link :to="'/users/detail/' + content.id">{{ content.email }}</router-link>

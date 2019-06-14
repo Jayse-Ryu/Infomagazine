@@ -58,7 +58,7 @@
       // Get organization!
       axios.get(this.$store.state.endpoints.baseUrl + 'organizations/')
         .then((response) => {
-          this.organization_list = response.data.results
+          this.organization_list = response.data.data.results
         })
         .catch((error) => {
           console.log('Error occurred from get organization', error)
@@ -93,7 +93,7 @@
           }
 
           // // Update actual user
-          // axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + this.user_obj.id + '/', form)
+          // axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + '?organization=' + this.org_selected)
           axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.org_selected + '?organization')
             .then((response) => {
               console.log('updated?', response.data)

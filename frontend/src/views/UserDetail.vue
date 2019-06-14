@@ -13,7 +13,7 @@
 
         <label for="user_num" class="col-form-label-sm col-sm-3 mt-3">번호</label>
         <div class="col-sm-9 mt-sm-3">
-          <div class="form-control" id="user_num">{{ content_obj.id }}</div>
+          <div class="form-control border-0" id="user_num">{{ content_obj.id }}</div>
         </div>
 
         <label for="user_id" class="col-form-label-sm col-sm-3 mt-3">이메일</label>
@@ -23,7 +23,10 @@
 
         <label for="user_name" class="col-form-label-sm col-sm-3 mt-3">이름</label>
         <div class="col-sm-9 mt-sm-3">
-          <div class="form-control" id="user_name">{{ content_obj.username }}</div>
+          <div class="form-control" id="user_name" v-if="content_obj.username">
+            {{ content_obj.username }}
+          </div>
+          <div v-else class="form-control" id="user_name">이름없음</div>
         </div>
 
         <label for="user_phone" class="col-form-label-sm col-sm-3 mt-3">연락처</label>
@@ -33,11 +36,6 @@
           </div>
           <div v-else class="form-control">없음</div>
         </div>
-
-        <!--<label for="user_mail" class="col-form-label-sm col-sm-3 mt-3">메일</label>
-        <div class="col-sm-9 mt-sm-3">
-          <div class="form-control" id="user_mail">{{ content_obj.email }}</div>
-        </div>-->
 
         <!-- Grade handler -->
         <label for="user_access" class="col-form-label-sm col-sm-3 mt-3">등급</label>
@@ -74,27 +72,19 @@
             </div>
           </div>
 
-          <!--<div v-else-if="content_obj.access == -2">
-            <div class="form-control border-0 p-0" id="user_access">
-              <div class="badge alert alert-danger">미인증 고객</div>
-              <button v-if="content_obj.user !== user_obj.id" type="button" class="btn btn-outline-success"
-                      @click.prevent="grade_set(2)">승인
-              </button>
-              <div v-else class="btn btn-secondary disabled">변경 권한없음</div>
-            </div>
-          </div>-->
-
         </div>
 
-        <label v-if="content_obj.organization" for="user_companion" class="col-form-label-sm col-sm-3 mt-3">소속</label>
-        <label v-else-if="content_obj.company" for="user_companion" class="col-form-label-sm col-sm-3 mt-3">업체</label>
+        <label v-if="content_obj.info.organization" for="user_companion"
+               class="col-form-label-sm col-sm-3 mt-3">소속</label>
+        <label v-else-if="content_obj.info.company" for="user_companion"
+               class="col-form-label-sm col-sm-3 mt-3">업체</label>
         <label v-else for="user_companion" class="col-form-label-sm col-sm-3 mt-3">업체</label>
         <div class="col-sm-9 mt-sm-3">
-          <div v-if="content_obj.organization" class="form-control" id="user_companion">
-            {{ content_obj.organization_name }}
+          <div v-if="content_obj.info.organization" class="form-control" id="user_companion">
+            {{ content_obj.info.organization }}
           </div>
-          <div v-else-if="content_obj.company" class="form-control" id="user_companion">
-            {{ content_obj.company_name }}
+          <div v-else-if="content_obj.info.company" class="form-control" id="user_companion">
+            {{ content_obj.info.organization }}
           </div>
           <div v-else class="form-control" id="user_companion">생성예정</div>
         </div>
@@ -109,71 +99,48 @@
 
       </div>
 
-      <div v-if="content_obj.user !== user_obj.id">
-        <!---->
-        <!-- I'm a superuser and this user is manager side -->
-        <div class="form-group row" v-if="user_obj.is_superuser && Math.abs(content_obj.access) == 1">
+      <div v-if="content_obj.id !== user_obj.id">
+        <!--
+        &lt;!&ndash; I'm a superuser and this user is manager side &ndash;&gt;
+        <div class="form-group row" v-if="user_obj.is_superuser || user_obj.is_staff">
           <label for="user_super_set" class="col-form-label-sm col-sm-3 mt-3">권한관리</label>
 
-          <!-- if this user is 'NOT' staff -->
-          <div v-if="!more_info.is_staff" class="col-sm-9 mt-sm-3">
+          &lt;!&ndash; if this user is 'NOT' staff &ndash;&gt;
+          <div v-if="!content_obj.is_staff" class="col-sm-9 mt-sm-3">
             <div id="user_super_set">
-              <button type="button" class="btn btn-info w-100" @click.prevent="staff_set('promote')">운영자로 승급</button>
+              <button type="button" class="btn btn-info w-100" @click.prevent="staff_set('promote')">
+                운영자로 승급
+              </button>
             </div>
           </div>
 
-          <!-- Or if this user 'IS' staff -->
-          <div v-else class="col-sm-9 mt-sm-3">
+          &lt;!&ndash; Or if this user 'IS' staff and im a superuser &ndash;&gt;
+          <div v-else-if="content_obj.is_staff && user_obj.is_superuser" class="col-sm-9 mt-sm-3">
             <div id="user_super_set">
-              <button type="button" class="btn btn-danger w-100" @click.prevent="staff_set('demote')">운영자 자격 박탈</button>
+              <button type="button" class="btn btn-danger w-100" @click.prevent="staff_set('demote')">
+                운영자 자격 박탈
+              </button>
             </div>
           </div>
 
-        </div>
-
-        <div v-if="user_obj.is_superuser">
-          <button type="button" class="btn btn-outline-warning w-100 mb-2 mb-md-3" v-if="more_info.is_active"
-                  @click.prevent="user_stall('stall')">유저 정지
-          </button>
-          <button type="button" class="btn btn-outline-primary w-100 mb-2 mb-md-3" v-else
-                  @click.prevent="user_stall('restart')">정지 해제
-          </button>
-          <button type="button" class="btn btn-outline-danger w-100 mb-sm-2 mb-md-3" @click.prevent="user_delete">유저
-            삭제
-          </button>
-        </div>
-
-        <!---->
-        <!-- I'm a staff and this user is manager side -->
-        <div class="form-group row" v-else-if="user_obj.is_staff && Math.abs(content_obj.access) == 1">
-
-          <label for="user_super_set" class="col-form-label-sm col-sm-3 mt-3">권한관리</label>
-
-          <!-- if this user is 'NOT' staff -->
-          <div v-if="!more_info.is_staff" class="col-sm-9 mt-sm-3">
+          &lt;!&ndash; Or if this user 'IS' staff but im staff too &ndash;&gt;
+          <div v-else-if="content_obj.is_staff && !user_obj.is_superuser" class="col-sm-9 mt-sm-3">
             <div id="user_super_set">
-              <button type="button" class="btn btn-info w-100" @click.prevent="staff_set('promote')">운영자로 승급</button>
+              <button type="button" class="btn btn-secondary w-100">권한 없음</button>
             </div>
           </div>
 
-          <!-- Or if this user 'IS' staff -->
-          <div v-else class="col-sm-9 mt-sm-3">
-            <div class="alert alert-danger col-12">이 유저는 운영자입니다.</div>
-          </div>
+        </div>-->
+
+        <div v-if="user_obj.is_superuser || user_obj.is_staff">
+          <button type="button" class="btn btn-outline-danger w-100 mb-sm-2 mb-md-3"
+                  @click.prevent="user_delete" v-if="[2,3].includes(content_obj.info.access_role)">
+            유저 삭제
+          </button>
         </div>
 
-        <div v-if="!user_obj.is_superuser && user_obj.is_staff && !more_info.is_staff">
-          <button type="button" class="btn btn-outline-warning w-100 mb-2 mb-md-3" v-if="more_info.is_active"
-                  @click.prevent="user_stall('stall')">유저 정지
-          </button>
-          <button type="button" class="btn btn-outline-primary w-100 mb-2 mb-md-3" v-else
-                  @click.prevent="user_stall('restart')">정지 해제
-          </button>
-          <button type="button" class="btn btn-outline-danger w-100 mb-sm-2 mb-md-3" @click.prevent="user_delete">유저
-            삭제
-          </button>
-        </div>
       </div>
+
       <div v-else>
         <button type="button" class="btn btn-primary w-100 mb-2 mb-md-3" @click.prevent="edit_my_info">내 정보 수정하기
         </button>

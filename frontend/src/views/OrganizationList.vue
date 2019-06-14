@@ -49,7 +49,7 @@
               <div class="col-12 p-0 text-center">데이터가 존재하지 않습니다.</div>
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-                v-for="content in content_obj.slice().reverse()">
+                v-for="content in content_obj">
               <div class="col-1 p-0 col-sm-1">{{ content.id }}</div>
               <div class="col-2 p-0 col-sm-2">
                 <router-link :to="'/organization/detail/' + content.id">
@@ -65,8 +65,8 @@
               <div v-if="content.org_tel_num" class="col-2 p-0">{{ content.org_tel_num }}</div>
               <div v-else-if="content.org_email" class="col-2 p-0">{{ content.org_email }}</div>
               <div v-else class="col-2 p-0">없음</div>
-              <div v-if="content.created_data" class="col-3 p-0 board_centre">{{ (content.created_date).substring(0, 10)
-                }}
+              <div v-if="content.created_data" class="col-3 p-0 board_centre">
+                {{ (content.created_date).substring(0, 10) }}
               </div>
               <div v-else class="col-3 p-0 board_centre">없음</div>
             </li>
@@ -301,11 +301,6 @@
         }
 
         return user_json
-      }
-    },
-    filters: {
-      reverse(items) {
-        return items.slice().reverse()
       }
     }
   }

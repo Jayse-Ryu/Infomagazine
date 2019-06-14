@@ -50,7 +50,7 @@
               <div class="col-12 p-0 text-center">데이터가 존재하지 않습니다.</div>
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-                v-for="content in content_obj.slice().reverse()">
+                v-for="content in content_obj">
               <div class="col-1 p-0">{{ content.id }}</div>
               <div class="col-3 p-0">
                 <router-link :to="'/company/detail/' + content.id">{{ content.corp_name }}</router-link>
@@ -82,7 +82,7 @@
               <div class="col-12 p-0 text-center">데이터가 존재하지 않습니다.</div>
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-                v-for="content in content_obj.slice().reverse()">
+                v-for="content in content_obj">
               <div class="col-2 p-0">{{ content.id }}</div>
               <div class="col-3 p-0">
                 <router-link :to="'/company/detail/' + content.id">{{ content.corp_name }}</router-link>
