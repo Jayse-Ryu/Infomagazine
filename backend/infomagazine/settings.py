@@ -177,8 +177,8 @@ DATABASES = {
     }
 }
 
-MONGO_CLOUD_ACCOUNT = 'skkim'
-MONGO_CLOUD_PASSWD = 'lcventures1201'
+MONGO_CLOUD_ACCOUNT = config('MONGO_CLOUD_ACCOUNT')
+MONGO_CLOUD_PASSWD = config('MONGO_CLOUD_PASSWD')
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

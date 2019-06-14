@@ -12,7 +12,7 @@ class LandingPagesViewSets(viewsets.ViewSet):
 
     def list(self, request):
         projection = {'_id', 'landing_info' 'company_id'}
-        data = self.landing_pages_model.list(choice_collection='landings', projection=projection)
+        data = self.landing_pages_model.list(choice_collection='landing_pages', projection=projection)
         result = (
             {
                 'state': True,
@@ -33,7 +33,7 @@ class LandingPagesViewSets(viewsets.ViewSet):
             "landing_info": body['landing_info'],
             "updated_date": body['updated_date']
         }
-        data = self.landing_pages_model.create(choice_collection='landings', document=document)
+        data = self.landing_pages_model.create(choice_collection='landing_pages', document=document)
 
         result = (
             {
@@ -49,7 +49,7 @@ class LandingPagesViewSets(viewsets.ViewSet):
         return Response(result[0], **result[1])
 
     def retrieve(self, request, pk):
-        data = self.landing_pages_model.retrieve(choice_collection='landings', doc_id=pk)
+        data = self.landing_pages_model.retrieve(choice_collection='landing_pages', doc_id=pk)
         result = (
             {
                 'state': True,
@@ -64,7 +64,7 @@ class LandingPagesViewSets(viewsets.ViewSet):
         return Response(result[0], **result[1])
 
     def update(self, request, pk):
-        data = self.landing_pages_model.update(choice_collection='landings', doc_id=pk, update={'$set': request.data})
+        data = self.landing_pages_model.update(choice_collection='landing_pages', doc_id=pk, update={'$set': request.data})
         result = (
             {
                 'state': True,
