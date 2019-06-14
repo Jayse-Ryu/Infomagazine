@@ -10,6 +10,7 @@ class LandingPages:
         client = pymongo.MongoClient(
             "mongodb+srv://%s:%s@production-vpq2e.mongodb.net/test?retryWrites=true&w=majority" % (
                 MONGO_CLOUD_ACCOUNT, MONGO_CLOUD_PASSWD))
+
         self.db = client[choice_db]
 
     def list(self, choice_collection, projection=None):

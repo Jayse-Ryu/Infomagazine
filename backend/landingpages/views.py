@@ -11,8 +11,7 @@ class LandingPagesViewSets(viewsets.ViewSet):
     permission_classes = (custom_permissions.IsMarketer,)
 
     def list(self, request):
-        projection = {'_id', 'landing_info' 'company_id'}
-        data = self.landing_pages_model.list(choice_collection='landing_pages', projection=projection)
+        data = self.landing_pages_model.list(choice_collection='landing_pages')
         result = (
             {
                 'state': True,
