@@ -11,7 +11,7 @@ class LandingPagesViewSets(viewsets.ViewSet):
     permission_classes = (custom_permissions.IsMarketer,)
 
     def list(self, request):
-        projection = {'_id', 'CompanyNum', 'LandingNum'}
+        projection = {'_id', 'landing_info' 'company_id'}
         data = self.landing_pages_model.list(choice_collection='landings', projection=projection)
         result = (
             {
@@ -29,10 +29,9 @@ class LandingPagesViewSets(viewsets.ViewSet):
     def create(self, request):
         body = json.loads(request.body)
         document = {
-            "CompanyNum": body['CompanyNum'],
-            "LandingNum": body['LandingNum'],
-            "LandingInfo": body['LandingInfo'],
-            "UpdatedTime": body['UpdatedTime']
+            "company_id": body['company_id'],
+            "landing_info": body['landing_info'],
+            "updated_date": body['updated_date']
         }
         data = self.landing_pages_model.create(choice_collection='landings', document=document)
 
