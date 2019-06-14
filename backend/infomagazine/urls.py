@@ -20,6 +20,7 @@ from rest_framework.routers import DefaultRouter
 
 from company.views import CompanyViewSets
 from infomagazine.views import custom_token_obtain_sliding, custom_token_refresh_sliding
+from landingpages.views import LandingPagesViewSets
 from organization.views import OrganizationViewSets
 from user.views import UserViewSets
 
@@ -34,6 +35,7 @@ router = DefaultRouter()
 router.register(r'users', UserViewSets, basename='users')
 router.register(r'organizations', OrganizationViewSets, basename='organizations')
 router.register(r'companies', CompanyViewSets, basename='companies')
+router.register(r'landing_pages', LandingPagesViewSets, basename='landing_pages')
 api_patterns[0].extend(router.urls)
 
 urlpatterns = [

@@ -1,7 +1,7 @@
 from infomagazine import permissions as custom_permissions
 from company.models import Company
 from company.serializers import CompanySerializer
-from infomagazine.custom import CustomModelViewSet
+from infomagazine.custom_packages import CustomModelViewSet
 
 
 class CompanyViewSets(CustomModelViewSet):
@@ -18,12 +18,6 @@ class CompanyViewSets(CustomModelViewSet):
                 'users__info__organization_id': request.user.info.organization_id,
                 'users__info__access_role__in': [0, 1]
             }
-
-            if 'limit' in get_qs:
-                limit = get_qs.pop('limit')
-
-            if 'offset' in get_qs:
-                offset = get_qs.pop('offset')
 
             if 'detail' in get_qs:
                 del get_qs['detail']

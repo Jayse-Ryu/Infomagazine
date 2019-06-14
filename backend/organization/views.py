@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
 from infomagazine import permissions as custom_permissions
-from infomagazine.custom import CustomModelViewSet
+from infomagazine.custom_packages import CustomModelViewSet
 from organization.filters import OrganizationFilter
 from organization.models import Organization
 from organization.serializers import OrganizationSerializer

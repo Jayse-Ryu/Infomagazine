@@ -83,7 +83,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'EXCEPTION_HANDLER': 'infomagazine.custom.custom_exception_handler'
+    'EXCEPTION_HANDLER': 'infomagazine.custom_packages.custom_exception_handler'
 }
 
 SIMPLE_JWT = {
@@ -176,6 +176,9 @@ DATABASES = {
         },
     }
 }
+
+MONGO_CLOUD_ACCOUNT = 'skkim'
+MONGO_CLOUD_PASSWD = 'lcventures1201'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

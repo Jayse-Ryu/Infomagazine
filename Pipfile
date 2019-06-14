@@ -21,6 +21,7 @@ djangorestframework-simplejwt = "*"
 djangorestframework-jwt = "*"
 django-filter = "*"
 djangorestframework = "*"
+dnspython = "*"
 
 [requires]
 python_version = "3.7"
