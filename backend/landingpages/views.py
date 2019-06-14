@@ -11,7 +11,8 @@ class LandingPagesViewSets(viewsets.ViewSet):
     permission_classes = (custom_permissions.IsMarketer,)
 
     def list(self, request):
-        data = self.landing_pages_model.list(choice_collection='landing_pages')
+        projection = {'_id': 1, 'landing_info.landing.name': 1, 'landing_info.landing.views': 1}
+        data = self.landing_pages_model.list(choice_collection='landing_pages', projection=projection)
         result = (
             {
                 'state': True,
@@ -63,7 +64,8 @@ class LandingPagesViewSets(viewsets.ViewSet):
         return Response(result[0], **result[1])
 
     def update(self, request, pk):
-        data = self.landing_pages_model.update(choice_collection='landing_pages', doc_id=pk, update={'$set': request.data})
+        data = self.landing_pages_model.update(choice_collection='landing_pages', doc_id=pk,
+                                               update={'$set': request.data})
         result = (
             {
                 'state': True,
