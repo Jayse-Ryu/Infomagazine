@@ -1,9 +1,9 @@
-from rest_framework import generics, permissions, viewsets, status
+from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from infomagazine import permissions as custom_permissions
-from infomagazine.custom import CustomModelViewSet
+from infomagazine.custom_packages import CustomModelViewSet
 from user.models import User
 from user.serializers import UserSerializer, CreateClientSerializer
 
