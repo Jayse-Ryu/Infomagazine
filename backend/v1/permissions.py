@@ -3,7 +3,7 @@ from rest_framework.permissions import BasePermission
 # class CommonPermission(BasePermission):
 #     def __eval_less_than_access_role(self,role):
 #         return None
-from user.models import AccessRole
+from v1.user.models import AccessRole
 
 
 def _eval_less_than_access_role(request, role):

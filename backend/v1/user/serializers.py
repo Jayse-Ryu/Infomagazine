@@ -2,8 +2,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from rest_framework.utils import model_meta
 
-from company.models import Company
-from user.models import User, UserInfo, AccessRole
+from v1.company.models import Company
+from v1.user.models import User, UserInfo, AccessRole
 
 
 # class UserInfoSerializer(serializers.ModelSerializer):

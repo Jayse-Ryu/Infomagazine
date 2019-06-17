@@ -1,7 +1,7 @@
 from rest_framework import permissions
 from rest_framework_simplejwt.views import TokenObtainSlidingView, TokenRefreshSlidingView
 
-from infomagazine.serializers import CustomTokenObtainSlidingSerializer
+from v1.serializers import CustomTokenObtainSlidingSerializer
 
 
 class CustomTokenObtainSlidingView(TokenObtainSlidingView):

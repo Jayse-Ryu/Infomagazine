@@ -5,7 +5,7 @@
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
-from user.models import User, AccessRole
+from v1.user.models import User, AccessRole
 
 
 class AuthorizedUsersTests(APITestCase):
@@ -14,7 +14,7 @@ class AuthorizedUsersTests(APITestCase):
     user_data_password = 'testcase'
     user_data_phone_num = '0109999888'
 
-    create_user_url = reverse('v1:user:list')
+    create_user_url = reverse('v1:router:user-list')
     obtain_token_url = reverse('v1:token_obtain_sliding')
 
     def setUp(self):

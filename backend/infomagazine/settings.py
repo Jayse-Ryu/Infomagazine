@@ -54,9 +54,9 @@ INSTALLED_APPS = [
     'django_filters',
 
     # Personal Apps
-    'user',
-    'organization',
-    'company',
+    'v1.user',
+    'v1.organization',
+    'v1.company',
 
     # AWS Management
     'storages',

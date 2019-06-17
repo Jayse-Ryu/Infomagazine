@@ -5,7 +5,7 @@ from bson.json_util import dumps
 from infomagazine.settings import MONGO_CLOUD_ACCOUNT, MONGO_CLOUD_PASSWD
 
 
-class LandingPages:
+class LandingPage:
     def __init__(self, choice_db):
         client = pymongo.MongoClient(
             "mongodb+srv://%s:%s@production-vpq2e.mongodb.net/test?retryWrites=true&w=majority" % (

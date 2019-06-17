@@ -4,6 +4,12 @@ from rest_framework_simplejwt.serializers import TokenObtainSlidingSerializer
 
 class CustomTokenObtainSlidingSerializer(TokenObtainSlidingSerializer):
 
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
@@ -24,3 +30,12 @@ class CustomTokenObtainSlidingSerializer(TokenObtainSlidingSerializer):
             pass
 
         return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        token = self.get_token(self.user)
+
+        data['token'] = str(token)
+
+        return data

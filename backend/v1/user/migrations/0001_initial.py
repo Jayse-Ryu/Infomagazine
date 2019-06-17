@@ -6,7 +6,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
 import django_enumfield.db.fields
-import user.models
+import v1.user.models
 
 
 class Migration(migrations.Migration):
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
             name='UserInfo',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('access_role', django_enumfield.db.fields.EnumField(default=3, enum=user.models.AccessRole)),
+                ('access_role', django_enumfield.db.fields.EnumField(default=3, enum=v1.user.models.AccessRole)),
                 ('phone_num', models.CharField(blank=True, max_length=11, unique=True)),
                 ('updated_date', models.DateTimeField(auto_now=True)),
                 ('organization', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='organization.Organization')),

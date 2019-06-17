@@ -1,6 +1,6 @@
-from infomagazine import permissions as custom_permissions
-from company.models import Company
-from company.serializers import CompanySerializer
+import v1.permissions as custom_permissions
+from v1.company.models import Company
+from v1.company.serializers import CompanySerializer
 from infomagazine.custom_packages import CustomModelViewSet
 
 
