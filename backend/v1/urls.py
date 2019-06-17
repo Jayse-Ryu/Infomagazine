@@ -9,8 +9,6 @@ from v1.user.views import UserViewSets
 from v1.views import custom_token_obtain_sliding, custom_token_refresh_sliding
 
 router = DefaultRouter()
-# router.register(r'auth', custom_token_obtain_sliding, basename='auth')
-# router.register(r'auth-refresh', custom_token_refresh_sliding, basename='auth-refresh')
 router.register(r'users', UserViewSets, basename='user')
 router.register(r'organizations', OrganizationViewSets, basename='organization')
 router.register(r'companies', CompanyViewSets, basename='company')
@@ -27,7 +25,3 @@ if settings.DEBUG:
 
     schema_view = get_swagger_view(title='Infomagzine API')
     api_urlpatterns[0].append(path('swagger/', schema_view, name='swagger'))
-
-    api_urlpatterns[0].extend([
-        path('silk/', include('silk.urls', namespace='silk')),
-    ])
