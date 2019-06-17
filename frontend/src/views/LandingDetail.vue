@@ -1583,7 +1583,7 @@
           this.duplicated_name_class = 'form-control'
           this.duplicated_name_flag = false
         } else {
-          axios.get(this.$store.state.endpoints.baseUrl + 'landing/api/?auth=staff')
+          axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/?auth=staff')
             .then((response) => {
               for (let i = 0; i < response.data.length; i++) {
                 if (response.data[i].LandingInfo['landing']['name'] !== null) {
@@ -1605,7 +1605,7 @@
           this.duplicated_url_class = 'form-control'
           this.duplicated_url_flag = false
         } else {
-          axios.get(this.$store.state.endpoints.baseUrl + 'landing/api/?auth=staff')
+          axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/?auth=staff')
             .then((response) => {
               for (let i = 0; i < response.data.length; i++) {
                 if (response.data[i].LandingInfo['landing']['base_url'] !== null || response.data[i].LandingInfo['landing']['base_url'] !== '') {
@@ -1726,7 +1726,7 @@
         // console.log('axios temporary disabled')
         // console.log(this.dynamo_obj)
         this.$store.state.pageOptions.loading = true
-        axios.post(this.$store.state.endpoints.baseUrl + 'landing/api/', this.dynamo_obj, config)
+        axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
           .then(() => {
             if (option == 'checked') {
               alert('랜딩이 수정되었습니다.')
@@ -1761,7 +1761,7 @@
         if (confirm('정말 삭제하시겠습니까?')) {
           let axios = this.$axios
           let landing_num = this.epoch_time
-          axios.delete(this.$store.state.endpoints.baseUrl + 'landing/api/' + landing_num)
+          axios.delete(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num)
             .then(() => {
               alert('삭제되었습니다.')
               this.$router.currentRoute.meta.protect_leave = 'no'
@@ -1810,7 +1810,7 @@
       // Get landing obj from Landing Num
       this.epoch_time = this.$route.params.landing_id
       this.$store.state.pageOptions.loading = true
-      axios.get(this.$store.state.endpoints.baseUrl + 'landing/api/' + this.$route.params.landing_id)
+      axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id)
         .then((response) => {
           this.dynamo_obj = response.data
           this.$store.state.pageOptions.loading = false
