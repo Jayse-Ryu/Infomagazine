@@ -8,73 +8,35 @@
       <router-link to="/landing/create">랜딩페이지 생성</router-link>
     </div>
 
+    <div>dynamo obj</div>
+    <div>{{ dynamo_obj }}</div>
+    <div>error obj</div>
+    <div>{{ error_label }}</div>
+
     <div class="container" style="margin-top: 20px;">
 
       <form v-on:submit.prevent="landing_check">
 
         <h5>기본정보</h5>
-        <section_basic/>
-        <!--<h5>기본정보</h5>
-        <div class="form-group row">
 
-          <label class="col-sm-3 col-form-label-sm mt-3" for="company_name">
-            <span>고객업체*</span>
-          </label>
-
-          <div class="col-sm-9 mt-sm-3" id="company_name">
-            &lt;!&ndash;<div v-if="dynamo_obj.landing_info.landing.company == -1">
-              <div class="form-control">업체를 선택하세요</div>
-            </div>&ndash;&gt;
-            <select class="form-control" name="company_name" v-model="dynamo_obj.landing_info.landing.company">
-              <option value="-1">업체를 선택하세요</option>
-              <option v-for="content in landing_company" :value="content.id">
-                {{ content.corp_name }} - {{ content.corp_sub_name }}
-              </option>
-            </select>
-            &lt;!&ndash;<div v-for="content in landing_company">
-              <div v-if="content.id == dynamo_obj.landing_info.landing.company" class="form-control">
-                {{content.name }} - {{ content.sub_name }}
-              </div>
-            </div>&ndash;&gt;
-          </div>
-
-          <label class="col-sm-3 col-form-label-sm mt-3" for="landing">
-            <span>랜딩페이지 이름*</span>
-          </label>
-          <div class="col-sm-9 mt-sm-3">
-            <input type="text" :class="duplicated_name_class" id="landing" maxlength="50"
-                   v-model="dynamo_obj.landing_info.landing.name" @change="check_name">
-          </div>
-
-          <label class="col-sm-3 col-form-label-sm mt-3" for="base_url">
-            <span>메인 URL*</span>
-            <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
-                  v-tooltip="{
-                  content: msg.base_url,
-                  placement: 'right',
-                  offset: 5,
-                  trigger: 'hover',
-                  }">?</span>
-            <span class="question badge btn-secondary p-1 align-middle" v-else
-                  v-tooltip="{
-                  content: msg.base_url,
-                  placement: 'right',
-                  offset: 5,
-                  trigger: 'click',
-                  }">?</span>
-          </label>
-          <div class="col-sm-9 mt-sm-3">
-            <input type="text" :class="duplicated_url_class" id="base_url" maxlength="30"
-                   v-model="dynamo_obj.landing_info.landing.base_url" @change="check_url">
-          </div>
-
-        </div>-->
+        <section_basic
+          :window_width="window_width"
+          :company.sync="dynamo_obj.landing_info.landing.company"
+          :name.sync="dynamo_obj.landing_info.landing.name"
+          :base_url.sync="dynamo_obj.landing_info.landing.base_url"
+          :error_name.sync="error_label.name"
+          :error_base_url.sync="error_label.base_url"
+        />
 
         <hr>
 
         <h5>DB 폼</h5>
-        <section_form_control/>
+        <section_form_control
+          :form.sync="dynamo_obj.landing_info.form"
+          :form_arrow.sync="form_arrow"
+        />
         <section_form_detail/>
+
         <!--<h5>DB 폼</h5>
         <div class="form-group row mb-0">
           <label class="col-sm-3 col-form-label-sm mt-3" for="form_group">DB 폼 그룹</label>
@@ -329,7 +291,7 @@
         <hr>
 
         <h5>추가내용</h5>
-        <section_term/>
+        <!--<section_term/>-->
         <!--<div class="form-group row mb-0">
 
           <label class="col-sm-3 col-form-label-sm mt-3" for="term_status">약관</label>
@@ -386,7 +348,7 @@
         <h5>페이지 내용</h5>
         <div class="form-group row">
 
-          <section_page_source/>
+          <!--<section_page_source/>-->
           <!--<label class="col-sm-12 col-form-label-sm mt-3" for="page_title">
             <span>페이지 타이틀</span>
             <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
@@ -426,8 +388,8 @@
           </div>
 -->
 
-          <section_layout/>
-          <section_layout_opt/>
+          <!--<section_layout/>
+          <section_layout_opt/>-->
           <!--
           <label class="col-sm-3 col-form-label-sm mt-3" for="main_layout">
             <span>랜딩 레이아웃</span>
@@ -1091,7 +1053,7 @@
         <hr>
 
         <h5>옵션</h5>
-        <section_page_opt/>
+        <!--<section_page_opt/>-->
         <!--<div class="form-group row">
           <label class="col-sm-3 col-form-label-sm mt-3" for="status">활성상태</label>
           <div class="col-sm-9 mt-sm-3">
@@ -1124,7 +1086,7 @@
 
     </div>
 
-    <popup_recovery/>
+    <!--<popup_recovery/>-->
     <!--&lt;!&ndash; When first access for create landing, show the company choice modal &ndash;&gt;
     <transition name="fade" mode="out-in">
       <div class="select_company_wrap" v-show="auto_flag">
@@ -1159,7 +1121,7 @@
         </div>
       </div>
     </transition>-->
-    <popup_company/>
+    <!--<popup_company/>-->
     <!--<transition name="fade" mode="out-in">
       <div class="select_company_wrap" v-show="company_flag">
         <div class="container company_list_box">
@@ -1208,24 +1170,25 @@
   export default {
     name: "landing_create",
     components: {
-      popup_recovery,
-      popup_company,
+      // popup_recovery,
+      // popup_company,
       section_basic,
       section_form_control,
       section_form_detail,
-      section_term,
-      section_page_source,
-      section_layout,
-      section_layout_opt,
-      section_page_opt
+      // section_term,
+      // section_page_source,
+      // section_layout,
+      // section_layout_opt,
+      // section_page_opt
     },
     data: () => ({
+      test: 'default',
       auto_flag: false,
       company_flag: false,
       window_width: window.innerWidth,
       // msg is Tooltip messages. 'msg' is static name by ToolTip api.
       msg: {
-        base_url: '기본 주소를 지정합니다.',
+        // base_url: '기본 주소를 지정합니다.',
         title: '사이트 내부 제목입니다.',
         order: '랜딩페이지를 커스터마이징 합니다. 1000px 이상의 화면에서 작업대가 활성화됩니다.',
         in_db: '레이아웃 내부에 DB 폼 그룹을 위치시키거나 하단 팝업으로 대체합니다.',
@@ -1234,6 +1197,10 @@
         in_banner: '스크롤 시 따라다니는 배너를 생성합니다.',
         holder: 'Place holder입니다. 텍스트 입력 전 설명이 필요하거나 전화, 링크의 버튼에 표시할 글을 지정합니다.',
         list: '선택 옵션을 선택하고 제공할 수 있습니다.'
+      },
+      error_label: {
+        name: true,
+        base_url: true,
       },
       // Get org's companies and managers lists
       auto_saved: [],
@@ -1279,15 +1246,15 @@
         }
       },
       // Duplicate check
-      duplicated_name_class: 'form-control',
-      duplicated_name_flag: false,
-      duplicated_url_class: 'form-control',
-      duplicated_url_flag: false,
+      // duplicated_name_class: 'form-control',
+      // duplicated_name_flag: false,
+      // duplicated_url_class: 'form-control',
+      // duplicated_url_flag: false,
       // Order relative
       order_focus_flag: false,
       order_selected: 0,
       // Form relative
-      form_temp: '',
+      // form_temp: '',
       form_arrow: -1,
       form_selected: {
         sign: -1,
@@ -1304,7 +1271,7 @@
       // Form groups Handle
       // Form groups Handle
       // Form groups Handle
-      form_group_add() {
+      /*form_group_add() {
         if (this.form_temp) {
           let len = this.dynamo_obj.landing_info.form.length
           let flag = true
@@ -1372,7 +1339,7 @@
             }
           }
         }
-      },
+      },*/
       // Filtered fields by form group
       filter_change() {
         this.filtered_fields = []
@@ -1644,7 +1611,7 @@
       // Check duplicated Name
       // Check duplicated Name
       // Check duplicated Name
-      check_name() {
+      /*check_name() {
         let axios = this.$axios
         if (this.dynamo_obj.landing_info.landing.name == '') {
           this.duplicated_name_class = 'form-control'
@@ -1665,8 +1632,8 @@
               this.duplicated_name_flag = false
             })
         }
-      },
-      check_url() {
+      },*/
+      /*check_url() {
         let axios = this.$axios
         if (this.dynamo_obj.landing_info.landing.base_url == '') {
           this.duplicated_url_class = 'form-control'
@@ -1689,7 +1656,7 @@
               this.duplicated_url_flag = false
             })
         }
-      },
+      },*/
       /* e */
       /* n */
       /* d */
@@ -1968,16 +1935,16 @@
       // this.auto_saved_get()
 
       // Get companies from logged in user's organization
-      let this_url = 'companies/'
-      // axios.get(this.$store.state.endpoints.baseUrl + this_url + '?organization=' + this.user_obj.info.organization)
-      axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
-        .then((response) => {
-          console.log(response)
-          this.landing_company = response.data.data.results
-        })
-        .catch((error) => {
-          console.log(error)
-        })
+      // let this_url = 'companies/'
+      // // axios.get(this.$store.state.endpoints.baseUrl + this_url + '?organization=' + this.user_obj.info.organization)
+      // axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
+      //   .then((response) => {
+      //     console.log(response)
+      //     this.landing_company = response.data.data.results
+      //   })
+      //   .catch((error) => {
+      //     console.log(error)
+      //   })
     },
     computed: {
       user_obj() {
@@ -2013,7 +1980,7 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss">
   hr {
     width: 100%;
   }

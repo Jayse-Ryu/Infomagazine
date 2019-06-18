@@ -1,5 +1,5 @@
 <template>
-  <div class="form-group row mb-0" v-if="form_selected.sign != -1">
+  <!--<div class="form-group row mb-0" v-if="form_selected.sign != -1">
     <label class="col-sm-3 col-form-label-sm mt-3" for="db_field">DB 필드</label>
     <form class="col-sm-9 mt-sm-3 row ml-0" v-on:submit.prevent="field_add">
       <select class="form-control col-sm-5 col-md-5" name="company" id="db_field" v-model="field_selected">
@@ -193,7 +193,7 @@
         </li>
       </ul>
     </div>
-  </div>
+  </div>-->
 </template>
 
 <script>
