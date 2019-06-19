@@ -22,7 +22,6 @@
       </button>
     </div>
 
-    <!-- Somehow !== is not responsible -->
     <label v-if="form_selected.sign != -1" class="col-sm-3 col-form-label-sm mt-3" for="form_group_bg">
       폼 배경색
     </label>
@@ -66,12 +65,14 @@
     props: [
       'form',
       'form_arrow',
+      'field'
       // 'form_selected'
     ],
     data: () => ({
       form_obj: [],
       form_temp: '',
-      form_selected: {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
+      form_selected: {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10},
+      temp_field: []
     }),
     mounted() {
       this.form_obj = this.form
@@ -129,9 +130,10 @@
             this.form_obj = this.form_obj.filter(el => el.sign != id)
             // this.form_arrow = -1
             this.$emit('update:form_arrow', -1)
+            this.$emit('update:form', this.form_obj)
             this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
             // Field objs delete also
-            this.dynamo_obj.landing_info.field = this.dynamo_obj.landing_info.field.filter(el => el.form_group_id != id)
+            this.field_work(id)
           }
         } else {
           alert('그룹을 먼저 선택하세요.')
@@ -144,11 +146,16 @@
         } else {
           for (let i = 0; i < this.form_obj.length; i++) {
             if (this.form_obj[i].sign == id) {
-              console.log(this.form_obj[i])
               this.form_selected = this.form_obj[i]
             }
           }
         }
+      },
+      field_work(id) {
+        this.temp_field = []
+        this.temp_field = this.field
+        this.temp_field = this.temp_field.filter(el => el.form_group_id != id)
+        this.$emit('update:field', this.temp_field)
       }
     }
   }
