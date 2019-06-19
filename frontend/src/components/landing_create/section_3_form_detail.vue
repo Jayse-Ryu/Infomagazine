@@ -220,7 +220,6 @@
     },
     methods: {
       filter_change() {
-        console.log('filter changed method run')
         this.filtered_fields = []
         for (let i = 0; i < this.field_obj.length; i++) {
           if (this.field_obj[i].form_group_id == this.form_arrow) {
@@ -340,7 +339,25 @@
       },
       field_option_close(that) {
         //
-      }
+      },
+      field_file_add(sign) {
+        // let file_data = $event.target.files[0]
+        // for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
+        //   if (this.dynamo_obj.landing_info.field[i].sign == sign) {
+        //     this.dynamo_obj.landing_info.field[i].image_data = file_data
+        //     this.dynamo_obj.landing_info.field[i].image_url = URL.createObjectURL(file_data)
+        //   }
+        // }
+      },
+      field_file_delete(sign) {
+        // document.getElementById('field_file_input' + sign).value = ''
+        // for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
+        //   if (this.dynamo_obj.landing_info.field[i].sign == sign) {
+        //     this.dynamo_obj.landing_info.field[i].image_data = null
+        //     this.dynamo_obj.landing_info.field[i].image_url = null
+        //   }
+        // }
+      },
     }
   }
 </script>

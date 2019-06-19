@@ -665,7 +665,16 @@
 
 <script>
   export default {
-    name: "section_6_layout"
+    name: "section_6_layout",
+    props: [
+      'window_width',
+      'order'
+    ],
+    data: () => ({
+      msg: {
+        order: '랜딩페이지를 커스터마이징 합니다. 1000px 이상의 화면에서 작업대가 활성화됩니다.',
+      }
+    }),
   }
 </script>
 

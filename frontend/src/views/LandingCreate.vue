@@ -8,6 +8,8 @@
       <router-link to="/landing/create">랜딩페이지 생성</router-link>
     </div>
 
+    <div> {{ dynamo_obj }} </div>
+
     <div class="container" style="margin-top: 20px;">
 
       <form v-on:submit.prevent="landing_check">
@@ -39,106 +41,29 @@
         <hr>
 
         <h5>추가내용</h5>
-        <!--<section_term/>-->
-        <!--<div class="form-group row mb-0">
-
-          <label class="col-sm-3 col-form-label-sm mt-3" for="term_status">약관</label>
-
-          <div class="col-sm-9 mt-sm-3">
-            <label class="switch" for="term_status">
-              <input type="checkbox" id="term_status" v-model="dynamo_obj.landing_info.landing.is_term">
-              <span class="slider round"></span>
-            </label>
-          </div>
-
-          <label v-if="dynamo_obj.landing_info.landing.is_term" class="col-sm-3 col-form-label-sm mt-3"
-                 for="term_switch">
-            약관 이미지
-          </label>
-
-          <div v-if="dynamo_obj.landing_info.landing.is_term" class="col-sm-9 mt-sm-3">
-            <label class="switch" for="term_switch">
-              <input type="checkbox" id="term_switch" v-model="dynamo_obj.landing_info.landing.image_term"
-                     @change="term_file_delete()">
-              <span class="slider round"></span>
-            </label>
-          </div>
-
-        </div>
-
-        <div class="form-group row"
-             v-if="dynamo_obj.landing_info.landing.is_term && dynamo_obj.landing_info.landing.image_term">
-          <label class="col-sm-3 col-form-label-sm mt-3" for="term_img">약관 이미지 파일</label>
-          <div class="col-sm-9 mt-sm-3 row ml-0">
-            <input type="file" class="input_one_btn form-control col-md-11 pt-1" id="term_img" placeholder="이미지"
-                   ref="term_file_input" @change="term_file_add()" accept="image/*">
-            <button type="button" class="btn btn-danger col-md-1 p-0" @click.prevent="term_file_delete()">삭제</button>
-          </div>
-        </div>
-
-        <div class="form-group row"
-             v-if="dynamo_obj.landing_info.landing.is_term && !dynamo_obj.landing_info.landing.image_term">
-          <label class="col-sm-3 col-form-label-sm mt-3" for="term_title">약관 제목</label>
-          <div class="col-sm-9 mt-sm-3">
-            <input type="text" class="form-control" id="term_title" placeholder="title"
-                   v-model="dynamo_obj.landing_info.term.title">
-          </div>
-          <label class="col-sm-3 col-form-label-sm mt-3" for="term_cont">약관 내용</label>
-          <div class="col-sm-9 mt-sm-3">
-                    <textarea type="text" class="form-control" id="term_cont" rows="4" placeholder="content"
-                              v-model="dynamo_obj.landing_info.term.content"></textarea>
-          </div>
-        </div>
--->
+        <section_term
+          :term_switch.sync="dynamo_obj.landing_info.landing.is_term"
+          :image_switch.sync="dynamo_obj.landing_info.landing.image_term"
+          :term.sync="dynamo_obj.landing_info.term"
+        />
 
         <hr>
 
         <h5>페이지 내용</h5>
-        <div class="form-group row">
+        <section_page_source
+          :window_width="window_width"
+          :title.sync="dynamo_obj.landing_info.landing.title"
+          :header_script.sync="dynamo_obj.landing_info.landing.header_script"
+          :body_script.sync="dynamo_obj.landing_info.landing.body_script"
+        />
 
-          <!--<section_page_source/>-->
-          <!--<label class="col-sm-12 col-form-label-sm mt-3" for="page_title">
-            <span>페이지 타이틀</span>
-            <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
-                  v-tooltip="{
-                  content: msg.title,
-                  placement: 'right',
-                  offset: 5,
-                  trigger: 'hover',
-                  }">?</span>
-            <span class="question badge btn-secondary p-1" v-else
-                  v-tooltip="{
-                  content: msg.title,
-                  placement: 'right',
-                  offset: 5,
-                  trigger: 'click',
-                  }">?</span>
-          </label>
-          <div class="col-sm-12">
-            <input type="text" class="form-control" id="page_title" maxlength="50"
-                   v-model="dynamo_obj.landing_info.landing.title">
-          </div>
+        <section_layout
+          :window_width="window_width"
+          :order="dynamo_obj.landing_info.order"
+        />
+        <!--<section_layout_opt/>-->
 
-          <label class="col-sm-3 col-form-label-sm mt-3" for="header_script">
-            <span>헤더 스크립트</span>
-          </label>
-          <div class="col-sm-12">
-            <textarea type="text" class="form-control" id="header_script" rows="4"
-                      v-model="dynamo_obj.landing_info.landing.header_script"></textarea>
-          </div>
-
-          <label class="col-sm-3 col-form-label-sm mt-3" for="body_script">
-            <span>바디 스크립트</span>
-          </label>
-          <div class="col-sm-12">
-            <textarea type="text" class="form-control" id="body_script" rows="4"
-                      v-model="dynamo_obj.landing_info.landing.body_script"></textarea>
-          </div>
--->
-
-          <!--<section_layout/>
-          <section_layout_opt/>-->
-          <!--
+        <!--
           <label class="col-sm-3 col-form-label-sm mt-3" for="main_layout">
             <span>랜딩 레이아웃</span>
             <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
@@ -796,7 +721,6 @@
             </div>
 
           </div>-->
-        </div>
 
         <hr>
 
@@ -918,16 +842,16 @@
   export default {
     name: "landing_create",
     components: {
-      // popup_recovery,
-      // popup_company,
+      popup_recovery,
+      popup_company,
       section_basic,
       section_form_control,
       section_form_detail,
-      // section_term,
-      // section_page_source,
-      // section_layout,
-      // section_layout_opt,
-      // section_page_opt
+      section_term,
+      section_page_source,
+      section_layout,
+      section_layout_opt,
+      section_page_opt
     },
     data: () => ({
       auto_flag: false,
@@ -936,8 +860,8 @@
       // msg is Tooltip messages. 'msg' is static name by ToolTip api.
       msg: {
         // base_url: '기본 주소를 지정합니다.',
-        title: '사이트 내부 제목입니다.',
-        order: '랜딩페이지를 커스터마이징 합니다. 1000px 이상의 화면에서 작업대가 활성화됩니다.',
+        // title: '사이트 내부 제목입니다.',
+        // order: '랜딩페이지를 커스터마이징 합니다. 1000px 이상의 화면에서 작업대가 활성화됩니다.',
         in_db: '레이아웃 내부에 DB 폼 그룹을 위치시키거나 하단 팝업으로 대체합니다.',
         in_company: '랜딩 페이지에 하단 Footer로 해당 고객업체의 정보를 자동 기입합니다.',
         hijack: '사용자가 뒤로 가기 시 해당 링크로 강제 이동시킵니다.',
@@ -998,16 +922,16 @@
       // Form relative
       // form_temp: '',
       form_arrow: -1,
-      form_selected: {
-        sign: -1,
-        bg_color: '#f9f9f9',
-        tx_color: '#313131',
-        opacity: 10
-      },
+      // form_selected: {
+      //   sign: -1,
+      //   bg_color: '#f9f9f9',
+      //   tx_color: '#313131',
+      //   opacity: 10
+      // },
       // Filter relative
       filtered_fields: [],
-      field_selected: -1,
-      field_temp_name: '',
+      // field_selected: -1,
+      // field_temp_name: '',
     }),
     methods: {
       // Order handle
@@ -1108,42 +1032,6 @@
             this.dynamo_obj.landing_info.order[i].image_url = URL.createObjectURL(file_data)
           }
         }
-      },
-      /* e */
-      /* n */
-      /* d */
-      // File handle
-      // File handle
-      // File handle
-      field_file_add(sign) {
-        let file_data = event.target.files[0]
-        for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
-          if (this.dynamo_obj.landing_info.field[i].sign == sign) {
-            this.dynamo_obj.landing_info.field[i].image_data = file_data
-            this.dynamo_obj.landing_info.field[i].image_url = URL.createObjectURL(file_data)
-          }
-        }
-      },
-      field_file_delete(sign) {
-        document.getElementById('field_file_input' + sign).value = ''
-        for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
-          if (this.dynamo_obj.landing_info.field[i].sign == sign) {
-            this.dynamo_obj.landing_info.field[i].image_data = null
-            this.dynamo_obj.landing_info.field[i].image_url = null
-          }
-        }
-      },
-      term_file_add() {
-        /* When file data changed */
-        let file_data = event.target.files[0]
-        this.dynamo_obj.landing_info.term.image = file_data
-      },
-      term_file_delete() {
-        /* Remove file data */
-        if (this.$refs.term_file_input) {
-          this.$refs.term_file_input.value = null
-        }
-        this.dynamo_obj.landing_info.term.image = null
       },
       in_banner_file_add() {
         /* When file data changed */
