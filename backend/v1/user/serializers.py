@@ -72,11 +72,12 @@ class UserSerializer(serializers.ModelSerializer):
         """
 
         if 'pk' in self.context:
-            pk = self.context['pk']
-            request = self.context['request']
-            if not request.user.is_staff:
-                if pk != request:
-                    raise serializers.ValidationError("You can only edit your information.")
+            request_user = self.context['request'].user
+            token_user_id = request_user.id
+            request_user_id = int(self.context['pk'])
+            if not request_user.is_staff and request_user.info.access_role is not 0:
+                    if token_user_id is not request_user_id:
+                        raise serializers.ValidationError("You can only edit your information.")
         return data
 
     def create(self, validated_data):

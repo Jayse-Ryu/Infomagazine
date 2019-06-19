@@ -83,7 +83,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'EXCEPTION_HANDLER': 'infomagazine.custom_packages.custom_exception_handler'
+    'EXCEPTION_HANDLER': 'infomagazine.custom_packages.custom_exception_handler',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
 
 SIMPLE_JWT = {
