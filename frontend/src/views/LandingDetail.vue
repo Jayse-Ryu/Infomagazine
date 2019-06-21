@@ -8,7 +8,7 @@
       <router-link :to="'/landing/detail/' + $route.params.landing_id">랜딩페이지 정보</router-link>
     </div>
 
-    <div class="container" style="margin-top: 20px;">
+    <!--<div class="container" style="margin-top: 20px;">
 
       <form v-on:submit.prevent="landing_check">
         <h5>기본정보</h5>
@@ -19,11 +19,11 @@
           </label>
 
           <div class="col-sm-9 mt-sm-3" id="company_name">
-            <div v-if="dynamo_obj.LandingInfo.landing.company == -1">
+            <div v-if="dynamo_obj.landing_info.landing.company == -1">
               <div class="form-control">업체를 선택하세요</div>
             </div>
             <div v-for="content in landing_company">
-              <div v-if="content.id == dynamo_obj.LandingInfo.landing.company" class="form-control">
+              <div v-if="content.id == dynamo_obj.landing_info.landing.company" class="form-control">
                 {{content.name }} - {{ content.sub_name }}
               </div>
             </div>
@@ -34,7 +34,7 @@
           </label>
           <div class="col-sm-9 mt-sm-3">
             <input type="text" :class="duplicated_name_class" id="landing" maxlength="50"
-                   v-model="dynamo_obj.LandingInfo.landing.name" @change="check_name">
+                   v-model="dynamo_obj.landing_info.landing.name" @change="check_name">
           </div>
 
           <label class="col-sm-3 col-form-label-sm mt-3" for="base_url">
@@ -56,7 +56,7 @@
           </label>
           <div class="col-sm-9 mt-sm-3">
             <input type="text" :class="duplicated_url_class" id="base_url" maxlength="30"
-                   v-model="dynamo_obj.LandingInfo.landing.base_url" @change="check_url">
+                   v-model="dynamo_obj.landing_info.landing.base_url" @change="check_url">
           </div>
 
           <label class="col-sm-3 col-form-label-sm mt-3" for="db_show">
@@ -85,7 +85,7 @@
             <select class="input_one_btn form-control col-md-11" name="form_group_list" id="form_group_list"
                     v-model="form_arrow" @change="form_changed(form_arrow)">
               <option value="-1">그룹을 선택하세요</option>
-              <option v-for="item in dynamo_obj.LandingInfo.form" :value="item.sign">{{ item.name }}</option>
+              <option v-for="item in dynamo_obj.landing_info.form" :value="item.sign">{{ item.name }}</option>
             </select>
             <button type="button" class="btn btn-danger col-md-1 p-0"
                     @click.prevent="form_group_delete(form_selected.sign)">
@@ -93,7 +93,7 @@
             </button>
           </div>
 
-          <!-- Somehow !== is not responsible -->
+          &lt;!&ndash; Somehow !== is not responsible &ndash;&gt;
           <label v-if="form_selected.sign != -1" class="col-sm-3 col-form-label-sm mt-3" for="form_group_bg">
             폼 배경색
           </label>
@@ -334,19 +334,19 @@
 
           <div class="col-sm-9 mt-sm-3">
             <label class="switch" for="term_status">
-              <input type="checkbox" id="term_status" v-model="dynamo_obj.LandingInfo.landing.is_term">
+              <input type="checkbox" id="term_status" v-model="dynamo_obj.landing_info.landing.is_term">
               <span class="slider round"></span>
             </label>
           </div>
 
-          <label v-if="dynamo_obj.LandingInfo.landing.is_term" class="col-sm-3 col-form-label-sm mt-3"
+          <label v-if="dynamo_obj.landing_info.landing.is_term" class="col-sm-3 col-form-label-sm mt-3"
                  for="term_switch">
             약관 이미지
           </label>
 
-          <div v-if="dynamo_obj.LandingInfo.landing.is_term" class="col-sm-9 mt-sm-3">
+          <div v-if="dynamo_obj.landing_info.landing.is_term" class="col-sm-9 mt-sm-3">
             <label class="switch" for="term_switch">
-              <input type="checkbox" id="term_switch" v-model="dynamo_obj.LandingInfo.landing.image_term"
+              <input type="checkbox" id="term_switch" v-model="dynamo_obj.landing_info.landing.image_term"
                      @change="term_file_delete()">
               <span class="slider round"></span>
             </label>
@@ -355,7 +355,7 @@
         </div>
 
         <div class="form-group row"
-             v-if="dynamo_obj.LandingInfo.landing.is_term && dynamo_obj.LandingInfo.landing.image_term">
+             v-if="dynamo_obj.landing_info.landing.is_term && dynamo_obj.landing_info.landing.image_term">
           <label class="col-sm-3 col-form-label-sm mt-3" for="term_img">약관 이미지 파일</label>
           <div class="col-sm-9 mt-sm-3 row ml-0">
             <input type="file" class="input_one_btn form-control col-md-11 pt-1" id="term_img" placeholder="이미지"
@@ -365,16 +365,16 @@
         </div>
 
         <div class="form-group row"
-             v-if="dynamo_obj.LandingInfo.landing.is_term && !dynamo_obj.LandingInfo.landing.image_term">
+             v-if="dynamo_obj.landing_info.landing.is_term && !dynamo_obj.landing_info.landing.image_term">
           <label class="col-sm-3 col-form-label-sm mt-3" for="term_title">약관 제목</label>
           <div class="col-sm-9 mt-sm-3">
             <input type="text" class="form-control" id="term_title" placeholder="title"
-                   v-model="dynamo_obj.LandingInfo.term.title">
+                   v-model="dynamo_obj.landing_info.term.title">
           </div>
           <label class="col-sm-3 col-form-label-sm mt-3" for="term_cont">약관 내용</label>
           <div class="col-sm-9 mt-sm-3">
                     <textarea type="text" class="form-control" id="term_cont" rows="4" placeholder="content"
-                              v-model="dynamo_obj.LandingInfo.term.content"></textarea>
+                              v-model="dynamo_obj.landing_info.term.content"></textarea>
           </div>
         </div>
 
@@ -402,7 +402,7 @@
           </label>
           <div class="col-sm-12">
             <input type="text" class="form-control" id="page_title" maxlength="50"
-                   v-model="dynamo_obj.LandingInfo.landing.title">
+                   v-model="dynamo_obj.landing_info.landing.title">
           </div>
 
           <label class="col-sm-3 col-form-label-sm mt-3" for="header_script">
@@ -410,7 +410,7 @@
           </label>
           <div class="col-sm-12">
             <textarea type="text" class="form-control" id="header_script" rows="4"
-                      v-model="dynamo_obj.LandingInfo.landing.header_script"></textarea>
+                      v-model="dynamo_obj.landing_info.landing.header_script"></textarea>
           </div>
 
           <label class="col-sm-3 col-form-label-sm mt-3" for="body_script">
@@ -418,7 +418,7 @@
           </label>
           <div class="col-sm-12">
             <textarea type="text" class="form-control" id="body_script" rows="4"
-                      v-model="dynamo_obj.LandingInfo.landing.body_script"></textarea>
+                      v-model="dynamo_obj.landing_info.landing.body_script"></textarea>
           </div>
 
           <label class="col-sm-3 col-form-label-sm mt-3" for="main_layout">
@@ -445,7 +445,7 @@
           <div class="col-sm-12">
             <div class="main_layout" v-if="window_width > 999" id="main_layout">
               <div class="basket" :style="{'height': order_wrap_height + 'px'}">
-                <vue-draggable-resizable v-for="item in dynamo_obj.LandingInfo.order"
+                <vue-draggable-resizable v-for="item in dynamo_obj.landing_info.order"
                                          @activated="order_activated(item.sign)"
                                          @deactivated="order_deactivated"
                                          @dragging="order_move"
@@ -467,27 +467,27 @@
                                          :grid=[5,5]
                                          :lock-aspect-ratio="false">
 
-                  <!--<img v-if="item.type == 1 && item.image_data.length == 0" src="../assets/logo1.png" alt="logo"
+                  &lt;!&ndash;<img v-if="item.type == 1 && item.image_data.length == 0" src="../assets/logo1.png" alt="logo"
                        style="width: 100%; height: 100%; object-fit: contain;">
                   <img v-if="item.type == 1 && item.image_data.length !== 0" :src="item.image_url" alt="logo"
-                       style="width: 100%; height: 100%; object-fit: contain;">-->
+                       style="width: 100%; height: 100%; object-fit: contain;">&ndash;&gt;
 
-                  <!-- Order layout for image -->
+                  &lt;!&ndash; Order layout for image &ndash;&gt;
                   <img v-if="item.type == 1 && !item.image_data" src="../assets/logo1.png" alt="logo_none"
                        style="width: 100%; height: 100%; object-fit: contain;">
                   <img v-if="item.type == 1 && item.image_data" :src="item.image_url" alt="logo_in"
                        style="width: 100%; height: 100%; object-fit: contain;">
 
 
-                  <!-- Order layout for form group -->
-                  <div v-if="item.type == 2" class="form_layout" v-for="form in dynamo_obj.LandingInfo.form">
+                  &lt;!&ndash; Order layout for form group &ndash;&gt;
+                  <div v-if="item.type == 2" class="form_layout" v-for="form in dynamo_obj.landing_info.form">
                     <div class="form_layout_cont" v-if="form.sign === item.form_group"
                          :style="'background:'+form.bg_color+';' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
 
-                      <!-- big form -->
-                      <div class="form-group row mb-1" v-if="item.position.w > 768" v-for="field in dynamo_obj.LandingInfo.field">
+                      &lt;!&ndash; big form &ndash;&gt;
+                      <div class="form-group row mb-1" v-if="item.position.w > 768" v-for="field in dynamo_obj.landing_info.field">
 
-                        <!-- input form area -->
+                        &lt;!&ndash; input form area &ndash;&gt;
                         <div class="w-100 row m-0" v-if="field.type != 7 && field.type != 8 && field.type != 9">
                           <label v-if="field.form_group_id == item.form_group && field.label == true"
                                  class="mt-3 text-center font-weight-bold pr-0 pt-2 order_form_label"
@@ -540,7 +540,7 @@
                                   <input class="form-check-input" type="checkbox" :id="'term'+field.name" value="1">
                                   {{ field.holder }}
                                 </label>
-                                <button type="button" v-if="dynamo_obj.LandingInfo.landing.is_term"
+                                <button type="button" v-if="dynamo_obj.landing_info.landing.is_term"
                                         class="btn-sm btn-link p-0 border-0"
                                         style="line-height: 15px;">[{{ field.name }}]</button>
                               </div>
@@ -593,7 +593,7 @@
                                   <input class="form-check-input" type="checkbox" :id="'term'+field.name" value="1">
                                   {{ field.holder }}
                                 </label>
-                                <button type="button" v-if="dynamo_obj.LandingInfo.landing.is_term"
+                                <button type="button" v-if="dynamo_obj.landing_info.landing.is_term"
                                         class="btn-sm btn-link p-0 border-0"
                                         style="line-height: 15px;">[{{ field.name }}]</button>
                               </div>
@@ -602,58 +602,58 @@
                           </div>
 
                         </div>
-                        <!-- /input form area -->
+                        &lt;!&ndash; /input form area &ndash;&gt;
 
-                        <!-- button area -->
+                        &lt;!&ndash; button area &ndash;&gt;
                         <div class="pl-3 pr-3 pt-1 pb-1 col"
                              v-else-if="field.type == 7 || field.type == 8 || field.type == 9">
                           <div v-if="field.form_group_id == item.form_group">
 
-                            <!-- link without image -->
+                            &lt;!&ndash; link without image &ndash;&gt;
                             <button v-if="field.type == 7 && !field.image_url" type="button"
                                     class="btn w-100"
                                     :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                               {{ field.holder }}
                             </button>
-                            <!-- link with image -->
+                            &lt;!&ndash; link with image &ndash;&gt;
                             <button v-else-if="field.type == 7 && field.image_url" type="button"
                                     class="btn w-100 p-0" style="background: transparent;">
                               <img :src="field.image_url" alt="button image" class="w-100 order_form_button_image">
                             </button>
 
-                            <!-- tel without image -->
+                            &lt;!&ndash; tel without image &ndash;&gt;
                             <button v-if="field.type == 8 && !field.image_url" type="button"
                                     class="btn w-100"
                                     :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                               {{ field.holder }}
                             </button>
-                            <!-- tel with image -->
+                            &lt;!&ndash; tel with image &ndash;&gt;
                             <button v-else-if="field.type == 8 && field.image_url" type="button"
                                     class="btn w-100 p-0" style="background: transparent;">
                               <img :src="field.image_url" alt="button image" class="w-100 order_form_button_image">
                             </button>
 
-                            <!-- submit without image -->
+                            &lt;!&ndash; submit without image &ndash;&gt;
                             <button v-if="field.type == 9 && !field.image_url" type="button"
                                     class="btn w-100"
                                     :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                               {{ field.holder }}
                             </button>
-                            <!-- submit with image -->
+                            &lt;!&ndash; submit with image &ndash;&gt;
                             <button v-else-if="field.type == 9 && field.image_url" type="button"
                                     class="btn w-100 p-0" style="background: transparent;">
                               <img :src="field.image_url" alt="button image" class="w-100 order_form_button_image">
                             </button>
                           </div>
                         </div>
-                        <!-- /button area -->
+                        &lt;!&ndash; /button area &ndash;&gt;
 
                       </div>
-                      <!-- /big form -->
+                      &lt;!&ndash; /big form &ndash;&gt;
 
-                      <!-- small form -->
+                      &lt;!&ndash; small form &ndash;&gt;
                       <div class="form-group row mb-1" v-else-if="item.position.w < 769">
-                        <!-- input form area -->
+                        &lt;!&ndash; input form area &ndash;&gt;
                         <div class="w-100 row m-0" v-if="field.type != 7 && field.type != 8 && field.type != 9">
                           <label v-if="field.form_group_id == item.form_group && field.label == true"
                                  class="col-12 font-weight-bold pr-0 pt-2 order_form_label"
@@ -706,7 +706,7 @@
                                   <input class="form-check-input" type="checkbox" :id="'term'+field.name" value="1">
                                   {{ field.holder }}
                                 </label>
-                                <button type="button" v-if="dynamo_obj.LandingInfo.landing.is_term"
+                                <button type="button" v-if="dynamo_obj.landing_info.landing.is_term"
                                         class="btn-sm btn-link p-0 border-0"
                                         style="line-height: 15px;">[{{ field.name }}]</button>
                               </div>
@@ -759,7 +759,7 @@
                                   <input class="form-check-input" type="checkbox" :id="'term'+field.name" value="1">
                                   {{ field.holder }}
                                 </label>
-                                <button type="button" v-if="dynamo_obj.LandingInfo.landing.is_term"
+                                <button type="button" v-if="dynamo_obj.landing_info.landing.is_term"
                                         class="btn-sm btn-link p-0 border-0"
                                         style="line-height: 15px;">[{{ field.name }}]</button>
                               </div>
@@ -768,60 +768,60 @@
                           </div>
 
                         </div>
-                        <!-- /input form area -->
+                        &lt;!&ndash; /input form area &ndash;&gt;
 
-                        <!-- button area -->
+                        &lt;!&ndash; button area &ndash;&gt;
                         <div class="pl-3 pr-3 pt-1 pb-1 col"
                              v-else-if="field.type == 7 || field.type == 8 || field.type == 9">
                           <div v-if="field.form_group_id == item.form_group">
 
-                            <!-- link without image -->
+                            &lt;!&ndash; link without image &ndash;&gt;
                             <button v-if="field.type == 7 && !field.image_url" type="button"
                                     class="btn w-100"
                                     :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                               {{ field.holder }}
                             </button>
-                            <!-- link with image -->
+                            &lt;!&ndash; link with image &ndash;&gt;
                             <button v-else-if="field.type == 7 && field.image_url" type="button"
                                     class="btn w-100 p-0" style="background: transparent;">
                               <img :src="field.image_url" alt="button image" class="w-100 order_form_button_image">
                             </button>
 
-                            <!-- tel without image -->
+                            &lt;!&ndash; tel without image &ndash;&gt;
                             <button v-if="field.type == 8 && !field.image_url" type="button"
                                     class="btn w-100"
                                     :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                               {{ field.holder }}
                             </button>
-                            <!-- tel with image -->
+                            &lt;!&ndash; tel with image &ndash;&gt;
                             <button v-else-if="field.type == 8 && field.image_url" type="button"
                                     class="btn w-100 p-0" style="background: transparent;">
                               <img :src="field.image_url" alt="button image" class="w-100 order_form_button_image">
                             </button>
 
-                            <!-- submit without image -->
+                            &lt;!&ndash; submit without image &ndash;&gt;
                             <button v-if="field.type == 9 && !field.image_url" type="button"
                                     class="btn w-100"
                                     :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                               {{ field.holder }}
                             </button>
-                            <!-- submit with image -->
+                            &lt;!&ndash; submit with image &ndash;&gt;
                             <button v-else-if="field.type == 9 && field.image_url" type="button"
                                     class="btn w-100 p-0" style="background: transparent;">
                               <img :src="field.image_url" alt="button image" class="w-100 order_form_button_image">
                             </button>
                           </div>
                         </div>
-                        <!-- /button area -->
+                        &lt;!&ndash; /button area &ndash;&gt;
                       </div>
-                      <!-- /small form -->
+                      &lt;!&ndash; /small form &ndash;&gt;
                     </div>
-                    <!-- /form_layout_cont -->
+                    &lt;!&ndash; /form_layout_cont &ndash;&gt;
                   </div>
-                  <!-- /form_layout -->
+                  &lt;!&ndash; /form_layout &ndash;&gt;
 
 
-                  <!-- Order layout for video -->
+                  &lt;!&ndash; Order layout for video &ndash;&gt;
                   <div v-if="item.type == 3">
                     <span class="video_handler">비디오 드래그</span>
                     <span class="video_handler_2">비디오 드래그</span>
@@ -847,7 +847,7 @@
               </div>
 
               <div class="console" v-if="order_focus_flag && order_selected != 0">
-                <div v-for="info in dynamo_obj.LandingInfo.order">
+                <div v-for="info in dynamo_obj.landing_info.order">
                   <div class="form-group row p-4" v-if="info.sign == order_selected">
                     <label for="console_name" class="col-sm-3 col-form-label-sm mt-3">이름</label>
                     <div class="col-sm-9 mt-sm-3">
@@ -887,7 +887,7 @@
                              @change="order_image_change(info.sign)">
                       <select v-if="info.type == 2" class="form-control" id="form_set" v-model="info.form_group">
                         <option value="0">폼 그룹을 선택하세요</option>
-                        <option v-for="content in dynamo_obj.LandingInfo.form" :value="content.sign">
+                        <option v-for="content in dynamo_obj.landing_info.form" :value="content.sign">
                           {{ content.name }}
                         </option>
                       </select>
@@ -942,7 +942,7 @@
               </label>
               <div class="col-sm-9 mt-sm-3 row ml-0">
                 <select class="form-control" name="layout_font" id="layout_font"
-                        v-model="dynamo_obj.LandingInfo.landing.font">
+                        v-model="dynamo_obj.landing_info.landing.font">
                   <option value="-1">OS 기본</option>
                   <option value="1">Sans-serif</option>
                   <option value="2">나눔고딕 (Nanum Gothic)</option>
@@ -970,7 +970,7 @@
               </label>
               <div class="col-sm-9 mt-sm-3">
                 <label class="switch" for="in_db">
-                  <input type="checkbox" id="in_db" v-model="dynamo_obj.LandingInfo.landing.inner_db">
+                  <input type="checkbox" id="in_db" v-model="dynamo_obj.landing_info.landing.inner_db">
                   <span class="slider round"></span>
                 </label>
               </div>
@@ -994,7 +994,7 @@
               </label>
               <div class="col-sm-9 mt-sm-3">
                 <label class="switch" for="in_company">
-                  <input type="checkbox" id="in_company" v-model="dynamo_obj.LandingInfo.landing.show_company">
+                  <input type="checkbox" id="in_company" v-model="dynamo_obj.landing_info.landing.show_company">
                   <span class="slider round"></span>
                 </label>
               </div>
@@ -1018,17 +1018,17 @@
               </label>
               <div class="col-sm-9 mt-sm-3">
                 <label class="switch" for="is_hijack">
-                  <input type="checkbox" id="is_hijack" v-model="dynamo_obj.LandingInfo.landing.is_hijack">
+                  <input type="checkbox" id="is_hijack" v-model="dynamo_obj.landing_info.landing.is_hijack">
                   <span class="slider round"></span>
                 </label>
               </div>
-              <label v-if="dynamo_obj.LandingInfo.landing.is_hijack" class="col-sm-3 col-form-label-sm mt-3"
+              <label v-if="dynamo_obj.landing_info.landing.is_hijack" class="col-sm-3 col-form-label-sm mt-3"
                      for="hijack">
                 <span>후팝업 링크</span>
               </label>
-              <div v-if="dynamo_obj.LandingInfo.landing.is_hijack" class="col-sm-9 mt-sm-3 row ml-0">
+              <div v-if="dynamo_obj.landing_info.landing.is_hijack" class="col-sm-9 mt-sm-3 row ml-0">
                 <input type="text" class="form-control col" id="hijack" placeholder="후팝업 주소"
-                       v-model="dynamo_obj.LandingInfo.landing.hijack_url">
+                       v-model="dynamo_obj.landing_info.landing.hijack_url">
                 <hr>
               </div>
 
@@ -1049,25 +1049,25 @@
               </label>
               <div class="col-sm-9 mt-sm-3">
                 <label class="switch" for="in_banner">
-                  <input type="checkbox" id="in_banner" v-model="dynamo_obj.LandingInfo.landing.is_banner"
+                  <input type="checkbox" id="in_banner" v-model="dynamo_obj.landing_info.landing.is_banner"
                          @change="in_banner_file_delete()">
                   <span class="slider round"></span>
                 </label>
               </div>
 
-              <label v-if="dynamo_obj.LandingInfo.landing.is_banner" class="col-sm-3 col-form-label-sm mt-3"
+              <label v-if="dynamo_obj.landing_info.landing.is_banner" class="col-sm-3 col-form-label-sm mt-3"
                      for="in_banner_img">
                 <span>띠배너 옵션</span>
               </label>
-              <div v-if="dynamo_obj.LandingInfo.landing.is_banner" class="col-sm-9 mt-sm-3 row ml-0">
+              <div v-if="dynamo_obj.landing_info.landing.is_banner" class="col-sm-9 mt-sm-3 row ml-0">
 
                 <input type="file" class="form-control col-sm-5 col-md-5 pt-1" id="in_banner_img" placeholder="이미지"
                        ref="in_banner_file_input" @change="in_banner_file_add()" accept="image/*">
                 <div class="margin_div"></div>
                 <input type="text" class="form-control col-sm-7 col-md-5" id="in_banner_desc" placeholder="띠배너 주소"
-                       v-model="dynamo_obj.LandingInfo.landing.banner_url">
+                       v-model="dynamo_obj.landing_info.landing.banner_url">
                 <div class="margin_div"></div>
-                <!--<button type="button" class="btn btn-primary col-md-1 p-0">추가</button>-->
+                &lt;!&ndash;<button type="button" class="btn btn-primary col-md-1 p-0">추가</button>&ndash;&gt;
                 <button type="button" class="btn btn-danger col-md-1 p-0" @click.prevent="in_banner_file_delete()">
                   <span>삭제</span>
                 </button>
@@ -1084,7 +1084,7 @@
           <label class="col-sm-3 col-form-label-sm mt-3" for="status">활성상태</label>
           <div class="col-sm-9 mt-sm-3">
             <label class="switch" for="status">
-              <input type="checkbox" id="status" v-model="dynamo_obj.LandingInfo.landing.is_active">
+              <input type="checkbox" id="status" v-model="dynamo_obj.landing_info.landing.is_active">
               <span class="slider round"></span>
             </label>
           </div>
@@ -1092,7 +1092,7 @@
           <label class="col-sm-3 col-form-label-sm mt-3" for="mobile">모바일 전용</label>
           <div class="col-sm-9 mt-sm-3">
             <label class="switch" for="mobile">
-              <input type="checkbox" id="mobile" v-model="dynamo_obj.LandingInfo.landing.is_mobile">
+              <input type="checkbox" id="mobile" v-model="dynamo_obj.landing_info.landing.is_mobile">
               <span class="slider round"></span>
             </label>
           </div>
@@ -1110,37 +1110,156 @@
         </div>
       </form>
 
+    </div>-->
+
+    <div>{{ dynamo_obj }}</div>
+
+    <div class="container" style="margin-top: 20px;">
+
+      <form v-on:submit.prevent="landing_check">
+
+        <h5>기본정보</h5>
+        <section_basic
+          :window_width="window_width"
+          :page_id="page_id"
+          :company.sync="dynamo_obj.landing_info.landing.company"
+          :name.sync="dynamo_obj.landing_info.landing.name"
+          :base_url.sync="dynamo_obj.landing_info.landing.base_url"
+          :error_name.sync="error_label.name"
+          :error_base_url.sync="error_label.base_url"
+        />
+
+        <hr>
+
+        <h5>DB 폼</h5>
+        <section_form_control
+          :form.sync="dynamo_obj.landing_info.form"
+          :form_arrow.sync="form_arrow"
+          :field.sync="dynamo_obj.landing_info.field"
+        />
+        <section_form_detail
+          :window_width="window_width"
+          :form_arrow.sync="form_arrow"
+          :field.sync="dynamo_obj.landing_info.field"
+        />
+
+        <hr>
+
+        <h5>추가내용</h5>
+        <section_term
+          :term_switch.sync="dynamo_obj.landing_info.landing.is_term"
+          :image_switch.sync="dynamo_obj.landing_info.landing.image_term"
+          :term.sync="dynamo_obj.landing_info.term"
+        />
+
+        <hr>
+
+        <h5>페이지 내용</h5>
+        <section_page_source
+          :window_width="window_width"
+          :title.sync="dynamo_obj.landing_info.landing.title"
+          :header_script.sync="dynamo_obj.landing_info.landing.header_script"
+          :body_script.sync="dynamo_obj.landing_info.landing.body_script"
+        />
+
+        <!-- Order layout component -->
+        <section_layout
+          :window_width="window_width"
+          :order.sync="dynamo_obj.landing_info.order"
+          :form.sync="dynamo_obj.landing_info.form"
+          :field.sync="dynamo_obj.landing_info.field"
+          :is_term.sync="dynamo_obj.landing_info.landing.is_term"
+        />
+
+        <section_layout_opt
+          :window_width.sync="window_width"
+          :landing.sync="dynamo_obj.landing_info.landing"
+        />
+
+        <hr>
+
+        <h5>옵션</h5>
+        <section_page_opt
+          :landing.sync="dynamo_obj.landing_info.landing"
+        />
+
+        <hr>
+
+        <div class="form-group row">
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary col-12">수정</button>
+            <button type="button" class="btn btn-danger col-12 mt-2" @click="delete_landing">삭제</button>
+            <button type="button" class="btn btn-dark col-12 mt-2" @click="back_to_list">취소</button>
+          </div>
+        </div>
+
+      </form>
+
     </div>
+
+    <popup_recovery
+      :user_obj="user_obj"
+    />
+
 
   </div>
 </template>
 
 <script>
+
+  import popup_recovery from '@/components/landing_detail/popup_1_recovery.vue'
+  import popup_company from '@/components/landing_detail/popup_2_company.vue'
+  import section_basic from '@/components/landing_detail/section_1_basic.vue'
+  import section_form_control from '@/components/landing_detail/section_2_form_control.vue'
+  import section_form_detail from '@/components/landing_detail/section_3_form_detail.vue'
+  import section_term from '@/components/landing_detail/section_4_term.vue'
+  import section_page_source from '@/components/landing_detail/section_5_page_source.vue'
+  import section_layout from '@/components/landing_detail/section_6_layout.vue'
+  import section_layout_opt from '@/components/landing_detail/section_7_layout_opt.vue'
+  import section_page_opt from '@/components/landing_detail/section_8_page_opt.vue'
+
   export default {
     name: "landing_detail",
+    components: {
+      popup_recovery,
+      popup_company,
+      section_basic,
+      section_form_control,
+      section_form_detail,
+      section_term,
+      section_page_source,
+      section_layout,
+      section_layout_opt,
+      section_page_opt
+    },
     data: () => ({
       window_width: window.innerWidth,
-      // msg is Tooltip messages. Static name by api.
-      msg: {
-        base_url: '기본 주소를 지정합니다.',
-        title: '사이트 내부 제목입니다.',
-        order: '랜딩페이지를 커스터마이징 합니다. 1000px 이상의 화면에서 작업대가 활성화됩니다.',
-        in_db: '레이아웃 내부에 DB 폼 그룹을 위치시키거나 하단 팝업으로 대체합니다.',
-        in_company: '랜딩 페이지에 하단 Footer로 해당 고객업체의 정보를 자동 기입합니다.',
-        hijack: '사용자가 뒤로 가기 시 해당 링크로 강제 이동시킵니다.',
-        in_banner: '스크롤 시 따라다니는 배너를 생성합니다.',
-        holder: 'Place holder입니다. 텍스트 입력 전 설명이 필요하거나 전화, 링크의 버튼에 표시할 글을 지정합니다.',
-        list: '선택 옵션을 선택하고 제공할 수 있습니다.'
+      error_label: {
+        name: true,
+        base_url: true,
       },
+      page_id: '',
+      // msg is Tooltip messages. Static name by api.
+      // msg: {
+      //   base_url: '기본 주소를 지정합니다.',
+      //   title: '사이트 내부 제목입니다.',
+      //   order: '랜딩페이지를 커스터마이징 합니다. 1000px 이상의 화면에서 작업대가 활성화됩니다.',
+      //   in_db: '레이아웃 내부에 DB 폼 그룹을 위치시키거나 하단 팝업으로 대체합니다.',
+      //   in_company: '랜딩 페이지에 하단 Footer로 해당 고객업체의 정보를 자동 기입합니다.',
+      //   hijack: '사용자가 뒤로 가기 시 해당 링크로 강제 이동시킵니다.',
+      //   in_banner: '스크롤 시 따라다니는 배너를 생성합니다.',
+      //   holder: 'Place holder입니다. 텍스트 입력 전 설명이 필요하거나 전화, 링크의 버튼에 표시할 글을 지정합니다.',
+      //   list: '선택 옵션을 선택하고 제공할 수 있습니다.'
+      // },
       // Get org's companies and managers lists
-      landing_company: [],
+      // landing_company: [],
       epoch_time: 0,
       // Landing obj
       dynamo_obj: {
         CompanyNum: '',
         LandingNum: '',
         UpdatedTime: '',
-        LandingInfo: {
+        landing_info: {
           landing: {
             company: -1,
             manager: -1,
@@ -1175,334 +1294,335 @@
         }
       },
       // Duplicate check
-      duplicated_name_class: 'form-control',
-      duplicated_name_flag: false,
-      duplicated_url_class: 'form-control',
-      duplicated_url_flag: false,
+      // duplicated_name_class: 'form-control',
+      // duplicated_name_flag: false,
+      // duplicated_url_class: 'form-control',
+      // duplicated_url_flag: false,
       // Order relative
-      order_focus_flag: false,
-      order_selected: 0,
+      // order_focus_flag: false,
+      // order_selected: 0,
       // Form relative
-      form_temp: '',
-      form_arrow: -1,
-      form_selected: {
-        sign: -1,
-        bg_color: '#f9f9f9',
-        tx_color: '#313131',
-        opacity: 10
-      },
+      // form_temp: '',
+      // form_arrow: -1,
+      // form_selected: {
+      //   sign: -1,
+      //   bg_color: '#f9f9f9',
+      //   tx_color: '#313131',
+      //   opacity: 10
+      // },
       // Filter relative
-      filtered_fields: [],
-      field_selected: -1,
-      field_temp_name: '',
+      // filtered_fields: [],
+      // field_selected: -1,
+      form_arrow: -1,
+      // field_temp_name: '',
     }),
     methods: {
       // Form groups Handle
       // Form groups Handle
       // Form groups Handle
-      form_group_add() {
-        if (this.form_temp) {
-          let len = this.dynamo_obj.LandingInfo.form.length
-          let flag = true
-          if (len) {
-            for (let i = 0; i < len; i++) {
-              if (this.dynamo_obj.LandingInfo.form[i].name === this.form_temp) {
-                alert('폼 그룹 이름이 이미 존재합니다.')
-                flag = false
-                return flag
-              }
-            }
-            if (flag) {
-              let highest = 0
-              for (let i = 0; i < len; i++) {
-                if (this.dynamo_obj.LandingInfo.form[i].sign > highest) {
-                  highest = this.dynamo_obj.LandingInfo.form[i].sign
-                }
-              }
-              let hex = '#fafafa'
-              let r = parseInt(hex.slice(1, 3), 16)
-              let g = parseInt(hex.slice(3, 5), 16)
-              let b = parseInt(hex.slice(5, 7), 16)
-              let o = 1
-              this.dynamo_obj.LandingInfo.form.push({
-                sign: highest + 1,
-                name: this.form_temp,
-                bg_color: '#fafafa',
-                tx_color: '#313131',
-                opacity: 10,
-                rgba: (r+','+g+','+b+','+o)
-              })
-              this.form_temp = ''
-              alert('폼 그룹이 생성되었습니다.')
-            }
-          } else {
-            let hex = '#fafafa'
-            let r = parseInt(hex.slice(1, 3), 16)
-            let g = parseInt(hex.slice(3, 5), 16)
-            let b = parseInt(hex.slice(5, 7), 16)
-            let o = 1
-            this.dynamo_obj.LandingInfo.form.push({
-              sign: 1,
-              name: this.form_temp,
-              bg_color: '#fafafa',
-              tx_color: '#313131',
-              opacity: 10,
-              rgba: (r+','+g+','+b+','+o),
-            })
-            this.form_temp = ''
-            alert('폼 그룹이 생성되었습니다.')
-          }
-        } else {
-          alert('폼 그룹 이름을 입력하세요!')
-        }
-      },
-      form_group_delete(id) {
-        if (id !== -1) {
-          if (confirm('이 폼그룹을 삭제하시겠습니까?')) {
-            this.dynamo_obj.LandingInfo.form = this.dynamo_obj.LandingInfo.form.filter(el => el.sign != id)
-            this.form_arrow = -1
-            this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
-            // Field objs delete also
-            this.dynamo_obj.LandingInfo.field = this.dynamo_obj.LandingInfo.field.filter(el => el.form_group_id != id)
-          }
-        } else {
-          alert('그룹을 먼저 선택하세요.')
-        }
-      },
-      form_changed(id) {
-        if (id == -1) {
-          this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
-        } else {
-          for (let i = 0; i < this.dynamo_obj.LandingInfo.form.length; i++) {
-            if (this.dynamo_obj.LandingInfo.form[i].sign == id) {
-              this.form_selected = this.dynamo_obj.LandingInfo.form[i]
-              this.filter_change()
-            }
-          }
-        }
-      },
+      // form_group_add() {
+      //   if (this.form_temp) {
+      //     let len = this.dynamo_obj.landing_info.form.length
+      //     let flag = true
+      //     if (len) {
+      //       for (let i = 0; i < len; i++) {
+      //         if (this.dynamo_obj.landing_info.form[i].name === this.form_temp) {
+      //           alert('폼 그룹 이름이 이미 존재합니다.')
+      //           flag = false
+      //           return flag
+      //         }
+      //       }
+      //       if (flag) {
+      //         let highest = 0
+      //         for (let i = 0; i < len; i++) {
+      //           if (this.dynamo_obj.landing_info.form[i].sign > highest) {
+      //             highest = this.dynamo_obj.landing_info.form[i].sign
+      //           }
+      //         }
+      //         let hex = '#fafafa'
+      //         let r = parseInt(hex.slice(1, 3), 16)
+      //         let g = parseInt(hex.slice(3, 5), 16)
+      //         let b = parseInt(hex.slice(5, 7), 16)
+      //         let o = 1
+      //         this.dynamo_obj.landing_info.form.push({
+      //           sign: highest + 1,
+      //           name: this.form_temp,
+      //           bg_color: '#fafafa',
+      //           tx_color: '#313131',
+      //           opacity: 10,
+      //           rgba: (r+','+g+','+b+','+o)
+      //         })
+      //         this.form_temp = ''
+      //         alert('폼 그룹이 생성되었습니다.')
+      //       }
+      //     } else {
+      //       let hex = '#fafafa'
+      //       let r = parseInt(hex.slice(1, 3), 16)
+      //       let g = parseInt(hex.slice(3, 5), 16)
+      //       let b = parseInt(hex.slice(5, 7), 16)
+      //       let o = 1
+      //       this.dynamo_obj.landing_info.form.push({
+      //         sign: 1,
+      //         name: this.form_temp,
+      //         bg_color: '#fafafa',
+      //         tx_color: '#313131',
+      //         opacity: 10,
+      //         rgba: (r+','+g+','+b+','+o),
+      //       })
+      //       this.form_temp = ''
+      //       alert('폼 그룹이 생성되었습니다.')
+      //     }
+      //   } else {
+      //     alert('폼 그룹 이름을 입력하세요!')
+      //   }
+      // },
+      // form_group_delete(id) {
+      //   if (id !== -1) {
+      //     if (confirm('이 폼그룹을 삭제하시겠습니까?')) {
+      //       this.dynamo_obj.landing_info.form = this.dynamo_obj.landing_info.form.filter(el => el.sign != id)
+      //       this.form_arrow = -1
+      //       this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
+      //       // Field objs delete also
+      //       this.dynamo_obj.landing_info.field = this.dynamo_obj.landing_info.field.filter(el => el.form_group_id != id)
+      //     }
+      //   } else {
+      //     alert('그룹을 먼저 선택하세요.')
+      //   }
+      // },
+      // form_changed(id) {
+      //   if (id == -1) {
+      //     this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
+      //   } else {
+      //     for (let i = 0; i < this.dynamo_obj.landing_info.form.length; i++) {
+      //       if (this.dynamo_obj.landing_info.form[i].sign == id) {
+      //         this.form_selected = this.dynamo_obj.landing_info.form[i]
+      //         this.filter_change()
+      //       }
+      //     }
+      //   }
+      // },
       // form_color_get(id) {
-      //   for(let i = 0; i< this.dynamo_obj.LandingInfo.form.length; i++) {
-      //     if (this.dynamo_obj.LandingInfo.form[i].sign == id) {
-      //       let hex = this.dynamo_obj.LandingInfo.form[i].bg_color
-      //       let opacity = this.dynamo_obj.LandingInfo.form[i].opacity
+      //   for(let i = 0; i< this.dynamo_obj.landing_info.form.length; i++) {
+      //     if (this.dynamo_obj.landing_info.form[i].sign == id) {
+      //       let hex = this.dynamo_obj.landing_info.form[i].bg_color
+      //       let opacity = this.dynamo_obj.landing_info.form[i].opacity
       //       let r = parseInt(hex.slice(1, 3), 16)
       //       let g = parseInt(hex.slice(3, 5), 16)
       //       let b = parseInt(hex.slice(5, 7), 16)
       //       let o = opacity / 10
       //       console.log(r, g, b, o)
-      //       this.dynamo_obj.LandingInfo.form[i].rgba = (r+','+g+','+b+','+o)
+      //       this.dynamo_obj.landing_info.form[i].rgba = (r+','+g+','+b+','+o)
       //     }
       //   }
       // },
       // Filtered fields by form group
-      filter_change() {
-        this.filtered_fields = []
-        for (let i = 0; i < this.dynamo_obj.LandingInfo.field.length; i++) {
-          if (this.dynamo_obj.LandingInfo.field[i].form_group_id == this.form_selected.sign) {
-            // this.filtered_fields
-            this.filtered_fields.push(this.dynamo_obj.LandingInfo.field[i])
-          }
-        }
-      },
+      // filter_change() {
+      //   this.filtered_fields = []
+      //   for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
+      //     if (this.dynamo_obj.landing_info.field[i].form_group_id == this.form_selected.sign) {
+      //       // this.filtered_fields
+      //       this.filtered_fields.push(this.dynamo_obj.landing_info.field[i])
+      //     }
+      //   }
+      // },
       /* e */
       /* n */
       /* d */
       // Field handle
       // Field handle
       // Field handle
-      field_add() {
-        // get form group sign
-        if (this.form_selected.sign != -1) {
-          // get field type and field name
-          if (this.field_selected != -1 && this.field_temp_name) {
-            // if field object is not empty
-            if (this.dynamo_obj.LandingInfo.field.length != 0) {
-              let highest = 0
-              let flag = true
-              for (let i = 0; i < this.dynamo_obj.LandingInfo.field.length; i++) {
-                if (this.form_selected.sign == this.dynamo_obj.LandingInfo.field[i].form_group_id) {
-                  if (this.field_temp_name == this.dynamo_obj.LandingInfo.field[i].name) {
-                    alert('이미 존재하는 필드 이름입니다.')
-                    flag = false
-                    return flag
-                  }
-                }
-              }
-              if (flag) {
-                for (let i = 0; i < this.dynamo_obj.LandingInfo.field.length; i++) {
-                  if (this.dynamo_obj.LandingInfo.field[i].sign > highest) {
-                    highest = this.dynamo_obj.LandingInfo.field[i].sign
-                  }
-                }
-              }
-              this.dynamo_obj.LandingInfo.field.push({
-                sign: highest + 1,
-                type: this.field_selected * 1,
-                label: true,
-                name: this.field_temp_name,
-                holder: this.field_temp_name,
-                form_group_id: this.form_selected.sign,
-                back_color: '#287BFF',
-                text_color: '#f0f0f0',
-                opacity: 10,
-                list: [],
-                image_data: null
-              })
-              this.field_temp_name = ''
-              this.filter_change()
-            } else {
-              this.dynamo_obj.LandingInfo.field.push({
-                sign: 1,
-                type: this.field_selected * 1,
-                label: true,
-                name: this.field_temp_name,
-                holder: this.field_temp_name,
-                form_group_id: this.form_selected.sign,
-                back_color: '#287BFF',
-                text_color: '#fafafa',
-                opacity: 10,
-                list: [],
-                image_data: null
-              })
-              this.field_temp_name = ''
-              this.filter_change()
-            }
-            // this.field_obj.push()
-            // this.filter_change()
-          } else {
-            alert('필드 타입과 내용을 입력하세요.')
-            document.getElementById('db_field').focus()
-          }
-        } else {
-          alert('폼 그룹을 먼저 선택하세요.')
-          document.getElementById('form_group_list').focus()
-        }
-      },
-      field_delete(id) {
-        for (let i = 0; i < this.dynamo_obj.LandingInfo.field.length; i++) {
-          if (this.dynamo_obj.LandingInfo.field[i].sign == id) {
-            // this.field_obj = this.field_obj.splice(id, 1)
-            this.dynamo_obj.LandingInfo.field.splice(i, 1)
-            this.filter_change()
-            return true
-          }
-        }
-      },
-      field_list_add(id) {
-        for (let i = 0; i < this.dynamo_obj.LandingInfo.field.length; i++) {
-          if (this.dynamo_obj.LandingInfo.field[i].sign == id) {
-            this.dynamo_obj.LandingInfo.field[i].list.push("")
-            this.filter_change()
-            return true
-          }
-        }
-      },
-      field_list_delete(id, index) {
-        for (let i = 0; i < this.dynamo_obj.LandingInfo.field.length; i++) {
-          if (this.dynamo_obj.LandingInfo.field[i].sign == id) {
-            this.dynamo_obj.LandingInfo.field[i].list.splice(index, 1)
-            this.filter_change()
-            return true
-          }
-        }
-      },
-      field_option_close(that) {
-        //
-      },
-      /* e */
-      /* n */
-      /* d */
+      // field_add() {
+      //   // get form group sign
+      //   if (this.form_selected.sign != -1) {
+      //     // get field type and field name
+      //     if (this.field_selected != -1 && this.field_temp_name) {
+      //       // if field object is not empty
+      //       if (this.dynamo_obj.landing_info.field.length != 0) {
+      //         let highest = 0
+      //         let flag = true
+      //         for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
+      //           if (this.form_selected.sign == this.dynamo_obj.landing_info.field[i].form_group_id) {
+      //             if (this.field_temp_name == this.dynamo_obj.landing_info.field[i].name) {
+      //               alert('이미 존재하는 필드 이름입니다.')
+      //               flag = false
+      //               return flag
+      //             }
+      //           }
+      //         }
+      //         if (flag) {
+      //           for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
+      //             if (this.dynamo_obj.landing_info.field[i].sign > highest) {
+      //               highest = this.dynamo_obj.landing_info.field[i].sign
+      //             }
+      //           }
+      //         }
+      //         this.dynamo_obj.landing_info.field.push({
+      //           sign: highest + 1,
+      //           type: this.field_selected * 1,
+      //           label: true,
+      //           name: this.field_temp_name,
+      //           holder: this.field_temp_name,
+      //           form_group_id: this.form_selected.sign,
+      //           back_color: '#287BFF',
+      //           text_color: '#f0f0f0',
+      //           opacity: 10,
+      //           list: [],
+      //           image_data: null
+      //         })
+      //         this.field_temp_name = ''
+      //         this.filter_change()
+      //       } else {
+      //         this.dynamo_obj.landing_info.field.push({
+      //           sign: 1,
+      //           type: this.field_selected * 1,
+      //           label: true,
+      //           name: this.field_temp_name,
+      //           holder: this.field_temp_name,
+      //           form_group_id: this.form_selected.sign,
+      //           back_color: '#287BFF',
+      //           text_color: '#fafafa',
+      //           opacity: 10,
+      //           list: [],
+      //           image_data: null
+      //         })
+      //         this.field_temp_name = ''
+      //         this.filter_change()
+      //       }
+      //       // this.field_obj.push()
+      //       // this.filter_change()
+      //     } else {
+      //       alert('필드 타입과 내용을 입력하세요.')
+      //       document.getElementById('db_field').focus()
+      //     }
+      //   } else {
+      //     alert('폼 그룹을 먼저 선택하세요.')
+      //     document.getElementById('form_group_list').focus()
+      //   }
+      // },
+      // field_delete(id) {
+      //   for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
+      //     if (this.dynamo_obj.landing_info.field[i].sign == id) {
+      //       // this.field_obj = this.field_obj.splice(id, 1)
+      //       this.dynamo_obj.landing_info.field.splice(i, 1)
+      //       this.filter_change()
+      //       return true
+      //     }
+      //   }
+      // },
+      // field_list_add(id) {
+      //   for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
+      //     if (this.dynamo_obj.landing_info.field[i].sign == id) {
+      //       this.dynamo_obj.landing_info.field[i].list.push("")
+      //       this.filter_change()
+      //       return true
+      //     }
+      //   }
+      // },
+      // field_list_delete(id, index) {
+      //   for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
+      //     if (this.dynamo_obj.landing_info.field[i].sign == id) {
+      //       this.dynamo_obj.landing_info.field[i].list.splice(index, 1)
+      //       this.filter_change()
+      //       return true
+      //     }
+      //   }
+      // },
+      // field_option_close(that) {
+      //   //
+      // },
+      // /* e */
+      // /* n */
+      // /* d */
       // Order handle
       // Order handle
       // Order handle
-      order_add() {
-        let len = this.dynamo_obj.LandingInfo.order.length
-        if (len) {
-          let highest = 0
-          let z = 1
-          for (let i = 0; i < len; i++) {
-            if (this.dynamo_obj.LandingInfo.order[i].sign > highest) {
-              highest = this.dynamo_obj.LandingInfo.order[i].sign
-            }
-          }
-          for (let j = 0; j < len; j++) {
-            if (this.dynamo_obj.LandingInfo.order[j].position.z > z) {
-              z = this.dynamo_obj.LandingInfo.order[j].position.z
-            }
-          }
-          let order_ready = {
-            sign: highest + 1,
-            type: 1,
-            name: 'new layout',
-            position: {x: 0, y: 0, w: 100, h: 100, z: z + 1},
-            image_data: '',
-            image_url: '',
-            video_type: 1
-          }
-          this.dynamo_obj.LandingInfo.order.push(order_ready)
-          alert('레이아웃이 생성되었습니다.')
-        } else {
-          let order_ready = {
-            sign: 1,
-            type: 1,
-            name: 'new layout',
-            position: {x: 0, y: 0, w: 100, h: 100, z: 1},
-            image_data: '',
-            image_url: '',
-            video_type: 1
-          }
-          this.dynamo_obj.LandingInfo.order.push(order_ready)
-          alert('레이아웃이 생성되었습니다.')
-        }
-      },
-      order_delete() {
-        if (this.order_selected) {
-          if (confirm('선택한 레이아웃을 삭제하시겠습니까?')) {
-            for (let i = 0; i < this.dynamo_obj.LandingInfo.order.length; i++) {
-              if (this.dynamo_obj.LandingInfo.order[i].sign == this.order_selected) {
-                if (i === 0) {
-                  this.dynamo_obj.LandingInfo.order.shift()
-                } else {
-                  this.dynamo_obj.LandingInfo.order.splice(i, 1)
-                }
-              }
-            }
-            let console_clear = {sign: 0, type: 0, name: '', position: {x: 0, y: 0, w: 0, h: 0, z: 0}}
-            this.console_obj = console_clear
-            this.order_selected = 0
-            this.order_activated(0)
-          }
-        } else {
-          alert('먼저 레이아웃을 선택하세요.')
-        }
-      },
-      order_activated(sign) {
-        this.order_selected = sign
-        this.order_focus_flag = true
-      },
-      order_deactivated() {
-        // this.order_selected = 0
-        // this.order_focus_flag = false
-      },
-      order_move(x, y) {
-        for (let i = 0; i < this.dynamo_obj.LandingInfo.order.length; i++) {
-          if (this.dynamo_obj.LandingInfo.order[i].sign == this.order_selected) {
-            this.dynamo_obj.LandingInfo.order[i].position.x = x
-            this.dynamo_obj.LandingInfo.order[i].position.y = y
-          }
-        }
-      },
-      order_resize(x, y, w, h) {
-        for (let i = 0; i < this.dynamo_obj.LandingInfo.order.length; i++) {
-          if (this.dynamo_obj.LandingInfo.order[i].sign == this.order_selected) {
-            this.dynamo_obj.LandingInfo.order[i].position.x = x
-            this.dynamo_obj.LandingInfo.order[i].position.y = y
-            this.dynamo_obj.LandingInfo.order[i].position.w = w
-            this.dynamo_obj.LandingInfo.order[i].position.h = h
-          }
-        }
-      },
+      // order_add() {
+      //   let len = this.dynamo_obj.landing_info.order.length
+      //   if (len) {
+      //     let highest = 0
+      //     let z = 1
+      //     for (let i = 0; i < len; i++) {
+      //       if (this.dynamo_obj.landing_info.order[i].sign > highest) {
+      //         highest = this.dynamo_obj.landing_info.order[i].sign
+      //       }
+      //     }
+      //     for (let j = 0; j < len; j++) {
+      //       if (this.dynamo_obj.landing_info.order[j].position.z > z) {
+      //         z = this.dynamo_obj.landing_info.order[j].position.z
+      //       }
+      //     }
+      //     let order_ready = {
+      //       sign: highest + 1,
+      //       type: 1,
+      //       name: 'new layout',
+      //       position: {x: 0, y: 0, w: 100, h: 100, z: z + 1},
+      //       image_data: '',
+      //       image_url: '',
+      //       video_type: 1
+      //     }
+      //     this.dynamo_obj.landing_info.order.push(order_ready)
+      //     alert('레이아웃이 생성되었습니다.')
+      //   } else {
+      //     let order_ready = {
+      //       sign: 1,
+      //       type: 1,
+      //       name: 'new layout',
+      //       position: {x: 0, y: 0, w: 100, h: 100, z: 1},
+      //       image_data: '',
+      //       image_url: '',
+      //       video_type: 1
+      //     }
+      //     this.dynamo_obj.landing_info.order.push(order_ready)
+      //     alert('레이아웃이 생성되었습니다.')
+      //   }
+      // },
+      // order_delete() {
+      //   if (this.order_selected) {
+      //     if (confirm('선택한 레이아웃을 삭제하시겠습니까?')) {
+      //       for (let i = 0; i < this.dynamo_obj.landing_info.order.length; i++) {
+      //         if (this.dynamo_obj.landing_info.order[i].sign == this.order_selected) {
+      //           if (i === 0) {
+      //             this.dynamo_obj.landing_info.order.shift()
+      //           } else {
+      //             this.dynamo_obj.landing_info.order.splice(i, 1)
+      //           }
+      //         }
+      //       }
+      //       let console_clear = {sign: 0, type: 0, name: '', position: {x: 0, y: 0, w: 0, h: 0, z: 0}}
+      //       this.console_obj = console_clear
+      //       this.order_selected = 0
+      //       this.order_activated(0)
+      //     }
+      //   } else {
+      //     alert('먼저 레이아웃을 선택하세요.')
+      //   }
+      // },
+      // order_activated(sign) {
+      //   this.order_selected = sign
+      //   this.order_focus_flag = true
+      // },
+      // order_deactivated() {
+      //   // this.order_selected = 0
+      //   // this.order_focus_flag = false
+      // },
+      // order_move(x, y) {
+      //   for (let i = 0; i < this.dynamo_obj.landing_info.order.length; i++) {
+      //     if (this.dynamo_obj.landing_info.order[i].sign == this.order_selected) {
+      //       this.dynamo_obj.landing_info.order[i].position.x = x
+      //       this.dynamo_obj.landing_info.order[i].position.y = y
+      //     }
+      //   }
+      // },
+      // order_resize(x, y, w, h) {
+      //   for (let i = 0; i < this.dynamo_obj.landing_info.order.length; i++) {
+      //     if (this.dynamo_obj.landing_info.order[i].sign == this.order_selected) {
+      //       this.dynamo_obj.landing_info.order[i].position.x = x
+      //       this.dynamo_obj.landing_info.order[i].position.y = y
+      //       this.dynamo_obj.landing_info.order[i].position.w = w
+      //       this.dynamo_obj.landing_info.order[i].position.h = h
+      //     }
+      //   }
+      // },
       // order_resize_console(info, pos) {
       //   if (info.type == 3) {
       //     if (pos == 'w') {
@@ -1514,115 +1634,115 @@
       //     }
       //   }
       // },
-      order_image_change(sign) {
-        let file_data = event.target.files[0]
-        for (let i = 0; i < this.dynamo_obj.LandingInfo.order.length; i++) {
-          if (this.dynamo_obj.LandingInfo.order[i].sign == sign) {
-            this.dynamo_obj.LandingInfo.order[i].image_data = file_data
-            this.dynamo_obj.LandingInfo.order[i].image_url = URL.createObjectURL(file_data)
-          }
-        }
-      },
+      // order_image_change(sign) {
+      //   let file_data = event.target.files[0]
+      //   for (let i = 0; i < this.dynamo_obj.landing_info.order.length; i++) {
+      //     if (this.dynamo_obj.landing_info.order[i].sign == sign) {
+      //       this.dynamo_obj.landing_info.order[i].image_data = file_data
+      //       this.dynamo_obj.landing_info.order[i].image_url = URL.createObjectURL(file_data)
+      //     }
+      //   }
+      // },
       /* e */
       /* n */
       /* d */
       // File handle
       // File handle
       // File handle
-      field_file_add(sign) {
-        let file_data = event.target.files[0]
-        for (let i = 0; i < this.dynamo_obj.LandingInfo.field.length; i++) {
-          if (this.dynamo_obj.LandingInfo.field[i].sign == sign) {
-            this.dynamo_obj.LandingInfo.field[i].image_data = file_data
-            this.dynamo_obj.LandingInfo.field[i].image_url = URL.createObjectURL(file_data)
-          }
-        }
-      },
-      field_file_delete(sign) {
-        document.getElementById('field_file_input' + sign).value = ''
-        for (let i = 0; i < this.dynamo_obj.LandingInfo.field.length; i++) {
-          if (this.dynamo_obj.LandingInfo.field[i].sign == sign) {
-            this.dynamo_obj.LandingInfo.field[i].image_data = null
-            this.dynamo_obj.LandingInfo.field[i].image_url = null
-          }
-        }
-      },
-      term_file_add() {
-        /* When file data changed */
-        let file_data = event.target.files[0]
-        this.dynamo_obj.LandingInfo.term.image = file_data
-      },
-      term_file_delete() {
-        /* Remove file data */
-        if (this.$refs.term_file_input) {
-          this.$refs.term_file_input.value = null
-        }
-        this.dynamo_obj.LandingInfo.term.image = null
-      },
-      in_banner_file_add() {
-        /* When file data changed */
-        let file_data = event.target.files[0]
-        this.dynamo_obj.LandingInfo.landing.banner_image = file_data
-      },
-      in_banner_file_delete() {
-        /* Remove file data */
-        if (this.$refs.in_banner_file_input) {
-          this.$refs.in_banner_file_input.value = null
-        }
-        this.dynamo_obj.LandingInfo.landing.banner_image = null
-      },
+      // field_file_add(sign) {
+      //   let file_data = event.target.files[0]
+      //   for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
+      //     if (this.dynamo_obj.landing_info.field[i].sign == sign) {
+      //       this.dynamo_obj.landing_info.field[i].image_data = file_data
+      //       this.dynamo_obj.landing_info.field[i].image_url = URL.createObjectURL(file_data)
+      //     }
+      //   }
+      // },
+      // field_file_delete(sign) {
+      //   document.getElementById('field_file_input' + sign).value = ''
+      //   for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
+      //     if (this.dynamo_obj.landing_info.field[i].sign == sign) {
+      //       this.dynamo_obj.landing_info.field[i].image_data = null
+      //       this.dynamo_obj.landing_info.field[i].image_url = null
+      //     }
+      //   }
+      // },
+      // term_file_add() {
+      //   /* When file data changed */
+      //   let file_data = event.target.files[0]
+      //   this.dynamo_obj.landing_info.term.image = file_data
+      // },
+      // term_file_delete() {
+      //   /* Remove file data */
+      //   if (this.$refs.term_file_input) {
+      //     this.$refs.term_file_input.value = null
+      //   }
+      //   this.dynamo_obj.landing_info.term.image = null
+      // },
+      // in_banner_file_add() {
+      //   /* When file data changed */
+      //   let file_data = event.target.files[0]
+      //   this.dynamo_obj.landing_info.landing.banner_image = file_data
+      // },
+      // in_banner_file_delete() {
+      //   /* Remove file data */
+      //   if (this.$refs.in_banner_file_input) {
+      //     this.$refs.in_banner_file_input.value = null
+      //   }
+      //   this.dynamo_obj.landing_info.landing.banner_image = null
+      // },
       /* e */
       /* n */
       /* d */
       // Check duplicated Name
       // Check duplicated Name
       // Check duplicated Name
-      check_name() {
-        let axios = this.$axios
-        if (this.dynamo_obj.LandingInfo.landing.name == '') {
-          this.duplicated_name_class = 'form-control'
-          this.duplicated_name_flag = false
-        } else {
-          axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/?auth=staff')
-            .then((response) => {
-              for (let i = 0; i < response.data.length; i++) {
-                if (response.data[i].LandingInfo['landing']['name'] !== null) {
-                  if ((this.dynamo_obj.LandingInfo.landing.name).toLowerCase() == (response.data[i].LandingInfo.landing.name).toLowerCase()) {
-                    this.duplicated_name_flag = true
-                    this.duplicated_name_class = 'form-control alert-danger'
-                    return false
-                  }
-                }
-              }
-              this.duplicated_name_class = 'form-control alert-success'
-              this.duplicated_name_flag = false
-            })
-        }
-      },
-      check_url() {
-        let axios = this.$axios
-        if (this.dynamo_obj.LandingInfo.landing.base_url == '') {
-          this.duplicated_url_class = 'form-control'
-          this.duplicated_url_flag = false
-        } else {
-          axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/?auth=staff')
-            .then((response) => {
-              for (let i = 0; i < response.data.length; i++) {
-                if (response.data[i].LandingInfo['landing']['base_url'] !== null || response.data[i].LandingInfo['landing']['base_url'] !== '') {
-                }
-                if (response.data[i].LandingInfo['landing']['base_url'] !== null || response.data[i].LandingInfo['landing']['base_url'] !== '') {
-                  if ((this.dynamo_obj.LandingInfo.landing.base_url).toLowerCase() == (response.data[i].LandingInfo['landing']['base_url']).toLowerCase()) {
-                    this.duplicated_url_flag = true
-                    this.duplicated_url_class = 'form-control alert-danger'
-                    return false
-                  }
-                }
-              }
-              this.duplicated_url_class = 'form-control alert-success'
-              this.duplicated_url_flag = false
-            })
-        }
-      },
+      // check_name() {
+      //   let axios = this.$axios
+      //   if (this.dynamo_obj.landing_info.landing.name == '') {
+      //     this.duplicated_name_class = 'form-control'
+      //     this.duplicated_name_flag = false
+      //   } else {
+      //     axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/?auth=staff')
+      //       .then((response) => {
+      //         for (let i = 0; i < response.data.length; i++) {
+      //           if (response.data[i].landing_info['landing']['name'] !== null) {
+      //             if ((this.dynamo_obj.landing_info.landing.name).toLowerCase() == (response.data[i].landing_info.landing.name).toLowerCase()) {
+      //               this.duplicated_name_flag = true
+      //               this.duplicated_name_class = 'form-control alert-danger'
+      //               return false
+      //             }
+      //           }
+      //         }
+      //         this.duplicated_name_class = 'form-control alert-success'
+      //         this.duplicated_name_flag = false
+      //       })
+      //   }
+      // },
+      // check_url() {
+      //   let axios = this.$axios
+      //   if (this.dynamo_obj.landing_info.landing.base_url == '') {
+      //     this.duplicated_url_class = 'form-control'
+      //     this.duplicated_url_flag = false
+      //   } else {
+      //     axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/?auth=staff')
+      //       .then((response) => {
+      //         for (let i = 0; i < response.data.length; i++) {
+      //           if (response.data[i].landing_info['landing']['base_url'] !== null || response.data[i].landing_info['landing']['base_url'] !== '') {
+      //           }
+      //           if (response.data[i].landing_info['landing']['base_url'] !== null || response.data[i].landing_info['landing']['base_url'] !== '') {
+      //             if ((this.dynamo_obj.landing_info.landing.base_url).toLowerCase() == (response.data[i].landing_info['landing']['base_url']).toLowerCase()) {
+      //               this.duplicated_url_flag = true
+      //               this.duplicated_url_class = 'form-control alert-danger'
+      //               return false
+      //             }
+      //           }
+      //         }
+      //         this.duplicated_url_class = 'form-control alert-success'
+      //         this.duplicated_url_flag = false
+      //       })
+      //   }
+      // },
       /* e */
       /* n */
       /* d */
@@ -1633,29 +1753,29 @@
         // Start validate before create
         this.$validator.validateAll()
         // Empty filtering first
-        if (this.dynamo_obj.LandingInfo.landing.company == -1) {
+        if (this.dynamo_obj.landing_info.landing.company == -1) {
           alert('업체를 선택하세요!')
           document.getElementById('company_id').focus()
-        } else if (this.dynamo_obj.LandingInfo.landing.manager == -1) {
+        } else if (this.dynamo_obj.landing_info.landing.manager == -1) {
           alert('관리자를 선택하세요!')
           document.getElementById('manager').focus()
-        } else if (!this.dynamo_obj.LandingInfo.landing.name) {
+        } else if (!this.dynamo_obj.landing_info.landing.name) {
           alert('랜딩페이지 이름을 입력하세요!')
           document.getElementById('landing').focus()
         } else if (this.duplicated_name_flag) {
           alert('랜딩페이지 이름이 이미 존재합니다!')
           document.getElementById('landing').focus()
-        } else if (!this.dynamo_obj.LandingInfo.landing.base_url) {
+        } else if (!this.dynamo_obj.landing_info.landing.base_url) {
           alert('메인 URL을 입력하세요!')
           document.getElementById('base_url').focus()
         } else if (this.duplicated_url_flag) {
           alert('메인 URL이 이미 존재합니다!')
           document.getElementById('base_url').focus()
         } else {
-          if (this.dynamo_obj.LandingInfo.form.length > 0) {
+          if (this.dynamo_obj.landing_info.form.length > 0) {
             let flag = true
-            for (let i = 0; i < this.dynamo_obj.LandingInfo.field.length; i++) {
-              if (this.dynamo_obj.LandingInfo.field[i].name == '') {
+            for (let i = 0; i < this.dynamo_obj.landing_info.field.length; i++) {
+              if (this.dynamo_obj.landing_info.field[i].name == '') {
                 alert('폼 그룹의 필드 이름을 모두 입력해주세요!')
                 document.getElementById('db_field').focus()
                 flag = false
@@ -1672,53 +1792,52 @@
       },
       collect_dynamo(option) {
         // option first(mounted) or checked(button clicked)
-        let axios = this.$axios
         const config = {
           headers: {
             'Content-Type': 'application/json'
             // 'Content-Type': 'multipart/form-data'
           }
         }
-        this.dynamo_obj.CompanyNum = this.dynamo_obj.LandingInfo.landing.company.toString()
+        this.dynamo_obj.CompanyNum = this.dynamo_obj.landing_info.landing.company.toString()
         this.dynamo_obj.LandingNum = this.epoch_time.toString()
         this.dynamo_obj.UpdatedTime = (Date.now()).toString()
         // Empty objects make as Null
-        for (let key in this.dynamo_obj.LandingInfo.landing) {
-          if (this.dynamo_obj.LandingInfo.landing.hasOwnProperty(key)) {
-            if (this.dynamo_obj.LandingInfo.landing[key] === '' && typeof (this.dynamo_obj.LandingInfo.landing[key]) != 'boolean') {
-              this.dynamo_obj.LandingInfo.landing[key] = null
+        for (let key in this.dynamo_obj.landing_info.landing) {
+          if (this.dynamo_obj.landing_info.landing.hasOwnProperty(key)) {
+            if (this.dynamo_obj.landing_info.landing[key] === '' && typeof (this.dynamo_obj.landing_info.landing[key]) != 'boolean') {
+              this.dynamo_obj.landing_info.landing[key] = null
             }
           }
         }
-        for (let key in this.dynamo_obj.LandingInfo.form) {
-          if (this.dynamo_obj.LandingInfo.form.hasOwnProperty(key)) {
-            if (this.dynamo_obj.LandingInfo.form[key] === '' && typeof (this.dynamo_obj.LandingInfo.form[key]) != 'boolean') {
-              this.dynamo_obj.LandingInfo.form[key] = null
+        for (let key in this.dynamo_obj.landing_info.form) {
+          if (this.dynamo_obj.landing_info.form.hasOwnProperty(key)) {
+            if (this.dynamo_obj.landing_info.form[key] === '' && typeof (this.dynamo_obj.landing_info.form[key]) != 'boolean') {
+              this.dynamo_obj.landing_info.form[key] = null
             }
           }
         }
-        for (let key in this.dynamo_obj.LandingInfo.field) {
-          if (this.dynamo_obj.LandingInfo.field.hasOwnProperty(key)) {
-            for (let j in this.dynamo_obj.LandingInfo.field[key]) {
-              if (this.dynamo_obj.LandingInfo.field[key][j] === '') {
-                this.dynamo_obj.LandingInfo.field[key][j] = null
+        for (let key in this.dynamo_obj.landing_info.field) {
+          if (this.dynamo_obj.landing_info.field.hasOwnProperty(key)) {
+            for (let j in this.dynamo_obj.landing_info.field[key]) {
+              if (this.dynamo_obj.landing_info.field[key][j] === '') {
+                this.dynamo_obj.landing_info.field[key][j] = null
               }
             }
           }
         }
-        for (let key in this.dynamo_obj.LandingInfo.order) {
-          if (this.dynamo_obj.LandingInfo.order.hasOwnProperty(key)) {
-            for (let j in this.dynamo_obj.LandingInfo.order[key]) {
-              if (this.dynamo_obj.LandingInfo.order[key][j] === '') {
-                this.dynamo_obj.LandingInfo.order[key][j] = null
+        for (let key in this.dynamo_obj.landing_info.order) {
+          if (this.dynamo_obj.landing_info.order.hasOwnProperty(key)) {
+            for (let j in this.dynamo_obj.landing_info.order[key]) {
+              if (this.dynamo_obj.landing_info.order[key][j] === '') {
+                this.dynamo_obj.landing_info.order[key][j] = null
               }
             }
           }
         }
-        for (let key in this.dynamo_obj.LandingInfo.term) {
-          if (this.dynamo_obj.LandingInfo.term.hasOwnProperty(key)) {
-            if (this.dynamo_obj.LandingInfo.term[key] === '' && typeof (this.dynamo_obj.LandingInfo.term[key]) != 'boolean') {
-              this.dynamo_obj.LandingInfo.term[key] = null
+        for (let key in this.dynamo_obj.landing_info.term) {
+          if (this.dynamo_obj.landing_info.term.hasOwnProperty(key)) {
+            if (this.dynamo_obj.landing_info.term[key] === '' && typeof (this.dynamo_obj.landing_info.term[key]) != 'boolean') {
+              this.dynamo_obj.landing_info.term[key] = null
             }
           }
         }
@@ -1726,8 +1845,9 @@
         // console.log('axios temporary disabled')
         // console.log(this.dynamo_obj)
         this.$store.state.pageOptions.loading = true
-        axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
-          .then(() => {
+        axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id, this.dynamo_obj, config)
+          .then((response) => {
+            console.log('update response! ', response)
             if (option == 'checked') {
               alert('랜딩이 수정되었습니다.')
               this.$store.state.pageOptions.loading = false
@@ -1759,8 +1879,7 @@
       /* d */
       delete_landing() {
         if (confirm('정말 삭제하시겠습니까?')) {
-          let axios = this.$axios
-          let landing_num = this.epoch_time
+          let landing_num = this.page_id
           axios.delete(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num)
             .then(() => {
               alert('삭제되었습니다.')
@@ -1778,41 +1897,26 @@
           this.$router.currentRoute.meta.protect_leave = 'no'
           this.$router.push({name: 'landing_list'})
         }
-      },
-      preview() {
-        let axios = this.$axios
-        const config = {
-          headers: {
-            'Content-Type': 'application/json'
-            // 'Content-Type': 'multipart/form-data'
-          }
-        }
-        axios.post(this.$store.state.endpoints.baseUrl + 'preview/', this.dynamo_obj, config)
-          .then((response) => {
-            console.log(response)
-          })
-          .catch((error) => {
-            console.log(error)
-          })
       }
     },
     mounted() {
       // Window width calculator
       // Window width calculator
       let that = this
-      this.$nextTick(function () {
+      that.$nextTick(function () {
         window.addEventListener('resize', function (e) {
           that.window_width = window.innerWidth
         })
       })
       // Get company, manager
-      let axios = this.$axios
       // Get landing obj from Landing Num
-      this.epoch_time = this.$route.params.landing_id
+      this.page_id = this.$route.params.landing_id
       this.$store.state.pageOptions.loading = true
       axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id)
         .then((response) => {
-          this.dynamo_obj = response.data
+          console.log('response check ', response)
+          this.dynamo_obj = response.data.data
+          console.log('dynamo set?', this.dynamo_obj)
           this.$store.state.pageOptions.loading = false
         })
         .catch((error) => {
@@ -1820,7 +1924,7 @@
           this.$store.state.pageOptions.loading = false
         })
       // Get companies from logged in user's organization
-      let this_url = 'company/'
+      let this_url = 'companies/'
       axios.get(this.$store.state.endpoints.baseUrl + this_url)
         .then((response) => {
           this.landing_company = response.data.results
@@ -1828,11 +1932,13 @@
         .catch((error) => {
           console.log(error)
         })
+
       // If not manager, push to db contents
-      if (this.user_obj.access_role != 1 || this.user_obj.access_role != 0) {
-        this.$router.currentRoute.meta.protect_leave = 'no'
-        this.$router.push({name: 'db_detail', params: {landing_id: this.epoch_time}})
-      }
+
+      // if (this.user_obj.access_role != 1 || this.user_obj.access_role != 0) {
+      //   this.$router.currentRoute.meta.protect_leave = 'no'
+      //   this.$router.push({name: 'db_detail', params: {landing_id: this.epoch_time}})
+      // }
     },
     computed: {
       user_obj() {
@@ -1854,21 +1960,21 @@
 
         return user_json
       },
-      order_wrap_height() {
-        let highest = 450
-        for (let i = 0; i < this.dynamo_obj.LandingInfo.order.length; i ++) {
-          let sum = this.dynamo_obj.LandingInfo.order[i].position.y + this.dynamo_obj.LandingInfo.order[i].position.h
-          if (sum > highest) {
-            highest = sum + 50
-          }
-        }
-        return highest
-      }
+      // order_wrap_height() {
+      //   let highest = 450
+      //   for (let i = 0; i < this.dynamo_obj.landing_info.order.length; i ++) {
+      //     let sum = this.dynamo_obj.landing_info.order[i].position.y + this.dynamo_obj.landing_info.order[i].position.h
+      //     if (sum > highest) {
+      //       highest = sum + 50
+      //     }
+      //   }
+      //   return highest
+      // }
     }
   }
 </script>
 
-<style scoped>
+<style lang="scss">
   hr {
     width: 100%;
   }

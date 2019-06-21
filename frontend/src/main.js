@@ -5,6 +5,7 @@ import store from './store'
 import router from './router'
 import './plugins/axios'
 import './plugins/vue-cookie'
+import AWS from 'aws-sdk'
 
 // Custom plugins
 import Header from './Header'
@@ -28,5 +29,6 @@ Vue.config.productionTip = false
 new Vue({
   router,
   store,
+  AWS,
   render: h => h(App),
 }).$mount('#app')

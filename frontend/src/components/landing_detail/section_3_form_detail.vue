@@ -212,8 +212,7 @@
     ],
     data: () => ({
       msg: {
-        holder: 'Place holder입니다. 텍스트 입력 전 설명이 필요하거나 전화, 링크의 버튼에 표시할 글을 지정합니다.',
-        list: '선택 옵션을 선택하고 제공할 수 있습니다.'
+        holder: 'Place holder입니다. 텍스트 입력 전 설명이 필요하거나 전화, 링크의 버튼에 표시할 글을 지정합니다.'
       },
       field_obj: [],
       filtered_fields: [],
