@@ -2,14 +2,14 @@ from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from infomagazine import permissions as custom_permissions
+import v1.permissions as custom_permissions
 from infomagazine.custom_packages import CustomModelViewSet
-from user.models import User
-from user.serializers import UserSerializer, CreateClientSerializer
+from v1.user.models import User
+from v1.user.serializers import UserSerializer, CreateClientSerializer
 
 
 class UserViewSets(CustomModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.select_related('info').all()
     serializer_class = UserSerializer
 
     @action(detail=False, methods=['POST'], permission_classes=[custom_permissions.IsMarketer])
@@ -41,11 +41,15 @@ class UserViewSets(CustomModelViewSet):
 
         if 'email' not in get_qs:
             result['message'] = 'must set query string "email"'
-        email_check = User.objects.filter(email=get_qs['email'])
+        else:
+            result['state'] = True
+            email_check = User.objects.filter(email=get_qs['email'])
 
-        if email_check.exists():
-            result['state'] = result['data']['email_check'] = True
-            result['message'] = 'success'
+            if email_check.exists():
+                result['data']['email_check'] = True
+                result['message'] = 'Existing email.'
+            else:
+                result['message'] = 'Nonexistent email.'
 
         return Response(result, status=status.HTTP_200_OK)
 

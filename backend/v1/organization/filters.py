@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from organization.models import Organization
+from v1.organization.models import Organization
 
 
 class OrganizationFilter(filters.FilterSet):

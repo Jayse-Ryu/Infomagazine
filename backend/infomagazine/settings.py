@@ -54,9 +54,9 @@ INSTALLED_APPS = [
     'django_filters',
 
     # Personal Apps
-    'user',
-    'organization',
-    'company',
+    'v1.user',
+    'v1.organization',
+    'v1.company',
 
     # AWS Management
     'storages',
@@ -83,7 +83,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'EXCEPTION_HANDLER': 'infomagazine.custom_packages.custom_exception_handler'
+    'EXCEPTION_HANDLER': 'infomagazine.custom_packages.custom_exception_handler',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
 
 SIMPLE_JWT = {

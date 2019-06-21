@@ -2,12 +2,12 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.utils import json
 
-from infomagazine import permissions as custom_permissions
-from landingpages.models import LandingPages
+import v1.permissions as custom_permissions
+from v1.landingpage.models import LandingPage
 
 
-class LandingPagesViewSets(viewsets.ViewSet):
-    landing_pages_model = LandingPages(choice_db='infomagazine')
+class LandingPageViewSets(viewsets.ViewSet):
+    landing_pages_model = LandingPage(choice_db='infomagazine')
     permission_classes = (custom_permissions.IsMarketer,)
 
     def list(self, request):
