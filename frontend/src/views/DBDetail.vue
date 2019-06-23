@@ -27,11 +27,11 @@
             </div>
             <ul class="list_body text-center list-group list-group-flush col-12 pr-0 text-center">
               <li class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1 font-weight-bold border-0">
-                <div class="col-3 p-0 col-sm-3">{{ landing_obj.LandingInfo.landing.company_name }}</div>
-                <div class="col-3 p-0 col-sm-4">{{ landing_obj.LandingInfo.landing.name }}</div>
-                <div class="col-3 p-0">{{ landing_obj.LandingInfo.landing.manager_name }}</div>
-                <div class="col-1 p-0 board_centre">{{ landing_obj.LandingInfo.landing.views }}</div>
-                <div class="col-1 p-0 board_centre">{{ landing_obj.LandingInfo.landing.collection_amount }}</div>
+                <div class="col-3 p-0 col-sm-3">{{ landing_obj.landing_info.landing.company_name }}</div>
+                <div class="col-3 p-0 col-sm-4">{{ landing_obj.landing_info.landing.name }}</div>
+                <div class="col-3 p-0">{{ landing_obj.landing_info.landing.manager_name }}</div>
+                <div class="col-1 p-0 board_centre">{{ landing_obj.landing_info.landing.views }}</div>
+                <div class="col-1 p-0 board_centre">{{ landing_obj.landing_info.landing.collection_amount }}</div>
               </li>
             </ul>
           </div>
@@ -48,10 +48,10 @@
             </div>
             <ul class="list_body text-center list-group list-group-flush col-12 pr-0">
               <li class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1 border-0">
-                <div class="col-3 p-0">{{ landing_obj.LandingInfo.landing.company_name }}</div>
-                <div class="col-6 p-0">{{ landing_obj.LandingInfo.landing.name }}</div>
-                <!--<div class="col-3 p-0">{{ landing_obj.LandingInfo.landing.manager_name }}</div>-->
-                <div class="col-3 p-0">{{ landing_obj.LandingInfo.landing.collection_amount }}</div>
+                <div class="col-3 p-0">{{ landing_obj.landing_info.landing.company_name }}</div>
+                <div class="col-6 p-0">{{ landing_obj.landing_info.landing.name }}</div>
+                <!--<div class="col-3 p-0">{{ landing_obj.landing_info.landing.manager_name }}</div>-->
+                <div class="col-3 p-0">{{ landing_obj.landing_info.landing.collection_amount }}</div>
               </li>
             </ul>
           </div>
@@ -87,11 +87,11 @@
 
           <ul class="text-center list-group list-group-flush text-center">
             <li class="list-group-item list-group-item-action d-inline-flex justify-content-around p-1">
-              <div class="p-0 w-100">{{ landing_obj.LandingInfo.landing.company_name }}</div>
-              <div class="p-0 w-100">{{ landing_obj.LandingInfo.landing.name }}</div>
-              <div class="p-0 w-100">{{ landing_obj.LandingInfo.landing.manager_name }}</div>
-              <div class="p-0 w-100">{{ landing_obj.LandingInfo.landing.views }}</div>
-              <div class="p-0 w-100">{{ landing_obj.LandingInfo.landing.collection_amount }}</div>
+              <div class="p-0 w-100">{{ landing_obj.landing_info.landing.company_name }}</div>
+              <div class="p-0 w-100">{{ landing_obj.landing_info.landing.name }}</div>
+              <div class="p-0 w-100">{{ landing_obj.landing_info.landing.manager_name }}</div>
+              <div class="p-0 w-100">{{ landing_obj.landing_info.landing.views }}</div>
+              <div class="p-0 w-100">{{ landing_obj.landing_info.landing.collection_amount }}</div>
             </li>
           </ul>
 
@@ -113,8 +113,6 @@
       landing_obj: {}
     }),
     mounted() {
-      let axios = this.$axios
-
       // Window width calculator
       let that = this
       that.$nextTick(function () {
@@ -124,10 +122,10 @@
       })
       //
       this.landing_id = this.$route.params.landing_id
-      axios.get(this.$store.state.endpoints.baseUrl + 'landing/api/' + this.landing_id)
+      axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.landing_id)
         .then((response) => {
           console.log(response)
-          this.landing_obj = response.data
+          this.landing_obj = response.data.data
           console.log(this.landing_obj)
         })
         .catch((error) => {
