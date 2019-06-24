@@ -172,17 +172,22 @@
                        for="f_img">이미지</label>
                 <div v-if="content.type == 7 || content.type == 8 || content.type == 9" class="col-sm-9 mt-sm-3">
 
-                  <input type="file" class="input_one_btn form-control col-md-11 pt-1" id="f_img"
+                  <div class="error_label" v-if="content.image_data">
+                    등록된 파일 : {{ content.image_data.name }}
+                  </div>
+
+                  <input type="file"
+                         class="input_one_btn form-control col-md-11 pt-1" id="f_img"
                          placeholder="이미지" :id="'field_file_input_'+content.sign"
                          :ref="'field_file_input_' + content.sign"
                          @change="field_file_add(content.sign, $event.target.files[0])"
-                         :value="content.image_data"
                          accept="image/*">
 
                   <button type="button" class="btn btn-danger w-100 mt-1" id="f_imgg"
                           @click.prevent="field_file_delete(content.sign, $event.target)">
                     파일삭제
                   </button>
+
                 </div>
               </div>
               <button type="button" class="btn btn-info col-12 m-auto" data-toggle="collapse"
@@ -207,8 +212,7 @@
     props: [
       'window_width',
       'form_arrow',
-      'field',
-      'AWS'
+      'field'
     ],
     data: () => ({
       msg: {
@@ -224,6 +228,11 @@
       this.field_obj = this.field
     },
     methods: {
+      init_component() {
+        // Set component object as parent's object
+        this.field_obj = []
+        this.field_obj = this.field
+      },
       filter_change() {
         this.filtered_fields = []
         for (let i = 0; i < this.field_obj.length; i++) {
@@ -233,8 +242,7 @@
         }
       },
       field_add() {
-        this.field_obj = []
-        this.field_obj = this.field
+        this.init_component()
         // get form group sign
         if (this.form_arrow != -1) {
           // get field type and field name
@@ -306,8 +314,7 @@
         }
       },
       field_delete(id) {
-        this.field_obj = []
-        this.field_obj = this.field
+        this.init_component()
         for (let i = 0; i < this.field_obj.length; i++) {
           if (this.field_obj[i].sign == id) {
             // console.log(this.field_obj.splice(i, 1))
@@ -319,8 +326,7 @@
         }
       },
       field_list_add(id) {
-        this.field_obj = []
-        this.field_obj = this.field
+        this.init_component()
         for (let i = 0; i < this.field.length; i++) {
           if (this.field_obj[i].sign == id) {
             this.field_obj[i].list.push("")
@@ -331,8 +337,7 @@
         }
       },
       field_list_delete(id, index) {
-        this.field_obj = []
-        this.field_obj = this.field
+        this.init_component()
         for (let i = 0; i < this.field_obj.length; i++) {
           if (this.field_obj[i].sign == id) {
             this.field_obj[i].list.splice(index, 1)
@@ -346,80 +351,67 @@
         //
       },
       field_file_add(sign, file) {
-        // this.field_obj = []
-        // this.field_obj = this.field
-        //
-        // let file_data = file
-        //
-        // for (let i = 0; i < this.field_obj.length; i++) {
-        //   if (this.field_obj[i].sign == sign) {
-        //     // this.field_obj[i].image_data = {}
-        //     this.field_obj[i].image_data = file_data
-        //     this.field_obj[i].image_url = URL.createObjectURL(file_data)
-        //   }
-        // }
-        //
-        // console.log('file data whatever array of object ', file_data)
-        // this.$emit('update:field', this.field_obj)
+        this.init_component()
+        let file_data = file
+
+        for (let i = 0; i < this.field_obj.length; i++) {
+          if (this.field_obj[i].sign == sign) {
+            console.log('upload return', this.s3_upload(sign, file))
+            this.field_obj[i].image_data = file_data
+            this.field_obj[i].image_url = URL.createObjectURL(file_data)
+            console.log('image data is? ', this.field_obj[i].image_data.name)
+            console.log('image url is? ', this.field_obj[i].image_url)
+          }
+        }
+        this.$emit('update:field', this.field_obj)
       },
       field_file_delete(sign) {
-        // this.field_obj = []
-        // this.field_obj = this.field
-        //
-        // document.getElementById('field_file_input_' + sign).value = ''
-        //
-        // for (let i = 0; i < this.field_obj.length; i++) {
-        //   if (this.field_obj[i].sign == sign) {
-        //     this.field_obj[i].image_data = null
-        //     this.field_obj[i].image_url = null
-        //   }
-        // }
-        // this.$emit('update:field', this.field_obj)
+        this.init_component()
+
+        document.getElementById('field_file_input_' + sign).value = ''
+
+        for (let i = 0; i < this.field_obj.length; i++) {
+          if (this.field_obj[i].sign == sign) {
+            this.field_obj[i].image_data = null
+            this.field_obj[i].image_url = null
+          }
+        }
+        this.$emit('update:field', this.field_obj)
       },
-      // upload_s3() {
-      //   let key = require('../../../vue_env')
-      //   let AWS = this.AWS
-      //
-      //   let s3 = new AWS.S3({
-      //     accessKeyId: key.AWS_ACCESS_KEY_ID,
-      //     secretAccessKey: key.AWS_SECRET_ACCESS_KEY,
-      //     Bucket: key.AWS_STORAGE_BUCKET_NAME
-      //   })
-      //
-      //   let params = {
-      //     Bucket: key.AWS_STORAGE_BUCKET_NAME,
-      //     Key: file.name,
-      //     Body: file.data
-      //   }
-      //
-      //   s3.upload(params, function (error, data) {
-      //     if (error) {
-      //       console.log('error in callback')
-      //       console.log(error)
-      //     }
-      //     console.log('success')
-      //     console.log(data)
-      //   })
-      //
-      //   // AWS.config.update({
-      //   //   region: key.BucketRegion,
-      //   //   credentials: new AWS.CognitoIdentityCredentials({
-      //   //     IdentityPoolId: key.IdentityPoolId
-      //   //   })
-      //   // })
-      //   //
-      //   // let s3 = new AWS.S3({
-      //   //   apiVersion: '2006-03-01',
-      //   //   params: {
-      //   //     Bucket: key.BucketName
-      //   //   }
-      //   // })
-      //   //
-      //   // s3.upload({
-      //   //
-      //   // })
-      //
-      // }
+      s3_upload(sign, file) {
+        let key = require('../../../vue_env')
+
+        AWS.config.update({
+          accessKeyId: key.AWS_ACCESS_KEY_ID,
+          secretAccessKey: key.AWS_SECRET_ACCESS_KEY,
+          region: key.BucketRegion
+        })
+
+        let s3 = new AWS.S3(
+          {apiVersion: '2008-10-17'}
+        )
+
+        let params = {
+          Bucket: key.AWS_STORAGE_BUCKET_NAME,
+          Key: 'landings/components/' + file.lastModified + '_' + file.name,
+          ContentType: file.type,
+          Body: file,
+          // ACL: 'public-read'
+        }
+
+        s3.putObject(params, function (error, data) {
+          if (error) {
+            console.log('S3 upload error occurred')
+            console.log('error?', error)
+            return false
+          } else {
+            console.log('S3 upload success')
+            console.log('data?', data)
+            return file.lastModified + '_' + file.name
+          }
+        })
+
+      }
     }
   }
 </script>

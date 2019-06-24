@@ -23,6 +23,7 @@ Vue.component('vue-draggable-resizable', VueDraggableResizable)
 Vue.use(VeeValidate)
 Vue.use(VTooltip)
 Vue.use(VueDraggableResizable)
+Vue.use(AWS)
 
 Vue.config.productionTip = false
 

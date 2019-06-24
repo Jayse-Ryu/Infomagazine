@@ -36,6 +36,7 @@
           :window_width="window_width"
           :form_arrow.sync="form_arrow"
           :field.sync="dynamo_obj.landing_info.field"
+
         />
 
         <hr>

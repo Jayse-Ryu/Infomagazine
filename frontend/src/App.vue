@@ -799,6 +799,7 @@
 
   /* Tooltip */
   .question {
+    margin-left: 5px;
     vertical-align: text-top !important;
   }
 
