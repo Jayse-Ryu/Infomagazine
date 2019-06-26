@@ -65,7 +65,8 @@
     props: [
       'form',
       'form_arrow',
-      'field'
+      'field',
+      'push_landing'
       // 'form_selected'
     ],
     data: () => ({
@@ -78,6 +79,18 @@
       this.form_obj = this.form
     },
     methods: {
+      form_changed(id) {
+        this.$emit('update:form_arrow', id)
+        if (id == -1) {
+          this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
+        } else {
+          for (let i = 0; i < this.form_obj.length; i++) {
+            if (this.form_obj[i].sign == id) {
+              this.form_selected = this.form_obj[i]
+            }
+          }
+        }
+      },
       form_group_add() {
         if (this.form_temp) {
           let len = this.form_obj.length
@@ -107,6 +120,7 @@
               this.form_temp = ''
               this.$emit('update:form', this.form_obj)
               alert('폼 그룹이 생성되었습니다.')
+              this.push_landing()
             }
           } else {
             this.form_obj.push({
@@ -119,6 +133,7 @@
             this.form_temp = ''
             this.$emit('update:form', this.form_obj)
             alert('폼 그룹이 생성되었습니다.')
+            this.push_landing()
           }
         } else {
           alert('폼 그룹 이름을 입력하세요!')
@@ -134,21 +149,10 @@
             this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
             // Field objs delete also
             this.field_work(id)
+            this.push_landing()
           }
         } else {
           alert('그룹을 먼저 선택하세요.')
-        }
-      },
-      form_changed(id) {
-        this.$emit('update:form_arrow', id)
-        if (id == -1) {
-          this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
-        } else {
-          for (let i = 0; i < this.form_obj.length; i++) {
-            if (this.form_obj[i].sign == id) {
-              this.form_selected = this.form_obj[i]
-            }
-          }
         }
       },
       field_work(id) {
@@ -156,6 +160,7 @@
         this.temp_field = this.field
         this.temp_field = this.temp_field.filter(el => el.form_group_id != id)
         this.$emit('update:field', this.temp_field)
+        this.push_landing()
       }
     }
   }

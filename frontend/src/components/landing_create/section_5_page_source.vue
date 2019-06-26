@@ -20,7 +20,8 @@
     </label>
     <div class="col-sm-12">
       <input type="text" class="form-control" id="page_title" maxlength="50"
-             :value="title" @keyup="$emit('update:title', $event.target.value)">
+             :value="title" @keyup="$emit('update:title', $event.target.value)"
+             @change="push_landing()">
     </div>
 
     <label class="col-sm-3 col-form-label-sm mt-3" for="header_script">
@@ -29,7 +30,8 @@
     <div class="col-sm-12">
             <textarea type="text" class="form-control" id="header_script" rows="4"
                       :value="header_script"
-                      @keyup="$emit('update:header_script', $event.target.value)"></textarea>
+                      @keyup="$emit('update:header_script', $event.target.value)"
+                      @change="push_landing()"></textarea>
     </div>
 
     <label class="col-sm-3 col-form-label-sm mt-3" for="body_script">
@@ -38,7 +40,8 @@
     <div class="col-sm-12">
             <textarea type="text" class="form-control" id="body_script" rows="4"
                       :value="body_script"
-                      @keyup="$emit('update:body_script', $event.target.value)"></textarea>
+                      @keyup="$emit('update:body_script', $event.target.value)"
+                      @change="push_landing()"></textarea>
     </div>
 
   </div>
@@ -51,7 +54,8 @@
       'window_width',
       'title',
       'header_script',
-      'body_script'
+      'body_script',
+      'push_landing'
     ],
     data: () => ({
       msg: {

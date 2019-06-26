@@ -8,7 +8,7 @@
     <div class="col-sm-9 mt-sm-3" id="company_name">
 
       <select class="form-control" name="company_name" :value="company"
-              @change="$emit('update:company', $event.target.value)">
+              @change="check_duplication('company', $event.target.value)">
         <option value="-1">업체를 선택하세요</option>
         <option v-for="content in landing_company" :value="content.id">
           {{ content.corp_name }} - {{ content.corp_sub_name }}
@@ -22,7 +22,7 @@
     </label>
     <div class="col-sm-9 mt-sm-3">
       <input type="text" :class="error_label.class.name" id="landing" maxlength="50"
-             :value="name" @change="check_name" @keyup="$emit('update:name', $event.target.value)">
+             :value="name" @change="check_duplication('name')" @keyup="$emit('update:name', $event.target.value)">
     </div>
 
     <label class="col-sm-3 col-form-label-sm mt-3" for="base_url">
@@ -44,7 +44,7 @@
     </label>
     <div class="col-sm-9 mt-sm-3">
       <input type="text" :class="error_label.class.base_url" id="base_url" maxlength="30"
-             :value="base_url" @change="check_url"
+             :value="base_url" @change="check_duplication('url')"
              @keyup="$emit('update:base_url', $event.target.value)">
     </div>
 
@@ -60,7 +60,8 @@
       'name',
       'base_url',
       'error_name',
-      'error_base_url'
+      'error_base_url',
+      'push_landing'
     ],
     data: () => ({
 
@@ -68,10 +69,10 @@
       landing_company: [],
       // Tooltip message
       msg: {
-        base_url:'기본 주소를 지정합니다.'
+        base_url: '기본 주소를 지정합니다.'
       },
       // Validation visualizer
-      error_label:{
+      error_label: {
         class: {
           name: 'form-control',
           base_url: 'form-control'
@@ -89,48 +90,55 @@
         })
     },
     methods: {
-      check_name() {
-        if (this.name == '') {
-          this.error_label.class.name = 'form-control'
-          this.$emit('update:error_name', true)
-        } else {
-          axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/')
-            .then((response) => {
-              for (let i = 0; i < response.data.length; i++) {
-                if (response.data[i].landing_info['landing']['name'] !== null) {
-                  if ((this.name).toLowerCase() == (response.data[i].landing_info.landing.name).toLowerCase()) {
-                    this.error_label.class.name = 'form-control alert-danger'
-                    this.$emit('update:error_name', true)
-                    return false
+      // Check exist duplication name, main_url
+      check_duplication(option, value) {
+        if (option === 'name') {
+          if (this.name == '') {
+            this.error_label.class.name = 'form-control'
+            this.$emit('update:error_name', true)
+          } else {
+            axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/')
+              .then((response) => {
+                for (let i = 0; i < response.data.data.length; i++) {
+                  if (response.data.data[i].landing_info.landing.name !== null) {
+                    if ((this.name).toLowerCase() == (response.data.data[i].landing_info.landing.name).toLowerCase()) {
+                      this.error_label.class.name = 'form-control alert-danger'
+                      this.$emit('update:error_name', true)
+                      return false
+                    }
                   }
                 }
-              }
-              this.error_label.class.name = 'form-control alert-success'
-              this.$emit('update:error_name', false)
-            })
+                this.error_label.class.name = 'form-control alert-success'
+                this.$emit('update:error_name', false)
+                this.push_landing()
+              })
+          }
+        } else if (option === 'url') {
+          if (this.base_url == '') {
+            this.error_label.class.base_url = 'form-control'
+            this.$emit('update:error_base_url', true)
+          } else {
+            axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/')
+              .then((response) => {
+                // // DISABLE UNTIL LANDING LIST SHOWING BASE URL
+                // for (let i = 0; i < response.data.data.length; i++) {
+                //   if (response.data.data[i].landing_info.landing.base_url !== null || response.data.data[i].landing_info.landing.base_url !== '') {
+                //     if ((this.base_url).toLowerCase() == (response.data.data[i].landing_info.landing.base_url).toLowerCase()) {
+                //       this.error_label.class.base_url = 'form-control alert-danger'
+                //       this.$emit('update:error_base_url', true)
+                //       return false
+                //     }
+                //   }
+                // }
+                this.error_label.class.base_url = 'form-control alert-success'
+                this.$emit('update:error_base_url', false)
+                this.push_landing()
+              })
+          }
+        } else if (option === 'company') {
+          this.$emit('update:company', $event.target.value)
         }
       },
-      check_url() {
-        if (this.base_url == '') {
-          this.error_label.class.base_url = 'form-control'
-          this.$emit('update:error_base_url', true)
-        } else {
-          axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/')
-            .then((response) => {
-              for (let i = 0; i < response.data.length; i++) {
-                if (response.data[i].landing_info['landing']['base_url'] !== null || response.data[i].landing_info['landing']['base_url'] !== '') {
-                  if ((this.base_url).toLowerCase() == (response.data[i].landing_info['landing']['base_url']).toLowerCase()) {
-                    this.error_label.class.base_url = 'form-control alert-danger'
-                    this.$emit('update:error_base_url', true)
-                    return false
-                  }
-                }
-              }
-              this.error_label.class.base_url = 'form-control alert-success'
-              this.$emit('update:error_base_url', false)
-            })
-        }
-      }
     },
     computed: {}
   }

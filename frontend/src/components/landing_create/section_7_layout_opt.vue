@@ -144,7 +144,8 @@
     name: "section_7_layout_opt",
     props: [
       'window_width',
-      'landing'
+      'landing',
+      'push_landing'
     ],
     data: () => ({
       msg: {

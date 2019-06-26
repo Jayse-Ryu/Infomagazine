@@ -12,6 +12,7 @@
   "dependencies": {
     "aws-sdk": "^2.478.0",
     "core-js": "^2.6.5",
+    "dotenv": "^8.0.0",
     "jwt-decode": "^2.2.0",
     "v-tooltip": "^2.0.2",
     "vee-validate": "^2.2.7",

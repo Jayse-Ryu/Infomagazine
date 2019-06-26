@@ -17,8 +17,11 @@
             <select class="form-control" name="company" id="auto_id"
                     v-model="recovery">
               <option value="-1">선택하세요</option>
+              <!--<option v-for="content in auto_saved" :value="content.LandingNum">
+                {{ content.landing_info.landing.company_name }} / {{ content.landing_info.landing.init_date }}
+              </option>-->
               <option v-for="content in auto_saved" :value="content.LandingNum">
-                {{content.landing_info.landing.company_name }} / {{ content.landing_info.landing.init_date }}
+                랜딩 {{ content.landing_info.company_id }}
               </option>
             </select>
           </div>
@@ -41,11 +44,10 @@
   export default {
     name: "popup_1_recovery",
     props: [
-      'user_obj'
+      'user_obj',
+      'auto_flag'
     ],
     data: () => ({
-      auto_flag: false,
-      company_flag: false,
       recovery: -1,
       auto_saved: [],
     }),
@@ -62,33 +64,35 @@
           .then((response) => {
             this.$store.state.pageOptions.loading = false
             let auto_flag = false
-            for (let i = 0; i < response.data.length; i++) {
-              if (response.data[i].landing_info.landing.name === null) {
+            for (let i = 0; i < response.data.data.length; i++) {
+              if (response.data.data[i].landing_info.landing.name === null) {
                 // auto saved list on
                 auto_flag = true
-                let temp_date = response.data[i].UpdatedTime
-                let init_date = new Date(temp_date * 1)
-                let date_string = init_date.getFullYear()
-                if (init_date.getMonth() < 10) {
-                  date_string += '-0' + init_date.getMonth()
-                } else {
-                  date_string += '-' + init_date.getMonth()
-                }
-                if (init_date.getDate() < 10) {
-                  date_string += '-0' + init_date.getDate()
-                } else {
-                  date_string += '-' + init_date.getDate()
-                }
-                response.data[i].landing_info.landing.init_date = date_string
-                this.auto_saved.push(response.data[i])
+
+                // // Set showing date disable
+                // let temp_date = response.data.data[i].UpdatedTime
+                // let init_date = new Date(temp_date * 1)
+                // let date_string = init_date.getFullYear()
+                // if (init_date.getMonth() < 10) {
+                //   date_string += '-0' + init_date.getMonth()
+                // } else {
+                //   date_string += '-' + init_date.getMonth()
+                // }
+                // if (init_date.getDate() < 10) {
+                //   date_string += '-0' + init_date.getDate()
+                // } else {
+                //   date_string += '-' + init_date.getDate()
+                // }
+                // response.data.data[i].landing_info.landing.init_date = date_string
+                this.auto_saved.push(response.data.data[i])
               }
             }
             if (auto_flag == true) {
-              this.auto_flag = auto_flag
-              this.company_flag = false
+              this.$emit('update:auto_flag', auto_flag)
+              // this.auto_flag = auto_flag
             } else {
-              this.auto_flag = auto_flag
-              this.company_flag = true
+              this.$emit('update:auto_flag', auto_flag)
+              // this.auto_flag = auto_flag
             }
           })
           .catch(() => {
@@ -97,9 +101,8 @@
       },
       auto_saved_delete() {
         if (this.recovery != -1) {
-          let axios = this.$axios
           let landing_num = this.recovery
-          axios.delete(this.$store.state.endpoints.baseUrl + 'landings/api/' + landing_num)
+          axios.delete(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num)
             .then(() => {
               this.recovery = -1
               this.auto_saved_get()
@@ -115,8 +118,8 @@
       auto_saved_not() {
         if (confirm('무시하고 생성하시겠습니까?')) {
           this.$store.state.pageOptions.loading = false
-          this.auto_flag = !this.auto_flag
-          this.company_flag = !this.company_flag
+          this.$emit('update:auto_flag', !this.auto_flag)
+          // this.auto_flag = !this.auto_flag
         }
       },
       auto_saved_detail() {

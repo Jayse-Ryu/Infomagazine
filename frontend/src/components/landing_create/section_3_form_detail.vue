@@ -173,7 +173,7 @@
                 <div v-if="content.type == 7 || content.type == 8 || content.type == 9" class="col-sm-9 mt-sm-3">
 
                   <div class="error_label" v-if="content.image_data">
-                    등록된 파일 : {{ content.image_data.name }}
+                    등록된 파일 : {{ content.image_data }}
                   </div>
 
                   <input type="file"
@@ -211,8 +211,10 @@
     name: "section_3_form_detail",
     props: [
       'window_width',
+      'epoch_time',
       'form_arrow',
-      'field'
+      'field',
+      'push_landing'
     ],
     data: () => ({
       msg: {
@@ -243,6 +245,7 @@
       },
       field_add() {
         this.init_component()
+
         // get form group sign
         if (this.form_arrow != -1) {
           // get field type and field name
@@ -281,9 +284,9 @@
                 image_data: null
               })
               this.$emit('update:field', this.field_obj)
-
               this.field_temp_name = ''
               this.filter_change()
+              this.push_landing()
             } else {
               // if field_obj length is 0
               this.field_obj.push({
@@ -300,9 +303,9 @@
                 image_data: null
               })
               this.$emit('update:field', this.field_obj)
-
               this.field_temp_name = ''
               this.filter_change()
+              this.push_landing()
             }
           } else {
             alert('필드 타입과 내용을 입력하세요.')
@@ -321,6 +324,7 @@
             this.field_obj.splice(i, 1)
             this.$emit('update:field', this.field_obj)
             this.filter_change()
+            this.push_landing()
             break
           }
         }
@@ -332,6 +336,7 @@
             this.field_obj[i].list.push("")
             this.$emit('update:field', this.field_obj)
             this.filter_change()
+            this.push_landing()
             break
           }
         }
@@ -343,6 +348,7 @@
             this.field_obj[i].list.splice(index, 1)
             this.$emit('update:field', this.field_obj)
             this.filter_change()
+            this.push_landing()
             break
           }
         }
@@ -352,65 +358,93 @@
       },
       field_file_add(sign, file) {
         this.init_component()
-        let file_data = file
 
-        for (let i = 0; i < this.field_obj.length; i++) {
-          if (this.field_obj[i].sign == sign) {
-            console.log('upload return', this.s3_upload(sign, file))
-            this.field_obj[i].image_data = file_data
-            this.field_obj[i].image_url = URL.createObjectURL(file_data)
-            console.log('image data is? ', this.field_obj[i].image_data.name)
-            console.log('image url is? ', this.field_obj[i].image_url)
+        let key = require('../../../vue_env')
+
+        AWS.config.update({
+          region: key.BucketRegion,
+          credentials: new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: key.IdentityPoolId
+          })
+        })
+
+        let s3 = new AWS.S3(
+          {
+            apiVersion: '2008-10-17',
+            params: {
+              Bucket: key.AWS_STORAGE_BUCKET_NAME
+            }
           }
+        )
+
+        let params = {
+          Key: 'assets/images/landing/preview/' + this.epoch_time + '/field/' + file.lastModified + '_' + file.name,
+          ContentType: file.type,
+          Body: file,
+          ACL: 'public-read'
         }
-        this.$emit('update:field', this.field_obj)
+
+        s3.upload(params, (error, data) => {
+          if (error) {
+            console.log('S3 method error occurred', error)
+          } else {
+            // console.log('S3 method success', data)
+            for (let i = 0; i < this.field_obj.length; i++) {
+              if (this.field_obj[i].sign == sign) {
+                this.field_obj[i].image_data = params.Key
+                this.field_obj[i].image_url = params.Key
+              }
+            }
+            this.$emit('update:field', this.field_obj)
+            this.push_landing()
+          }
+        })
+
+        // s3.copyObject()
+
       },
       field_file_delete(sign) {
         this.init_component()
 
-        document.getElementById('field_file_input_' + sign).value = ''
-
-        for (let i = 0; i < this.field_obj.length; i++) {
-          if (this.field_obj[i].sign == sign) {
-            this.field_obj[i].image_data = null
-            this.field_obj[i].image_url = null
-          }
-        }
-        this.$emit('update:field', this.field_obj)
-      },
-      s3_upload(sign, file) {
         let key = require('../../../vue_env')
 
         AWS.config.update({
-          accessKeyId: key.AWS_ACCESS_KEY_ID,
-          secretAccessKey: key.AWS_SECRET_ACCESS_KEY,
-          region: key.BucketRegion
+          region: key.BucketRegion,
+          credentials: new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: key.IdentityPoolId
+          })
         })
 
         let s3 = new AWS.S3(
-          {apiVersion: '2008-10-17'}
+          {
+            apiVersion: '2008-10-17',
+            params: {
+              Bucket: key.AWS_STORAGE_BUCKET_NAME
+            }
+          }
         )
 
-        let params = {
-          Bucket: key.AWS_STORAGE_BUCKET_NAME,
-          Key: 'landings/components/' + file.lastModified + '_' + file.name,
-          ContentType: file.type,
-          Body: file,
-          // ACL: 'public-read'
-        }
+        for(let i = 0; i < this.field_obj.length; i ++) {
+          if (this.field_obj[i].sign == sign) {
+            let photoKey = this.field_obj[i].image_data
 
-        s3.putObject(params, function (error, data) {
-          if (error) {
-            console.log('S3 upload error occurred')
-            console.log('error?', error)
-            return false
-          } else {
-            console.log('S3 upload success')
-            console.log('data?', data)
-            return file.lastModified + '_' + file.name
+            s3.deleteObject({Key: photoKey}, (err, data) => {
+              if (err) {
+                alert('There was an error deleting your photo: ', err.message)
+              } else {
+                // alert('Successfully deleted photo.', data)
+
+                document.getElementById('field_file_input_' + sign).value = ''
+                this.field_obj[i].image_data = null
+                this.field_obj[i].image_url = null
+
+                this.$emit('update:field', this.field_obj)
+                this.push_landing()
+              }
+            })
+
           }
-        })
-
+        }
       }
     }
   }

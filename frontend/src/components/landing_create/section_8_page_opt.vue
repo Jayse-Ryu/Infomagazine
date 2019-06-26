@@ -24,7 +24,8 @@
   export default {
     name: "section_8_page_opt",
     props: [
-      'landing'
+      'landing',
+      'push_landing'
     ],
     data: () => ({
 

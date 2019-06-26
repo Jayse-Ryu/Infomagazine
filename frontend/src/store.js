@@ -40,45 +40,6 @@ export default new Vuex.Store({
         option: 0,
         text: ''
       }
-    },
-    landing_create: {
-      dynamo_obj: {
-        company_id: '',
-        updated_date: '',
-        landing_info: {
-          landing: {
-            company: -1,
-            manager: -1,
-            name: '',
-            title: null,
-            header_script: null,
-            body_script: null,
-            base_url: '',
-            is_hijack: false,
-            hijack_url: null,
-            is_active: true,
-            is_mobile: false,
-            views: 0,
-            collections: [],
-            is_banner: false,
-            banner_url: null,
-            banner_image: null,
-            inner_db: true,
-            font: -1,
-            is_term: false,
-            image_term: false,
-            show_company: false
-          },
-          term: {
-            title: '',
-            content: '',
-            image: ''
-          },
-          form: [],
-          field: [],
-          order: []
-        }
-      }
     }
   },
   mutations: {
@@ -102,45 +63,6 @@ export default new Vuex.Store({
       state.isAuthenticated = false
       Vue.cookie.delete('token')
       // Vue.cookie.delete('authUser')
-    },
-    init_landing(state) {
-      state.landing_create.dynamo_obj = {
-        company_id: '',
-        updated_date: '',
-        landing_info: {
-          landing: {
-            company: -1,
-            manager: -1,
-            name: '',
-            title: null,
-            header_script: null,
-            body_script: null,
-            base_url: '',
-            is_hijack: false,
-            hijack_url: null,
-            is_active: true,
-            is_mobile: false,
-            views: 0,
-            collections: [],
-            is_banner: false,
-            banner_url: null,
-            banner_image: null,
-            inner_db: true,
-            font: -1,
-            is_term: false,
-            image_term: false,
-            show_company: false
-          },
-          term: {
-            title: '',
-            content: '',
-            image: ''
-          },
-          form: [],
-          field: [],
-          order: []
-        }
-      }
     }
   },
   actions: {

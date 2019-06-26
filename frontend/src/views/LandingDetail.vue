@@ -61,7 +61,7 @@
         <!-- Order layout component -->
         <section_layout
           :window_width="window_width"
-          :order.sync="dynamo_obj.landing_info.order"
+          :order.sync="dynamo_obj.landing_info.sections"
           :form.sync="dynamo_obj.landing_info.form"
           :field.sync="dynamo_obj.landing_info.field"
           :is_term.sync="dynamo_obj.landing_info.landing.is_term"
@@ -126,16 +126,17 @@
         name: true,
         base_url: true,
       },
+      auto_flag: false,
+      company_flag: false,
       page_id: '',
       epoch_time: 0,
-      // Landing obj
+      form_arrow: -1,
       dynamo_obj: {
-        CompanyNum: '',
-        LandingNum: '',
-        UpdatedTime: '',
+        company_id: '',
+        created_date: '',
+        updated_date: '',
         landing_info: {
           landing: {
-            company: -1,
             manager: -1,
             name: '',
             title: null,
@@ -146,8 +147,6 @@
             hijack_url: null,
             is_active: true,
             is_mobile: false,
-            views: 0,
-            collections: [],
             is_banner: false,
             banner_url: null,
             banner_image: null,
@@ -164,12 +163,51 @@
           },
           form: [],
           field: [],
-          order: []
+          sections: [],
+          views: 0
         }
-      },
-      form_arrow: -1,
-      // field_temp_name: '',
+      }
     }),
+    mounted() {
+      // Window width calculator
+      // Window width calculator
+      let that = this
+      that.$nextTick(function () {
+        window.addEventListener('resize', function (e) {
+          that.window_width = window.innerWidth
+        })
+      })
+      // Get company, manager
+      // Get landing obj from Landing Num
+      this.page_id = this.$route.params.landing_id
+      this.$store.state.pageOptions.loading = true
+      axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id)
+        .then((response) => {
+          this.$store.state.pageOptions.loading = false
+          console.log('response check ', response)
+          this.dynamo_obj = response.data.data
+          this.epoch_time = response.data.data.landing_info.landing.base_url
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$store.state.pageOptions.loading = false
+        })
+      // Get companies from logged in user's organization
+      axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
+        .then((response) => {
+          this.landing_company = response.data.results
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+
+      // If not manager, push to db contents
+
+      // if (this.user_obj.access_role != 1 || this.user_obj.access_role != 0) {
+      //   this.$router.currentRoute.meta.protect_leave = 'no'
+      //   this.$router.push({name: 'db_detail', params: {landing_id: this.epoch_time}})
+      // }
+    },
     methods: {
       // Create Landing Start
       // Create Landing Start
@@ -208,14 +246,14 @@
               }
             }
             if (flag) {
-              this.collect_dynamo('checked')
+              this.push_landing('checked')
             }
           } else {
-            this.collect_dynamo('checked')
+            this.push_landing('checked')
           }
         }
       },
-      collect_dynamo(option) {
+      push_landing(option) {
         // option first(mounted) or checked(button clicked)
         const config = {
           headers: {
@@ -265,6 +303,29 @@
               this.dynamo_obj.landing_info.term[key] = null
             }
           }
+        }
+
+        if(option === 'checked') {
+          this.dynamo_obj.updated_date = (Date.now()).toString()
+          this.$store.state.pageOptions.loading = true
+          console.log('landing create object is? ', this.dynamo_obj)
+          axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+            .then(() => {
+              this.$store.state.pageOptions.loading = false
+              if (option == 'checked') {
+                alert('랜딩이 생성되었습니다.')
+                this.bye()
+              }
+            })
+            .catch((error) => {
+              if (option == 'checked') {
+                alert('랜딩 생성이 실패하였습니다.')
+                this.$store.state.pageOptions.loading = false
+              }
+              console.log(error)
+            })
+        } else {
+          console.log('detail is not support auto save')
         }
 
         // console.log('axios temporary disabled')
@@ -323,47 +384,6 @@
           this.$router.push({name: 'landing_list'})
         }
       }
-    },
-    mounted() {
-      // Window width calculator
-      // Window width calculator
-      let that = this
-      that.$nextTick(function () {
-        window.addEventListener('resize', function (e) {
-          that.window_width = window.innerWidth
-        })
-      })
-      // Get company, manager
-      // Get landing obj from Landing Num
-      this.page_id = this.$route.params.landing_id
-      this.$store.state.pageOptions.loading = true
-      axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id)
-        .then((response) => {
-          console.log('response check ', response)
-          this.dynamo_obj = response.data.data
-          console.log('dynamo set?', this.dynamo_obj)
-          this.$store.state.pageOptions.loading = false
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$store.state.pageOptions.loading = false
-        })
-      // Get companies from logged in user's organization
-      let this_url = 'companies/'
-      axios.get(this.$store.state.endpoints.baseUrl + this_url)
-        .then((response) => {
-          this.landing_company = response.data.results
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-
-      // If not manager, push to db contents
-
-      // if (this.user_obj.access_role != 1 || this.user_obj.access_role != 0) {
-      //   this.$router.currentRoute.meta.protect_leave = 'no'
-      //   this.$router.push({name: 'db_detail', params: {landing_id: this.epoch_time}})
-      // }
     },
     computed: {
       user_obj() {

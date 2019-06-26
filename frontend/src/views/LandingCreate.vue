@@ -8,7 +8,7 @@
       <router-link to="/landing/create">랜딩페이지 생성</router-link>
     </div>
 
-    <div> {{ dynamo_obj }} </div>
+    <div> {{ dynamo_obj }}</div>
 
     <div class="container" style="margin-top: 20px;">
 
@@ -22,6 +22,7 @@
           :base_url.sync="dynamo_obj.landing_info.landing.base_url"
           :error_name.sync="error_label.name"
           :error_base_url.sync="error_label.base_url"
+          :push_landing="push_landing"
         />
 
         <hr>
@@ -31,21 +32,25 @@
           :form.sync="dynamo_obj.landing_info.form"
           :form_arrow.sync="form_arrow"
           :field.sync="dynamo_obj.landing_info.field"
+          :push_landing="push_landing"
         />
         <section_form_detail
           :window_width="window_width"
+          :epoch_time="epoch_time"
           :form_arrow.sync="form_arrow"
           :field.sync="dynamo_obj.landing_info.field"
-
+          :push_landing="push_landing"
         />
 
         <hr>
 
         <h5>추가내용</h5>
         <section_term
+          :epoch_time="epoch_time"
           :term_switch.sync="dynamo_obj.landing_info.landing.is_term"
           :image_switch.sync="dynamo_obj.landing_info.landing.image_term"
           :term.sync="dynamo_obj.landing_info.term"
+          :push_landing="push_landing"
         />
 
         <hr>
@@ -56,20 +61,24 @@
           :title.sync="dynamo_obj.landing_info.landing.title"
           :header_script.sync="dynamo_obj.landing_info.landing.header_script"
           :body_script.sync="dynamo_obj.landing_info.landing.body_script"
+          :push_landing="push_landing"
         />
 
         <!-- Order layout component -->
         <section_layout
           :window_width="window_width"
-          :order.sync="dynamo_obj.landing_info.order"
+          :epoch_time="epoch_time"
+          :order.sync="dynamo_obj.landing_info.sections"
           :form.sync="dynamo_obj.landing_info.form"
           :field.sync="dynamo_obj.landing_info.field"
           :is_term.sync="dynamo_obj.landing_info.landing.is_term"
+          :push_landing="push_landing"
         />
 
         <section_layout_opt
           :window_width.sync="window_width"
           :landing.sync="dynamo_obj.landing_info.landing"
+          :push_landing="push_landing"
         />
 
         <hr>
@@ -77,6 +86,7 @@
         <h5>옵션</h5>
         <section_page_opt
           :landing.sync="dynamo_obj.landing_info.landing"
+          :push_landing="push_landing"
         />
 
         <hr>
@@ -94,16 +104,15 @@
 
     <popup_recovery
       :user_obj="user_obj"
+      :auto_flag="auto_flag"
+      :company_flag="company_flag"
     />
-
-    <!--<popup_company/>-->
 
   </div>
 </template>
 
 <script>
   import popup_recovery from '@/components/landing_create/popup_1_recovery.vue'
-  import popup_company from '@/components/landing_create/popup_2_company.vue'
   import section_basic from '@/components/landing_create/section_1_basic.vue'
   import section_form_control from '@/components/landing_create/section_2_form_control.vue'
   import section_form_detail from '@/components/landing_create/section_3_form_detail.vue'
@@ -117,7 +126,6 @@
     name: "landing_create",
     components: {
       popup_recovery,
-      popup_company,
       section_basic,
       section_form_control,
       section_form_detail,
@@ -134,13 +142,15 @@
         base_url: true,
       },
       epoch_time: 0,
-      // Landing obj
+      form_arrow: -1,
+      auto_flag: false,
+      company_flag: false,
       dynamo_obj: {
         company_id: '',
+        created_date: '',
         updated_date: '',
         landing_info: {
           landing: {
-            company: -1,
             manager: -1,
             name: '',
             title: null,
@@ -151,8 +161,6 @@
             hijack_url: null,
             is_active: true,
             is_mobile: false,
-            views: 0,
-            collections: [],
             is_banner: false,
             banner_url: null,
             banner_image: null,
@@ -165,15 +173,25 @@
           term: {
             title: '',
             content: '',
-            image: ''
+            image_data: ''
           },
           form: [],
           field: [],
-          order: []
+          sections: [],
+          views: 0
         }
-      },
-      form_arrow: -1,
+      }
     }),
+    mounted() {
+      // Window width calculator
+      let that = this
+      that.$nextTick(function () {
+        window.addEventListener('resize', function (e) {
+          that.window_width = window.innerWidth
+        })
+      })
+      this.epoch_time = (new Date).getTime()
+    },
     methods: {
       landing_check() {
         // Start validate before create
@@ -212,14 +230,14 @@
               }
             }
             if (flag) {
-              this.collect_dynamo('checked')
+              this.push_landing('checked')
             }
           } else {
-            this.collect_dynamo('checked')
+            this.push_landing('checked')
           }
         }
       },
-      collect_dynamo(option) {
+      push_landing(option) {
         // option first(mounted) or checked(button clicked)
         // let axios = this.$axios
         const config = {
@@ -229,14 +247,16 @@
           }
         }
         this.dynamo_obj.company_id = this.dynamo_obj.landing_info.landing.company.toString()
-        // this.dynamo_obj.LandingNum = this.epoch_time.toString()
-        this.dynamo_obj.updated_date = (Date.now()).toString()
+        this.dynamo_obj.created_date = this.epoch_time.toString()
         // Empty objects make as Null
         for (let key in this.dynamo_obj.landing_info.landing) {
           if (this.dynamo_obj.landing_info.landing.hasOwnProperty(key)) {
             if (this.dynamo_obj.landing_info.landing[key] === '' && typeof (this.dynamo_obj.landing_info.landing[key]) != 'boolean') {
               this.dynamo_obj.landing_info.landing[key] = null
             }
+            // if (key === 'name') {
+            //   console.log('key is name~')
+            // }
           }
         }
         for (let key in this.dynamo_obj.landing_info.form) {
@@ -272,25 +292,36 @@
           }
         }
 
-        // console.log('axios temporary disabled')
-        // console.log(this.dynamo_obj)
-        this.$store.state.pageOptions.loading = true
-        console.log('landing create object is? ', this.dynamo_obj)
-        axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
-          .then(() => {
-            this.$store.state.pageOptions.loading = false
-            if (option == 'checked') {
-              alert('랜딩이 생성되었습니다.')
-              this.bye()
-            }
-          })
-          .catch((error) => {
-            if (option == 'checked') {
-              alert('랜딩 생성이 실패하였습니다.')
+        if (option === 'checked') {
+          this.dynamo_obj.updated_date = (Date.now()).toString()
+          this.$store.state.pageOptions.loading = true
+          console.log('landing create object is? ', this.dynamo_obj)
+          axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+            .then(() => {
               this.$store.state.pageOptions.loading = false
-            }
-            console.log(error)
-          })
+              if (option == 'checked') {
+                alert('랜딩이 생성되었습니다.')
+                this.bye()
+              }
+            })
+            .catch((error) => {
+              if (option == 'checked') {
+                alert('랜딩 생성이 실패하였습니다.')
+                this.$store.state.pageOptions.loading = false
+              }
+              console.log(error)
+            })
+        } else {
+          if(!this.error_label.name && !this.error_label.base_url) {
+            console.log('Landing pushed! ')
+            // axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+            //   .catch((error) => {
+            //     console.log(error)
+            //   })
+          }
+        }
+
+
       },
       bye() {
         this.$router.currentRoute.meta.protect_leave = 'no'
@@ -313,15 +344,6 @@
             })
         }
       }
-    },
-    mounted() {
-      // Window width calculator
-      let that = this
-      that.$nextTick(function () {
-        window.addEventListener('resize', function (e) {
-          that.window_width = window.innerWidth
-        })
-      })
     },
     computed: {
       user_obj() {
