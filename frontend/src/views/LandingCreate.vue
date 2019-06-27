@@ -8,8 +8,6 @@
       <router-link to="/landing/create">랜딩페이지 생성</router-link>
     </div>
 
-    <div> {{ dynamo_obj }}</div>
-
     <div class="container" style="margin-top: 20px;">
 
       <form v-on:submit.prevent="landing_check">
@@ -79,6 +77,7 @@
 
         <section_layout_opt
           :window_width.sync="window_width"
+          :epoch_time="epoch_time"
           :landing.sync="dynamo_obj.landing_info.landing"
           :push_landing="push_landing"
         />

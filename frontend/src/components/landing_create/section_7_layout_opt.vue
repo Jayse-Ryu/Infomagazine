@@ -113,8 +113,7 @@
     </label>
     <div class="col-sm-9 mt-sm-3">
       <label class="switch" for="in_banner">
-        <input type="checkbox" id="in_banner" v-model="landing.is_banner"
-               @change="in_banner_file_delete()">
+        <input type="checkbox" id="in_banner" v-model="landing.is_banner">
         <span class="slider round"></span>
       </label>
     </div>
@@ -126,7 +125,7 @@
     <div v-if="landing.is_banner" class="col-sm-9 mt-sm-3 row ml-0">
 
       <input type="file" class="form-control col-sm-5 col-md-5 pt-1" id="in_banner_img" placeholder="이미지"
-             ref="in_banner_file_input" @change="in_banner_file_add()" accept="image/*">
+             ref="in_banner_file_input" @change="in_banner_file_add($event.target.files[0])" accept="image/*">
       <div class="margin_div"></div>
       <input type="text" class="form-control col-sm-7 col-md-5" id="in_banner_desc" placeholder="띠배너 주소"
              v-model="landing.banner_url">
@@ -136,6 +135,15 @@
         <span>삭제</span>
       </button>
     </div>
+    <label v-if="landing.is_banner" class="col-sm-3 col-form-label-sm mt-3" for="term_img_preview">배너 이미지 미리보기</label>
+    <div v-if="landing.is_banner" class="col-sm-9 mt-sm-3 row ml-0" id="term_img_preview">
+      <div v-if="landing.banner_image" class="term_preview_wrap">
+        <img class="term_preview" :src="key_to_url(landing.banner_image)" alt="배너 이미지 미리보기">
+      </div>
+      <div v-else class="form-control">
+        <div>등록된 파일이 없습니다</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -144,6 +152,7 @@
     name: "section_7_layout_opt",
     props: [
       'window_width',
+      'epoch_time',
       'landing',
       'push_landing'
     ],
@@ -159,22 +168,120 @@
 
     },
     methods: {
-      in_banner_file_add() {
+      in_banner_file_add(file) {
         /* When file data changed */
-        let file_data = event.target.files[0]
-        this.landing.banner_image = file_data
+        /* When file data changed */
+        let key = require('../../../vue_env')
+
+        AWS.config.update({
+          region: key.BucketRegion,
+          credentials: new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: key.IdentityPoolId
+          })
+        })
+
+        let s3 = new AWS.S3(
+          {
+            apiVersion: '2008-10-17',
+            params: {
+              Bucket: key.AWS_STORAGE_BUCKET_NAME
+            }
+          }
+        )
+
+        let params = {
+          Key: 'assets/images/landing/preview/' + this.epoch_time + '/banner/' + file.lastModified + '_' + file.name,
+          ContentType: file.type,
+          Body: file,
+          ACL: 'public-read'
+        }
+
+        s3.upload(params, (error, data) => {
+          if (error) {
+            console.log('S3 method error occurred', error)
+          } else {
+            // console.log('S3 method success', data)
+            this.landing.banner_image = params.Key
+            this.push_landing()
+          }
+        })
       },
       in_banner_file_delete() {
-        /* Remove file data */
-        if (this.$refs.in_banner_file_input) {
-          this.$refs.in_banner_file_input.value = null
+
+        let key = require('../../../vue_env')
+
+        AWS.config.update({
+          region: key.BucketRegion,
+          credentials: new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: key.IdentityPoolId
+          })
+        })
+
+        let s3 = new AWS.S3(
+          {
+            apiVersion: '2008-10-17',
+            params: {
+              Bucket: key.AWS_STORAGE_BUCKET_NAME
+            }
+          }
+        )
+
+        let photoKey = this.landing.banner_image
+
+        if (photoKey) {
+          s3.deleteObject({Key: photoKey}, (err, data) => {
+            if (err) {
+              alert('이미지 삭제 중 오류가 발생하였습니다: ', err.message)
+            } else {
+              // alert('Successfully deleted photo.', data)
+              document.getElementById('in_banner_img').value = ''
+              this.landing.banner_image = null
+
+              this.push_landing()
+            }
+          })
         }
-        this.landing.banner_image = null
       },
+      key_to_url(key) {
+        let divided = key.split('/')
+        let url = 'https://'
+
+        if (this.updated_date == '') {
+          url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+        } else {
+          for (let i = 0; i < divided.length; i++) {
+            if (i == 0) {
+              url += (divided[i] + '.infomagazine.xyz')
+            } else {
+              url += ('/' + divided[i])
+            }
+          }
+        }
+
+        return url
+      }
     }
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+  .term_preview_wrap {
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    text-align: center;
+  }
 
+  .term_preview {
+    position: relative;
+    max-width: 100%;
+  }
 </style>

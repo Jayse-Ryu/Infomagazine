@@ -568,12 +568,20 @@
         for (let i = 0; i < this.order_obj.length; i++) {
           for (let j = 0; j < this.order_obj[i].length; j++) {
             if (this.order_obj[i][j].form_group_id > 0) {
-              console.log('section has form_group_id')
-            } else {
-              console.log('section has not form_group_id')
+              this.get_field(i, j)
             }
           }
         }
+      },
+      get_field(i, j) {
+        // for (let k = 0; k < this.field.length; k++) {
+        //   if (this.field[k].form_group_id == this.order_obj[i][j].form_group_id) {
+        //     console.log(this.field[k])
+        //     let field_info = {sign: this.field[k], position: {x:0, y:0, w:100, h:100, z:1}}
+        //     this.order_obj[i][j].fields.push(field_info)
+        //   }
+        // }
+        console.log(this.order_obj[i][j])
       },
       // Order handle
       // Order handle
