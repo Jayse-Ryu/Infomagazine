@@ -30,9 +30,6 @@
         <button type="button" class="btn btn-danger btn-sm p-1" @click.prevent="object_delete(index)">선택 삭제</button>
       </div>
 
-      {{ order }}
-      {{ object }}
-
       <div class="col-sm-12">
         <div class="main_layout" id="main_layout">
           <div class="basket" :style="{'height': order_wrap_height[index] + 'px'}">
@@ -56,28 +53,22 @@
                                      :grid=[10,10]
                                      :lock-aspect-ratio="false">
 
-              <!--:key="item.sign"
-                                     :sign="item.sign"-->
-
-              <!--<img v-if="item.type == 1 && item.image_data.length == 0" src="../assets/logo1.png" alt="logo"
-                   style="width: 100%; height: 100%; object-fit: contain;">
-              <img v-if="item.type == 1 && item.image_data.length !== 0" :src="item.image_url" alt="logo"
-                   style="width: 100%; height: 100%; object-fit: contain;">-->
-
               <!-- Order layout for image -->
               <img v-if="item.type == 1 && !item.image_data" src="../../assets/logo1.png" alt="logo_none"
                    style="width: 100%; height: 100%; object-fit: contain;">
-              <img v-if="item.type == 1 && item.image_data" :src="item.image_data" alt="logo_in"
+              <img v-if="item.type == 1 && item.image_data" :src="key_to_url(item.image_data)" alt="logo_in"
                    style="width: 100%; height: 100%; object-fit: contain;">
 
               <!-- Order layout for form group -->
               <div v-if="item.type == 2" class="form_layout" v-for="form in form">
                 <div class="form_layout_cont" v-if="form.sign === item.form_group_id"
-                     :style="'background:'+form.bg_color+';' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
+                     :style="'background: rgba('+hex_to_decimal(form.bg_color)+','+form.opacity*0.1+');' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
 
-                  <!-- big form -->
-                  <div class="form-group row mb-1" v-if="item.position.w > 768"
-                       v-for="field in field">
+                  <!-- big width form (disabled 27 june 2019) -->
+                  <!--<div class="form-group row mb-1" v-if="item.position.w > 768"
+                       v-for="field in field">-->
+
+                  <div class="form-group row mb-1" v-for="field in field">
 
                     <!-- input form area -->
                     <div class="w-100 row m-0" v-if="field.type != 7 && field.type != 8 && field.type != 9">
@@ -179,20 +170,21 @@
 
                         <input v-if="field.type == 6" type="text" class="form-control" disabled
                                placeholder="Datepicker" :id="'label'+field.name">
-                      </div>
 
-                      <div v-if="field.type == 10" :id="'label'+field.name"
-                           class="form-check-inline d-flex flex-wrap justify-content-end">
-                        <div class="p-2">
-                          <label class="form-check-label" :for="'term' + field.name">
-                            <input class="form-check-input" type="checkbox" :id="'term'+field.name" value="1">
-                            {{ field.holder }}
-                          </label>
-                          <button type="button" v-if="is_term"
-                                  class="btn-sm btn-link p-0 border-0"
-                                  style="line-height: 15px;">[{{ field.name }}]
-                          </button>
+                        <div v-if="field.type == 10" :id="'label'+field.name"
+                             class="form-check-inline d-flex flex-wrap justify-content-end">
+                          <div class="p-2">
+                            <label class="form-check-label" :for="'term' + field.name">
+                              <input class="form-check-input" type="checkbox" :id="'term'+field.name" value="1">
+                              {{ field.holder }}
+                            </label>
+                            <button type="button" v-if="is_term"
+                                    class="btn-sm btn-link p-0 border-0"
+                                    style="line-height: 15px;">[{{ field.name }}]
+                            </button>
+                          </div>
                         </div>
+
                       </div>
 
                     </div>
@@ -204,39 +196,42 @@
                       <div v-if="field.form_group_id == item.form_group_id">
 
                         <!-- link without image -->
-                        <button v-if="field.type == 7 && !field.image_url" type="button"
+                        <button v-if="field.type == 7 && !field.image_data" type="button"
                                 class="btn w-100"
                                 :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                           {{ field.holder }}
                         </button>
                         <!-- link with image -->
-                        <button v-else-if="field.type == 7 && field.image_url" type="button"
+                        <button v-else-if="field.type == 7 && field.image_data" type="button"
                                 class="btn w-100 p-0" style="background: transparent;">
-                          <img :src="field.image_url" alt="button image" class="w-100 order_form_button_image">
+                          <img :src="key_to_url(field.image_data)" alt="button image"
+                               class="w-100 order_form_button_image">
                         </button>
 
                         <!-- tel without image -->
-                        <button v-if="field.type == 8 && !field.image_url" type="button"
+                        <button v-if="field.type == 8 && !field.image_data" type="button"
                                 class="btn w-100"
                                 :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                           {{ field.holder }}
                         </button>
                         <!-- tel with image -->
-                        <button v-else-if="field.type == 8 && field.image_url" type="button"
+                        <button v-else-if="field.type == 8 && field.image_data" type="button"
                                 class="btn w-100 p-0" style="background: transparent;">
-                          <img :src="field.image_url" alt="button image" class="w-100 order_form_button_image">
+                          <img :src="key_to_url(field.image_data)" alt="button image"
+                               class="w-100 order_form_button_image">
                         </button>
 
                         <!-- submit without image -->
-                        <button v-if="field.type == 9 && !field.image_url" type="button"
+                        <button v-if="field.type == 9 && !field.image_data" type="button"
                                 class="btn w-100"
                                 :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                           {{ field.holder }}
                         </button>
                         <!-- submit with image -->
-                        <button v-else-if="field.type == 9 && field.image_url" type="button"
+                        <button v-else-if="field.type == 9 && field.image_data" type="button"
                                 class="btn w-100 p-0" style="background: transparent;">
-                          <img :src="field.image_url" alt="button image" class="w-100 order_form_button_image">
+                          <img :src="key_to_url(field.image_data)" alt="button image"
+                               class="w-100 order_form_button_image">
                         </button>
                       </div>
                     </div>
@@ -244,9 +239,9 @@
                   </div>
                   <!-- /big form -->
 
-                  <!-- small form -->
-                  <div class="form-group row mb-1" v-else-if="item.position.w < 769">
-                    <!-- input form area -->
+                  <!-- small width form (disabled 27 june 2019) -->
+                  <!--<div class="form-group row mb-1" v-else-if="item.position.w < 769">
+                    &lt;!&ndash; input form area &ndash;&gt;
                     <div class="w-100 row m-0" v-if="field.type != 7 && field.type != 8 && field.type != 9">
                       <label v-if="field.form_group_id == item.form_group_id && field.label == true"
                              class="col-12 font-weight-bold pr-0 pt-2 order_form_label"
@@ -364,53 +359,54 @@
                       </div>
 
                     </div>
-                    <!-- /input form area -->
+                    &lt;!&ndash; /input form area &ndash;&gt;
 
-                    <!-- button area -->
+                    &lt;!&ndash; button area &ndash;&gt;
                     <div class="pl-3 pr-3 pt-1 pb-1 col"
                          v-else-if="field.type == 7 || field.type == 8 || field.type == 9">
                       <div v-if="field.form_group_id == item.form_group_id">
 
-                        <!-- link without image -->
+                        &lt;!&ndash; link without image &ndash;&gt;
                         <button v-if="field.type == 7 && !field.image_url" type="button"
                                 class="btn w-100"
                                 :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                           {{ field.holder }}
                         </button>
-                        <!-- link with image -->
+                        &lt;!&ndash; link with image &ndash;&gt;
                         <button v-else-if="field.type == 7 && field.image_url" type="button"
                                 class="btn w-100 p-0" style="background: transparent;">
                           <img :src="field.image_url" alt="button image" class="w-100 order_form_button_image">
                         </button>
 
-                        <!-- tel without image -->
+                        &lt;!&ndash; tel without image &ndash;&gt;
                         <button v-if="field.type == 8 && !field.image_url" type="button"
                                 class="btn w-100"
                                 :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                           {{ field.holder }}
                         </button>
-                        <!-- tel with image -->
+                        &lt;!&ndash; tel with image &ndash;&gt;
                         <button v-else-if="field.type == 8 && field.image_url" type="button"
                                 class="btn w-100 p-0" style="background: transparent;">
                           <img :src="field.image_url" alt="button image" class="w-100 order_form_button_image">
                         </button>
 
-                        <!-- submit without image -->
+                        &lt;!&ndash; submit without image &ndash;&gt;
                         <button v-if="field.type == 9 && !field.image_url" type="button"
                                 class="btn w-100"
                                 :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                           {{ field.holder }}
                         </button>
-                        <!-- submit with image -->
+                        &lt;!&ndash; submit with image &ndash;&gt;
                         <button v-else-if="field.type == 9 && field.image_url" type="button"
                                 class="btn w-100 p-0" style="background: transparent;">
                           <img :src="field.image_url" alt="button image" class="w-100 order_form_button_image">
                         </button>
                       </div>
                     </div>
-                    <!-- /button area -->
-                  </div>
+                    &lt;!&ndash; /button area &ndash;&gt;
+                  </div>-->
                   <!-- /small form -->
+
                 </div>
                 <!-- /form_layout_cont -->
               </div>
@@ -478,7 +474,7 @@
                   <input v-if="info.type == 1" type="file" class="form-control p-1" id="image_set" accept="image/*"
                          @change="order_image_change(info.sign, $event.target.files[0])">
                   <button v-if="info.type == 1" type="button" class="btn btn-sm btn-danger w-100"
-                  @click="order_image_delete(info.sign)">
+                          @click="order_image_delete(info.sign)">
                     이미지 삭제
                   </button>
                   <select v-if="info.type == 2" class="form-control" id="form_set" v-model="info.form_group_id">
@@ -550,6 +546,7 @@
       'form',
       'field',
       'is_term',
+      'updated_date',
       'push_landing'
     ],
     data: () => ({
@@ -560,7 +557,6 @@
       order_focus_flag: false,
       section_selected: -1,
       order_selected: 0,
-      console_height: []
     }),
     mounted() {
       this.order_obj = this.order
@@ -569,6 +565,15 @@
       object_init() {
         this.order_obj = []
         this.order_obj = this.order
+        for (let i = 0; i < this.order_obj.length; i++) {
+          for (let j = 0; j < this.order_obj[i].length; j++) {
+            if (this.order_obj[i][j].form_group_id > 0) {
+              console.log('section has form_group_id')
+            } else {
+              console.log('section has not form_group_id')
+            }
+          }
+        }
       },
       // Order handle
       // Order handle
@@ -576,13 +581,11 @@
       section_add() {
         this.object_init()
         this.order_obj.push([])
-        this.console_height.push({height: 450})
         this.$emit('update:order', this.order_obj)
       },
       section_delete(index) {
         this.object_init()
         this.order_obj.splice(index, 1)
-        this.console_height.splice(index, 1)
         this.$emit('update:order', this.order_obj)
       },
       object_add(index) {
@@ -593,8 +596,8 @@
             {
               sign: 1,
               type: 1,
-              video_type: null,
-              form_group_id: null,
+              video_type: 1,
+              form_group_id: -1,
               section_h: 0,
               position: {
                 x: 0,
@@ -624,8 +627,8 @@
             {
               sign: sign,
               type: 1,
-              video_type: null,
-              form_group_id: null,
+              video_type: 1,
+              form_group_id: -1,
               section_h: 0,
               position: {
                 x: 0,
@@ -657,8 +660,8 @@
                 this.$emit('update:order', this.order_obj)
               }
             }
-            let console_clear = {sign: 0, type: 0, name: '', position: {x: 0, y: 0, w: 0, h: 0, z: 0}}
-            this.console_obj = console_clear
+            // let console_clear = {sign: 0, type: 0, name: '', position: {x: 0, y: 0, w: 0, h: 0, z: 0}}
+            // this.console_obj = console_clear
             this.order_selected = 0
             this.order_activated(0)
           }
@@ -757,13 +760,76 @@
           }
         })
 
-
-
-
       },
       order_image_delete(sign) {
         this.object_init()
 
+        let key = require('../../../vue_env')
+
+        AWS.config.update({
+          region: key.BucketRegion,
+          credentials: new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: key.IdentityPoolId
+          })
+        })
+
+        let s3 = new AWS.S3(
+          {
+            apiVersion: '2008-10-17',
+            params: {
+              Bucket: key.AWS_STORAGE_BUCKET_NAME
+            }
+          }
+        )
+
+        let photoKey = ''
+
+        for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
+          if (this.order_obj[this.section_selected][i].sign == sign) {
+            photoKey = this.order_obj[this.section_selected][i].image_data
+          }
+        }
+
+        s3.deleteObject({Key: photoKey}, (err, data) => {
+          if (err) {
+            alert('파일 삭제중 에러가 발생하였습니다. ', err.message)
+          } else {
+            // alert('Successfully deleted photo.', data)
+
+            document.getElementById('image_set').value = ''
+            for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
+              if (this.order_obj[this.section_selected][i].sign == sign) {
+                this.order_obj[this.section_selected][i].image_data = ''
+              }
+            }
+
+            this.$emit('update:order', this.order_obj)
+            this.push_landing()
+          }
+        })
+
+      },
+      key_to_url(key) {
+        let divided = key.split('/')
+        let url = ''
+
+        if (this.updated_date == '') {
+          url = 'https://infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+        } else {
+          for (let i = 0; i < divided.length; i++) {
+            if (i == 0) {
+              url += (divided[i] + '.infomagazine.xyz')
+            } else {
+              url += ('/' + divided[i])
+            }
+          }
+        }
+
+        return url
+      },
+      hex_to_decimal(hex) {
+        let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+        return parseInt(result[1], 16) + ', ' + parseInt(result[2], 16) + ', ' + parseInt(result[3], 16)
       },
       preview() {
         // let axios = this.$axios

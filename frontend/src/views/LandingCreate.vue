@@ -17,7 +17,7 @@
         <h5>기본정보</h5>
         <section_basic
           :window_width="window_width"
-          :company.sync="dynamo_obj.landing_info.landing.company"
+          :company.sync="dynamo_obj.company_id"
           :name.sync="dynamo_obj.landing_info.landing.name"
           :base_url.sync="dynamo_obj.landing_info.landing.base_url"
           :error_name.sync="error_label.name"
@@ -50,6 +50,7 @@
           :term_switch.sync="dynamo_obj.landing_info.landing.is_term"
           :image_switch.sync="dynamo_obj.landing_info.landing.image_term"
           :term.sync="dynamo_obj.landing_info.term"
+          :updated_date="dynamo_obj.updated_date"
           :push_landing="push_landing"
         />
 
@@ -72,6 +73,7 @@
           :form.sync="dynamo_obj.landing_info.form"
           :field.sync="dynamo_obj.landing_info.field"
           :is_term.sync="dynamo_obj.landing_info.landing.is_term"
+          :updated_date="dynamo_obj.updated_date"
           :push_landing="push_landing"
         />
 
@@ -146,7 +148,7 @@
       auto_flag: false,
       company_flag: false,
       dynamo_obj: {
-        company_id: '',
+        company_id: '-1',
         created_date: '',
         updated_date: '',
         landing_info: {
@@ -191,6 +193,7 @@
         })
       })
       this.epoch_time = (new Date).getTime()
+      this.dynamo_obj.created_date = this.epoch_time.toString()
     },
     methods: {
       landing_check() {
@@ -246,8 +249,6 @@
             // 'Content-Type': 'multipart/form-data'
           }
         }
-        this.dynamo_obj.company_id = this.dynamo_obj.landing_info.landing.company.toString()
-        this.dynamo_obj.created_date = this.epoch_time.toString()
         // Empty objects make as Null
         for (let key in this.dynamo_obj.landing_info.landing) {
           if (this.dynamo_obj.landing_info.landing.hasOwnProperty(key)) {
@@ -515,13 +516,12 @@
     overflow-x: hidden;
     overflow-y: auto;
     position: relative;
+    box-sizing: content-box;
     margin: auto;
   }
 
   .drag_thing {
-    /*position: absolute;*/
-    /*display: inline-block;*/
-    background-color: #eaeaea;
+    background-color: rgba(240, 240, 240, 0.4);
     border: 1px solid #818181;
   }
 
@@ -541,6 +541,7 @@
     max-width: 1000px;
     border: 1px solid #515151;
     margin: auto;
+    box-sizing: content-box;
     background-color: #eaeaea;
   }
 
