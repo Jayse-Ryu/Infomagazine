@@ -36,7 +36,7 @@
                ref="term_file_input" @change="term_file_add($event.target.files[0])" accept="image/*">
         <button type="button" class="btn btn-danger col-md-1 p-0" @click.prevent="term_file_delete()">삭제</button>
       </div>
-      <label class="col-sm-3 col-form-label-sm mt-3" for="term_img_preview">약관 이미지 미리보기</label>
+      <label class="col-sm-3 col-form-label-sm mt-3" for="term_img_preview">미리보기</label>
       <div class="col-sm-9 mt-sm-3 row ml-0" id="term_img_preview">
         <div v-if="term.image_data" class="term_preview_wrap">
           <img class="term_preview" :src="key_to_url(term.image_data)" alt="약관 이미지 미리보기">
@@ -118,6 +118,16 @@
             }
           }
         )
+
+        if (this.term.image_data) {
+          s3.deleteObject({Key: this.term.image_data}, (err, data) => {
+            if (err) {
+              alert('There was an error deleting your photo: ', err.message)
+            } else {
+              this.term.image_data = null
+            }
+          })
+        }
 
         let params = {
           Key: 'assets/images/landing/preview/' + this.epoch_time + '/term/' + file.lastModified + '_' + file.name,

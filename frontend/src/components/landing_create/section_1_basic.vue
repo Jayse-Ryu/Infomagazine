@@ -5,9 +5,9 @@
       <span>고객업체*</span>
     </label>
 
-    <div class="col-sm-9 mt-sm-3" id="company_name">
+    <div class="col-sm-9 mt-sm-3">
 
-      <select class="form-control" name="company_name" :value="company"
+      <select class="form-control" name="company_name" id="company_name" :value="company"
               @change="$emit('update:company', $event.target.value)">
         <option value="-1">업체를 선택하세요</option>
         <option v-for="content in landing_company" :value="content.id">

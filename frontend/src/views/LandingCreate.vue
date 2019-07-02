@@ -30,13 +30,16 @@
           :form.sync="dynamo_obj.landing_info.form"
           :form_arrow.sync="form_arrow"
           :field.sync="dynamo_obj.landing_info.field"
+          :set_field="set_field_position"
           :push_landing="push_landing"
         />
         <section_form_detail
           :window_width="window_width"
           :epoch_time="epoch_time"
+          :updated_date="dynamo_obj.updated_date"
           :form_arrow.sync="form_arrow"
           :field.sync="dynamo_obj.landing_info.field"
+          :set_field="set_field_position"
           :push_landing="push_landing"
         />
 
@@ -72,6 +75,7 @@
           :field.sync="dynamo_obj.landing_info.field"
           :is_term.sync="dynamo_obj.landing_info.landing.is_term"
           :updated_date="dynamo_obj.updated_date"
+          :set_field="set_field_position"
           :push_landing="push_landing"
         />
 
@@ -312,9 +316,12 @@
               console.log(error)
             })
         } else {
-          if(!this.error_label.name && !this.error_label.base_url) {
+          if (!this.error_label.name && !this.error_label.base_url) {
             console.log('Landing pushed! ')
             // axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+            //   .then((response) => {
+            //     console.log('landing updated', response)
+            //   })
             //   .catch((error) => {
             //     console.log(error)
             //   })
@@ -343,7 +350,76 @@
               console.log(error)
             })
         }
-      }
+      },
+      set_field_position() {
+        let sections = this.dynamo_obj.landing_info.sections
+        let fields = this.dynamo_obj.landing_info.field
+        let original_fields = []
+        let new_fields = []
+
+        let for_add = []
+        let for_rem = []
+
+        for (let i = 0; i < sections.length; i++) {
+
+          let objects = sections[i]
+          console.log('a section ', sections[i])
+
+          for (let j = 0; j < objects.length; j++) {
+            console.log('a object in a section ', objects[j])
+
+            if (objects[j].type == 2 && objects[j].form_group_id != 0) {
+
+              for (let l = 0; l < objects[j].field.length; l++) {
+                original_fields.push(objects[j].field[l].sign)
+              } // get original
+
+              for (let k = 0; k < fields.length; k++) {
+                if (fields[k].form_group_id == objects[j].form_group_id) {
+                  new_fields.push(fields[k].sign)
+                }
+              } // get actual field
+              // ///////////Here!
+              // Get fields for add
+              for (let q = 0; q < original_fields.length; q++) {
+                if (!new_fields.includes(original_fields[q])) {
+                  for_add.push(original_fields[q])
+                }
+              }
+              // Get fields for remove
+              for (let w = 0; w < new_fields.length; w++) {
+                if (!original_fields.includes(new_fields[w])) {
+                  for_rem.push(new_fields[w])
+                }
+              }
+              // ///////////Here!
+              // for add
+              for (let e = 0; e < for_add.length; e++) {
+                let field_start = {
+                  sign: for_add[e],
+                  position: {
+                    x:0,
+                    y:0,
+                    w:200,
+                    h:50,
+                    z:10
+                  }
+                }
+                objects[j].field.push(field_start)
+              }
+              // for remove
+              for(let r = 0; r < objects[j].field.length; r++) {
+                if (for_rem.includes(objects[j].field[r].sign)) {
+                  objects[j].field.splice(r, 1)
+                }
+              }
+
+            }// object is form group
+          }// object
+        }// section
+        console.log(original_fields)
+        console.log(new_fields)
+      },
     },
     computed: {
       user_obj() {

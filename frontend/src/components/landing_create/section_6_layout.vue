@@ -64,11 +64,13 @@
                 <div class="form_layout_cont" v-if="form.sign === item.form_group_id"
                      :style="'background: rgba('+hex_to_decimal(form.bg_color)+','+form.opacity*0.1+');' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
 
-                  <!-- big width form (disabled 27 june 2019) -->
+                  <!-- big width form (disabled and combined 27 june 2019) -->
                   <!--<div class="form-group row mb-1" v-if="item.position.w > 768"
                        v-for="field in field">-->
 
-                  <div class="form-group row mb-1" v-for="field in field">
+
+                  <div>{{ item }}</div>
+                  <div class="field_position form-group row mb-1" v-for="field in field" style="">
 
                     <!-- input form area -->
                     <div class="w-100 row m-0" v-if="field.type != 7 && field.type != 8 && field.type != 9">
@@ -477,7 +479,9 @@
                           @click="order_image_delete(info.sign)">
                     이미지 삭제
                   </button>
-                  <select v-if="info.type == 2" class="form-control" id="form_set" v-model="info.form_group_id">
+                  <select v-if="info.type == 2" class="form-control" id="form_set"
+                          v-model="info.form_group_id"
+                          @change="set_field"><!-- @change="set_field_position('form', index, order_selected)" -->
                     <option value="0">폼 그룹을 선택하세요</option>
                     <option v-for="content in form" :value="content.sign">
                       {{ content.name }}
@@ -547,6 +551,7 @@
       'field',
       'is_term',
       'updated_date',
+      'set_field',
       'push_landing'
     ],
     data: () => ({
@@ -560,28 +565,12 @@
     }),
     mounted() {
       this.order_obj = this.order
+      // this.set_field_position('mounted')
     },
     methods: {
       object_init() {
         this.order_obj = []
         this.order_obj = this.order
-        for (let i = 0; i < this.order_obj.length; i++) {
-          for (let j = 0; j < this.order_obj[i].length; j++) {
-            if (this.order_obj[i][j].form_group_id > 0) {
-              this.get_field(i, j)
-            }
-          }
-        }
-      },
-      get_field(i, j) {
-        // for (let k = 0; k < this.field.length; k++) {
-        //   if (this.field[k].form_group_id == this.order_obj[i][j].form_group_id) {
-        //     console.log(this.field[k])
-        //     let field_info = {sign: this.field[k], position: {x:0, y:0, w:100, h:100, z:1}}
-        //     this.order_obj[i][j].fields.push(field_info)
-        //   }
-        // }
-        console.log(this.order_obj[i][j])
       },
       // Order handle
       // Order handle
@@ -746,6 +735,18 @@
           }
         )
 
+        for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
+          if (this.order_obj[this.section_selected][i].sign == sign && this.order_obj[this.section_selected][i].image_data) {
+            s3.deleteObject({Key: this.order_obj[this.section_selected][i].image_data}, (err, data) => {
+              if (err) {
+                alert('There was an error deleting your photo: ', err.message)
+              } else {
+                this.order_obj[this.section_selected][i].image_data = null
+              }
+            })
+          }
+        }
+
         let params = {
           Key: 'assets/images/landing/preview/' + this.epoch_time + '/section/' + file.lastModified + '_' + file.name,
           ContentType: file.type,
@@ -757,7 +758,6 @@
           if (error) {
             console.log('S3 method error occurred', error)
           } else {
-            // console.log('S3 method success', data)
             for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
               if (this.order_obj[this.section_selected][i].sign == sign) {
                 this.order_obj[this.section_selected][i].image_data = params.Key
@@ -851,6 +851,12 @@
           })
       },
     },
+    watch: {
+      // field: {
+      //   deep: true,
+      //   // handler: this.set_field_position()
+      // }
+    },
     computed: {
       order_wrap_height() {
         // Calculation layout section editor height
@@ -884,6 +890,9 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+  .field_position {
+    position: absolute;
 
+  }
 </style>

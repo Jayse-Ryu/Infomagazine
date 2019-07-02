@@ -172,9 +172,9 @@
                        for="f_img">이미지</label>
                 <div v-if="content.type == 7 || content.type == 8 || content.type == 9" class="col-sm-9 mt-sm-3">
 
-                  <div class="error_label" v-if="content.image_data">
+                  <!--<div class="error_label" v-if="content.image_data">
                     등록된 파일 : {{ content.image_data }}
-                  </div>
+                  </div>-->
 
                   <input type="file"
                          class="input_one_btn form-control col-md-11 pt-1" id="f_img"
@@ -182,6 +182,15 @@
                          :ref="'field_file_input_' + content.sign"
                          @change="field_file_add(content.sign, $event.target.files[0])"
                          accept="image/*">
+
+                  <div class="col-12 p-0" id="term_img_preview">
+                    <div v-if="content.image_data" class="term_preview_wrap">
+                      <img class="term_preview" :src="key_to_url(content.image_data)" alt="약관 이미지 미리보기">
+                    </div>
+                    <div v-else class="form-control">
+                      <div>등록된 파일이 없습니다</div>
+                    </div>
+                  </div>
 
                   <button type="button" class="btn btn-danger w-100 mt-1" id="f_imgg"
                           @click.prevent="field_file_delete(content.sign, $event.target)">
@@ -214,6 +223,7 @@
       'epoch_time',
       'form_arrow',
       'field',
+      'set_field',
       'push_landing'
     ],
     data: () => ({
@@ -377,8 +387,21 @@
           }
         )
 
+        for (let i = 0; i < this.field_obj.length; i++) {
+          if (this.field_obj[i].sign == sign && this.field_obj[i].image_data) {
+            s3.deleteObject({Key: this.field_obj[i].image_data}, (err, data) => {
+              if (err) {
+                alert('There was an error deleting your photo: ', err.message)
+              } else {
+                this.field_obj[i].image_data = null
+                this.field_obj[i].image_url = null
+              }
+            })
+          }
+        }
+
         let params = {
-          Key: 'assets/images/landing/preview/' + this.epoch_time + '/field/' + file.lastModified + '_' + file.name,
+          Key: 'assets/images/landing/preview/' + this.epoch_time + '/field/' + Date.now() + '_' + file.name,
           ContentType: file.type,
           Body: file,
           ACL: 'public-read'
@@ -386,9 +409,8 @@
 
         s3.upload(params, (error, data) => {
           if (error) {
-            console.log('S3 method error occurred', error)
+            console.log('S3 upload error occurred', error)
           } else {
-            // console.log('S3 method success', data)
             for (let i = 0; i < this.field_obj.length; i++) {
               if (this.field_obj[i].sign == sign) {
                 this.field_obj[i].image_data = params.Key
@@ -399,8 +421,6 @@
             this.push_landing()
           }
         })
-
-        // s3.copyObject()
 
       },
       field_file_delete(sign) {
@@ -424,7 +444,7 @@
           }
         )
 
-        for(let i = 0; i < this.field_obj.length; i ++) {
+        for (let i = 0; i < this.field_obj.length; i++) {
           if (this.field_obj[i].sign == sign) {
             let photoKey = this.field_obj[i].image_data
 
@@ -445,11 +465,47 @@
 
           }
         }
+      },
+      key_to_url(key) {
+        let divided = key.split('/')
+        let url = 'https://'
+
+        if (this.updated_date == '') {
+          url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+        } else {
+          for (let i = 0; i < divided.length; i++) {
+            if (i == 0) {
+              url += (divided[i] + '.infomagazine.xyz')
+            } else {
+              url += ('/' + divided[i])
+            }
+          }
+        }
+
+        return url
       }
     }
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+  .term_preview_wrap {
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    text-align: center;
+  }
 
+  .term_preview {
+    position: relative;
+    max-width: 100%;
+  }
 </style>

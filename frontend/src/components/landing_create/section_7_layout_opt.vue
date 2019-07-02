@@ -135,7 +135,7 @@
         <span>삭제</span>
       </button>
     </div>
-    <label v-if="landing.is_banner" class="col-sm-3 col-form-label-sm mt-3" for="term_img_preview">배너 이미지 미리보기</label>
+    <label v-if="landing.is_banner" class="col-sm-3 col-form-label-sm mt-3" for="term_img_preview">미리보기</label>
     <div v-if="landing.is_banner" class="col-sm-9 mt-sm-3 row ml-0" id="term_img_preview">
       <div v-if="landing.banner_image" class="term_preview_wrap">
         <img class="term_preview" :src="key_to_url(landing.banner_image)" alt="배너 이미지 미리보기">
@@ -188,6 +188,16 @@
             }
           }
         )
+
+        if (this.landing.banner_image) {
+          s3.deleteObject({Key: this.landing.banner_image}, (err, data) => {
+            if (err) {
+              alert('There was an error deleting your photo: ', err.message)
+            } else {
+              this.landing.banner_image = null
+            }
+          })
+        }
 
         let params = {
           Key: 'assets/images/landing/preview/' + this.epoch_time + '/banner/' + file.lastModified + '_' + file.name,

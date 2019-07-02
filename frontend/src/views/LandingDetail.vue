@@ -8,8 +8,6 @@
       <router-link :to="'/landing/detail/' + $route.params.landing_id">랜딩페이지 정보</router-link>
     </div>
 
-    <div>{{ dynamo_obj }}</div>
-
     <div class="container" style="margin-top: 20px;">
 
       <form v-on:submit.prevent="landing_check">
@@ -23,6 +21,7 @@
           :base_url.sync="dynamo_obj.landing_info.landing.base_url"
           :error_name.sync="error_label.name"
           :error_base_url.sync="error_label.base_url"
+          :push_landing="push_landing"
         />
 
         <hr>
@@ -32,20 +31,27 @@
           :form.sync="dynamo_obj.landing_info.form"
           :form_arrow.sync="form_arrow"
           :field.sync="dynamo_obj.landing_info.field"
+          :push_landing="push_landing"
         />
         <section_form_detail
           :window_width="window_width"
+          :epoch_time="epoch_time"
+          :updated_date="dynamo_obj.updated_date"
           :form_arrow.sync="form_arrow"
           :field.sync="dynamo_obj.landing_info.field"
+          :push_landing="push_landing"
         />
 
         <hr>
 
         <h5>추가내용</h5>
         <section_term
+          :epoch_time="epoch_time"
           :term_switch.sync="dynamo_obj.landing_info.landing.is_term"
           :image_switch.sync="dynamo_obj.landing_info.landing.image_term"
           :term.sync="dynamo_obj.landing_info.term"
+          :updated_date="dynamo_obj.updated_date"
+          :push_landing="push_landing"
         />
 
         <hr>
@@ -56,20 +62,26 @@
           :title.sync="dynamo_obj.landing_info.landing.title"
           :header_script.sync="dynamo_obj.landing_info.landing.header_script"
           :body_script.sync="dynamo_obj.landing_info.landing.body_script"
+          :push_landing="push_landing"
         />
 
         <!-- Order layout component -->
         <section_layout
           :window_width="window_width"
+          :epoch_time="epoch_time"
           :order.sync="dynamo_obj.landing_info.sections"
           :form.sync="dynamo_obj.landing_info.form"
           :field.sync="dynamo_obj.landing_info.field"
           :is_term.sync="dynamo_obj.landing_info.landing.is_term"
+          :updated_date="dynamo_obj.updated_date"
+          :push_landing="push_landing"
         />
 
         <section_layout_opt
           :window_width.sync="window_width"
+          :epoch_time="epoch_time"
           :landing.sync="dynamo_obj.landing_info.landing"
+          :push_landing="push_landing"
         />
 
         <hr>
@@ -77,6 +89,7 @@
         <h5>옵션</h5>
         <section_page_opt
           :landing.sync="dynamo_obj.landing_info.landing"
+          :push_landing="push_landing"
         />
 
         <hr>
@@ -126,13 +139,13 @@
         name: true,
         base_url: true,
       },
-      auto_flag: false,
-      company_flag: false,
       page_id: '',
       epoch_time: 0,
       form_arrow: -1,
+      auto_flag: false,
+      company_flag: false,
       dynamo_obj: {
-        company_id: '',
+        company_id: '-1',
         created_date: '',
         updated_date: '',
         landing_info: {
@@ -159,7 +172,7 @@
           term: {
             title: '',
             content: '',
-            image: ''
+            image_data: ''
           },
           form: [],
           field: [],
@@ -258,12 +271,11 @@
         const config = {
           headers: {
             'Content-Type': 'application/json'
-            // 'Content-Type': 'multipart/form-data'
           }
         }
         this.dynamo_obj.CompanyNum = this.dynamo_obj.landing_info.landing.company.toString()
-        this.dynamo_obj.LandingNum = this.epoch_time.toString()
-        this.dynamo_obj.UpdatedTime = (Date.now()).toString()
+        // this.dynamo_obj.LandingNum = this.epoch_time.toString()
+        // this.dynamo_obj.UpdatedTime = (Date.now()).toString()
         // Empty objects make as Null
         for (let key in this.dynamo_obj.landing_info.landing) {
           if (this.dynamo_obj.landing_info.landing.hasOwnProperty(key)) {
@@ -309,19 +321,15 @@
           this.dynamo_obj.updated_date = (Date.now()).toString()
           this.$store.state.pageOptions.loading = true
           console.log('landing create object is? ', this.dynamo_obj)
-          axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+          axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id, this.dynamo_obj, config)
             .then(() => {
               this.$store.state.pageOptions.loading = false
-              if (option == 'checked') {
-                alert('랜딩이 생성되었습니다.')
-                this.bye()
-              }
+              alert('랜딩이 생성되었습니다.')
+              this.bye()
             })
             .catch((error) => {
-              if (option == 'checked') {
-                alert('랜딩 생성이 실패하였습니다.')
-                this.$store.state.pageOptions.loading = false
-              }
+              alert('랜딩 생성이 실패하였습니다.')
+              this.$store.state.pageOptions.loading = false
               console.log(error)
             })
         } else {
@@ -330,23 +338,23 @@
 
         // console.log('axios temporary disabled')
         // console.log(this.dynamo_obj)
-        this.$store.state.pageOptions.loading = true
-        axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id, this.dynamo_obj, config)
-          .then((response) => {
-            console.log('update response! ', response)
-            if (option == 'checked') {
-              alert('랜딩이 수정되었습니다.')
-              this.$store.state.pageOptions.loading = false
-              this.bye()
-            }
-          })
-          .catch((error) => {
-            if (option == 'checked') {
-              alert('랜딩 수정이 실패하였습니다.')
-              this.$store.state.pageOptions.loading = false
-            }
-            console.log(error)
-          })
+        // this.$store.state.pageOptions.loading = true
+        // axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id, this.dynamo_obj, config)
+        //   .then((response) => {
+        //     console.log('update response! ', response)
+        //     if (option == 'checked') {
+        //       alert('랜딩이 수정되었습니다.')
+        //       this.$store.state.pageOptions.loading = false
+        //       this.bye()
+        //     }
+        //   })
+        //   .catch((error) => {
+        //     if (option == 'checked') {
+        //       alert('랜딩 수정이 실패하였습니다.')
+        //       this.$store.state.pageOptions.loading = false
+        //     }
+        //     console.log(error)
+        //   })
       },
       /* e */
       /* n */

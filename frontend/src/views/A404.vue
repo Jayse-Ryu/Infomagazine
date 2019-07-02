@@ -58,86 +58,57 @@
           ],
           field: [
             {
+              sign: 1,
+              type: 1,
               back_color: '#287BFF',
               image_data: null,
-              name: '이름입력',
-              sign: 1,
-              holder: '이름을 입력하세요',
+              name: 'non label',
+              holder: 'non label 입니다.',
               label: false,
               text_color: '#fafafa',
               list: [],
-              type: 1,
-              form_group_id: 2,
-              position: {
-                x: 0,
-                y: 0,
-                w: 100,
-                h: 100,
-                z: 1
-              }
+              form_group_id: 1,
+              url: ''
             },
             {
-              back_color: '#287BFF',
-              image_data: null,
-              name: '지점스크롤',
-              sign: 3,
-              holder: '지점을 선택하세요',
-              label: false,
-              text_color: '#f0f0f0',
-              list: [
-                '서울',
-                '부산'
-              ],
-              type: 3,
-              form_group_id: 2
-            },
-            {
+              sign: 2,
+              type: 9,
               back_color: '#ff6069',
               image_data: null,
-              sign: 6,
-              name: '홈페이지링크',
-              holder: '홈페이지 가기',
+              name: '완료버튼',
+              holder: '신청하기',
               label: true,
               text_color: '#f0f0f0',
-              type: 7,
-              opacity: 10,
               list: [],
               form_group_id: 2,
-              url: 'lcventures.net'
+              url: ''
             },
             {
-              back_color: '#bfffba',
-              image_data: 'assets/image/landing/preview/1557911402220/field/field_1.jpg',
-              sign: 7,
-              name: '전화걸기',
-              holder: '엘씨로 걸기',
-              label: true,
-              text_color: '#313131',
-              type: 8,
-              opacity: 10,
-              list: [],
-              form_group_id: 2,
-              value: '0103333333'
-            },
-            {
+              sign: 3,
+              type: 1,
               back_color: '#287BFF',
               image_data: null,
-              sign: 8,
-              name: '취미선택',
-              holder: '취미선택',
+              name: '필드있음',
+              holder: '라벨트루',
               label: true,
               text_color: '#f0f0f0',
-              type: 5,
-              opacity: 10,
-              list: [
-                '1취미',
-                '2취미',
-                '3취미'
-              ],
-              form_group_id: 2
+              list: [],
+              form_group_id: 1,
+              url: 'link.com'
             },
-
-
+            {
+              sign: 4,
+              type: 9,
+              back_color: '#ff6069',
+              image_data: null,
+              name: '완료버튼',
+              holder: '신청하기',
+              label: true,
+              text_color: '#f0f0f0',
+              list: [],
+              form_group_id: 2,
+              url: ''
+            }
           ],
           sections: [
             [
@@ -145,14 +116,51 @@
                 type: 1,
                 video_type: null,
                 form_group_id: null,
+                fields: [],
                 position: {
                   x: 0,
                   y: 0,
-                  w: 100,
-                  h: 100,
+                  w: 1000,
+                  h: 750,
                   z: 1
                 },
-                image_data: 'assets/image/landing/preview/1557911402220/field/field_1.jpg',
+                image_data: '1000x750',
+                video_url: null
+              },
+              {
+                type: 2,
+                video_type: null,
+                form_group_id: 1,
+                fields: [
+                  {
+                    sign: 1,
+                    position: {
+                      x: 50,
+                      y: 100,
+                      w: 400,
+                      h: 50,
+                      z: 1,
+                    }
+                  },
+                  {
+                    sign: 2,
+                    position: {
+                      x: 150,
+                      y: 200,
+                      w: 200,
+                      h: 50,
+                      z: 1,
+                    }
+                  }
+                ],
+                position: {
+                  x: 200,
+                  y: 500,
+                  w: 600,
+                  h: 250,
+                  z: 2
+                },
+                image_data: null,
                 video_url: null
               }
             ],
@@ -161,71 +169,86 @@
                 type: 1,
                 video_type: null,
                 form_group_id: null,
+                fields: [],
                 position: {
                   x: 0,
                   y: 0,
-                  w: 100,
-                  h: 100,
+                  w: 1000,
+                  h: 850,
                   z: 1
                 },
-                image_data: 'assets/image/landing/preview/1557911402220/field/field_1.jpg',
+                image_data: '1000x850',
+                video_url: null
+              },
+              {
+                type: 1,
+                video_type: null,
+                form_group_id: null,
+                fields: [],
+                position: {
+                  x: 200,
+                  y: 200,
+                  w: 250,
+                  h: 150,
+                  z: 2
+                },
+                image_data: '250x150',
+                video_url: null
+              },
+              {
+                type: 1,
+                video_type: null,
+                form_group_id: null,
+                fields: [],
+                position: {
+                  x: 550,
+                  y: 200,
+                  w: 250,
+                  h: 150,
+                  z: 2
+                },
+                image_data: '250x150',
                 video_url: null
               },
               {
                 type: 2,
                 video_type: null,
                 form_group_id: 2,
-                section_h: 450,
-                position: {
-                  x: 0,
-                  y: 0,
-                  w: 100,
-                  h: 100,
-                  z: 2
-                },
                 fields: [
                   {
-                    sign: 1,
+                    sign: 3,
                     position: {
-                      x: 0,
-                      y: 0,
-                      w: 100,
-                      h: 100,
-                      z: 2
+                      x: 50,
+                      y: 100,
+                      w: 500,
+                      h: 50,
+                      z: 1,
                     }
                   },
                   {
-                    sign: 2,
+                    sign: 4,
                     position: {
-                      x: 50,
-                      y: 0,
-                      w: 100,
-                      h: 100,
-                      z: 3
+                      x: 200,
+                      y: 350,
+                      w: 400,
+                      h: 50,
+                      z: 1,
                     }
                   }
                 ],
+                position: {
+                  x: 200,
+                  y: 450,
+                  w: 600,
+                  h: 350,
+                  z: 2
+                },
                 image_data: null,
                 video_url: null
               }
-            ],
-            [
-              {
-                type: 3,
-                video_type: 1,
-                form_group_id: null,
-                position: {
-                  x: 0,
-                  y: 0,
-                  w: 100,
-                  h: 100,
-                  z: 1
-                },
-                image_data: null,
-                video_url: 'yuMnWsIlEBY'
-              }
             ]
           ],
+
           views: 0
         }
       }

@@ -66,6 +66,7 @@
       'form',
       'form_arrow',
       'field',
+      'set_field',
       'push_landing'
       // 'form_selected'
     ],

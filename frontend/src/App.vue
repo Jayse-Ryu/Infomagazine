@@ -794,6 +794,7 @@
     border-radius: 5px;
     margin: 1px 3px;
     border: 1px solid #ee5151;
+    word-break: break-word;
     box-sizing: border-box;
   }
 
