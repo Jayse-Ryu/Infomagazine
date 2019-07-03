@@ -352,48 +352,64 @@
         }
       },
       set_field_position() {
+        // Section list short name
         let sections = this.dynamo_obj.landing_info.sections
+        // Dynamo field short name
         let fields = this.dynamo_obj.landing_info.field
-        let original_fields = []
-        let new_fields = []
 
+        // Fields in section object (static data)
+        let original_fields = []
+        // Fields in dynamo object (dynamically change)
+        let dynamic_fields = []
+
+        // Field sign list for add
         let for_add = []
+        // Field sign list for delete
         let for_rem = []
 
+        // Get A Section
         for (let i = 0; i < sections.length; i++) {
-
+          // Object lists
           let objects = sections[i]
-          console.log('a section ', sections[i])
 
+          // Get A object
           for (let j = 0; j < objects.length; j++) {
-            console.log('a object in a section ', objects[j])
-
+            // If the layout object is form_group and it has a form group id
             if (objects[j].type == 2 && objects[j].form_group_id != 0) {
+              // Init calculator list
+              original_fields = []
+              dynamic_fields = []
+              for_add = []
+              for_rem = []
 
-              for (let l = 0; l < objects[j].field.length; l++) {
-                original_fields.push(objects[j].field[l].sign)
-              } // get original
+              // Set original field
+              for (let l = 0; l < objects[j].fields.length; l++) {
+                original_fields.push(objects[j].fields[l].sign)
+              }
 
+              // Set dynamic field as object's form group
               for (let k = 0; k < fields.length; k++) {
                 if (fields[k].form_group_id == objects[j].form_group_id) {
-                  new_fields.push(fields[k].sign)
+                  dynamic_fields.push(fields[k].sign)
                 }
-              } // get actual field
-              // ///////////Here!
+              }
+
+              // ///////////Here! calculate
               // Get fields for add
-              for (let q = 0; q < original_fields.length; q++) {
-                if (!new_fields.includes(original_fields[q])) {
-                  for_add.push(original_fields[q])
+              for (let w = 0; w < dynamic_fields.length; w++) {
+                if (!original_fields.includes(dynamic_fields[w])) {
+                  for_add.push(dynamic_fields[w])
                 }
               }
               // Get fields for remove
-              for (let w = 0; w < new_fields.length; w++) {
-                if (!original_fields.includes(new_fields[w])) {
-                  for_rem.push(new_fields[w])
+              for (let q = 0; q < original_fields.length; q++) {
+                if (!dynamic_fields.includes(original_fields[q])) {
+                  for_rem.push(original_fields[q])
                 }
               }
-              // ///////////Here!
-              // for add
+              // ///////////Here! calculate
+
+              // Add fields into Object fields
               for (let e = 0; e < for_add.length; e++) {
                 let field_start = {
                   sign: for_add[e],
@@ -405,20 +421,19 @@
                     z:10
                   }
                 }
-                objects[j].field.push(field_start)
+                objects[j].fields.push(field_start)
               }
-              // for remove
-              for(let r = 0; r < objects[j].field.length; r++) {
-                if (for_rem.includes(objects[j].field[r].sign)) {
-                  objects[j].field.splice(r, 1)
+
+              // Remove fields from Object fields
+              for(let r = 0; r < objects[j].fields.length; r++) {
+                if (for_rem.includes(objects[j].fields[r].sign)) {
+                  objects[j].fields.splice(r, 1)
                 }
               }
 
-            }// object is form group
-          }// object
-        }// section
-        console.log(original_fields)
-        console.log(new_fields)
+            }// is object form group?
+          }// get object
+        }// get section
       },
     },
     computed: {
