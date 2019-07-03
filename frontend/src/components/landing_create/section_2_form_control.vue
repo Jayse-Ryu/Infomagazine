@@ -150,7 +150,7 @@
             this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
             // Field objs delete also
             this.field_work(id)
-            this.push_landing()
+            // this.push_landing()
           }
         } else {
           alert('그룹을 먼저 선택하세요.')
@@ -161,6 +161,7 @@
         this.temp_field = this.field
         this.temp_field = this.temp_field.filter(el => el.form_group_id != id)
         this.$emit('update:field', this.temp_field)
+        this.set_field()
         this.push_landing()
       }
     }

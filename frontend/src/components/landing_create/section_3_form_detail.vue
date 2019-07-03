@@ -108,6 +108,81 @@
                   <input type="text" class="form-control" id="f_holder" maxlength="50" v-model="content.holder">
                 </div>
 
+                <label v-if="content.type == 1 || content.type == 2" class="col-sm-3 col-form-label-sm mt-3"
+                       for="f_validate">
+                  <span>유효성 검사</span>
+                </label>
+                <div v-if="content.type == 1 || content.type == 2" class="col-sm-9 mt-sm-3" id="f_validate">
+                  <label :for="'f_validate_1' + content.sign" class="validate_label">
+                    <input type="checkbox" :id="'f_validate_1' + content.sign" v-model="content.validation.required">
+                    필수
+                  </label>
+                  <label :for="'f_validate_2' + content.sign" class="validate_label">
+                    <input type="checkbox" :id="'f_validate_2' + content.sign" v-model="content.validation.korean_only">
+                    한글만
+                  </label>
+                  <label :for="'f_validate_3' + content.sign" class="validate_label">
+                    <input type="checkbox" :id="'f_validate_3' + content.sign"
+                           v-model="content.validation.english_only">
+                    영어만
+                  </label>
+                  <label :for="'f_validate_4' + content.sign" class="validate_label">
+                    <input type="checkbox" :id="'f_validate_4' + content.sign" v-model="content.validation.number_only">
+                    숫자만
+                  </label>
+                  <label :for="'f_validate_5' + content.sign" class="validate_label">
+                    <input type="checkbox" :id="'f_validate_5' + content.sign" v-model="content.validation.phone_only">
+                    전화번호만
+                  </label>
+                  <label :for="'f_validate_6' + content.sign" class="validate_label">
+                    <input type="checkbox" :id="'f_validate_6' + content.sign" v-model="content.validation.email">
+                    이메일
+                  </label>
+                  <label :for="'f_validate_7' + content.sign" class="validate_label">
+                    <input type="checkbox" :id="'f_validate_7' + content.sign" v-model="content.validation.age_limit">
+                    나이제한
+                  </label>
+                </div>
+
+                <div v-if="content.type == 1 || content.type == 2" class="w-100">
+                  <label v-if="content.validation.age_limit" class="col-sm-3 col-form-label-sm mt-3 float-left" for="limit_option">
+                    <span>나이제한 옵션</span>
+                  </label>
+                  <div v-if="content.validation.age_limit" class="col-sm-9 mt-sm-3 float-left" id="limit_option">
+                    <input type="number" class="form-control"
+                           v-model.number="content.validation.value_min">
+                    <div class="mt-2">
+                      <label :for="'limit_option_min_gt' + content.sign" class="validate_label">
+                        <input type="radio" :id="'limit_option_min_gt' + content.sign" value="gt"
+                               v-model="content.validation.max_option">
+                        <span>초과</span>
+                      </label>
+                      <label :for="'limit_option_min_gte' + content.sign" class="validate_label">
+                        <input type="radio" :id="'limit_option_min_gte' + content.sign" value="gte"
+                               v-model="content.validation.max_option">
+                        <span>이상</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div v-if="content.validation.age_limit" class="col-sm-3 col-form-label-sm mt-3 float-left"> </div>
+                  <div v-if="content.validation.age_limit" class="col-sm-9 mt-sm-3 float-left">
+                    <input type="number" class="form-control"
+                           v-model.number="content.validation.value_max">
+                    <div class="mt-2">
+                      <label for="limit_option_min_lt" class="validate_label">
+                        <input type="radio" id="limit_option_min_lt" value="lt" v-model="content.validation.min_option">
+                        <span>미만</span>
+                      </label>
+                      <label for="limit_option_min_lte" class="validate_label">
+                        <input type="radio" id="limit_option_min_lte" value="lte"
+                               v-model="content.validation.min_option">
+                        <span>이하</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
                 <label v-if="content.type == 8" class="col-sm-3 col-form-label-sm mt-3" for="f_val">전화번호</label>
                 <div v-if="content.type == 8" class="col-sm-9 mt-sm-3">
                   <input type="text" class="form-control" id="f_val" maxlength="12" v-model="content.value">
@@ -289,6 +364,19 @@
                 form_group_id: this.form_arrow,
                 back_color: '#287BFF',
                 text_color: '#f0f0f0',
+                validation: {
+                  required: false,
+                  korean_only: false,
+                  english_only: false,
+                  number_only: false,
+                  phone_only: false,
+                  email: false,
+                  age_limit: false,
+                  value_min: 0,
+                  value_max: 120,
+                  min_option: 'lt',
+                  max_option: 'gt'
+                },
                 opacity: 10,
                 list: [],
                 image_data: null
@@ -296,6 +384,7 @@
               this.$emit('update:field', this.field_obj)
               this.field_temp_name = ''
               this.filter_change()
+              this.set_field()
               this.push_landing()
             } else {
               // if field_obj length is 0
@@ -308,6 +397,19 @@
                 form_group_id: this.form_arrow,
                 back_color: '#287BFF',
                 text_color: '#fafafa',
+                validation: {
+                  required: false,
+                  korean_only: false,
+                  english_only: false,
+                  number_only: false,
+                  phone_only: false,
+                  email: false,
+                  age_limit: false,
+                  value_min: 0,
+                  value_max: 120,
+                  min_option: 'lt',
+                  max_option: 'gt'
+                },
                 opacity: 10,
                 list: [],
                 image_data: null
@@ -315,6 +417,7 @@
               this.$emit('update:field', this.field_obj)
               this.field_temp_name = ''
               this.filter_change()
+              this.set_field()
               this.push_landing()
             }
           } else {
@@ -334,6 +437,7 @@
             this.field_obj.splice(i, 1)
             this.$emit('update:field', this.field_obj)
             this.filter_change()
+            this.set_field()
             this.push_landing()
             break
           }
@@ -507,5 +611,13 @@
   .term_preview {
     position: relative;
     max-width: 100%;
+  }
+
+  .validate_label {
+    padding: 0 10px;
+
+    input {
+      margin: 0 4px;
+    }
   }
 </style>

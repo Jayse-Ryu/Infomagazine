@@ -31,6 +31,7 @@
           :form.sync="dynamo_obj.landing_info.form"
           :form_arrow.sync="form_arrow"
           :field.sync="dynamo_obj.landing_info.field"
+          :set_field="set_field_position"
           :push_landing="push_landing"
         />
         <section_form_detail
@@ -39,6 +40,7 @@
           :updated_date="dynamo_obj.updated_date"
           :form_arrow.sync="form_arrow"
           :field.sync="dynamo_obj.landing_info.field"
+          :set_field="set_field_position"
           :push_landing="push_landing"
         />
 
@@ -74,6 +76,7 @@
           :field.sync="dynamo_obj.landing_info.field"
           :is_term.sync="dynamo_obj.landing_info.landing.is_term"
           :updated_date="dynamo_obj.updated_date"
+          :set_field="set_field_position"
           :push_landing="push_landing"
         />
 
@@ -222,6 +225,90 @@
       // }
     },
     methods: {
+      set_field_position() {
+        // Section list short name
+        let sections = this.dynamo_obj.landing_info.sections
+        // Dynamo field short name
+        let fields = this.dynamo_obj.landing_info.field
+
+        // Fields in section object (static data)
+        let original_fields = []
+        // Fields in dynamo object (dynamically change)
+        let dynamic_fields = []
+
+        // Field sign list for add
+        let for_add = []
+        // Field sign list for delete
+        let for_rem = []
+
+        // Get A Section
+        for (let i = 0; i < sections.length; i++) {
+          // Object lists
+          let objects = sections[i]
+
+          // Get A object
+          for (let j = 0; j < objects.length; j++) {
+            // If the layout object is form_group and it has a form group id
+            if (objects[j].type == 2 && objects[j].form_group_id != 0) {
+              // Init calculator list
+              original_fields = []
+              dynamic_fields = []
+              for_add = []
+              for_rem = []
+
+              // Set original field
+              for (let l = 0; l < objects[j].fields.length; l++) {
+                original_fields.push(objects[j].fields[l].sign)
+              }
+
+              // Set dynamic field as object's form group
+              for (let k = 0; k < fields.length; k++) {
+                if (fields[k].form_group_id == objects[j].form_group_id) {
+                  dynamic_fields.push(fields[k].sign)
+                }
+              }
+
+              // ///////////Here! calculate
+              // Get fields for add
+              for (let w = 0; w < dynamic_fields.length; w++) {
+                if (!original_fields.includes(dynamic_fields[w])) {
+                  for_add.push(dynamic_fields[w])
+                }
+              }
+              // Get fields for remove
+              for (let q = 0; q < original_fields.length; q++) {
+                if (!dynamic_fields.includes(original_fields[q])) {
+                  for_rem.push(original_fields[q])
+                }
+              }
+              // ///////////Here! calculate
+
+              // Add fields into Object fields
+              for (let e = 0; e < for_add.length; e++) {
+                let field_start = {
+                  sign: for_add[e],
+                  position: {
+                    x:0,
+                    y:0,
+                    w:200,
+                    h:50,
+                    z:10
+                  }
+                }
+                objects[j].fields.push(field_start)
+              }
+
+              // Remove fields from Object fields
+              for(let r = 0; r < objects[j].fields.length; r++) {
+                if (for_rem.includes(objects[j].fields[r].sign)) {
+                  objects[j].fields.splice(r, 1)
+                }
+              }
+
+            }// is object form group?
+          }// get object
+        }// get section
+      },
       // Create Landing Start
       // Create Landing Start
       // Create Landing Start
