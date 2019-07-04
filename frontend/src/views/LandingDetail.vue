@@ -387,15 +387,15 @@
             }
           }
         }
-        for (let key in this.dynamo_obj.landing_info.order) {
-          if (this.dynamo_obj.landing_info.order.hasOwnProperty(key)) {
-            for (let j in this.dynamo_obj.landing_info.order[key]) {
-              if (this.dynamo_obj.landing_info.order[key][j] === '') {
-                this.dynamo_obj.landing_info.order[key][j] = null
-              }
-            }
-          }
-        }
+        // for (let key in this.dynamo_obj.landing_info.sections) {
+        //   if (this.dynamo_obj.landing_info.sections.hasOwnProperty(key)) {
+        //     for (let j in this.dynamo_obj.landing_info.sections[key]) {
+        //       if (this.dynamo_obj.landing_info.sections[key][j] === '') {
+        //         this.dynamo_obj.landing_info.sections[key][j] = null
+        //       }
+        //     }
+        //   }
+        // }
         for (let key in this.dynamo_obj.landing_info.term) {
           if (this.dynamo_obj.landing_info.term.hasOwnProperty(key)) {
             if (this.dynamo_obj.landing_info.term[key] === '' && typeof (this.dynamo_obj.landing_info.term[key]) != 'boolean') {
@@ -411,7 +411,7 @@
           axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id, this.dynamo_obj, config)
             .then(() => {
               this.$store.state.pageOptions.loading = false
-              alert('랜딩이 생성되었습니다.')
+              alert('랜딩이 수정되었습니다.')
               this.bye()
             })
             .catch((error) => {

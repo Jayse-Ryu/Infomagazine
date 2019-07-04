@@ -280,19 +280,17 @@
               }
 
             }// is object form group?
-            else {
+            else if (objects[j].type != 2 || objects[j].form_group_id == 0) {
               // If object type is not form, and there is no form group id
-              objects[j].field = []
+              objects[j].fields = []
             }
           }// get object
         }// get section
-        console.log('set field done! ', this.dynamo_obj.landing_info.sections)
-        console.log('set field done! ', sections)
       },
       landing_check() {
         // Start validate before create
         this.$validator.validateAll()
-        console.log(this.user_obj)
+        // console.log(this.user_obj)
         this.dynamo_obj.landing_info.landing.manager = this.user_obj.id
 
         // Empty filtering first
@@ -369,15 +367,15 @@
             }
           }
         }
-        for (let key in this.dynamo_obj.landing_info.order) {
-          if (this.dynamo_obj.landing_info.order.hasOwnProperty(key)) {
-            for (let j in this.dynamo_obj.landing_info.order[key]) {
-              if (this.dynamo_obj.landing_info.order[key][j] === '') {
-                this.dynamo_obj.landing_info.order[key][j] = null
-              }
-            }
-          }
-        }
+        // for (let key in this.dynamo_obj.landing_info.sections) {
+        //   if (this.dynamo_obj.landing_info.sections.hasOwnProperty(key)) {
+        //     for (let j in this.dynamo_obj.landing_info.sections[key]) {
+        //       if (this.dynamo_obj.landing_info.sections[key][j] === '') {
+        //         this.dynamo_obj.landing_info.sections[key][j] = null
+        //       }
+        //     }
+        //   }
+        // }
         for (let key in this.dynamo_obj.landing_info.term) {
           if (this.dynamo_obj.landing_info.term.hasOwnProperty(key)) {
             if (this.dynamo_obj.landing_info.term[key] === '' && typeof (this.dynamo_obj.landing_info.term[key]) != 'boolean') {
@@ -389,32 +387,32 @@
         if (option === 'checked') {
           this.dynamo_obj.updated_date = (Date.now()).toString()
           this.$store.state.pageOptions.loading = true
-          console.log('landing create object is? ', this.dynamo_obj)
+          // console.log('landing create object is? ', this.dynamo_obj)
           axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
             .then(() => {
               this.$store.state.pageOptions.loading = false
-              if (option == 'checked') {
+              // if (option == 'checked') {
                 alert('랜딩이 생성되었습니다.')
                 this.bye()
-              }
+              // }
             })
             .catch((error) => {
-              if (option == 'checked') {
+              // if (option == 'checked') {
                 alert('랜딩 생성이 실패하였습니다.')
                 this.$store.state.pageOptions.loading = false
-              }
+              // }
               console.log(error)
             })
         } else {
           if (!this.error_label.name && !this.error_label.base_url) {
-            console.log('Landing pushed! ')
-            // axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
-            //   .then((response) => {
-            //     console.log('landing updated', response)
-            //   })
-            //   .catch((error) => {
-            //     console.log(error)
-            //   })
+            // console.log('Landing pushed! ')
+            axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+              .then((response) => {
+                console.log('landing updated', response)
+              })
+              .catch((error) => {
+                console.log(error)
+              })
           }
         }
 
@@ -692,7 +690,6 @@
   .order_form_button_image {
     width: 100%;
     height: 100%;
-    max-height: 50px;
     object-fit: contain;
   }
 

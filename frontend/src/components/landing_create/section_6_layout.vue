@@ -30,8 +30,6 @@
         <button type="button" class="btn btn-danger btn-sm p-1" @click.prevent="object_delete(index)">선택 삭제</button>
       </div>
 
-      {{ object }}
-
       <div class="col-sm-12">
         <div class="main_layout" id="main_layout">
           <div class="basket" :style="{'height': order_wrap_height[index] + 'px'}">
@@ -64,7 +62,6 @@
               <!-- Order layout for form group -->
               <div v-if="item.type == 2" class="form_layout" v-for="form in form">
 
-
                 <div v-if="form.sign === item.form_group_id"
                      :style="'background: rgba('+hex_to_decimal(form.bg_color)+','+form.opacity*0.1+');' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
 
@@ -73,7 +70,7 @@
                        v-for="field in field">-->
 
                   <!-- V-for follow section field list -->
-                  <div class="form_layout_cont" v-for="area in item.fields" @click="function(){alert('oo')}"
+                  <div class="form_layout_cont" v-for="area in item.fields" @click="field_console(area.sign)"
                        :style="{
                         'left': area.position.x + 'px',
                         'top': area.position.y + 'px',
@@ -211,39 +208,39 @@
 
                           <!-- link without image -->
                           <button v-if="field.type == 7 && !field.image_data" type="button"
-                                  class="btn w-100 p-0"
+                                  class="btn w-100 p-0 h-100"
                                   :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                             {{ field.holder }}
                           </button>
                           <!-- link with image -->
                           <button v-else-if="field.type == 7 && field.image_data" type="button"
-                                  class="btn w-100 p-0" style="background: transparent;">
+                                  class="btn w-100 p-0 h-100" style="background: transparent;">
                             <img :src="key_to_url(field.image_data)" alt="button image"
                                  class="w-100 order_form_button_image">
                           </button>
 
                           <!-- tel without image -->
                           <button v-if="field.type == 8 && !field.image_data" type="button"
-                                  class="btn w-100"
+                                  class="btn w-100 h-100"
                                   :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                             {{ field.holder }}
                           </button>
                           <!-- tel with image -->
                           <button v-else-if="field.type == 8 && field.image_data" type="button"
-                                  class="btn w-100 p-0" style="background: transparent;">
+                                  class="btn w-100 p-0 h-100" style="background: transparent;">
                             <img :src="key_to_url(field.image_data)" alt="button image"
                                  class="w-100 order_form_button_image">
                           </button>
 
                           <!-- submit without image -->
                           <button v-if="field.type == 9 && !field.image_data" type="button"
-                                  class="btn w-100"
+                                  class="btn w-100 h-100"
                                   :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                             {{ field.holder }}
                           </button>
                           <!-- submit with image -->
                           <button v-else-if="field.type == 9 && field.image_data" type="button"
-                                  class="btn w-100 p-0" style="background: transparent;">
+                                  class="btn w-100 p-0 h-100" style="background: transparent;">
                             <img :src="key_to_url(field.image_data)" alt="button image"
                                  class="w-100 order_form_button_image">
                           </button>
@@ -456,8 +453,47 @@
 
           </div>
 
-          <div class="field_console">
+          <div class="field_console" v-if="index == section_selected && field_selected != 0">
+            <div v-for="info in object">
+              <div v-for="item in info.fields" v-if="field_selected == item.sign">
 
+                <div class="col-12">
+                  <h5 class="pl-3 pt-3">필드 배치</h5>
+                </div>
+
+                <div class="form-group row p-4 m-0">
+                  <label for="field_x" class="col-sm-3 col-form-label-sm mt-3">X 좌표</label>
+                  <div class="col-sm-9 mt-sm-3">
+                    <input type="number" id="field_x" v-model.number="item.position.x" class="form-control"
+                           step="10">
+                  </div>
+
+                  <label for="field_y" class="col-sm-3 col-form-label-sm mt-3">Y 좌표</label>
+                  <div class="col-sm-9 mt-sm-3">
+                    <input type="number" id="field_y" v-model.number="item.position.y" class="form-control"
+                           step="10">
+                  </div>
+
+                  <label for="field_w" class="col-sm-3 col-form-label-sm mt-3">필드 너비</label>
+                  <div class="col-sm-9 mt-sm-3">
+                    <input type="number" id="field_w" v-model.number="item.position.w" class="form-control"
+                           step="10">
+                  </div>
+
+                  <label for="field_h" class="col-sm-3 col-form-label-sm mt-3">필드 높이</label>
+                  <div class="col-sm-9 mt-sm-3">
+                    <input type="number" id="field_h" v-model.number="item.position.h" class="form-control"
+                           step="10">
+                  </div>
+
+                  <label for="field_z" class="col-sm-3 col-form-label-sm mt-3">필드 깊이</label>
+                  <div class="col-sm-9 mt-sm-3">
+                    <input type="number" id="field_z" v-model.number="item.position.z" class="form-control">
+                  </div>
+                </div>
+
+              </div>
+            </div>
           </div>
 
           <div class="console" v-if="order_focus_flag && order_selected != 0 && index == section_selected">
@@ -582,6 +618,7 @@
       order_focus_flag: false,
       section_selected: -1,
       order_selected: 0,
+      field_selected: 0,
     }),
     mounted() {
       this.order_obj = this.order
@@ -683,6 +720,7 @@
             // let console_clear = {sign: 0, type: 0, name: '', position: {x: 0, y: 0, w: 0, h: 0, z: 0}}
             // this.console_obj = console_clear
             this.order_selected = 0
+            this.field_selected = 0
             this.order_activated(0)
           }
         } else {
@@ -692,6 +730,7 @@
       order_activated(index, sign) {
         this.section_selected = index
         this.order_selected = sign
+        this.field_selected = 0
         this.order_focus_flag = true
       },
       order_deactivated() {
@@ -715,6 +754,7 @@
             this.order_obj[this.section_selected][i].section_h = compare
           }
         }
+        this.field_selected = 0
         this.$emit('update:order', this.order_obj)
       },
       order_resize(x, y, w, h) {
@@ -735,6 +775,7 @@
             this.order_obj[this.section_selected][i].section_h = compare
           }
         }
+        this.field_selected = 0
         this.$emit('update:order', this.order_obj)
       },
       order_image_change(sign, file) {
@@ -839,6 +880,13 @@
           }
         })
 
+      },
+      field_console(sign) {
+        // this.field_console_data.section = section
+        // this.field_console_data.object = object
+        // this.field_console_data.field = sign
+        // console.log(sign)
+        this.field_selected = sign
       },
       key_to_url(key) {
         let divided = key.split('/')
@@ -995,8 +1043,8 @@
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
-    min-height: 200px;
-    background: #007aff;
+    min-height: 150px;
+    background: #f7feff;
     box-sizing: content-box;
     border-left: 1px solid #515151;
     border-right: 1px solid #515151;
