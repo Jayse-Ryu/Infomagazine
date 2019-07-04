@@ -14,7 +14,7 @@
       <select class="input_one_btn form-control col-md-11" name="form_group_list" id="form_group_list"
               :value="form_arrow" @change="form_changed($event.target.value)">
         <option value="-1">그룹을 선택하세요</option>
-        <option v-for="item in form_obj" :value="item.sign">{{ item.name }}</option>
+        <option v-for="item in form" :value="item.sign">{{ item.name }}</option>
       </select>
       <button type="button" class="btn btn-danger col-md-1 p-0"
               @click.prevent="form_group_delete(form_selected.sign)">
@@ -77,9 +77,13 @@
       temp_field: []
     }),
     mounted() {
-      this.form_obj = this.form
+      this.form_init()
     },
     methods: {
+      form_init() {
+        this.form_obj = []
+        this.form_obj = this.form
+      },
       form_changed(id) {
         this.$emit('update:form_arrow', id)
         if (id == -1) {
@@ -93,6 +97,7 @@
         }
       },
       form_group_add() {
+        this.form_init()
         if (this.form_temp) {
           let len = this.form_obj.length
           let flag = true
@@ -143,6 +148,7 @@
       form_group_delete(id) {
         if (id !== -1) {
           if (confirm('이 폼그룹을 삭제하시겠습니까?')) {
+            this.form_init()
             this.form_obj = this.form_obj.filter(el => el.sign != id)
             // this.form_arrow = -1
             this.$emit('update:form_arrow', -1)

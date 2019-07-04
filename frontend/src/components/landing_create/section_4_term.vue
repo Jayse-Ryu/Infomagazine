@@ -7,21 +7,21 @@
 
       <div class="col-sm-9 mt-sm-3">
         <label class="switch" for="term_status">
-          <input type="checkbox" id="term_status" v-model="term_state"
-                 @change="change_switch('term')">
+          <input type="checkbox" id="term_status" v-model="landing.is_term"
+                 @change="push_landing()">
           <span class="slider round"></span>
         </label>
       </div>
 
-      <label v-if="term_state" class="col-sm-3 col-form-label-sm mt-3"
+      <label v-if="landing.is_term" class="col-sm-3 col-form-label-sm mt-3"
              for="term_switch">
         약관 이미지
       </label>
 
-      <div v-if="term_state" class="col-sm-9 mt-sm-3">
+      <div v-if="landing.is_term" class="col-sm-9 mt-sm-3">
         <label class="switch" for="term_switch">
-          <input type="checkbox" id="term_switch" v-model="image_state"
-                 @change="change_switch('image')">
+          <input type="checkbox" id="term_switch" v-model="landing.image_term"
+                 @change="push_landing()">
           <span class="slider round"></span>
         </label>
       </div>
@@ -29,7 +29,7 @@
     </div>
 
     <div class="form-group row"
-         v-if="term_state && image_state">
+         v-if="landing.is_term && landing.image_term">
       <label class="col-sm-3 col-form-label-sm mt-3" for="term_img">약관 이미지 파일</label>
       <div class="col-sm-9 mt-sm-3 row ml-0">
         <input type="file" class="input_one_btn form-control col-md-11 pt-1" id="term_img" placeholder="이미지"
@@ -48,7 +48,7 @@
     </div>
 
     <div class="form-group row"
-         v-if="term_state && !image_state">
+         v-if="landing.is_term && !landing.image_term">
       <label class="col-sm-3 col-form-label-sm mt-3" for="term_title">약관 제목</label>
       <div class="col-sm-9 mt-sm-3">
         <input type="text" class="form-control" id="term_title" placeholder="title"
@@ -72,33 +72,11 @@
     name: "section_3_term",
     props: [
       'epoch_time',
-      'term_switch',
-      'image_switch',
+      'landing',
       'term',
       'push_landing'
     ],
-    data: () => ({
-      term_state: false,
-      image_state: false
-    }),
-    mounted() {
-      this.init_switch()
-    },
     methods: {
-      init_switch() {
-        this.term_state = this.term_switch
-        this.image_state = this.image_switch
-      },
-      change_switch(option) {
-        if (option == 'term') {
-          this.$emit('update:term_switch', this.term_state)
-          this.push_landing()
-        } else if (option == 'image') {
-          this.$emit('update:image_switch', this.image_state)
-          this.push_landing()
-        }
-
-      },
       term_file_add(file) {
         /* When file data changed */
         let key = require('../../../vue_env')

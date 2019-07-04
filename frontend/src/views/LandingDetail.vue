@@ -16,7 +16,7 @@
         <section_basic
           :window_width="window_width"
           :page_id="page_id"
-          :company.sync="dynamo_obj.landing_info.landing.company"
+          :company.sync="dynamo_obj.company_id"
           :name.sync="dynamo_obj.landing_info.landing.name"
           :base_url.sync="dynamo_obj.landing_info.landing.base_url"
           :error_name.sync="error_label.name"
@@ -47,10 +47,9 @@
         <hr>
 
         <h5>추가내용</h5>
-        <section_term
+        <section_term ref="term_comp"
           :epoch_time="epoch_time"
-          :term_switch.sync="dynamo_obj.landing_info.landing.is_term"
-          :image_switch.sync="dynamo_obj.landing_info.landing.image_term"
+          :landing="dynamo_obj.landing_info.landing"
           :term.sync="dynamo_obj.landing_info.term"
           :updated_date="dynamo_obj.updated_date"
           :push_landing="push_landing"
@@ -360,7 +359,7 @@
             'Content-Type': 'application/json'
           }
         }
-        this.dynamo_obj.CompanyNum = this.dynamo_obj.landing_info.landing.company.toString()
+        // this.dynamo_obj.CompanyNum = this.dynamo_obj.landing_info.landing.company.toString()
         // this.dynamo_obj.LandingNum = this.epoch_time.toString()
         // this.dynamo_obj.UpdatedTime = (Date.now()).toString()
         // Empty objects make as Null

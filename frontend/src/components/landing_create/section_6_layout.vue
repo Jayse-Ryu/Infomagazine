@@ -26,7 +26,7 @@
 
     <div class="col-12 p-0" v-for="(object, index) in order">
       <div class="col-sm-12 col-form-label-sm mt-3 text-right">
-        <button type="button" class="btn btn-primary btn-sm p-1" @click.prevent="object_add(index)">객체 추가</button>
+        <button type="button" class="btn btn-primary btn-sm p-1 mr-1" @click.prevent="object_add(index)">객체 추가</button>
         <button type="button" class="btn btn-danger btn-sm p-1" @click.prevent="object_delete(index)">선택 삭제</button>
       </div>
 
@@ -1045,7 +1045,7 @@
     margin: 0 auto;
     min-height: 150px;
     background: #f7feff;
-    box-sizing: content-box;
+    box-sizing: border-box;
     border-left: 1px solid #515151;
     border-right: 1px solid #515151;
   }

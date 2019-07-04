@@ -48,8 +48,7 @@
         <h5>추가내용</h5>
         <section_term
           :epoch_time="epoch_time"
-          :term_switch.sync="dynamo_obj.landing_info.landing.is_term"
-          :image_switch.sync="dynamo_obj.landing_info.landing.image_term"
+          :landing="dynamo_obj.landing_info.landing"
           :term.sync="dynamo_obj.landing_info.term"
           :updated_date="dynamo_obj.updated_date"
           :push_landing="push_landing"
@@ -262,18 +261,18 @@
                 let field_start = {
                   sign: for_add[e],
                   position: {
-                    x:0,
-                    y:0,
-                    w:200,
-                    h:50,
-                    z:10
+                    x: 0,
+                    y: 0,
+                    w: 200,
+                    h: 50,
+                    z: 10
                   }
                 }
                 objects[j].fields.push(field_start)
               }
 
               // Remove fields from Object fields
-              for(let r = 0; r < objects[j].fields.length; r++) {
+              for (let r = 0; r < objects[j].fields.length; r++) {
                 if (for_rem.includes(objects[j].fields[r].sign)) {
                   objects[j].fields.splice(r, 1)
                 }
@@ -294,7 +293,7 @@
         this.dynamo_obj.landing_info.landing.manager = this.user_obj.id
 
         // Empty filtering first
-        if (this.dynamo_obj.landing_info.landing.company == -1) {
+        if (this.dynamo_obj.company_id == -1) {
           alert('업체를 선택하세요!')
           document.getElementById('company_id').focus()
         } else if (this.dynamo_obj.landing_info.landing.manager == -1) {
@@ -392,21 +391,22 @@
             .then(() => {
               this.$store.state.pageOptions.loading = false
               // if (option == 'checked') {
-                alert('랜딩이 생성되었습니다.')
-                this.bye()
+              alert('랜딩이 생성되었습니다.')
+              // this.bye()
+              this.s3_reset()
               // }
             })
             .catch((error) => {
               // if (option == 'checked') {
-                alert('랜딩 생성이 실패하였습니다.')
-                this.$store.state.pageOptions.loading = false
+              alert('랜딩 생성이 실패하였습니다.')
+              this.$store.state.pageOptions.loading = false
               // }
               console.log(error)
             })
         } else {
           if (!this.error_label.name && !this.error_label.base_url) {
             // console.log('Landing pushed! ')
-            axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+            axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
               .then((response) => {
                 console.log('landing updated', response)
               })
@@ -416,7 +416,66 @@
           }
         }
 
+      },
+      s3_reset() {
+        let key = require('../../vue_env')
 
+        AWS.config.update({
+          region: key.BucketRegion,
+          credentials: new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: key.IdentityPoolId
+          })
+        })
+
+        let s3 = new AWS.S3(
+          {
+            apiVersion: '2008-10-17',
+            params: {
+              Bucket: key.AWS_STORAGE_BUCKET_NAME
+            }
+          }
+        )
+
+        // let params = {
+        //   Key: 'assets/images/landing/preview/' + this.epoch_time + '/term/' + file.lastModified + '_' + file.name,
+        //   ContentType: file.type,
+        //   Body: file,
+        //   ACL: 'public-read'
+        // }
+
+        let oldPrefix = 'assets/images/landing/preview/' + this.epoch_time
+        let newPrefix = 'assets/images/landing/' + this.epoch_time
+
+        s3.listObjects({Prefix: oldPrefix}, function (err, data) {
+          if (data.Contents.length) {
+            async.each(data.Contents, function (file, cb) {
+              let params = {
+                CopySource: key.AWS_STORAGE_BUCKET_NAME + '/' + file.Key,
+                Key: file.Key.replace(oldPrefix, newPrefix)
+              }
+              s3.copyObject(params, function (copyErr, copyData) {
+                if (copyErr) {
+                  console.log(err)
+                } else {
+                  console.log('Copied: ', params.Key)
+                  cb()
+                }
+              })
+            }, done)
+          }
+        })
+                // this.bye()
+
+        // s3.copyObject()
+
+        // s3.upload(params, (error, data) => {
+        //   if (error) {
+        //     console.log('S3 method error occurred', error)
+        //   } else {
+        //     // console.log('S3 method success', data)
+        //     this.term.image_data = params.Key
+        //   }
+        // })
       },
       bye() {
         this.$router.currentRoute.meta.protect_leave = 'no'
