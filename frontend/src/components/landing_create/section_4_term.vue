@@ -72,6 +72,7 @@
     name: "section_3_term",
     props: [
       'epoch_time',
+      'updated_date',
       'landing',
       'term',
       'push_landing'
@@ -107,11 +108,23 @@
           })
         }
 
-        let params = {
-          Key: 'assets/images/landing/preview/' + this.epoch_time + '/term/' + file.lastModified + '_' + file.name,
-          ContentType: file.type,
-          Body: file,
-          ACL: 'public-read'
+
+        let params = {}
+
+        if (this.updated_date) {
+          params = {
+            Key: 'assets/images/landing/' + this.epoch_time + '/term/' + Date.now() + '_' + file.name,
+            ContentType: file.type,
+            Body: file,
+            ACL: 'public-read'
+          }
+        } else {
+          params = {
+            Key: 'assets/images/landing/preview/' + this.epoch_time + '/term/' + Date.now() + '_' + file.name,
+            ContentType: file.type,
+            Body: file,
+            ACL: 'public-read'
+          }
         }
 
         s3.upload(params, (error, data) => {
@@ -162,22 +175,26 @@
 
       },
       key_to_url(key) {
-        let divided = key.split('/')
-        let url = 'https://'
+        if (key != null) {
+          let divided = key.split('/')
+          let url = 'https://'
 
-        if (this.updated_date == '') {
-          url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
-        } else {
-          for (let i = 0; i < divided.length; i++) {
-            if (i == 0) {
-              url += (divided[i] + '.infomagazine.xyz')
-            } else {
-              url += ('/' + divided[i])
+          if (this.updated_date == '') {
+            url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+          } else {
+            for (let i = 0; i < divided.length; i++) {
+              if (i == 0) {
+                url += (divided[i] + '.infomagazine.xyz')
+              } else {
+                url += ('/' + divided[i])
+              }
             }
           }
-        }
 
-        return url
+          return url
+        } else {
+          return ''
+        }
       }
     }
   }

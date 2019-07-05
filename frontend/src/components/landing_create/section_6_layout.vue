@@ -811,11 +811,22 @@
           }
         }
 
-        let params = {
-          Key: 'assets/images/landing/preview/' + this.epoch_time + '/section/' + file.lastModified + '_' + file.name,
-          ContentType: file.type,
-          Body: file,
-          ACL: 'public-read'
+        let params = {}
+
+        if (this.updated_date) {
+          params = {
+            Key: 'assets/images/landing/' + this.epoch_time + '/section/' + Date.now() + '_' + file.name,
+            ContentType: file.type,
+            Body: file,
+            ACL: 'public-read'
+          }
+        } else {
+          params = {
+            Key: 'assets/images/landing/preview/' + this.epoch_time + '/section/' + Date.now() + '_' + file.name,
+            ContentType: file.type,
+            Body: file,
+            ACL: 'public-read'
+          }
         }
 
         s3.upload(params, (error, data) => {
@@ -889,22 +900,26 @@
         this.field_selected = sign
       },
       key_to_url(key) {
-        let divided = key.split('/')
-        let url = ''
+        if (key != null) {
+          let divided = key.split('/')
+          let url = 'https://'
 
-        if (this.updated_date == '') {
-          url = 'https://infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
-        } else {
-          for (let i = 0; i < divided.length; i++) {
-            if (i == 0) {
-              url += (divided[i] + '.infomagazine.xyz')
-            } else {
-              url += ('/' + divided[i])
+          if (this.updated_date == '') {
+            url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+          } else {
+            for (let i = 0; i < divided.length; i++) {
+              if (i == 0) {
+                url += (divided[i] + '.infomagazine.xyz')
+              } else {
+                url += ('/' + divided[i])
+              }
             }
           }
+          return url
+        } else {
+          return ''
         }
 
-        return url
       },
       hex_to_decimal(hex) {
         let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)

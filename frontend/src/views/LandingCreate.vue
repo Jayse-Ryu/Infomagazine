@@ -81,6 +81,7 @@
         <section_layout_opt
           :window_width.sync="window_width"
           :epoch_time="epoch_time"
+          :updated_date="dynamo_obj.updated_date"
           :landing.sync="dynamo_obj.landing_info.landing"
           :push_landing="push_landing"
         />

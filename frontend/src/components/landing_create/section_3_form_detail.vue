@@ -145,7 +145,8 @@
                 </div>
 
                 <div v-if="content.type == 1 || content.type == 2" class="w-100">
-                  <label v-if="content.validation.age_limit" class="col-sm-3 col-form-label-sm mt-3 float-left" for="limit_option">
+                  <label v-if="content.validation.age_limit" class="col-sm-3 col-form-label-sm mt-3 float-left"
+                         for="limit_option">
                     <span>나이제한 옵션</span>
                   </label>
                   <div v-if="content.validation.age_limit" class="col-sm-9 mt-sm-3 float-left" id="limit_option">
@@ -165,7 +166,7 @@
                     </div>
                   </div>
 
-                  <div v-if="content.validation.age_limit" class="col-sm-3 col-form-label-sm mt-3 float-left"> </div>
+                  <div v-if="content.validation.age_limit" class="col-sm-3 col-form-label-sm mt-3 float-left"></div>
                   <div v-if="content.validation.age_limit" class="col-sm-9 mt-sm-3 float-left">
                     <input type="number" class="form-control"
                            v-model.number="content.validation.value_max">
@@ -296,6 +297,7 @@
     props: [
       'window_width',
       'epoch_time',
+      'updated_date',
       'form_arrow',
       'field',
       'set_field',
@@ -504,12 +506,24 @@
           }
         }
 
-        let params = {
-          Key: 'assets/images/landing/preview/' + this.epoch_time + '/field/' + Date.now() + '_' + file.name,
-          ContentType: file.type,
-          Body: file,
-          ACL: 'public-read'
+        let params = {}
+
+        if (this.updated_date) {
+          params = {
+            Key: 'assets/images/landing/' + this.epoch_time + '/field/' + Date.now() + '_' + file.name,
+            ContentType: file.type,
+            Body: file,
+            ACL: 'public-read'
+          }
+        } else {
+          params = {
+            Key: 'assets/images/landing/preview/' + this.epoch_time + '/field/' + Date.now() + '_' + file.name,
+            ContentType: file.type,
+            Body: file,
+            ACL: 'public-read'
+          }
         }
+
 
         s3.upload(params, (error, data) => {
           if (error) {
@@ -571,22 +585,27 @@
         }
       },
       key_to_url(key) {
-        let divided = key.split('/')
-        let url = 'https://'
+        if (key != null) {
+          let divided = key.split('/')
+          let url = 'https://'
 
-        if (this.updated_date == '') {
-          url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
-        } else {
-          for (let i = 0; i < divided.length; i++) {
-            if (i == 0) {
-              url += (divided[i] + '.infomagazine.xyz')
-            } else {
-              url += ('/' + divided[i])
+          if (this.updated_date == '') {
+            url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+          } else {
+            for (let i = 0; i < divided.length; i++) {
+              if (i == 0) {
+                url += (divided[i] + '.infomagazine.xyz')
+              } else {
+                url += ('/' + divided[i])
+              }
             }
           }
+
+          return url
+        } else {
+          return ''
         }
 
-        return url
       }
     }
   }
