@@ -16,6 +16,7 @@
         <section_basic
           :window_width="window_width"
           :page_id="page_id"
+          :dynamo="dynamo_obj"
           :company.sync="dynamo_obj.company_id"
           :name.sync="dynamo_obj.landing_info.landing.name"
           :base_url.sync="dynamo_obj.landing_info.landing.base_url"
@@ -200,7 +201,8 @@
       axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id)
         .then((response) => {
           this.$store.state.pageOptions.loading = false
-          console.log('response check ', response)
+          // console.log('response check ', response)
+          // console.log('response check ', JSON.stringify(response))
           this.dynamo_obj = response.data.data
           this.epoch_time = response.data.data.landing_info.landing.base_url
         })
@@ -411,37 +413,19 @@
           axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id, this.dynamo_obj, config)
             .then(() => {
               this.$store.state.pageOptions.loading = false
-              alert('랜딩이 수정되었습니다.')
-              this.bye()
+              if(confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
+                this.bye()
+              }
             })
             .catch((error) => {
-              alert('랜딩 생성이 실패하였습니다.')
+              alert('랜딩 수정이 실패하였습니다.')
               this.$store.state.pageOptions.loading = false
               console.log(error)
             })
         } else {
-          console.log('detail is not support auto save')
+          // console.log('detail is not support auto save')
         }
 
-        // console.log('axios temporary disabled')
-        // console.log(this.dynamo_obj)
-        // this.$store.state.pageOptions.loading = true
-        // axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id, this.dynamo_obj, config)
-        //   .then((response) => {
-        //     console.log('update response! ', response)
-        //     if (option == 'checked') {
-        //       alert('랜딩이 수정되었습니다.')
-        //       this.$store.state.pageOptions.loading = false
-        //       this.bye()
-        //     }
-        //   })
-        //   .catch((error) => {
-        //     if (option == 'checked') {
-        //       alert('랜딩 수정이 실패하였습니다.')
-        //       this.$store.state.pageOptions.loading = false
-        //     }
-        //     console.log(error)
-        //   })
       },
       /* e */
       /* n */
@@ -654,9 +638,7 @@
   }
 
   .drag_thing {
-    /*position: absolute;*/
-    /*display: inline-block;*/
-    background-color: #eaeaea;
+    background-color: rgba(240, 240, 240, 0.4);
     border: 1px solid #818181;
   }
 

@@ -6,8 +6,7 @@
     </label>
 
     <div class="col-sm-9 mt-sm-3" id="company_name">
-
-      <select class="form-control" name="company_name" :value="company"
+      <select class="form-control" name="company_name" v-model="dynamo.company_id"
               @change="$emit('update:company', $event.target.value)">
         <option value="-1">업체를 선택하세요</option>
         <option v-for="content in landing_company" :value="content.id">
@@ -65,6 +64,7 @@
     name: "section_1_basic",
     props: [
       'window_width',
+      'dynamo',
       'page_id',
       'company',
       'name',
@@ -90,15 +90,18 @@
     }),
     mounted() {
       // Get companies for select
-      axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
-        .then((response) => {
-          this.landing_company = response.data.data.results
-        })
-        .catch((error) => {
-          console.log('get companies error', error)
-        })
+      this.get_company()
     },
     methods: {
+      get_company() {
+        axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
+          .then((response) => {
+            this.landing_company = response.data.data.results
+          })
+          .catch((error) => {
+            console.log('get companies error', error)
+          })
+      },
       check_name() {
         if (this.name == '') {
           this.error_label.class.name = 'form-control'
@@ -141,8 +144,7 @@
             })
         }
       }
-    },
-    computed: {}
+    }
   }
 </script>
 

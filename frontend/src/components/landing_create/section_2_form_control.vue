@@ -85,6 +85,7 @@
         this.form_obj = this.form
       },
       form_changed(id) {
+        this.form_init()
         this.$emit('update:form_arrow', id)
         if (id == -1) {
           this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
@@ -146,6 +147,7 @@
         }
       },
       form_group_delete(id) {
+        this.form_init()
         if (id !== -1) {
           if (confirm('이 폼그룹을 삭제하시겠습니까?')) {
             this.form_init()
@@ -163,6 +165,7 @@
         }
       },
       field_work(id) {
+        this.form_init()
         this.temp_field = []
         this.temp_field = this.field
         this.temp_field = this.temp_field.filter(el => el.form_group_id != id)

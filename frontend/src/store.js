@@ -51,7 +51,7 @@ export default new Vuex.Store({
       // localStorage.setItem('token', newToken)
       // state.jwt = newToken
       try {
-        Vue.cookie.set('token', newToken, {expires: '10m'})
+        Vue.cookie.set('token', newToken, {expires: '50m'})
       } catch (error) {
         console.log('Set token cookie error', error)
       }

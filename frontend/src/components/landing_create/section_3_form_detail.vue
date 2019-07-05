@@ -57,8 +57,10 @@
             <form v-on:submit.prevent="field_option_close">
               <div class="form-group row p-4 mb-0">
 
-                <label class="col-sm-3 col-form-label-sm mt-3" :for="'la_switch'+content.sign">라벨 켜기</label>
-                <div class="col-sm-9 mt-sm-3">
+                <label v-if="[1, 2, 3, 4, 5, 6, 10].includes(content.type * 1)"
+                       class="col-sm-3 col-form-label-sm mt-3"
+                       :for="'la_switch'+content.sign">라벨 켜기</label>
+                <div v-if="[1, 2, 3, 4, 5, 6, 10].includes(content.type * 1)" class="col-sm-9 mt-sm-3">
                   <label class="switch" :for="'la_switch'+content.sign">
                     <input type="checkbox" :id="'la_switch'+content.sign" v-model="content.label">
                     <span class="slider round"></span>
@@ -108,43 +110,43 @@
                   <input type="text" class="form-control" id="f_holder" maxlength="50" v-model="content.holder">
                 </div>
 
-                <label v-if="content.type == 1 || content.type == 2" class="col-sm-3 col-form-label-sm mt-3"
+                <label v-if="[1, 2, 5, 6, 10].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3"
                        for="f_validate">
                   <span>유효성 검사</span>
                 </label>
-                <div v-if="content.type == 1 || content.type == 2" class="col-sm-9 mt-sm-3" id="f_validate">
+                <div v-if="[1, 2, 5, 6, 10].includes(content.type * 1)" class="col-sm-9 mt-sm-3 pt-2" id="f_validate">
                   <label :for="'f_validate_1' + content.sign" class="validate_label">
                     <input type="checkbox" :id="'f_validate_1' + content.sign" v-model="content.validation.required">
                     필수
                   </label>
-                  <label :for="'f_validate_2' + content.sign" class="validate_label">
+                  <label v-if="[1].includes(content.type * 1)" :for="'f_validate_2' + content.sign" class="validate_label">
                     <input type="checkbox" :id="'f_validate_2' + content.sign" v-model="content.validation.korean_only">
                     한글만
                   </label>
-                  <label :for="'f_validate_3' + content.sign" class="validate_label">
+                  <label v-if="[1].includes(content.type * 1)" :for="'f_validate_3' + content.sign" class="validate_label">
                     <input type="checkbox" :id="'f_validate_3' + content.sign"
                            v-model="content.validation.english_only">
                     영어만
                   </label>
-                  <label :for="'f_validate_4' + content.sign" class="validate_label">
+                  <label v-if="[1, 2].includes(content.type * 1)" :for="'f_validate_4' + content.sign" class="validate_label">
                     <input type="checkbox" :id="'f_validate_4' + content.sign" v-model="content.validation.number_only">
                     숫자만
                   </label>
-                  <label :for="'f_validate_5' + content.sign" class="validate_label">
+                  <label v-if="[1, 2].includes(content.type * 1)" :for="'f_validate_5' + content.sign" class="validate_label">
                     <input type="checkbox" :id="'f_validate_5' + content.sign" v-model="content.validation.phone_only">
                     전화번호만
                   </label>
-                  <label :for="'f_validate_6' + content.sign" class="validate_label">
+                  <label v-if="[1].includes(content.type * 1)" :for="'f_validate_6' + content.sign" class="validate_label">
                     <input type="checkbox" :id="'f_validate_6' + content.sign" v-model="content.validation.email">
                     이메일
                   </label>
-                  <label :for="'f_validate_7' + content.sign" class="validate_label">
+                  <label v-if="[2, 6].includes(content.type * 1)" :for="'f_validate_7' + content.sign" class="validate_label">
                     <input type="checkbox" :id="'f_validate_7' + content.sign" v-model="content.validation.age_limit">
                     나이제한
                   </label>
                 </div>
 
-                <div v-if="content.type == 1 || content.type == 2" class="w-100">
+                <div v-if="[2, 6].includes(content.type * 1)" class="w-100">
                   <label v-if="content.validation.age_limit" class="col-sm-3 col-form-label-sm mt-3 float-left"
                          for="limit_option">
                     <span>나이제한 옵션</span>
@@ -223,20 +225,18 @@
                   </div>
                 </div>
 
-                <label v-if="content.type == 7 || content.type == 8 || content.type == 9"
-                       class="col-sm-3 col-form-label-sm mt-3"
+                <label class="col-sm-3 col-form-label-sm mt-3"
                        for="f_back">배경색</label>
-                <div v-if="content.type == 7 || content.type == 8 || content.type == 9" class="col-sm-9 mt-sm-3">
+                <div class="col-sm-9 mt-sm-3">
                   <div class="color_wrap form-control col">
                     <input type="color" v-model="content.back_color" class="color_picker">
                   </div>
                   <input type="text" class="form-control" id="f_back" maxlength="10" v-model="content.back_color">
                 </div>
 
-                <label v-if="content.type == 7 || content.type == 8 || content.type == 9"
-                       class="col-sm-3 col-form-label-sm mt-3"
+                <label class="col-sm-3 col-form-label-sm mt-3"
                        for="f_color">글씨색</label>
-                <div v-if="content.type == 7 || content.type == 8 || content.type == 9" class="col-sm-9 mt-sm-3">
+                <div class="col-sm-9 mt-sm-3">
                   <div class="color_wrap form-control col">
                     <input type="color" v-model="content.text_color" class="color_picker">
                   </div>
@@ -367,7 +367,7 @@
                 back_color: '#287BFF',
                 text_color: '#f0f0f0',
                 validation: {
-                  required: false,
+                  required: true,
                   korean_only: false,
                   english_only: false,
                   number_only: false,
@@ -400,7 +400,7 @@
                 back_color: '#287BFF',
                 text_color: '#fafafa',
                 validation: {
-                  required: false,
+                  required: true,
                   korean_only: false,
                   english_only: false,
                   number_only: false,

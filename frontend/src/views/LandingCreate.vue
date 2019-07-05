@@ -393,8 +393,8 @@
               this.$store.state.pageOptions.loading = false
               // if (option == 'checked') {
               alert('랜딩이 생성되었습니다.')
-              // this.bye()
-              this.s3_reset()
+              this.bye()
+              // this.s3_reset()
               // }
             })
             .catch((error) => {
@@ -417,66 +417,6 @@
           }
         }
 
-      },
-      s3_reset() {
-        let key = require('../../vue_env')
-
-        AWS.config.update({
-          region: key.BucketRegion,
-          credentials: new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: key.IdentityPoolId
-          })
-        })
-
-        let s3 = new AWS.S3(
-          {
-            apiVersion: '2008-10-17',
-            params: {
-              Bucket: key.AWS_STORAGE_BUCKET_NAME
-            }
-          }
-        )
-
-        // let params = {
-        //   Key: 'assets/images/landing/preview/' + this.epoch_time + '/term/' + file.lastModified + '_' + file.name,
-        //   ContentType: file.type,
-        //   Body: file,
-        //   ACL: 'public-read'
-        // }
-
-        let oldPrefix = 'assets/images/landing/preview/' + this.epoch_time
-        let newPrefix = 'assets/images/landing/' + this.epoch_time
-
-        s3.listObjects({Prefix: oldPrefix}, function (err, data) {
-          if (data.Contents.length) {
-            async.each(data.Contents, function (file, cb) {
-              let params = {
-                CopySource: key.AWS_STORAGE_BUCKET_NAME + '/' + file.Key,
-                Key: file.Key.replace(oldPrefix, newPrefix)
-              }
-              s3.copyObject(params, function (copyErr, copyData) {
-                if (copyErr) {
-                  console.log(err)
-                } else {
-                  console.log('Copied: ', params.Key)
-                  cb()
-                }
-              })
-            }, done)
-          }
-        })
-                // this.bye()
-
-        // s3.copyObject()
-
-        // s3.upload(params, (error, data) => {
-        //   if (error) {
-        //     console.log('S3 method error occurred', error)
-        //   } else {
-        //     // console.log('S3 method success', data)
-        //     this.term.image_data = params.Key
-        //   }
-        // })
       },
       bye() {
         this.$router.currentRoute.meta.protect_leave = 'no'
