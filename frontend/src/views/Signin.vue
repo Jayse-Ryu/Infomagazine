@@ -2,6 +2,7 @@
   <div>
     <div class="main" id="main_signin">
     </div>
+
     <!-- Login fields login button signup button logo -->
     <div class="login_box container">
       <div class="login_border">
@@ -45,9 +46,7 @@
         </form>
       </div>
 
-    </div>
-
-    <div class="warn_wrap">
+      <div class="warn_wrap">
       <div class="warn_content">
         <ol>
           <li>• 본 사이트는 인포맥 디비시스템 사이트로써 관련자가 아닌 사람은 사용하실 수 없습니다.</li>
@@ -56,6 +55,10 @@
         <div class="copy_right">Copyright© infomag DB system Inc. All Rights Reserved</div>
       </div>
     </div>
+
+    </div>
+
+
 
   </div>
 </template>
@@ -105,6 +108,34 @@
 </script>
 
 <style scoped lang="scss">
+
+  @keyframes Gradient {
+    0% {
+      background-position: 75% 100%
+    }
+    14% {
+      background-position: 20% 50%
+    }
+    28% {
+      background-position: 100% 20%
+    }
+    42% {
+      background-position: 50% 10%
+    }
+    56% {
+      background-position: 90% 50%
+    }
+    70% {
+      background-position: 65% 80%
+    }
+    86% {
+      background-position: 90% 10%
+    }
+    100% {
+      background-position: 75% 100%
+    }
+  }
+
   .main {
     position: fixed;
     width: 100%;
@@ -114,19 +145,21 @@
     z-index: -1;
     overflow: auto;
     background: linear-gradient(217deg, rgba(2, 0, 36, .8), rgba(255, 0, 0, 0) 70.71%),
-    linear-gradient(127deg, rgba(141, 168, 185, .8), rgba(0, 255, 0, 0) 70.71%),
+    linear-gradient(127deg, rgba(185, 169, 141, .8), rgba(0, 255, 0, 0) 70.71%),
     linear-gradient(336deg, rgba(0, 212, 255, .8), rgba(0, 0, 255, 0) 70.71%);
+    background-size: 180% 180%;
+    animation: Gradient 25s ease-in-out infinite;
   }
 
   .login_box {
-    // position: absolute;
-    // top: 45%;
-    // left: 50%;
-    // transform: translate(-50%, -50%);
+    position: absolute;
+    top: 47%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 100%;
     font-family: 'Nanum Gothic', 'sans-serif';
     max-width: 500px;
-    margin: 10vh auto 10px;
+    margin: 1px auto 10px;
   }
 
   .login_border {
@@ -167,14 +200,14 @@
   }
 
   .warn_wrap {
-    // position: absolute;
-    // width: 40%;
-    width: 100%;
-    // left: 0;
+    position: absolute;
+    width: 100vw;
     margin: 10px auto;
     text-align: center;
     font-family: 'Nanum Gothic', 'sans-serif';
     font-size: 15px;
+    left: 50%;
+    transform: translateX(-50%);
 
     .warn_content {
       max-width: 630px;

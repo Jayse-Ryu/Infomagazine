@@ -19,6 +19,7 @@
     "vue": "^2.6.10",
     "vue-draggable-resizable": "^2.0.0-rc1",
     "vue-router": "^3.0.3",
+    "vuejs-datepicker": "^1.6.2",
     "vuejs-paginate": "^2.1.0",
     "vuex": "^3.0.1"
   },

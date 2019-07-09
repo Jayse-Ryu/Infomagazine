@@ -820,6 +820,7 @@
     position: absolute;
     overflow: visible;
     font-size: 1rem;
+    border: 1px solid rgba(100, 100, 100, 0.1);
   }
 
   .order_stretch {

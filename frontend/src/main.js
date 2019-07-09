@@ -6,6 +6,7 @@ import router from './router'
 import './plugins/axios'
 import './plugins/vue-cookie'
 import AWS from 'aws-sdk'
+import Datepicker from 'vuejs-datepicker'
 
 // Custom plugins
 import Header from './Header'
@@ -18,6 +19,7 @@ import VueDraggableResizable from 'vue-draggable-resizable'
 Vue.component('app-header', Header)
 Vue.component('paginate', Paginate)
 Vue.component('vue-draggable-resizable', VueDraggableResizable)
+Vue.component('datepicker', Datepicker)
 
 // Vue use
 Vue.use(VeeValidate)
