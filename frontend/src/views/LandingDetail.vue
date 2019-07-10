@@ -118,7 +118,9 @@
   import section_basic from '@/components/landing_detail/section_1_basic.vue'
 
   import section_form_control from '@/components/landing_create/section_2_form_control.vue'
+  import section_form_control_etc from '@/components/landing_create/section_2_1_form_control.vue'
   import section_form_detail from '@/components/landing_create/section_3_form_detail.vue'
+  import section_form_detail_etc from '@/components/landing_create/section_3_1_form_detail.vue'
   import section_term from '@/components/landing_create/section_4_term.vue'
   import section_page_source from '@/components/landing_create/section_5_page_source.vue'
   import section_layout from '@/components/landing_create/section_6_layout.vue'
@@ -130,7 +132,9 @@
     components: {
       section_basic,
       section_form_control,
+      section_form_control_etc,
       section_form_detail,
+      section_form_detail_etc,
       section_term,
       section_page_source,
       section_layout,

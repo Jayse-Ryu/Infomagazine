@@ -45,6 +45,17 @@
 
         <hr>
 
+        <h5>기타 폼</h5>
+        <section_form_control_etc
+          :form.sync="dynamo_obj.landing_info.etc"
+          :form_arrow.sync="etc_arrow"
+          :field.sync="dynamo_obj.landing_info.field"
+          :set_field="set_field_position"
+          :push_landing="push_landing"
+        />
+
+        <hr>
+
         <h5>추가내용</h5>
         <section_term
           :epoch_time="epoch_time"
@@ -120,7 +131,9 @@
   import popup_recovery from '@/components/landing_create/popup_1_recovery.vue'
   import section_basic from '@/components/landing_create/section_1_basic.vue'
   import section_form_control from '@/components/landing_create/section_2_form_control.vue'
+  import section_form_control_etc from '@/components/landing_create/section_2_1_form_control.vue'
   import section_form_detail from '@/components/landing_create/section_3_form_detail.vue'
+  import section_form_detail_etc from '@/components/landing_create/section_3_1_form_detail.vue'
   import section_term from '@/components/landing_create/section_4_term.vue'
   import section_page_source from '@/components/landing_create/section_5_page_source.vue'
   import section_layout from '@/components/landing_create/section_6_layout.vue'
@@ -133,7 +146,9 @@
       popup_recovery,
       section_basic,
       section_form_control,
+      section_form_control_etc,
       section_form_detail,
+      section_form_detail_etc,
       section_term,
       section_page_source,
       section_layout,
@@ -148,6 +163,7 @@
       },
       epoch_time: 0,
       form_arrow: -1,
+      etc_arrow: -1,
       auto_flag: false,
       company_flag: false,
       dynamo_obj: {
@@ -181,6 +197,7 @@
             image_data: ''
           },
           form: [],
+          etc: [],
           field: [],
           sections: [],
           views: 0
