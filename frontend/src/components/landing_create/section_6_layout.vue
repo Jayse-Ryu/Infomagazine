@@ -960,7 +960,7 @@
     margin: 0 auto;
     min-height: 150px;
     background: #f7feff;
-    box-sizing: border-box;
+    box-sizing: content-box;
     border-left: 1px solid #515151;
     border-right: 1px solid #515151;
   }

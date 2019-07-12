@@ -51,6 +51,8 @@
         <section_form_control_etc
           :etc.sync="dynamo_obj.landing_info.etc"
           :etc_arrow.sync="etc_arrow"
+          :epoch_time="epoch_time"
+          :updated_date="dynamo_obj.updated_date"
           :push_landing="push_landing"
         />
 

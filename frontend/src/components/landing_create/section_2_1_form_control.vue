@@ -34,12 +34,14 @@
       </select>
     </div>
 
-    <label v-if="etc_arrow * 1 > 0 && form_selected.type == 1" class="col-sm-3 col-form-label-sm mt-3" for="form_group_link">링크 url</label>
+    <label v-if="etc_arrow * 1 > 0 && form_selected.type == 1" class="col-sm-3 col-form-label-sm mt-3"
+           for="form_group_link">링크 url</label>
     <div v-if="etc_arrow * 1 > 0 && form_selected.type == 1" class="col-sm-9 mt-sm-3 row ml-0">
       <input type="text" class="form-control col-md-12" id="form_group_link" v-model="form_selected.link">
     </div>
 
-    <label v-if="etc_arrow * 1 > 0 && form_selected.type == 2" class="col-sm-3 col-form-label-sm mt-3" for="form_group_tel">전화 번호</label>
+    <label v-if="etc_arrow * 1 > 0 && form_selected.type == 2" class="col-sm-3 col-form-label-sm mt-3"
+           for="form_group_tel">전화 번호</label>
     <div v-if="etc_arrow * 1 > 0 && form_selected.type == 2" class="col-sm-9 mt-sm-3 row ml-0">
       <input type="tel" class="form-control col-md-12" id="form_group_tel" v-model="form_selected.tel">
     </div>
@@ -77,6 +79,23 @@
       <div class="margin_div"></div>
       <input type="text" v-model="form_selected.tx_color" class="form-control col-sm-5" maxlength="10">
     </div>
+
+    <label v-if="etc_arrow * 1 > -1" class="col-sm-3 col-form-label-sm mt-3" for="term_img">버튼 이미지 파일</label>
+    <div v-if="etc_arrow * 1 > -1" class="col-sm-9 mt-sm-3 row ml-0">
+      <input type="file" class="input_one_btn form-control col-md-11 pt-1" id="term_img" placeholder="이미지"
+             ref="term_file_input" @change="etc_file_add($event.target.files[0])" accept="image/*">
+      <button type="button" class="btn btn-danger col-md-1 p-0" @click.prevent="etc_file_delete()">삭제</button>
+    </div>
+    <label v-if="etc_arrow * 1 > -1" class="col-sm-3 col-form-label-sm mt-3" for="term_img_preview">미리보기</label>
+    <div v-if="etc_arrow * 1 > -1" class="col-sm-9 mt-sm-3 row ml-0" id="term_img_preview">
+      <div v-if="form_selected.image_data" class="term_preview_wrap">
+        <img class="term_preview" :src="key_to_url(form_selected.image_data)" alt="기타 폼 이미지 미리보기">
+      </div>
+      <div v-else class="form-control">
+        <div>등록된 파일이 없습니다</div>
+      </div>
+    </div>
+
   </div>
 
 </template>
@@ -87,6 +106,8 @@
     props: [
       'etc',
       'etc_arrow',
+      'epoch_time',
+      'updated_date',
       'push_landing'
     ],
     data: () => ({
@@ -100,6 +121,7 @@
         opacity: '10',
         link: '',
         tel: '',
+        image_data: ''
       },
     }),
     mounted() {
@@ -121,7 +143,8 @@
             bg_color: '#fafafa',
             opacity: '10',
             link: '',
-            tel: ''
+            tel: '',
+            image_data: ''
           }
         } else {
           for (let i = 0; i < this.form_obj.length; i++) {
@@ -159,7 +182,8 @@
                 tx_color: '#313131',
                 opacity: '10',
                 link: '',
-                tel: ''
+                tel: '',
+                image_data: ''
               })
               this.form_temp = ''
               this.$emit('update:etc', this.form_obj)
@@ -175,7 +199,8 @@
               tx_color: '#313131',
               opacity: '10',
               link: '',
-              tel: ''
+              tel: '',
+              image_data: ''
             })
             this.form_temp = ''
             this.$emit('update:etc', this.form_obj)
@@ -202,7 +227,8 @@
               bg_color: '#fafafa',
               opacity: '10',
               link: '',
-              tel: ''
+              tel: '',
+              image_data: ''
             }
             // Field objs delete also
             // this.field_work(id)
@@ -212,19 +238,157 @@
           alert('그룹을 먼저 선택하세요.')
         }
       },
-      // field_work(id) {
-      //   this.form_init()
-      //   this.temp_field = []
-      //   this.temp_field = this.field
-      //   this.temp_field = this.temp_field.filter(el => el.form_group_id != id)
-      //   this.$emit('update:field', this.temp_field)
-      //   this.set_field()
-      //   this.push_landing()
-      // }
+      etc_file_add(file) {
+        if (this.etc_arrow > -1) {
+          this.form_init()
+          /* When file data changed */
+          let key = require('../../../vue_env')
+
+          AWS.config.update({
+            region: key.BucketRegion,
+            credentials: new AWS.CognitoIdentityCredentials({
+              IdentityPoolId: key.IdentityPoolId
+            })
+          })
+
+          let s3 = new AWS.S3(
+            {
+              apiVersion: '2008-10-17',
+              params: {
+                Bucket: key.AWS_STORAGE_BUCKET_NAME
+              }
+            }
+          )
+
+          if (this.form_selected.image_data) {
+            s3.deleteObject({
+              Key: this.form_selected.image_data
+            }, (err, data) => {
+              if (err) {
+                alert('There was an error deleting your photo: ', err.message)
+              } else {
+                this.form_selected.image_data = null
+              }
+            })
+          }
+
+
+          let params = {}
+
+          if (this.updated_date) {
+            params = {
+              Key: 'assets/images/landing/' + this.epoch_time + '/etc/' + Date.now() + '_' + file.name,
+              ContentType: file.type,
+              Body: file,
+              ACL: 'public-read'
+            }
+          } else {
+            params = {
+              Key: 'assets/images/landing/preview/' + this.epoch_time + '/etc/' + Date.now() + '_' + file.name,
+              ContentType: file.type,
+              Body: file,
+              ACL: 'public-read'
+            }
+          }
+
+          s3.upload(params, (error, data) => {
+            if (error) {
+              console.log('S3 method error occurred', error)
+            } else {
+              // console.log('S3 method success', data)
+              this.form_selected.image_data = params.Key
+              this.push_landing()
+            }
+          })
+
+        }
+
+      },
+      etc_file_delete() {
+
+        if (this.etc_arrow > -1) {
+          this.form_init()
+          let key = require('../../../vue_env')
+
+          AWS.config.update({
+            region: key.BucketRegion,
+            credentials: new AWS.CognitoIdentityCredentials({
+              IdentityPoolId: key.IdentityPoolId
+            })
+          })
+
+          let s3 = new AWS.S3(
+            {
+              apiVersion: '2008-10-17',
+              params: {
+                Bucket: key.AWS_STORAGE_BUCKET_NAME
+              }
+            }
+          )
+
+          let photoKey = this.form_selected.image_data
+
+          if (photoKey) {
+            s3.deleteObject({Key: photoKey}, (err, data) => {
+              if (err) {
+                alert('이미지 삭제 중 오류가 발생하였습니다: ', err.message)
+              } else {
+                // alert('Successfully deleted photo.', data)
+                document.getElementById('term_img').value = ''
+                this.form_selected.image_data = null
+
+                this.push_landing()
+              }
+            })
+          }
+        }
+
+
+      },
+      key_to_url(key) {
+        if (key != null) {
+          let divided = key.split('/')
+          let url = 'https://'
+
+          if (this.updated_date == '') {
+            url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+          } else {
+            for (let i = 0; i < divided.length; i++) {
+              if (i == 0) {
+                url += (divided[i] + '.infomagazine.xyz')
+              } else {
+                url += ('/' + divided[i])
+              }
+            }
+          }
+
+          return url
+        } else {
+          return ''
+        }
+      }
     }
   }
 </script>
 
 <style scoped>
+  .term_preview_wrap {
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    text-align: center;
+  }
 
+  .term_preview {
+    position: relative;
+    max-width: 100%;
+  }
 </style>
