@@ -2,6 +2,9 @@
 
   <div class="form-group row mb-0">
 
+    <!--<div class="alert-info w-100">{{ form }}</div>
+    <div class="alert-danger w-100 m-1" v-for="item in field">{{ item }}</div>-->
+
     <label class="col-sm-3 col-form-label-sm mt-3" for="form_group">DB 폼 그룹</label>
     <form class="col-sm-9 mt-sm-3 row ml-0" v-on:submit.prevent="form_group_add">
       <input type="text" class="input_one_btn form-control col-md-11" id="form_group" name="form_group"
@@ -73,7 +76,7 @@
     data: () => ({
       form_obj: [],
       form_temp: '',
-      form_selected: {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10},
+      form_selected: {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: '10'},
       temp_field: []
     }),
     mounted() {
@@ -88,7 +91,7 @@
         this.form_init()
         this.$emit('update:form_arrow', id)
         if (id == -1) {
-          this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
+          this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: '10'}
         } else {
           for (let i = 0; i < this.form_obj.length; i++) {
             if (this.form_obj[i].sign == id) {
@@ -122,7 +125,7 @@
                 name: this.form_temp,
                 bg_color: '#fafafa',
                 tx_color: '#313131',
-                opacity: 10
+                opacity: '10'
               })
               this.form_temp = ''
               this.$emit('update:form', this.form_obj)
@@ -135,7 +138,7 @@
               name: this.form_temp,
               bg_color: '#fafafa',
               tx_color: '#313131',
-              opacity: 10
+              opacity: '10'
             })
             this.form_temp = ''
             this.$emit('update:form', this.form_obj)
@@ -155,7 +158,7 @@
             // this.form_arrow = -1
             this.$emit('update:form_arrow', -1)
             this.$emit('update:form', this.form_obj)
-            this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
+            this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: '10'}
             // Field objs delete also
             this.field_work(id)
             // this.push_landing()
@@ -170,7 +173,7 @@
         this.temp_field = this.field
         this.temp_field = this.temp_field.filter(el => el.form_group_id != id)
         this.$emit('update:field', this.temp_field)
-        this.set_field()
+        this.set_field('form')
         this.push_landing()
       }
     }

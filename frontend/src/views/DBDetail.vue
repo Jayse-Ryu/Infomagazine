@@ -101,6 +101,20 @@
 
       <hr>
 
+      <!--<vue-excel
+        class="btn btn-success"
+        :header="db_keys"
+        :data="db_vals">
+        엑셀 저장
+      </vue-excel>-->
+
+      <!--<vue-xlsx
+        class="btn btn-success"
+        :title="db_keys"
+        :data="db_vals">
+        Xlsx
+      </vue-xlsx>-->
+
       <section class="section section_box">
         <h5>DB 필터</h5>
         <div class="row">
@@ -128,7 +142,11 @@
             <button type="button" class="btn btn-info w-100" @click="date_clear()">초기화</button>
           </div>
           <div class="col-md-2">
-            <button type="button" class="btn btn-success w-100">엑셀저장</button>
+            <vue-excel type="button" class="btn btn-success w-100"
+                       :title="db_keys"
+                       :data="db_vals">
+              엑셀저장
+            </vue-excel>
           </div>
         </div>
         <div class="row mt-3">

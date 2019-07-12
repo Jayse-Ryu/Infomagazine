@@ -3,18 +3,17 @@
   <div class="form-group row mb-0" v-if="form_arrow != -1">
     <label class="col-sm-3 col-form-label-sm mt-3" for="db_field">DB 필드</label>
     <form class="col-sm-9 mt-sm-3 row ml-0" v-on:submit.prevent="field_add">
-      <select class="form-control col-sm-5 col-md-5" name="company" id="db_field" v-model="field_selected">
+      <select class="form-control col-sm-5 col-md-5" name="company" id="db_field" v-model.number="field_selected">
         <option value="-1">타입을 선택하세요</option>
         <option value="1">텍스트 입력</option>
-        <option value="2">번호 입력</option>
-        <option value="3">선택 스크롤</option>
-        <option value="4">선택 버튼</option>
-        <option value="5">체크 박스</option>
-        <option value="6">날짜</option>
-        <option value="7">링크 버튼</option>
-        <option value="8">전화 버튼</option>
-        <option value="9">완료 버튼</option>
-        <option value="10">약관 동의</option>
+        <option value="2">숫자 입력</option>
+        <option value="3">전화번호 입력</option>
+        <option value="4">선택 스크롤</option>
+        <option value="5">선택 버튼</option>
+        <option value="6">체크 박스</option>
+        <option value="7">날짜</option>
+        <option value="8">완료 버튼</option>
+        <option value="9">약관 동의</option>
       </select>
       <div class="margin_div"></div>
       <input type="text" class="form-control col-sm-7 col-md-5" placeholder="필드이름" maxlength="10"
@@ -34,15 +33,14 @@
         <li class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
             v-for="content in field" v-if="content.form_group_id == form_arrow">
           <div class="col-3 p-2 text-center" v-if="content.type == 1">텍스트 입력</div>
-          <div class="col-3 p-2 text-center" v-if="content.type == 2">번호 입력</div>
-          <div class="col-3 p-2 text-center" v-if="content.type == 3">선택 스크롤</div>
-          <div class="col-3 p-2 text-center" v-if="content.type == 4">선택 버튼</div>
-          <div class="col-3 p-2 text-center" v-if="content.type == 5">체크 박스</div>
-          <div class="col-3 p-2 text-center" v-if="content.type == 6">날짜</div>
-          <div class="col-3 p-2 text-center" v-if="content.type == 7">링크 버튼</div>
-          <div class="col-3 p-2 text-center" v-if="content.type == 8">전화 버튼</div>
-          <div class="col-3 p-2 text-center" v-if="content.type == 9">완료 버튼</div>
-          <div class="col-3 p-2 text-center" v-if="content.type == 10">약관 동의</div>
+          <div class="col-3 p-2 text-center" v-if="content.type == 2">숫자 입력</div>
+          <div class="col-3 p-2 text-center" v-if="content.type == 3">전화번호 입력</div>
+          <div class="col-3 p-2 text-center" v-if="content.type == 4">선택 스크롤</div>
+          <div class="col-3 p-2 text-center" v-if="content.type == 5">선택 버튼</div>
+          <div class="col-3 p-2 text-center" v-if="content.type == 6">체크 박스</div>
+          <div class="col-3 p-2 text-center" v-if="content.type == 7">날짜</div>
+          <div class="col-3 p-2 text-center" v-if="content.type == 8">완료 버튼</div>
+          <div class="col-3 p-2 text-center" v-if="content.type == 9">약관 동의</div>
           <div class="col-3 p-2 text-center">{{ content.name }}</div>
           <button type="button" class="btn btn-outline-info p-0 col-3 col-sm-2 m-auto" data-toggle="collapse"
                   v-bind:href="'#collapse_option'+ content.sign" aria-expanded="false">
@@ -57,10 +55,10 @@
             <form v-on:submit.prevent="field_option_close">
               <div class="form-group row p-4 mb-0">
 
-                <label v-if="[1, 2, 3, 4, 5, 6, 10].includes(content.type * 1)"
+                <label v-if="[1, 2, 3, 4, 5, 6, 7, 9].includes(content.type * 1)"
                        class="col-sm-3 col-form-label-sm mt-3"
                        :for="'la_switch'+content.sign">라벨 켜기</label>
-                <div v-if="[1, 2, 3, 4, 5, 6, 10].includes(content.type * 1)" class="col-sm-9 mt-sm-3">
+                <div v-if="[1, 2, 3, 4, 5, 6, 7, 9].includes(content.type * 1)" class="col-sm-9 mt-sm-3">
                   <label class="switch" :for="'la_switch'+content.sign">
                     <input type="checkbox" :id="'la_switch'+content.sign" v-model="content.label">
                     <span class="slider round"></span>
@@ -69,17 +67,16 @@
 
                 <label class="col-sm-3 col-form-label-sm mt-3" for="f_type">타입*</label>
                 <div class="col-sm-9 mt-sm-3">
-                  <select class="form-control" id="f_type" v-model="content.type">
+                  <select class="form-control" id="f_type" v-model.number="content.type">
                     <option value="1">텍스트 입력</option>
-                    <option value="2">번호 입력</option>
-                    <option value="3">선택 스크롤</option>
-                    <option value="4">선택 버튼</option>
-                    <option value="5">체크 박스</option>
-                    <option value="6">날짜</option>
-                    <option value="7">링크 버튼</option>
-                    <option value="8">전화 버튼</option>
-                    <option value="9">완료 버튼</option>
-                    <option value="10">약관 동의</option>
+                    <option value="2">숫자 입력</option>
+                    <option value="3">전화번호 입력</option>
+                    <option value="4">선택 스크롤</option>
+                    <option value="5">선택 버튼</option>
+                    <option value="6">체크 박스</option>
+                    <option value="7">날짜</option>
+                    <option value="8">완료 버튼</option>
+                    <option value="9">약관 동의</option>
                   </select>
                 </div>
 
@@ -88,7 +85,7 @@
                   <input type="text" class="form-control" id="f_name" maxlength="10" v-model="content.name">
                 </div>
 
-                <label v-if="content.type != 4 && content.type != 5 && content.type != 6"
+                <label v-if="content.type != 5 && content.type != 6 && content.type != 8"
                        class="col-sm-3 col-form-label-sm mt-3" for="f_holder">
                   <span>안내문</span>
                   <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
@@ -106,15 +103,15 @@
                               trigger: 'click',
                               }">?</span>
                 </label>
-                <div v-if="content.type != 4 && content.type != 5 && content.type != 6" class="col-sm-9 mt-sm-3">
+                <div v-if="content.type != 5 && content.type != 6 && content.type != 8" class="col-sm-9 mt-sm-3">
                   <input type="text" class="form-control" id="f_holder" maxlength="50" v-model="content.holder">
                 </div>
 
-                <label v-if="[1, 2, 5, 6, 10].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3"
+                <label v-if="[1, 2, 3, 4, 6, 7, 9].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3"
                        for="f_validate">
                   <span>유효성 검사</span>
                 </label>
-                <div v-if="[1, 2, 5, 6, 10].includes(content.type * 1)" class="col-sm-9 mt-sm-3 pt-2" id="f_validate">
+                <div v-if="[1, 2, 3, 4, 6, 7, 9].includes(content.type * 1)" class="col-sm-9 mt-sm-3 pt-2" id="f_validate">
                   <label :for="'f_validate_1' + content.sign" class="validate_label">
                     <input type="checkbox" :id="'f_validate_1' + content.sign" v-model="content.validation.required">
                     필수
@@ -132,7 +129,7 @@
                     <input type="checkbox" :id="'f_validate_4' + content.sign" v-model="content.validation.number_only">
                     숫자만
                   </label>
-                  <label v-if="[1, 2].includes(content.type * 1)" :for="'f_validate_5' + content.sign" class="validate_label">
+                  <label v-if="[3].includes(content.type * 1)" :for="'f_validate_5' + content.sign" class="validate_label">
                     <input type="checkbox" :id="'f_validate_5' + content.sign" v-model="content.validation.phone_only">
                     전화번호만
                   </label>
@@ -140,13 +137,13 @@
                     <input type="checkbox" :id="'f_validate_6' + content.sign" v-model="content.validation.email">
                     이메일
                   </label>
-                  <label v-if="[2, 6].includes(content.type * 1)" :for="'f_validate_7' + content.sign" class="validate_label">
+                  <label v-if="[2, 7].includes(content.type * 1)" :for="'f_validate_7' + content.sign" class="validate_label">
                     <input type="checkbox" :id="'f_validate_7' + content.sign" v-model="content.validation.age_limit">
                     나이제한
                   </label>
                 </div>
 
-                <div v-if="[2, 6].includes(content.type * 1)" class="w-100">
+                <div v-if="[2, 7].includes(content.type * 1)" class="w-100">
                   <label v-if="content.validation.age_limit" class="col-sm-3 col-form-label-sm mt-3 float-left"
                          for="limit_option">
                     <span>나이제한 옵션</span>
@@ -186,17 +183,17 @@
                   </div>
                 </div>
 
-                <label v-if="content.type == 8" class="col-sm-3 col-form-label-sm mt-3" for="f_val">전화번호</label>
+                <!--<label v-if="content.type == 8" class="col-sm-3 col-form-label-sm mt-3" for="f_val">전화번호</label>
                 <div v-if="content.type == 8" class="col-sm-9 mt-sm-3">
                   <input type="text" class="form-control" id="f_val" maxlength="12" v-model="content.value">
-                </div>
+                </div>-->
 
-                <label v-if="content.type == 7" class="col-sm-3 col-form-label-sm mt-3" for="f_link">링크</label>
+                <!--<label v-if="content.type == 7" class="col-sm-3 col-form-label-sm mt-3" for="f_link">링크</label>
                 <div v-if="content.type == 7" class="col-sm-9 mt-sm-3">
                   <input type="text" class="form-control" id="f_link" maxlength="200" v-model="content.url">
-                </div>
+                </div>-->
 
-                <label v-if="content.type == 3 || content.type == 4 || content.type == 5"
+                <label v-if="content.type == 4 || content.type == 5 || content.type == 6"
                        class="col-sm-3 col-form-label-sm mt-3" for="f_list"><span>리스트</span>
                   <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
                         v-tooltip="{
@@ -213,7 +210,7 @@
                               trigger: 'click',
                               }">?</span>
                 </label>
-                <div v-if="content.type == 3 || content.type == 4 || content.type == 5" class="col-sm-9 mt-sm-3">
+                <div v-if="content.type == 4 || content.type == 5 || content.type == 6" class="col-sm-9 mt-sm-3">
                   <button type="button" @click.prevent="field_list_add(content.sign)"
                           class="btn btn-primary pl-3 pr-3 pt-1 pb-1">추가
                   </button>
@@ -243,10 +240,10 @@
                   <input type="text" class="form-control" id="f_color" maxlength="10"
                          v-model="content.text_color">
                 </div>
-                <label v-if="content.type == 7 || content.type == 8 || content.type == 9"
+                <label v-if="content.type == 8"
                        class="col-sm-3 col-form-label-sm mt-3"
                        for="f_img">이미지</label>
-                <div v-if="content.type == 7 || content.type == 8 || content.type == 9" class="col-sm-9 mt-sm-3">
+                <div v-if="content.type == 8" class="col-sm-9 mt-sm-3">
 
                   <!--<div class="error_label" v-if="content.image_data">
                     등록된 파일 : {{ content.image_data }}
@@ -282,9 +279,9 @@
             </form>
           </div>
         </li>
-        <!--<li v-if="" class="d-inline-flex justify-content-between p-1">
-          <div class="col p-2 text-center bg-light">데이터 없음</div>
-        </li>-->
+        <li v-if="field.length == 0" class="d-inline-flex justify-content-between p-1">
+          <div class="col p-2 text-center bg-light">필드 없음</div>
+        </li>
       </ul>
     </div>
   </div>
@@ -305,7 +302,7 @@
     ],
     data: () => ({
       msg: {
-        holder: 'Place holder입니다. 텍스트 입력 전 설명이 필요하거나 전화, 링크의 버튼에 표시할 글을 지정합니다.',
+        holder: 'Place holder입니다. 텍스트 입력 전 설명 혹은, 약관의 라벨에 기입됩니다.',
         list: '선택 옵션을 선택하고 제공할 수 있습니다.'
       },
       field_obj: [],
@@ -363,7 +360,7 @@
                 label: true,
                 name: this.field_temp_name,
                 holder: this.field_temp_name,
-                form_group_id: this.form_arrow,
+                form_group_id: this.form_arrow * 1,
                 back_color: '#287BFF',
                 text_color: '#f0f0f0',
                 validation: {
@@ -379,14 +376,14 @@
                   min_option: 'lt',
                   max_option: 'gt'
                 },
-                opacity: 10,
+                opacity: '10',
                 list: [],
                 image_data: null
               })
               this.$emit('update:field', this.field_obj)
               this.field_temp_name = ''
               this.filter_change()
-              this.set_field()
+              this.set_field('form')
               this.push_landing()
             } else {
               // if field_obj length is 0
@@ -396,7 +393,7 @@
                 label: true,
                 name: this.field_temp_name,
                 holder: this.field_temp_name,
-                form_group_id: this.form_arrow,
+                form_group_id: this.form_arrow * 1,
                 back_color: '#287BFF',
                 text_color: '#fafafa',
                 validation: {
@@ -412,14 +409,14 @@
                   min_option: 'lt',
                   max_option: 'gt'
                 },
-                opacity: 10,
+                opacity: '10',
                 list: [],
                 image_data: null
               })
               this.$emit('update:field', this.field_obj)
               this.field_temp_name = ''
               this.filter_change()
-              this.set_field()
+              this.set_field('form')
               this.push_landing()
             }
           } else {
@@ -439,7 +436,7 @@
             this.field_obj.splice(i, 1)
             this.$emit('update:field', this.field_obj)
             this.filter_change()
-            this.set_field()
+            this.set_field('form')
             this.push_landing()
             break
           }

@@ -6,7 +6,7 @@
     </label>
     <div class="col-sm-9 mt-sm-3 row ml-0">
       <select class="form-control" name="layout_font" id="layout_font"
-              v-model="landing.font">
+              v-model.number="landing.font">
         <option value="-1">OS 기본</option>
         <option value="1">Sans-serif</option>
         <option value="2">나눔고딕 (Nanum Gothic)</option>

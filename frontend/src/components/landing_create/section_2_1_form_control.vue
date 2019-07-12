@@ -2,6 +2,8 @@
 
   <div class="form-group row mb-0">
 
+    <!--<div class="alert-info w-100">{{ etc }}</div>-->
+
     <label class="col-sm-3 col-form-label-sm mt-3" for="form_group">기타 폼 그룹</label>
     <form class="col-sm-9 mt-sm-3 row ml-0" v-on:submit.prevent="form_group_add">
       <input type="text" class="input_one_btn form-control col-md-11" id="form_group" name="form_group"
@@ -12,9 +14,9 @@
     <label class="col-sm-3 col-form-label-sm mt-3" for="form_group_list"></label>
     <div class="col-sm-9 mt-sm-3 row ml-0">
       <select class="input_one_btn form-control col-md-11" name="form_group_list" id="form_group_list"
-              :value="form_arrow" @change="form_changed($event.target.value)">
+              :value="etc_arrow" @change="form_changed($event.target.value * 1)">
         <option value="-1">그룹을 선택하세요</option>
-        <option v-for="item in form" :value="item.sign">{{ item.name }}</option>
+        <option v-for="item in etc" :value.number="item.sign">{{ item.name }}</option>
       </select>
       <button type="button" class="btn btn-danger col-md-1 p-0"
               @click.prevent="form_group_delete(form_selected.sign)">
@@ -22,10 +24,30 @@
       </button>
     </div>
 
-    <label v-if="form_selected.sign != -1" class="col-sm-3 col-form-label-sm mt-3" for="form_group_bg">
+    <label v-if="etc_arrow * 1 > 0" class="col-sm-3 col-form-label-sm mt-3" for="form_group_type">폼 타입</label>
+    <div v-if="etc_arrow * 1 > 0" class="col-sm-9 mt-sm-3 row ml-0">
+      <select class="form-control col-md-12" name="form_group_list" id="form_group_type"
+              v-model.number="form_selected.type">
+        <option value="-1">그룹을 선택하세요</option>
+        <option value="1">링크 버튼</option>
+        <option value="2">전화 버튼</option>
+      </select>
+    </div>
+
+    <label v-if="etc_arrow * 1 > 0 && form_selected.type == 1" class="col-sm-3 col-form-label-sm mt-3" for="form_group_link">링크 url</label>
+    <div v-if="etc_arrow * 1 > 0 && form_selected.type == 1" class="col-sm-9 mt-sm-3 row ml-0">
+      <input type="text" class="form-control col-md-12" id="form_group_link" v-model="form_selected.link">
+    </div>
+
+    <label v-if="etc_arrow * 1 > 0 && form_selected.type == 2" class="col-sm-3 col-form-label-sm mt-3" for="form_group_tel">전화 번호</label>
+    <div v-if="etc_arrow * 1 > 0 && form_selected.type == 2" class="col-sm-9 mt-sm-3 row ml-0">
+      <input type="tel" class="form-control col-md-12" id="form_group_tel" v-model="form_selected.tel">
+    </div>
+
+    <label v-if="etc_arrow * 1 > 0" class="col-sm-3 col-form-label-sm mt-3" for="form_group_bg">
       폼 배경색
     </label>
-    <div v-if="form_selected.sign != -1" class="col-sm-9 mt-sm-3 row ml-0">
+    <div v-if="etc_arrow * 1 > 0" class="col-sm-9 mt-sm-3 row ml-0">
       <div class="color_wrap form-control col-sm-2" id="form_group_bg">
         <input type="color" v-model="form_selected.bg_color" class="color_picker">
       </div>
@@ -33,10 +55,10 @@
       <input type="text" v-model="form_selected.bg_color" class="form-control col-sm-5" maxlength="10">
     </div>
 
-    <label v-if="form_selected.sign != -1" class="col-sm-3 col-form-label-sm mt-3" for="opacity_slider">
+    <label v-if="etc_arrow * 1 > 0" class="col-sm-3 col-form-label-sm mt-3" for="opacity_slider">
       배경 불투명도
     </label>
-    <div v-if="form_selected.sign != -1" class="col-sm-9 mt-sm-3 row ml-0">
+    <div v-if="etc_arrow * 1 > 0" class="col-sm-9 mt-sm-3 row ml-0">
       <div class="form-control col-sm-2">{{ form_selected.opacity * 10 }}%</div>
       <div class="margin_div"></div>
       <div class="slide_container col-sm-5 form-control border-0 p-0">
@@ -45,10 +67,10 @@
       </div>
     </div>
 
-    <label v-if="form_selected.sign != -1" class="col-sm-3 col-form-label-sm mt-3" for="form_group_col">
+    <label v-if="etc_arrow * 1 > -1" class="col-sm-3 col-form-label-sm mt-3" for="form_group_col">
       폼 폰트색
     </label>
-    <div v-if="form_selected.sign != -1" class="col-sm-9 mt-sm-3 row ml-0">
+    <div v-if="etc_arrow * 1 > -1" class="col-sm-9 mt-sm-3 row ml-0">
       <div class="color_wrap form-control col-sm-2" id="form_group_col">
         <input type="color" v-model="form_selected.tx_color" class="color_picker">
       </div>
@@ -63,18 +85,22 @@
   export default {
     name: "section_2_form_control_etc",
     props: [
-      'form',
-      'form_arrow',
-      'field',
-      'set_field',
+      'etc',
+      'etc_arrow',
       'push_landing'
-      // 'form_selected'
     ],
     data: () => ({
       form_obj: [],
       form_temp: '',
-      form_selected: {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10},
-      temp_field: []
+      form_selected: {
+        sign: -1,
+        type: 1,
+        tx_color: '#313131',
+        bg_color: '#fafafa',
+        opacity: '10',
+        link: '',
+        tel: '',
+      },
     }),
     mounted() {
       this.form_init()
@@ -82,13 +108,21 @@
     methods: {
       form_init() {
         this.form_obj = []
-        this.form_obj = this.form
+        this.form_obj = this.etc
       },
       form_changed(id) {
         this.form_init()
-        this.$emit('update:form_arrow', id)
+        this.$emit('update:etc_arrow', id)
         if (id == -1) {
-          this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
+          this.form_selected = {
+            sign: -1,
+            type: -1,
+            tx_color: '#313131',
+            bg_color: '#fafafa',
+            opacity: '10',
+            link: '',
+            tel: ''
+          }
         } else {
           for (let i = 0; i < this.form_obj.length; i++) {
             if (this.form_obj[i].sign == id) {
@@ -120,12 +154,15 @@
               this.form_obj.push({
                 sign: highest + 1,
                 name: this.form_temp,
+                type: -1,
                 bg_color: '#fafafa',
                 tx_color: '#313131',
-                opacity: 10
+                opacity: '10',
+                link: '',
+                tel: ''
               })
               this.form_temp = ''
-              this.$emit('update:form', this.form_obj)
+              this.$emit('update:etc', this.form_obj)
               alert('폼 그룹이 생성되었습니다.')
               this.push_landing()
             }
@@ -133,12 +170,15 @@
             this.form_obj.push({
               sign: 1,
               name: this.form_temp,
+              type: -1,
               bg_color: '#fafafa',
               tx_color: '#313131',
-              opacity: 10
+              opacity: '10',
+              link: '',
+              tel: ''
             })
             this.form_temp = ''
-            this.$emit('update:form', this.form_obj)
+            this.$emit('update:etc', this.form_obj)
             alert('폼 그룹이 생성되었습니다.')
             this.push_landing()
           }
@@ -153,26 +193,34 @@
             this.form_init()
             this.form_obj = this.form_obj.filter(el => el.sign != id)
             // this.form_arrow = -1
-            this.$emit('update:form_arrow', -1)
-            this.$emit('update:form', this.form_obj)
-            this.form_selected = {sign: -1, tx_color: '#313131', bg_color: '#fafafa', opacity: 10}
+            this.$emit('update:etc_arrow', -1)
+            this.$emit('update:etc', this.form_obj)
+            this.form_selected = {
+              sign: -1,
+              type: -1,
+              tx_color: '#313131',
+              bg_color: '#fafafa',
+              opacity: '10',
+              link: '',
+              tel: ''
+            }
             // Field objs delete also
-            this.field_work(id)
+            // this.field_work(id)
             // this.push_landing()
           }
         } else {
           alert('그룹을 먼저 선택하세요.')
         }
       },
-      field_work(id) {
-        this.form_init()
-        this.temp_field = []
-        this.temp_field = this.field
-        this.temp_field = this.temp_field.filter(el => el.form_group_id != id)
-        this.$emit('update:field', this.temp_field)
-        this.set_field()
-        this.push_landing()
-      }
+      // field_work(id) {
+      //   this.form_init()
+      //   this.temp_field = []
+      //   this.temp_field = this.field
+      //   this.temp_field = this.temp_field.filter(el => el.form_group_id != id)
+      //   this.$emit('update:field', this.temp_field)
+      //   this.set_field()
+      //   this.push_landing()
+      // }
     }
   }
 </script>

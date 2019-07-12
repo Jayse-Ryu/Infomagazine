@@ -326,7 +326,7 @@
     linear-gradient(127deg, rgba(185, 169, 141, .8), rgba(0, 255, 0, 0) 70.71%),
     linear-gradient(336deg, rgba(0, 212, 255, .8), rgba(0, 0, 255, 0) 70.71%);
     background-size: 180% 180%;
-    animation: Gradient 25s ease-in-out infinite;
+    animation: Gradient 18s ease-in-out infinite;
   }
 
   .login_box {

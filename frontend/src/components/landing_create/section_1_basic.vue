@@ -8,7 +8,7 @@
     <div class="col-sm-9 mt-sm-3">
 
       <select class="form-control" name="company_name" id="company_name" :value="company"
-              @change="$emit('update:company', $event.target.value)">
+              @change="$emit('update:company', $event.target.value * 1)">
         <option value="-1">업체를 선택하세요</option>
         <option v-for="content in landing_company" :value="content.id">
           {{ content.corp_name }} - {{ content.corp_sub_name }}

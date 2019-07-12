@@ -47,13 +47,22 @@
 
         <hr>
 
+        <h5>기타 폼</h5>
+        <section_form_control_etc
+          :etc.sync="dynamo_obj.landing_info.etc"
+          :etc_arrow.sync="etc_arrow"
+          :push_landing="push_landing"
+        />
+
+        <hr>
+
         <h5>추가내용</h5>
         <section_term ref="term_comp"
-          :epoch_time="epoch_time"
-          :landing="dynamo_obj.landing_info.landing"
-          :term.sync="dynamo_obj.landing_info.term"
-          :updated_date="dynamo_obj.updated_date"
-          :push_landing="push_landing"
+                      :epoch_time="epoch_time"
+                      :landing="dynamo_obj.landing_info.landing"
+                      :term.sync="dynamo_obj.landing_info.term"
+                      :updated_date="dynamo_obj.updated_date"
+                      :push_landing="push_landing"
         />
 
         <hr>
@@ -74,6 +83,7 @@
           :order.sync="dynamo_obj.landing_info.sections"
           :form.sync="dynamo_obj.landing_info.form"
           :field.sync="dynamo_obj.landing_info.field"
+          :etc.sync="dynamo_obj.landing_info.etc"
           :is_term.sync="dynamo_obj.landing_info.landing.is_term"
           :updated_date="dynamo_obj.updated_date"
           :set_field="set_field_position"
@@ -120,7 +130,6 @@
   import section_form_control from '@/components/landing_create/section_2_form_control.vue'
   import section_form_control_etc from '@/components/landing_create/section_2_1_form_control.vue'
   import section_form_detail from '@/components/landing_create/section_3_form_detail.vue'
-  import section_form_detail_etc from '@/components/landing_create/section_3_1_form_detail.vue'
   import section_term from '@/components/landing_create/section_4_term.vue'
   import section_page_source from '@/components/landing_create/section_5_page_source.vue'
   import section_layout from '@/components/landing_create/section_6_layout.vue'
@@ -134,7 +143,6 @@
       section_form_control,
       section_form_control_etc,
       section_form_detail,
-      section_form_detail_etc,
       section_term,
       section_page_source,
       section_layout,
@@ -150,10 +158,11 @@
       page_id: '',
       epoch_time: 0,
       form_arrow: -1,
+      etc_arrow: -1,
       auto_flag: false,
       company_flag: false,
       dynamo_obj: {
-        company_id: '-1',
+        company_id: -1,
         created_date: '',
         updated_date: '',
         landing_info: {
@@ -184,6 +193,7 @@
           },
           form: [],
           field: [],
+          etc: [],
           sections: [],
           views: 0
         }
@@ -231,89 +241,91 @@
       // }
     },
     methods: {
-      set_field_position() {
-        // Section list short name
-        let sections = this.dynamo_obj.landing_info.sections
-        // Dynamo field short name
-        let fields = this.dynamo_obj.landing_info.field
+      set_field_position(option) {
+        if (option == 'form') {
+          // Section list short name
+          let sections = this.dynamo_obj.landing_info.sections
+          // Dynamo field short name
+          let fields = this.dynamo_obj.landing_info.field
 
-        // Fields in section object (static data)
-        let original_fields = []
-        // Fields in dynamo object (dynamically change)
-        let dynamic_fields = []
+          // Fields in section object (static data)
+          let original_fields = []
+          // Fields in dynamo object (dynamically change)
+          let dynamic_fields = []
 
-        // Field sign list for add
-        let for_add = []
-        // Field sign list for delete
-        let for_rem = []
+          // Field sign list for add
+          let for_add = []
+          // Field sign list for delete
+          let for_rem = []
 
-        // Get A Section
-        for (let i = 0; i < sections.length; i++) {
-          // Object lists
-          let objects = sections[i]
+          // Get A Section
+          for (let i = 0; i < sections.length; i++) {
+            // Object lists
+            let objects = sections[i]
 
-          // Get A object
-          for (let j = 0; j < objects.length; j++) {
-            // If the layout object is form_group and it has a form group id
-            if (objects[j].type == 2 && objects[j].form_group_id != 0) {
-              // Init calculator list
-              original_fields = []
-              dynamic_fields = []
-              for_add = []
-              for_rem = []
+            // Get A object
+            for (let j = 0; j < objects.length; j++) {
+              // If the layout object is form_group and it has a form group id
+              if (objects[j].type == 2 && objects[j].form_group_id != 0) {
+                // Init calculator list
+                original_fields = []
+                dynamic_fields = []
+                for_add = []
+                for_rem = []
 
-              // Set original field
-              for (let l = 0; l < objects[j].fields.length; l++) {
-                original_fields.push(objects[j].fields[l].sign)
-              }
-
-              // Set dynamic field as object's form group
-              for (let k = 0; k < fields.length; k++) {
-                if (fields[k].form_group_id == objects[j].form_group_id) {
-                  dynamic_fields.push(fields[k].sign)
+                // Set original field
+                for (let l = 0; l < objects[j].fields.length; l++) {
+                  original_fields.push(objects[j].fields[l].sign)
                 }
-              }
 
-              // ///////////Here! calculate
-              // Get fields for add
-              for (let w = 0; w < dynamic_fields.length; w++) {
-                if (!original_fields.includes(dynamic_fields[w])) {
-                  for_add.push(dynamic_fields[w])
-                }
-              }
-              // Get fields for remove
-              for (let q = 0; q < original_fields.length; q++) {
-                if (!dynamic_fields.includes(original_fields[q])) {
-                  for_rem.push(original_fields[q])
-                }
-              }
-              // ///////////Here! calculate
-
-              // Add fields into Object fields
-              for (let e = 0; e < for_add.length; e++) {
-                let field_start = {
-                  sign: for_add[e],
-                  position: {
-                    x:0,
-                    y:0,
-                    w:200,
-                    h:50,
-                    z:10
+                // Set dynamic field as object's form group
+                for (let k = 0; k < fields.length; k++) {
+                  if (fields[k].form_group_id == objects[j].form_group_id) {
+                    dynamic_fields.push(fields[k].sign)
                   }
                 }
-                objects[j].fields.push(field_start)
-              }
 
-              // Remove fields from Object fields
-              for(let r = 0; r < objects[j].fields.length; r++) {
-                if (for_rem.includes(objects[j].fields[r].sign)) {
-                  objects[j].fields.splice(r, 1)
+                // ///////////Here! calculate
+                // Get fields for add
+                for (let w = 0; w < dynamic_fields.length; w++) {
+                  if (!original_fields.includes(dynamic_fields[w])) {
+                    for_add.push(dynamic_fields[w])
+                  }
                 }
-              }
+                // Get fields for remove
+                for (let q = 0; q < original_fields.length; q++) {
+                  if (!dynamic_fields.includes(original_fields[q])) {
+                    for_rem.push(original_fields[q])
+                  }
+                }
+                // ///////////Here! calculate
 
-            }// is object form group?
-          }// get object
-        }// get section
+                // Add fields into Object fields
+                for (let e = 0; e < for_add.length; e++) {
+                  let field_start = {
+                    sign: for_add[e],
+                    position: {
+                      x: 0,
+                      y: 0,
+                      w: 200,
+                      h: 50,
+                      z: 10
+                    }
+                  }
+                  objects[j].fields.push(field_start)
+                }
+
+                // Remove fields from Object fields
+                for (let r = 0; r < objects[j].fields.length; r++) {
+                  if (for_rem.includes(objects[j].fields[r].sign)) {
+                    objects[j].fields.splice(r, 1)
+                  }
+                }
+
+              }// is object form group?
+            }// get object
+          }// get section
+        }
       },
       // Create Landing Start
       // Create Landing Start
@@ -410,14 +422,14 @@
           }
         }
 
-        if(option === 'checked') {
+        if (option === 'checked') {
           this.dynamo_obj.updated_date = (Date.now()).toString()
           this.$store.state.pageOptions.loading = true
           console.log('landing create object is? ', this.dynamo_obj)
           axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id, this.dynamo_obj, config)
             .then(() => {
               this.$store.state.pageOptions.loading = false
-              if(confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
+              if (confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
                 this.bye()
               }
             })
@@ -734,7 +746,7 @@
 
   /* The slider itself */
   .opacity_slider {
-    -webkit-appearance: none;  /* Override default CSS styles */
+    -webkit-appearance: none; /* Override default CSS styles */
     appearance: none;
     background: #eaeaea; /* Grey background */
     outline: none; /* Remove outline */

@@ -2,6 +2,12 @@
 
   <div v-if="window_width > 999" class="form-group row">
 
+    <div class="alert-danger w-100 m-1" v-for="item in order">
+      <div class="alert alert-info m-1" v-for="obj in item">
+        {{ obj }}
+      </div>
+    </div>
+
     <label class="col-sm-3 col-form-label-sm mt-3" for="main_layout">
       <span>랜딩 레이아웃</span>
       <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
@@ -79,7 +85,7 @@
                     <div class="order_stretch" v-for="field in field" v-if="field.sign == area.sign">
 
                       <!-- input form area -->
-                      <div class="order_stretch" v-if="field.type != 7 && field.type != 8 && field.type != 9">
+                      <div class="order_stretch" v-if="field.type != 8">
                         <label v-if="field.form_group_id == item.form_group_id && field.label == true"
                                class="order_form_label" :for="'label'+field.name">
                           <div class="order_form_label_child">{{ field.name }}</div>
@@ -93,13 +99,16 @@
                           <input v-if="field.type == 2" type="number" class="order_form_control"
                                  maxlength="0" :placeholder="field.holder" :id="'label'+field.name">
 
-                          <select v-if="field.type == 3" type="number" class="order_form_control"
+                          <input v-if="field.type == 3" type="tel" class="order_form_control"
+                                 maxlength="0" :placeholder="field.holder" :id="'label'+field.name">
+
+                          <select v-if="field.type == 4" type="number" class="order_form_control"
                                   :placeholder="field.holder" :id="'label'+field.name">
                             <option value="0">select here</option>
                             <option v-for="list in field.list" :value="list">{{ list }}</option>
                           </select>
 
-                          <div v-if="field.type == 4" :id="'label'+field.name"
+                          <div v-if="field.type == 5" :id="'label'+field.name"
                                class="form-check-inline d-flex flex-wrap h-100">
                             <div class="p-2" v-for="list in field.list">
                               <label class="form-check-label" :for="'field_' + list">
@@ -110,7 +119,7 @@
                             </div>
                           </div>
 
-                          <div v-if="field.type == 5" :id="'label'+field.name"
+                          <div v-if="field.type == 6" :id="'label'+field.name"
                                class="form-check-inline d-flex flex-wrap h-100">
                             <div class="p-2" v-for="list in field.list">
                               <label class="form-check-label" :for="'field_' + list">
@@ -120,10 +129,10 @@
                             </div>
                           </div>
 
-                          <input v-if="field.type == 6" type="text" class="order_form_control" disabled
+                          <input v-if="field.type == 7" type="text" class="order_form_control" disabled
                                  placeholder="Datepicker" :id="'label'+field.name">
 
-                          <div v-if="field.type == 10" :id="'label'+field.name"
+                          <div v-if="field.type == 9" :id="'label'+field.name"
                                class="form-check-inline d-flex flex-wrap h-100">
                             <div class="p-2">
                               <label class="form-check-label" :for="'term' + field.name">
@@ -148,13 +157,16 @@
                           <input v-if="field.type == 2" type="number" class="order_form_control"
                                  maxlength="0" :placeholder="field.holder" :id="'label'+field.name">
 
-                          <select v-if="field.type == 3" type="number" class="order_form_control"
+                          <input v-if="field.type == 3" type="tel" class="order_form_control"
+                                 maxlength="0" :placeholder="field.holder" :id="'label'+field.name">
+
+                          <select v-if="field.type == 4" type="number" class="order_form_control"
                                   :placeholder="field.holder" :id="'label'+field.name">
                             <option value="0">select here</option>
                             <option v-for="list in field.list" :value="list">{{ list }}</option>
                           </select>
 
-                          <div v-if="field.type == 4" :id="'label'+field.name"
+                          <div v-if="field.type == 5" :id="'label'+field.name"
                                class="form-check-inline d-flex flex-wrap h-100">
                             <div class="p-2" v-for="list in field.list">
                               <label class="form-check-label" :for="'field_' + list">
@@ -165,7 +177,7 @@
                             </div>
                           </div>
 
-                          <div v-if="field.type == 5" :id="'label'+field.name"
+                          <div v-if="field.type == 6" :id="'label'+field.name"
                                class="form-check-inline d-flex flex-wrap h-100">
                             <div class="p-2" v-for="list in field.list">
                               <label class="form-check-label" :for="'field_' + list">
@@ -175,10 +187,10 @@
                             </div>
                           </div>
 
-                          <input v-if="field.type == 6" type="text" class="order_form_control" disabled
+                          <input v-if="field.type == 7" type="text" class="order_form_control" disabled
                                  placeholder="Datepicker" :id="'label'+field.name">
 
-                          <div v-if="field.type == 10" :id="'label'+field.name"
+                          <div v-if="field.type == 9" :id="'label'+field.name"
                                class="form-check-inline d-flex flex-wrap justify-content-end h-100">
                             <div class="p-2">
                               <label class="form-check-label" :for="'term' + field.name">
@@ -199,43 +211,43 @@
 
                       <!-- button area -->
                       <div class="order_stretch"
-                           v-else-if="field.type == 7 || field.type == 8 || field.type == 9">
+                           v-else-if="field.type == 8">
                         <div class="order_stretch" v-if="field.form_group_id == item.form_group_id">
 
                           <!-- link without image -->
-                          <button v-if="field.type == 7 && !field.image_data" type="button"
+                          <!--<button v-if="field.type == 7 && !field.image_data" type="button"
                                   class="btn w-100 p-0 h-100"
                                   :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                             {{ field.name }}
-                          </button>
+                          </button>-->
                           <!-- link with image -->
-                          <button v-else-if="field.type == 7 && field.image_data" type="button"
+                          <!--<button v-else-if="field.type == 7 && field.image_data" type="button"
                                   class="btn w-100 p-0 h-100" style="background: transparent;">
                             <img :src="key_to_url(field.image_data)" alt="button image"
                                  class="w-100 order_form_button_image">
-                          </button>
+                          </button>-->
 
                           <!-- tel without image -->
+                          <!--<button v-if="field.type == 8 && !field.image_data" type="button"
+                                  class="btn w-100 h-100"
+                                  :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
+                            {{ field.name }}
+                          </button>-->
+                          <!-- tel with image -->
+                          <!--<button v-else-if="field.type == 8 && field.image_data" type="button"
+                                  class="btn w-100 p-0 h-100" style="background: transparent;">
+                            <img :src="key_to_url(field.image_data)" alt="button image"
+                                 class="w-100 order_form_button_image">
+                          </button>-->
+
+                          <!-- submit without image -->
                           <button v-if="field.type == 8 && !field.image_data" type="button"
                                   class="btn w-100 h-100"
                                   :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
                             {{ field.name }}
                           </button>
-                          <!-- tel with image -->
-                          <button v-else-if="field.type == 8 && field.image_data" type="button"
-                                  class="btn w-100 p-0 h-100" style="background: transparent;">
-                            <img :src="key_to_url(field.image_data)" alt="button image"
-                                 class="w-100 order_form_button_image">
-                          </button>
-
-                          <!-- submit without image -->
-                          <button v-if="field.type == 9 && !field.image_data" type="button"
-                                  class="btn w-100 h-100"
-                                  :style="'background:'+field.back_color+';' + 'color:'+field.text_color+';'">
-                            {{ field.name }}
-                          </button>
                           <!-- submit with image -->
-                          <button v-else-if="field.type == 9 && field.image_data" type="button"
+                          <button v-else-if="field.type == 8 && field.image_data" type="button"
                                   class="btn w-100 p-0 h-100" style="background: transparent;">
                             <img :src="key_to_url(field.image_data)" alt="button image"
                                  class="w-100 order_form_button_image">
@@ -275,6 +287,33 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Order layout for etc form -->
+              <div v-if="item.type == 4" class="form_layout" v-for="form in etc">
+
+                <div v-if="form.sign === item.etc_id"
+                     :style="'background: rgba('+hex_to_decimal(form.bg_color)+','+form.opacity*0.1+');' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
+
+                  <!-- Etc form is link button -->
+                  <div v-if="form.type == 1" class="etc_layout_cont">
+                    <button type="button" class="btn etc_button"
+                            :style="'background: rgba('+hex_to_decimal(form.bg_color)+','+form.opacity*0.1+');' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
+                      {{ form.name }}
+                    </button>
+                  </div>
+
+                  <!-- Etc form is tel button -->
+                  <div v-if="form.type == 2" class="etc_layout_cont">
+                    <button type="button" class="btn etc_button"
+                            :style="'background: rgba('+hex_to_decimal(form.bg_color)+','+form.opacity*0.1+');' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
+                      {{ form.name }}
+                    </button>
+                  </div>
+
+                </div>
+                <!-- /form_layout_cont -->
+              </div>
+              <!-- /form_layout -->
 
             </vue-draggable-resizable>
 
@@ -332,8 +371,9 @@
                   <select class="form-control" id="console_type" v-model.number="info.type"
                           @change="call_set()">
                     <option value="1">이미지</option>
-                    <option value="2">폼그룹</option>
+                    <option value="2">DB 폼그룹</option>
                     <option value="3">비디오</option>
+                    <option value="4">기타 폼그룹</option>
                   </select>
                 </div>
 
@@ -341,7 +381,7 @@
                   비디오 타입
                 </label>
                 <div v-if="info.type == 3" class="col-sm-9 mt-sm-3">
-                  <select id="video_type" class="form-control" v-model="info.video_type">
+                  <select id="video_type" class="form-control" v-model.number="info.video_type">
                     <option value="1">Youtube</option>
                     <option value="2">Vimeo</option>
                   </select>
@@ -350,10 +390,13 @@
                   이미지 첨부
                 </label>
                 <label v-if="info.type == 2" class="col-sm-3 col-form-label-sm mt-3" for="form_set">
-                  폼 그룹 선택
+                  DB 폼 그룹 선택
                 </label>
                 <label v-if="info.type == 3" class="col-sm-3 col-form-label-sm mt-3" for="video_set">
                   동영상 값
+                </label>
+                <label v-if="info.type == 4" class="col-sm-3 col-form-label-sm mt-3" for="video_set">
+                  기타 폼 그룹 선택
                 </label>
                 <div class="col-sm-9 mt-sm-3" id="choose_set">
                   <input v-if="info.type == 1" type="file" class="form-control p-1" id="image_set" accept="image/*"
@@ -363,7 +406,7 @@
                     이미지 삭제
                   </button>
                   <select v-if="info.type == 2" class="form-control" id="form_set"
-                          v-model="info.form_group_id"
+                          v-model.number="info.form_group_id"
                           @change="call_set()">
                     <option value="0">폼 그룹을 선택하세요</option>
                     <option v-for="content in form" :value="content.sign">
@@ -372,6 +415,14 @@
                   </select>
                   <input v-if="info.type == 3" type="text" class="form-control" id="video_set"
                          v-model="info.video_url">
+                  <select v-if="info.type == 4" class="form-control" id="etc_set"
+                          v-model.number="info.etc_id"
+                          @change="call_set()">
+                    <option value="-1">폼 그룹을 선택하세요</option>
+                    <option v-for="content in etc" :value="content.sign">
+                      {{ content.name }}
+                    </option>
+                  </select>
                 </div>
 
                 <label for="console_x" class="col-sm-3 col-form-label-sm mt-3">X 좌표</label>
@@ -432,6 +483,7 @@
       'order',
       'form',
       'field',
+      'etc',
       'is_term',
       'updated_date',
       'set_field',
@@ -456,7 +508,8 @@
         this.order_obj = this.order
       },
       call_set() {
-        this.set_field()
+        console.log('call set - (set field, obj init)')
+        this.set_field('form')
         this.object_init()
       },
       // Order handle
@@ -466,11 +519,13 @@
         this.object_init()
         this.order_obj.push([])
         this.$emit('update:order', this.order_obj)
+        this.set_field('form')
       },
       section_delete(index) {
         this.object_init()
         this.order_obj.splice(index, 1)
         this.$emit('update:order', this.order_obj)
+        this.set_field('form')
       },
       object_add(index) {
         this.object_init()
@@ -482,6 +537,7 @@
               type: 1,
               video_type: 1,
               form_group_id: -1,
+              etc_id: -1,
               section_h: 0,
               position: {
                 x: 0,
@@ -513,6 +569,7 @@
               type: 1,
               video_type: 1,
               form_group_id: -1,
+              etc_id: -1,
               section_h: 0,
               position: {
                 x: 0,
@@ -549,6 +606,7 @@
             this.order_selected = 0
             this.field_selected = 0
             this.order_activated(0)
+            this.set_field('form')
           }
         } else {
           alert('먼저 레이아웃을 선택하세요.')
@@ -570,15 +628,15 @@
         let compare = 0
         let sum = 0
         for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
-          sum = this.order[this.section_selected][i].position.y + this.order[this.section_selected][i].position.h
+          sum = (this.order[this.section_selected][i].position.y + this.order[this.section_selected][i].position.h) * 1
           // Compare objects values
           if (compare < sum) {
             compare = sum
           }
           if (this.order_obj[this.section_selected][i].sign == this.order_selected) {
-            this.order_obj[this.section_selected][i].position.x = x
-            this.order_obj[this.section_selected][i].position.y = y
-            this.order_obj[this.section_selected][i].section_h = compare
+            this.order_obj[this.section_selected][i].position.x = x * 1
+            this.order_obj[this.section_selected][i].position.y = y * 1
+            this.order_obj[this.section_selected][i].section_h = compare * 1
           }
         }
         this.field_selected = 0
@@ -589,17 +647,17 @@
         let compare = 0
         let sum = 0
         for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
-          sum = this.order[this.section_selected][i].position.y + this.order[this.section_selected][i].position.h
+          sum = (this.order[this.section_selected][i].position.y + this.order[this.section_selected][i].position.h) * 1
           // Compare objects values
           if (compare < sum) {
             compare = sum
           }
           if (this.order_obj[this.section_selected][i].sign == this.order_selected) {
-            this.order_obj[this.section_selected][i].position.x = x
-            this.order_obj[this.section_selected][i].position.y = y
-            this.order_obj[this.section_selected][i].position.w = w
-            this.order_obj[this.section_selected][i].position.h = h
-            this.order_obj[this.section_selected][i].section_h = compare
+            this.order_obj[this.section_selected][i].position.x = x * 1
+            this.order_obj[this.section_selected][i].position.y = y * 1
+            this.order_obj[this.section_selected][i].position.w = w * 1
+            this.order_obj[this.section_selected][i].position.h = h * 1
+            this.order_obj[this.section_selected][i].section_h = compare * 1
           }
         }
         this.field_selected = 0
@@ -783,7 +841,7 @@
 
           // Object parts
           for (let j = 0; j < this.order[i].length; j++) {
-            let sum = this.order[i][j].position.y + this.order[i][j].position.h
+            let sum = (this.order[i][j].position.y + this.order[i][j].position.h) * 1
             // Compare objects values
             if (compare < sum) {
               compare = sum
@@ -821,6 +879,20 @@
     overflow: visible;
     font-size: 1rem;
     border: 1px solid rgba(100, 100, 100, 0.1);
+  }
+
+  .etc_layout_cont {
+    position: absolute;
+    overflow: visible;
+    font-size: 1rem;
+    border: 1px solid rgba(100, 100, 100, 0.1);
+    width: 100%;
+    height: 100%;
+  }
+
+  .etc_button {
+    width: 100%;
+    height: 100%;
   }
 
   .order_stretch {
