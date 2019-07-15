@@ -373,6 +373,147 @@
           }
         }
       },
+      field_validation() {
+        let type_text = ['required', 'korean_only', 'english_only', 'number_only', 'email']
+        let type_num = ['required', 'number_only']
+        let type_tel = ['required', 'phone_only']
+        let type_scr = ['required']
+        let type_chk = ['required']
+        let type_date = ['required', 'age_limit', 'value_min', 'value_max']
+        let type_agr = ['required']
+
+        for (let index = 0; index < this.dynamo_obj.landing_info.field.length; index++) {
+          let field = this.dynamo_obj.landing_info.field[index]
+
+          if (field.type == 1) {
+            // text
+            let type = type_text
+            let replace = {}
+            for (let j = 0; j < type.length; j++) {
+              if (field.validation.hasOwnProperty(type[j])) {
+                if (field.validation[type[j]]) {
+                  replace[type[j]] = {}
+                }
+              }
+            }
+            field.validation = replace
+          } else if (field.type == 2) {
+            // num
+            let type = type_num
+            let replace = {}
+            for (let j = 0; j < type.length; j++) {
+              if (field.validation.hasOwnProperty(type[j])) {
+                if (field.validation[type[j]]) {
+                  replace[type[j]] = {}
+                }
+              }
+            }
+            field.validation = replace
+          } else if (field.type == 3) {
+            // phone
+            let type = type_tel
+            let replace = {}
+            for (let j = 0; j < type.length; j++) {
+              if (field.validation.hasOwnProperty(type[j])) {
+                if (field.validation[type[j]]) {
+                  replace[type[j]] = {}
+                }
+              }
+            }
+            field.validation = replace
+          } else if (field.type == 4) {
+            // scr
+            let type = type_scr
+            let replace = {}
+            for (let j = 0; j < type.length; j++) {
+              if (field.validation.hasOwnProperty(type[j])) {
+                if (field.validation[type[j]]) {
+                  replace[type[j]] = {}
+                }
+              }
+            }
+            field.validation = replace
+            console.log('scr new obj', replace)
+          } else if (field.type == 5) {
+            field.validation = {}
+            if (field.default == '') {
+              if (field.list.length != 0) {
+                field.default = field.list[0]
+              }
+            }
+          } else if (field.type == 6) {
+            // chk
+            let type = type_chk
+            let replace = {}
+            for (let j = 0; j < type.length; j++) {
+              if (field.validation.hasOwnProperty(type[j])) {
+                if (field.validation[type[j]]) {
+                  replace[type[j]] = {}
+                }
+              }
+            }
+            field.validation = replace
+          } else if (field.type == 7) {
+            // date
+            let type = type_date
+            let replace = {}
+            let flag = false
+
+            // set flag
+            for (let j = 0; j < type.length; j++) {
+              if (field.validation.hasOwnProperty(type[j])) {
+                if (type[j] == 'age_limit') {
+                  flag = field.validation[type[j]]
+                }
+              }
+            }
+
+            if (flag) {
+              for (let k = 0; k < type.length; k++) {
+                if (field.validation.hasOwnProperty(type[k])) {
+                  if (type[k] == 'value_min' || type[k] == 'value_max') {
+                    replace[type[k]] = field.validation[type[k]]
+                  } else {
+                    if (field.validation[type[k]]) {
+                      replace[type[k]] = {}
+                    }
+                  }
+                }
+              }
+            } else {
+              for (let k = 0; k < type.length; k++) {
+                if (field.validation.hasOwnProperty(type[k])) {
+                  if (field.validation[type[k]]) {
+                    replace[type[k]] = {}
+                  }
+                }
+              }
+            }
+
+            field.validation = replace
+          } else if (field.type == 8) {
+            field.validation = {}
+          } else if (field.type == 9) {
+            // agr
+            let type = type_agr
+            let replace = {}
+            for (let j = 0; j < type.length; j++) {
+              if (field.validation.hasOwnProperty(type[j])) {
+                if (field.validation[type[j]]) {
+                  replace[type[j]] = {}
+                }
+              }
+            }
+            if (field.default == 'true' || field.default == 'false') {
+              field.default = JSON.parse(field.default)
+            } else {
+              field.default = true
+            }
+
+            field.validation = replace
+          }
+        }
+      },
       push_landing(option) {
         // option first(mounted) or checked(button clicked)
         const config = {
@@ -427,6 +568,9 @@
         if (option === 'checked') {
           this.dynamo_obj.updated_date = (Date.now()).toString()
           this.$store.state.pageOptions.loading = true
+
+          this.field_validation()
+
           // console.log('landing create object is? ', this.dynamo_obj)
           axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id, this.dynamo_obj, config)
             .then(() => {

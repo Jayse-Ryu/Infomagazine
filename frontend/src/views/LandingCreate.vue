@@ -350,38 +350,6 @@
         }
       },
       field_validation() {
-        let temp = {
-          sign: 1,
-          type: this.field_selected * 1,
-          label: true,
-          name: this.field_temp_name,
-          holder: this.field_temp_name,
-          form_group_id: this.form_arrow * 1,
-          back_color: '#287BFF',
-          text_color: '#f0f0f0',
-          validation: {
-            required: true,
-            korean_only: false,
-            english_only: false,
-            number_only: false,
-            phone_only: false,
-            email: false,
-            age_limit: false,
-            value_min: {
-              value: 0,
-              option: 'gt'
-            },
-            value_max: {
-              value: 120,
-              option: 'lt'
-            }
-          },
-          opacity: '10',
-          list: [],
-          default: '',
-          image_data: null
-        }
-
         let type_text = ['required', 'korean_only', 'english_only', 'number_only', 'email']
         let type_num = ['required', 'number_only']
         let type_tel = ['required', 'phone_only']
@@ -552,7 +520,7 @@
 
         if (option === 'checked') {
           this.dynamo_obj.updated_date = (Date.now()).toString()
-          // this.$store.state.pageOptions.loading = true
+          this.$store.state.pageOptions.loading = true
 
           this.field_validation()
 
@@ -561,17 +529,12 @@
           axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
             .then(() => {
               this.$store.state.pageOptions.loading = false
-              // if (option == 'checked') {
               alert('랜딩이 생성되었습니다.')
               this.bye()
-              // this.s3_reset()
-              // }
             })
             .catch((error) => {
-              // if (option == 'checked') {
               alert('랜딩 생성이 실패하였습니다.')
               this.$store.state.pageOptions.loading = false
-              // }
               console.log(error)
             })
         } else {
