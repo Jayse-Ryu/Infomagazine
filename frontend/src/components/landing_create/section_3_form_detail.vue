@@ -107,37 +107,43 @@
                   <input type="text" class="form-control" id="f_holder" maxlength="50" v-model="content.holder">
                 </div>
 
-                <label v-if="[1, 2, 3, 4, 6, 7, 9].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3"
+                <label v-if="[1, 2, 3, 6, 7, 9].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3"
                        for="f_validate">
                   <span>유효성 검사</span>
                 </label>
-                <div v-if="[1, 2, 3, 4, 6, 7, 9].includes(content.type * 1)" class="col-sm-9 mt-sm-3 pt-2" id="f_validate">
+                <div v-if="[1, 2, 3, 6, 7, 9].includes(content.type * 1)" class="col-sm-9 mt-sm-3 pt-2" id="f_validate">
                   <label :for="'f_validate_1' + content.sign" class="validate_label">
                     <input type="checkbox" :id="'f_validate_1' + content.sign" v-model="content.validation.required">
                     필수
                   </label>
-                  <label v-if="[1].includes(content.type * 1)" :for="'f_validate_2' + content.sign" class="validate_label">
+                  <label v-if="[1].includes(content.type * 1)" :for="'f_validate_2' + content.sign"
+                         class="validate_label">
                     <input type="checkbox" :id="'f_validate_2' + content.sign" v-model="content.validation.korean_only">
                     한글만
                   </label>
-                  <label v-if="[1].includes(content.type * 1)" :for="'f_validate_3' + content.sign" class="validate_label">
+                  <label v-if="[1].includes(content.type * 1)" :for="'f_validate_3' + content.sign"
+                         class="validate_label">
                     <input type="checkbox" :id="'f_validate_3' + content.sign"
                            v-model="content.validation.english_only">
                     영어만
                   </label>
-                  <label v-if="[1, 2].includes(content.type * 1)" :for="'f_validate_4' + content.sign" class="validate_label">
+                  <label v-if="[1, 2].includes(content.type * 1)" :for="'f_validate_4' + content.sign"
+                         class="validate_label">
                     <input type="checkbox" :id="'f_validate_4' + content.sign" v-model="content.validation.number_only">
                     숫자만
                   </label>
-                  <label v-if="[3].includes(content.type * 1)" :for="'f_validate_5' + content.sign" class="validate_label">
+                  <label v-if="[3].includes(content.type * 1)" :for="'f_validate_5' + content.sign"
+                         class="validate_label">
                     <input type="checkbox" :id="'f_validate_5' + content.sign" v-model="content.validation.phone_only">
                     전화번호만
                   </label>
-                  <label v-if="[1].includes(content.type * 1)" :for="'f_validate_6' + content.sign" class="validate_label">
+                  <label v-if="[1].includes(content.type * 1)" :for="'f_validate_6' + content.sign"
+                         class="validate_label">
                     <input type="checkbox" :id="'f_validate_6' + content.sign" v-model="content.validation.email">
                     이메일
                   </label>
-                  <label v-if="[2, 7].includes(content.type * 1)" :for="'f_validate_7' + content.sign" class="validate_label">
+                  <label v-if="[2, 7].includes(content.type * 1)" :for="'f_validate_7' + content.sign"
+                         class="validate_label">
                     <input type="checkbox" :id="'f_validate_7' + content.sign" v-model="content.validation.age_limit">
                     나이제한
                   </label>
@@ -148,18 +154,19 @@
                          for="limit_option">
                     <span>나이제한 옵션</span>
                   </label>
+
                   <div v-if="content.validation.age_limit" class="col-sm-9 mt-sm-3 float-left" id="limit_option">
                     <input type="number" class="form-control"
-                           v-model.number="content.validation.value_min">
+                           v-model.number="content.validation.value_min.value">
                     <div class="mt-2">
                       <label :for="'limit_option_min_gt' + content.sign" class="validate_label">
                         <input type="radio" :id="'limit_option_min_gt' + content.sign" value="gt"
-                               v-model="content.validation.max_option">
+                               v-model="content.validation.value_min.option">
                         <span>초과</span>
                       </label>
                       <label :for="'limit_option_min_gte' + content.sign" class="validate_label">
                         <input type="radio" :id="'limit_option_min_gte' + content.sign" value="gte"
-                               v-model="content.validation.max_option">
+                               v-model="content.validation.value_min.option">
                         <span>이상</span>
                       </label>
                     </div>
@@ -168,30 +175,21 @@
                   <div v-if="content.validation.age_limit" class="col-sm-3 col-form-label-sm mt-3 float-left"></div>
                   <div v-if="content.validation.age_limit" class="col-sm-9 mt-sm-3 float-left">
                     <input type="number" class="form-control"
-                           v-model.number="content.validation.value_max">
+                           v-model.number="content.validation.value_max.value">
                     <div class="mt-2">
                       <label for="limit_option_min_lt" class="validate_label">
-                        <input type="radio" id="limit_option_min_lt" value="lt" v-model="content.validation.min_option">
+                        <input type="radio" id="limit_option_min_lt" value="lt"
+                               v-model="content.validation.value_max.option">
                         <span>미만</span>
                       </label>
                       <label for="limit_option_min_lte" class="validate_label">
                         <input type="radio" id="limit_option_min_lte" value="lte"
-                               v-model="content.validation.min_option">
+                               v-model="content.validation.value_max.option">
                         <span>이하</span>
                       </label>
                     </div>
                   </div>
                 </div>
-
-                <!--<label v-if="content.type == 8" class="col-sm-3 col-form-label-sm mt-3" for="f_val">전화번호</label>
-                <div v-if="content.type == 8" class="col-sm-9 mt-sm-3">
-                  <input type="text" class="form-control" id="f_val" maxlength="12" v-model="content.value">
-                </div>-->
-
-                <!--<label v-if="content.type == 7" class="col-sm-3 col-form-label-sm mt-3" for="f_link">링크</label>
-                <div v-if="content.type == 7" class="col-sm-9 mt-sm-3">
-                  <input type="text" class="form-control" id="f_link" maxlength="200" v-model="content.url">
-                </div>-->
 
                 <label v-if="content.type == 4 || content.type == 5 || content.type == 6"
                        class="col-sm-3 col-form-label-sm mt-3" for="f_list"><span>리스트</span>
@@ -222,6 +220,43 @@
                   </div>
                 </div>
 
+                <!-- Scroll -->
+                <label v-if="[4].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3">
+                  <span>리스트 기본값</span>
+                </label>
+                <div v-if="[4].includes(content.type * 1)" class="col-sm-9 mt-sm-3">
+                  <select class="form-control" v-model="content.default">
+                    <option value="">기본값 없음</option>
+                    <option v-for="item in content.list" :value="item">{{ item }}</option>
+                  </select>
+                </div>
+
+                <!-- Radio -->
+                <label v-if="[5].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3">
+                  <span>체크 기본값</span>
+                </label>
+                <div v-if="[5].includes(content.type * 1)" class="col-sm-9 mt-sm-3">
+                  <select class="form-control" v-model="content.default">
+                    <option v-for="item in content.list" :value="item">{{ item }}</option>
+                  </select>
+                </div>
+
+                <label v-if="[9].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3">
+                  <span>미리체크 여부</span>
+                </label>
+                <div v-if="[9].includes(content.type * 1)" class="col-sm-9 mt-sm-3">
+                  <label :for="'agree_precheck_true'+content.sign" class="validate_label">
+                    <input type="radio" :id="'agree_precheck_true'+content.sign" value='true'
+                           v-model="content.default">
+                    <span>체크</span>
+                  </label>
+                  <label :for="'agree_precheck_false'+content.sign" class="validate_label">
+                    <input type="radio" :id="'agree_precheck_false'+content.sign" value='false'
+                           v-model="content.default">
+                    <span>해제</span>
+                  </label>
+                </div>
+
                 <label class="col-sm-3 col-form-label-sm mt-3"
                        for="f_back">배경색</label>
                 <div class="col-sm-9 mt-sm-3">
@@ -244,10 +279,6 @@
                        class="col-sm-3 col-form-label-sm mt-3"
                        for="f_img">이미지</label>
                 <div v-if="content.type == 8" class="col-sm-9 mt-sm-3">
-
-                  <!--<div class="error_label" v-if="content.image_data">
-                    등록된 파일 : {{ content.image_data }}
-                  </div>-->
 
                   <input type="file"
                          class="input_one_btn form-control col-md-11 pt-1" id="f_img"
@@ -371,13 +402,18 @@
                   phone_only: false,
                   email: false,
                   age_limit: false,
-                  value_min: 0,
-                  value_max: 120,
-                  min_option: 'lt',
-                  max_option: 'gt'
+                  value_min: {
+                    value: 0,
+                    option: 'gt'
+                  },
+                  value_max: {
+                    value: 120,
+                    option: 'lt'
+                  }
                 },
                 opacity: '10',
                 list: [],
+                default: '',
                 image_data: null
               })
               this.$emit('update:field', this.field_obj)
@@ -404,13 +440,18 @@
                   phone_only: false,
                   email: false,
                   age_limit: false,
-                  value_min: 0,
-                  value_max: 120,
-                  min_option: 'lt',
-                  max_option: 'gt'
+                  value_min: {
+                    value: 0,
+                    option: 'gt'
+                  },
+                  value_max: {
+                    value: 120,
+                    option: 'lt'
+                  }
                 },
                 opacity: '10',
                 list: [],
+                default: '',
                 image_data: null
               })
               this.$emit('update:field', this.field_obj)
