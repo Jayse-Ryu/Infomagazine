@@ -499,7 +499,7 @@
             }
 
             field.validation = replace
-          } else if(field.type == 8) {
+          } else if (field.type == 8) {
             field.validation = {}
           } else if (field.type == 9) {
             // agr
@@ -512,6 +512,12 @@
                 }
               }
             }
+            if (field.default == 'true' || field.default == 'false') {
+              field.default = JSON.parse(field.default)
+            } else {
+              field.default = true
+            }
+
             field.validation = replace
           }
         }
