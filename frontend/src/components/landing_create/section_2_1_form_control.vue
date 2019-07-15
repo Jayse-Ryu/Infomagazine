@@ -24,7 +24,7 @@
       </button>
     </div>
 
-    <label v-if="etc_arrow * 1 > 0" class="col-sm-3 col-form-label-sm mt-3" for="form_group_type">폼 타입</label>
+    <label v-if="etc_arrow * 1 !== -1" class="col-sm-3 col-form-label-sm mt-3" for="form_group_type">폼 타입</label>
     <div v-if="etc_arrow * 1 > 0" class="col-sm-9 mt-sm-3 row ml-0">
       <select class="form-control col-md-12" name="form_group_list" id="form_group_type"
               v-model.number="form_selected.type">
@@ -34,22 +34,22 @@
       </select>
     </div>
 
-    <label v-if="etc_arrow * 1 > 0 && form_selected.type == 1" class="col-sm-3 col-form-label-sm mt-3"
+    <label v-if="etc_arrow * 1 !== -1 && form_selected.type == 1" class="col-sm-3 col-form-label-sm mt-3"
            for="form_group_link">링크 url</label>
     <div v-if="etc_arrow * 1 > 0 && form_selected.type == 1" class="col-sm-9 mt-sm-3 row ml-0">
       <input type="text" class="form-control col-md-12" id="form_group_link" v-model="form_selected.link">
     </div>
 
-    <label v-if="etc_arrow * 1 > 0 && form_selected.type == 2" class="col-sm-3 col-form-label-sm mt-3"
+    <label v-if="etc_arrow * 1 !== -1 && form_selected.type == 2" class="col-sm-3 col-form-label-sm mt-3"
            for="form_group_tel">전화 번호</label>
     <div v-if="etc_arrow * 1 > 0 && form_selected.type == 2" class="col-sm-9 mt-sm-3 row ml-0">
       <input type="tel" class="form-control col-md-12" id="form_group_tel" v-model="form_selected.tel">
     </div>
 
-    <label v-if="etc_arrow * 1 > 0" class="col-sm-3 col-form-label-sm mt-3" for="form_group_bg">
+    <label v-if="etc_arrow * 1 !== -1" class="col-sm-3 col-form-label-sm mt-3" for="form_group_bg">
       폼 배경색
     </label>
-    <div v-if="etc_arrow * 1 > 0" class="col-sm-9 mt-sm-3 row ml-0">
+    <div v-if="etc_arrow * 1 !== -1" class="col-sm-9 mt-sm-3 row ml-0">
       <div class="color_wrap form-control col-sm-2" id="form_group_bg">
         <input type="color" v-model="form_selected.bg_color" class="color_picker">
       </div>
@@ -57,10 +57,10 @@
       <input type="text" v-model="form_selected.bg_color" class="form-control col-sm-5" maxlength="10">
     </div>
 
-    <label v-if="etc_arrow * 1 > 0" class="col-sm-3 col-form-label-sm mt-3" for="opacity_slider">
+    <label v-if="etc_arrow * 1 !== -1" class="col-sm-3 col-form-label-sm mt-3" for="opacity_slider">
       배경 불투명도
     </label>
-    <div v-if="etc_arrow * 1 > 0" class="col-sm-9 mt-sm-3 row ml-0">
+    <div v-if="etc_arrow * 1 !== -1" class="col-sm-9 mt-sm-3 row ml-0">
       <div class="form-control col-sm-2">{{ form_selected.opacity * 10 }}%</div>
       <div class="margin_div"></div>
       <div class="slide_container col-sm-5 form-control border-0 p-0">
@@ -69,10 +69,10 @@
       </div>
     </div>
 
-    <label v-if="etc_arrow * 1 > -1" class="col-sm-3 col-form-label-sm mt-3" for="form_group_col">
+    <label v-if="etc_arrow * 1 !== -1" class="col-sm-3 col-form-label-sm mt-3" for="form_group_col">
       폼 폰트색
     </label>
-    <div v-if="etc_arrow * 1 > -1" class="col-sm-9 mt-sm-3 row ml-0">
+    <div v-if="etc_arrow * 1 !== -1" class="col-sm-9 mt-sm-3 row ml-0">
       <div class="color_wrap form-control col-sm-2" id="form_group_col">
         <input type="color" v-model="form_selected.tx_color" class="color_picker">
       </div>
@@ -80,14 +80,14 @@
       <input type="text" v-model="form_selected.tx_color" class="form-control col-sm-5" maxlength="10">
     </div>
 
-    <label v-if="etc_arrow * 1 > -1" class="col-sm-3 col-form-label-sm mt-3" for="term_img">버튼 이미지 파일</label>
-    <div v-if="etc_arrow * 1 > -1" class="col-sm-9 mt-sm-3 row ml-0">
+    <label v-if="etc_arrow * 1 !== -1" class="col-sm-3 col-form-label-sm mt-3" for="term_img">버튼 이미지 파일</label>
+    <div v-if="etc_arrow * 1 !== -1" class="col-sm-9 mt-sm-3 row ml-0">
       <input type="file" class="input_one_btn form-control col-md-11 pt-1" id="term_img" placeholder="이미지"
              ref="term_file_input" @change="etc_file_add($event.target.files[0])" accept="image/*">
       <button type="button" class="btn btn-danger col-md-1 p-0" @click.prevent="etc_file_delete()">삭제</button>
     </div>
-    <label v-if="etc_arrow * 1 > -1" class="col-sm-3 col-form-label-sm mt-3" for="term_img_preview">미리보기</label>
-    <div v-if="etc_arrow * 1 > -1" class="col-sm-9 mt-sm-3 row ml-0" id="term_img_preview">
+    <label v-if="etc_arrow * 1 !== -1" class="col-sm-3 col-form-label-sm mt-3" for="term_img_preview">미리보기</label>
+    <div v-if="etc_arrow * 1 !== -1" class="col-sm-9 mt-sm-3 row ml-0" id="term_img_preview">
       <div v-if="form_selected.image_data" class="term_preview_wrap">
         <img class="term_preview" :src="key_to_url(form_selected.image_data)" alt="기타 폼 이미지 미리보기">
       </div>
@@ -95,6 +95,9 @@
         <div>등록된 파일이 없습니다</div>
       </div>
     </div>
+
+    <!--<div class="alert-info">{{ etc }}</div>-->
+    <!--<div class="alert-warning">{{ form_selected }}</div>-->
 
   </div>
 
@@ -155,7 +158,7 @@
         }
       },
       form_group_add() {
-        this.form_init()
+        // this.form_init()
         if (this.form_temp) {
           let len = this.form_obj.length
           let flag = true
@@ -206,13 +209,14 @@
             this.$emit('update:etc', this.form_obj)
             alert('폼 그룹이 생성되었습니다.')
             this.push_landing()
+            this.form_init()
           }
         } else {
           alert('폼 그룹 이름을 입력하세요!')
         }
       },
       form_group_delete(id) {
-        this.form_init()
+        // this.form_init()
         if (id !== -1) {
           if (confirm('이 폼그룹을 삭제하시겠습니까?')) {
             this.form_init()
@@ -230,6 +234,7 @@
               tel: '',
               image_data: ''
             }
+            this.form_init()
             // Field objs delete also
             // this.field_work(id)
             // this.push_landing()
@@ -297,6 +302,7 @@
             } else {
               // console.log('S3 method success', data)
               this.form_selected.image_data = params.Key
+              this.$emit('update:etc', this.form_obj)
               this.push_landing()
             }
           })
@@ -336,6 +342,7 @@
                 // alert('Successfully deleted photo.', data)
                 document.getElementById('term_img').value = ''
                 this.form_selected.image_data = null
+                this.$emit('update:etc', this.form_obj)
 
                 this.push_landing()
               }

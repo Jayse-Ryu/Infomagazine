@@ -384,29 +384,29 @@
         // this.dynamo_obj.LandingNum = this.epoch_time.toString()
         // this.dynamo_obj.UpdatedTime = (Date.now()).toString()
         // Empty objects make as Null
-        for (let key in this.dynamo_obj.landing_info.landing) {
-          if (this.dynamo_obj.landing_info.landing.hasOwnProperty(key)) {
-            if (this.dynamo_obj.landing_info.landing[key] === '' && typeof (this.dynamo_obj.landing_info.landing[key]) != 'boolean') {
-              this.dynamo_obj.landing_info.landing[key] = null
-            }
-          }
-        }
-        for (let key in this.dynamo_obj.landing_info.form) {
-          if (this.dynamo_obj.landing_info.form.hasOwnProperty(key)) {
-            if (this.dynamo_obj.landing_info.form[key] === '' && typeof (this.dynamo_obj.landing_info.form[key]) != 'boolean') {
-              this.dynamo_obj.landing_info.form[key] = null
-            }
-          }
-        }
-        for (let key in this.dynamo_obj.landing_info.field) {
-          if (this.dynamo_obj.landing_info.field.hasOwnProperty(key)) {
-            for (let j in this.dynamo_obj.landing_info.field[key]) {
-              if (this.dynamo_obj.landing_info.field[key][j] === '') {
-                this.dynamo_obj.landing_info.field[key][j] = null
-              }
-            }
-          }
-        }
+        // for (let key in this.dynamo_obj.landing_info.landing) {
+        //   if (this.dynamo_obj.landing_info.landing.hasOwnProperty(key)) {
+        //     if (this.dynamo_obj.landing_info.landing[key] === '' && typeof (this.dynamo_obj.landing_info.landing[key]) != 'boolean') {
+        //       this.dynamo_obj.landing_info.landing[key] = null
+        //     }
+        //   }
+        // }
+        // for (let key in this.dynamo_obj.landing_info.form) {
+        //   if (this.dynamo_obj.landing_info.form.hasOwnProperty(key)) {
+        //     if (this.dynamo_obj.landing_info.form[key] === '' && typeof (this.dynamo_obj.landing_info.form[key]) != 'boolean') {
+        //       this.dynamo_obj.landing_info.form[key] = null
+        //     }
+        //   }
+        // }
+        // for (let key in this.dynamo_obj.landing_info.field) {
+        //   if (this.dynamo_obj.landing_info.field.hasOwnProperty(key)) {
+        //     for (let j in this.dynamo_obj.landing_info.field[key]) {
+        //       if (this.dynamo_obj.landing_info.field[key][j] === '') {
+        //         this.dynamo_obj.landing_info.field[key][j] = null
+        //       }
+        //     }
+        //   }
+        // }
         // for (let key in this.dynamo_obj.landing_info.sections) {
         //   if (this.dynamo_obj.landing_info.sections.hasOwnProperty(key)) {
         //     for (let j in this.dynamo_obj.landing_info.sections[key]) {
@@ -416,18 +416,18 @@
         //     }
         //   }
         // }
-        for (let key in this.dynamo_obj.landing_info.term) {
-          if (this.dynamo_obj.landing_info.term.hasOwnProperty(key)) {
-            if (this.dynamo_obj.landing_info.term[key] === '' && typeof (this.dynamo_obj.landing_info.term[key]) != 'boolean') {
-              this.dynamo_obj.landing_info.term[key] = null
-            }
-          }
-        }
+        // for (let key in this.dynamo_obj.landing_info.term) {
+        //   if (this.dynamo_obj.landing_info.term.hasOwnProperty(key)) {
+        //     if (this.dynamo_obj.landing_info.term[key] === '' && typeof (this.dynamo_obj.landing_info.term[key]) != 'boolean') {
+        //       this.dynamo_obj.landing_info.term[key] = null
+        //     }
+        //   }
+        // }
 
         if (option === 'checked') {
           this.dynamo_obj.updated_date = (Date.now()).toString()
           this.$store.state.pageOptions.loading = true
-          console.log('landing create object is? ', this.dynamo_obj)
+          // console.log('landing create object is? ', this.dynamo_obj)
           axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id, this.dynamo_obj, config)
             .then(() => {
               this.$store.state.pageOptions.loading = false
@@ -652,6 +652,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     position: relative;
+    box-sizing: content-box;
     margin: auto;
   }
 
@@ -676,7 +677,8 @@
     max-width: 1000px;
     border: 1px solid #515151;
     margin: auto;
-    background-color: #eaeaea;
+    box-sizing: content-box;
+    background-color: #f7f7f7;
   }
 
   .preview {
@@ -706,43 +708,30 @@
     padding: 8px;
   }
 
-  .form_layout {
-    position: absolute;
+  .select_company_wrap {
+    position: fixed;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-  }
-
-  .form_layout_cont {
-    position: relative;
-    left: 0;
-    width: 100%;
-    padding: 0 15px;
-    /*max-width: 750px;*/
-  }
-
-  /*.form_group_big {
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  .form_group_small {
     top: 0;
-  }*/
-
-  .order_form_label {
-    width: 25%;
+    left: 0;
+    background: rgba(0, 0, 0, 0.3);
+    transition: 200ms visibility ease-in-out;
   }
 
-  .order_form_box {
-    width: 75%;
-    padding: 0 15px;
+  .company_list_box {
+    background: #fff;
+    padding: 25px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
   }
 
   .order_form_button_image {
     width: 100%;
     height: 100%;
-    max-height: 50px;
     object-fit: contain;
   }
 
@@ -782,6 +771,4 @@
     cursor: pointer; /* Cursor on hover */
     border-radius: 5px;
   }
-
-
 </style>

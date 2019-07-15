@@ -2,11 +2,11 @@
 
   <div v-if="window_width > 999" class="form-group row">
 
-    <div class="alert-danger w-100 m-1" v-for="item in order">
+    <!--<div class="alert-danger w-100 m-1" v-for="item in order">
       <div class="alert alert-info m-1" v-for="obj in item">
         {{ obj }}
       </div>
-    </div>
+    </div>-->
 
     <label class="col-sm-3 col-form-label-sm mt-3" for="main_layout">
       <span>랜딩 레이아웃</span>
@@ -54,8 +54,8 @@
                                      :w="item.position.w"
                                      :h="item.position.h"
                                      :z="item.position.z"
-                                     :min-width="100"
-                                     :min-height="100"
+                                     :min-width="20"
+                                     :min-height="20"
                                      :grid=[10,10]
                                      :lock-aspect-ratio="false">
 
@@ -296,7 +296,11 @@
 
                   <!-- Etc form is link button -->
                   <div v-if="form.type == 1" class="etc_layout_cont">
-                    <button type="button" class="btn etc_button"
+                    <button v-if="form.image_data" type="button" class="btn p-0 etc_button"
+                            :style="'z-index:10;'+'min-height: 100%;'">
+                      <img :src="key_to_url(form.image_data)" alt="Etc form image" class="w-100 order_form_button_image">
+                    </button>
+                    <button v-else="form.image_data" type="button" class="btn etc_button"
                             :style="'background: rgba('+hex_to_decimal(form.bg_color)+','+form.opacity*0.1+');' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
                       {{ form.name }}
                     </button>
@@ -304,7 +308,11 @@
 
                   <!-- Etc form is tel button -->
                   <div v-if="form.type == 2" class="etc_layout_cont">
-                    <button type="button" class="btn etc_button"
+                    <button v-if="form.image_data" type="button" class="btn p-0 etc_button"
+                            :style="'z-index:10;'+'min-height: 100%;'">
+                      <img :src="key_to_url(form.image_data)" alt="Etc form image" class="w-100 order_form_button_image">
+                    </button>
+                    <button v-else type="button" class="btn etc_button"
                             :style="'background: rgba('+hex_to_decimal(form.bg_color)+','+form.opacity*0.1+');' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
                       {{ form.name }}
                     </button>
@@ -508,7 +516,7 @@
         this.order_obj = this.order
       },
       call_set() {
-        console.log('call set - (set field, obj init)')
+        // console.log('call set - (set field, obj init)')
         this.set_field('form')
         this.object_init()
       },

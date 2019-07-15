@@ -359,32 +359,32 @@
           }
         }
         // Empty objects make as Null
-        for (let key in this.dynamo_obj.landing_info.landing) {
-          if (this.dynamo_obj.landing_info.landing.hasOwnProperty(key)) {
-            if (this.dynamo_obj.landing_info.landing[key] === '' && typeof (this.dynamo_obj.landing_info.landing[key]) != 'boolean') {
-              this.dynamo_obj.landing_info.landing[key] = null
-            }
-            // if (key === 'name') {
-            //   console.log('key is name~')
-            // }
-          }
-        }
-        for (let key in this.dynamo_obj.landing_info.form) {
-          if (this.dynamo_obj.landing_info.form.hasOwnProperty(key)) {
-            if (this.dynamo_obj.landing_info.form[key] === '' && typeof (this.dynamo_obj.landing_info.form[key]) != 'boolean') {
-              this.dynamo_obj.landing_info.form[key] = null
-            }
-          }
-        }
-        for (let key in this.dynamo_obj.landing_info.field) {
-          if (this.dynamo_obj.landing_info.field.hasOwnProperty(key)) {
-            for (let j in this.dynamo_obj.landing_info.field[key]) {
-              if (this.dynamo_obj.landing_info.field[key][j] === '') {
-                this.dynamo_obj.landing_info.field[key][j] = null
-              }
-            }
-          }
-        }
+        // for (let key in this.dynamo_obj.landing_info.landing) {
+        //   if (this.dynamo_obj.landing_info.landing.hasOwnProperty(key)) {
+        //     if (this.dynamo_obj.landing_info.landing[key] === '' && typeof (this.dynamo_obj.landing_info.landing[key]) != 'boolean') {
+        //       this.dynamo_obj.landing_info.landing[key] = null
+        //     }
+        //     // if (key === 'name') {
+        //     //   console.log('key is name~')
+        //     // }
+        //   }
+        // }
+        // for (let key in this.dynamo_obj.landing_info.form) {
+        //   if (this.dynamo_obj.landing_info.form.hasOwnProperty(key)) {
+        //     if (this.dynamo_obj.landing_info.form[key] === '' && typeof (this.dynamo_obj.landing_info.form[key]) != 'boolean') {
+        //       this.dynamo_obj.landing_info.form[key] = null
+        //     }
+        //   }
+        // }
+        // for (let key in this.dynamo_obj.landing_info.field) {
+        //   if (this.dynamo_obj.landing_info.field.hasOwnProperty(key)) {
+        //     for (let j in this.dynamo_obj.landing_info.field[key]) {
+        //       if (this.dynamo_obj.landing_info.field[key][j] === '') {
+        //         this.dynamo_obj.landing_info.field[key][j] = null
+        //       }
+        //     }
+        //   }
+        // }
         // for (let key in this.dynamo_obj.landing_info.sections) {
         //   if (this.dynamo_obj.landing_info.sections.hasOwnProperty(key)) {
         //     for (let j in this.dynamo_obj.landing_info.sections[key]) {
@@ -394,13 +394,13 @@
         //     }
         //   }
         // }
-        for (let key in this.dynamo_obj.landing_info.term) {
-          if (this.dynamo_obj.landing_info.term.hasOwnProperty(key)) {
-            if (this.dynamo_obj.landing_info.term[key] === '' && typeof (this.dynamo_obj.landing_info.term[key]) != 'boolean') {
-              this.dynamo_obj.landing_info.term[key] = null
-            }
-          }
-        }
+        // for (let key in this.dynamo_obj.landing_info.term) {
+        //   if (this.dynamo_obj.landing_info.term.hasOwnProperty(key)) {
+        //     if (this.dynamo_obj.landing_info.term[key] === '' && typeof (this.dynamo_obj.landing_info.term[key]) != 'boolean') {
+        //       this.dynamo_obj.landing_info.term[key] = null
+        //     }
+        //   }
+        // }
 
         if (option === 'checked') {
           this.dynamo_obj.updated_date = (Date.now()).toString()
@@ -426,11 +426,12 @@
           if (!this.error_label.name && !this.error_label.base_url) {
             // console.log('Landing pushed! ')
             axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
-              .then((response) => {
-                console.log('landing updated', response)
+              .then(() => {
+                // console.log('landing updated', response)
+                // console.log('landing updated')
               })
               .catch((error) => {
-                console.log(error)
+                console.log('Landing update fail', error)
               })
           }
         }

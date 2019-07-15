@@ -101,20 +101,6 @@
 
       <hr>
 
-      <!--<vue-excel
-        class="btn btn-success"
-        :header="db_keys"
-        :data="db_vals">
-        엑셀 저장
-      </vue-excel>-->
-
-      <!--<vue-xlsx
-        class="btn btn-success"
-        :title="db_keys"
-        :data="db_vals">
-        Xlsx
-      </vue-xlsx>-->
-
       <section class="section section_box">
         <h5>DB 필터</h5>
         <div class="row">
@@ -142,9 +128,7 @@
             <button type="button" class="btn btn-info w-100" @click="date_clear()">초기화</button>
           </div>
           <div class="col-md-2">
-            <vue-excel type="button" class="btn btn-success w-100"
-                       :title="db_keys"
-                       :data="db_vals">
+            <vue-excel type="button" class="btn btn-success w-100" :data="db_vals">
               엑셀저장
             </vue-excel>
           </div>
@@ -202,6 +186,9 @@
         </div>
 
       </section>
+
+      <!--      <div class="alert-warning">{{ db_keys }}</div>-->
+      <!--<div class="alert-success">{{ db_vals }}</div>-->
 
     </div>
     <!-- /Container -->
@@ -284,15 +271,17 @@
             console.log(response)
             this.landing_obj = response.data.data
             // Call get resources after data loaded
-            this.get_resources()
+            this.get_resources_key()
           })
           .catch((error) => {
             console.log(error)
           })
       },
-      get_resources() {
+      get_resources_key() {
         this.db_keys = []
-        this.db_vals = []
+        // this.db_vals = []
+
+        // Get only obje keys for pretty list
         for (let index in this.db_list) {
           // Extract db object by index
           if (this.db_list.hasOwnProperty(index)) {
@@ -306,23 +295,33 @@
                 }
               }
             }
+            // Push url and date fields to backward
             this.db_keys.splice(this.db_keys.indexOf('url'), 1)
             this.db_keys.push('url')
             this.db_keys.splice(this.db_keys.indexOf('created_date'), 1)
             this.db_keys.push('created_date')
           }
         }
-        // Set values by key length
+        // /get key
+
+        this.get_resources_val()
+      },
+      get_resources_val() {
+        let val_obj = []
+        this.db_vals = []
+
+        // Set values by keys
         for (let index in this.db_list) {
           if (this.db_list.hasOwnProperty(index)) {
             // value set by all of keys
-            let val_obj = []
             let month_array = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
             let date_obj = ''
+            val_obj.push({})
             // Inspect by key name
             for (let i = 0; i < this.db_keys.length; i++) {
               // If this object has this key
               if (this.db_list[index].hasOwnProperty(this.db_keys[i])) {
+
                 // If key is created date
                 if (this.db_keys[i] == 'created_date') {
                   date_obj = ''
@@ -335,33 +334,47 @@
                   }
                   // Make date string
                   let date_str = date_obj.getFullYear() + '-' + month_array[date_obj.getMonth()] + '-' + date_obj.getDate()
-                  val_obj.push(date_str)
+
+                  val_obj[index][this.db_keys[i]] = date_str
+                  //Date val done
                 } else {
-                  val_obj.push(this.db_list[index][this.db_keys[i]])
+                  val_obj[index][this.db_keys[i]] = this.db_list[index][this.db_keys[i]]
                 }
+
               } else {
-                val_obj.push(' ')
+                // If db[index] dont have this key[i]
+                val_obj[index][this.db_keys[i]] = (' ')
               }
-            }
-            // If calendat works, Time comparison and push data or not
-            if (this.start_time != '' && this.finish_time != '') {
-              let from_t = new Date(this.start_time).setHours(0, 0, 0, 0)
-              let to_t = new Date(this.finish_time).setHours(0, 0, 0, 0)
-              let value_t = new Date(date_obj).setHours(0, 0, 0, 0)
-              if (from_t <= value_t && value_t <= to_t) {
-                this.db_vals.push(val_obj)
-              }
-            } else {
-              // It calendar is empty, push all data
-              this.db_vals.push(val_obj)
             }
           }
         }
+
+        // If calendar works, Time comparison and push data or not
+        if (this.start_time != '' && this.finish_time != '') {
+          let length = val_obj.length
+          while (length--) {
+            for (let i in val_obj) {
+              let from_t = new Date(this.start_time).setHours(0, 0, 0, 0)
+              let to_t = new Date(this.finish_time).setHours(0, 0, 0, 0)
+              let value_t = new Date(val_obj[i]['created_date']).setHours(0, 0, 0, 0)
+
+              if (!(from_t <= value_t && value_t <= to_t)) {
+                val_obj.splice(i, 1)
+              }
+
+            }
+          }
+
+        }
+        // Date filter
+
+        this.db_vals = (val_obj)
+        // set val
       },
       date_clear() {
         this.start_time = ''
         this.finish_time = ''
-        this.get_resources()
+        this.get_resources_key()
       },
       short_cut(option) {
         if (option == 'recent3') {
@@ -369,25 +382,25 @@
           let to = new Date().setHours(0, 0, 0, 0)
           this.start_time = new Date(from)
           this.finish_time = new Date(to)
-          this.get_resources()
+          this.get_resources_key()
         } else if (option == 'recent2') {
           let from = new Date(new Date().setDate(new Date().getDate() - 2)).setHours(0, 0, 0, 0)
           let to = new Date().setHours(0, 0, 0, 0)
           this.start_time = new Date(from)
           this.finish_time = new Date(to)
-          this.get_resources()
+          this.get_resources_key()
         } else if (option == 'yesterday') {
           let from = new Date(new Date().setDate(new Date().getDate() - 1)).setHours(0, 0, 0, 0)
           let to = new Date(new Date().setDate(new Date().getDate() - 1)).setHours(0, 0, 0, 0)
           this.start_time = new Date(from)
           this.finish_time = new Date(to)
-          this.get_resources()
+          this.get_resources_key()
         } else if (option == 'today') {
           let from = new Date().setHours(0, 0, 0, 0)
           let to = new Date().setHours(0, 0, 0, 0)
           this.start_time = new Date(from)
           this.finish_time = new Date(to)
-          this.get_resources()
+          this.get_resources_key()
         }
       }
     },
@@ -398,7 +411,7 @@
           to: this.finish_time
         }
         if (range.from != '' && range.to != '') {
-          this.get_resources()
+          this.get_resources_key()
         }
         return range
       },
@@ -415,6 +428,7 @@
         return range
       },
       db_width() {
+        // Set field width by field counts
         let percent = 100 / this.db_keys.length
         return 'width:' + percent + '%; word-break: break-all;'
       }
