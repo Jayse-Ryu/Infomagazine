@@ -91,7 +91,9 @@
               </div>
               <div v-else class="col-2 p-0 board_centre">없음</div>
 
-              <div v-if="content.created_date" class="col-2 p-0 board_centre">{{ (content.created_date).substring(0, 10) }}</div>
+              <div v-if="content.created_date" class="col-2 p-0 board_centre">{{ (content.created_date).substring(0, 10)
+                }}
+              </div>
               <div v-else class="col-2 p-0 board_centre">정보 없음</div>
             </li>
 
@@ -145,7 +147,7 @@
     <paginate class="pagination"
               v-model="page_current"
               :page-count="page_max"
-              :page-range="5"
+              :page-range="10"
               :margin-pages="1"
               :click-handler="pagination"
               :prev-text="'<'"
@@ -226,6 +228,7 @@
         // Calling landings with new values
         // let auth_filter = ''
         let search_param = ''
+        let pagination = ''
 
         // (For Pagination check)
         // axios.get(this.$store.state.endpoints.baseUrl + 'landing/' + '?offset=' + offset + '&' + this.search_option + '=' + this.search_text)
@@ -245,8 +248,16 @@
         //   }
         // }
 
+        if (offset) {
+          pagination = '?offset=' + offset
+        }
+        // Set search option
         if (this.search_option == 1) {
-          search_param = '&name=' + this.search_text
+          if (pagination) {
+            search_param = '&name=' + this.search_text
+          } else {
+            search_param = '?name=' + this.search_text
+          }
         }
 
         // if (this.user_obj.is_staff || this.user_obj.is_superuser) {
@@ -261,10 +272,17 @@
         // }
 
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'users/' + search_param)
+        axios.get(this.$store.state.endpoints.baseUrl + 'users/' + pagination + search_param)
           .then((response) => {
             this.$store.state.pageOptions.loading = false
             this.content_obj = response.data.data.results
+            // Calculation for page_max
+            if (response.data.data.count % this.page_chunk === 0) {
+              console.log(response.data.data.count)
+              this.page_max = Math.floor(response.data.data.count / this.page_chunk)
+            } else {
+              this.page_max = Math.floor(response.data.data.count / this.page_chunk) + 1
+            }
           })
           .catch((error) => {
             this.$store.state.pageOptions.loading = false

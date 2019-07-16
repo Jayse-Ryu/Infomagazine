@@ -169,6 +169,7 @@
         company_id: -1,
         created_date: '',
         updated_date: '',
+        views: 0,
         landing_info: {
           landing: {
             manager: -1,
@@ -198,8 +199,7 @@
           form: [],
           field: [],
           etc: [],
-          sections: [],
-          views: 0
+          sections: []
         }
       }
     }),

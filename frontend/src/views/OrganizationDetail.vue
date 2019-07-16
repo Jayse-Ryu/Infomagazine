@@ -144,37 +144,43 @@
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
                 v-for="content in user_list">
               <div class="col-4">
-                <router-link :to="'/users/detail/' + content.id">{{ content.email }}</router-link>
+                <router-link :to="'/users/detail/' + content.id" style="word-break: break-all;">{{ content.email }}
+                </router-link>
               </div>
               <div class="col-3">
                 <router-link :to="'/users/detail/' + content.id">{{ content.username }}</router-link>
               </div>
               <div class="col-3">{{ content.info.phone_num }}</div>
               <div class="col-2">
-                <div v-if="content.info.access_role == 0">
+                <div v-if="content.info.access_role == 0 && user_obj.id != content.id">
                   <button type="button" class="btn btn-primary p-0">
                     <div class="promote_btn">조직관리자</div>
                   </button>
                 </div>
-                <div v-else-if="content.is_staff || content.is_superuser">
+                <!--<div v-else-if="content.is_staff || content.is_superuser">
                   <button type="button" class="btn btn-outline-primary p-0 disabled"
                           @click.prevent="promote('he', content.id)">
                     <div class="promote_btn">운영자</div>
                   </button>
+                </div>-->
+                <div v-else-if="content.info.access_role == 1 && user_obj.id != content.id">
+                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('de', content.id)">
+                    <div class="promote_btn">마케터</div>
+                  </button>
                 </div>
-                <div v-else-if="content.info.access_role == 1">
-                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.id)">
-                    <div class="promote_btn">강등</div>
+                <div v-else-if="content.info.access_role == 2 && user_obj.id != content.id">
+                  <button type="button" class="btn btn-secondary p-0" @click.prevent="promote('pr', content.id)">
+                    <div class="promote_btn">고객</div>
+                  </button>
+                </div>
+                <div v-else-if="content.info.access_role == 3 && user_obj.id != content.id">
+                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('pr', content.id)">
+                    <div class="promote_btn">미승인 마케터</div>
                   </button>
                 </div>
                 <div v-else-if="user_obj.id == content.id">
                   <button type="button" class="btn btn-info p-0">
                     <div class="promote_btn">본인</div>
-                  </button>
-                </div>
-                <div v-if="content.info.access_obj == 3">
-                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.id)">
-                    <div class="promote_btn">승인</div>
                   </button>
                 </div>
               </div>
@@ -199,35 +205,40 @@
             </li>
             <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
                 v-for="content in user_list">
-              <div class="col-4">{{ content.email }}</div>
+              <div class="col-4" style="word-break: break-all;">{{ content.email }}</div>
               <div class="col-4">
                 <router-link :to="'/users/detail/' + content.user">{{ content.username }}</router-link>
               </div>
               <div class="col-4">
-                <div v-if="content.info.access_role == 0">
+                <div v-if="content.info.access_role == 0 && user_obj.id != content.id">
                   <button type="button" class="btn btn-primary p-0" @click.prevent="promote('he', content.user)">
                     <div class="promote_btn">조직관리자</div>
                   </button>
                 </div>
-                <div v-else-if="content.is_staff || content.is_superuser">
+                <!--<div v-else-if="content.is_staff || content.is_superuser">
                   <button type="button" class="btn btn-outline-primary p-0 disabled"
                           @click.prevent="promote('he', content.id)">
                     <div class="promote_btn">운영자</div>
                   </button>
+                </div>-->
+                <div v-else-if="content.info.access_role == 1 && user_obj.id != content.id">
+                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('de', content.id)">
+                    <div class="promote_btn">마케터</div>
+                  </button>
                 </div>
-                <div v-else-if="content.info.access_role == 1">
-                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.id)">
-                    <div class="promote_btn">강등</div>
+                <div v-else-if="content.info.access_role == 2 && user_obj.id != content.id">
+                  <button type="button" class="btn btn-secondary p-0" @click.prevent="promote('de', content.id)">
+                    <div class="promote_btn">고객</div>
+                  </button>
+                </div>
+                <div v-else-if="content.info.access_role == 3 && user_obj.id != content.id">
+                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('pr', content.id)">
+                    <div class="promote_btn">미승인 마케터</div>
                   </button>
                 </div>
                 <div v-else-if="user_obj.id == content.id">
                   <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.id)">
                     <div class="promote_btn">본인</div>
-                  </button>
-                </div>
-                <div v-if="content.info.access_role == 3">
-                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.id)">
-                    <div class="promote_btn">승인</div>
                   </button>
                 </div>
               </div>
@@ -521,10 +532,34 @@
 
       this.page_id = this.$route.params.organization_id * 1
 
-      this.refresh_organization()
+      this.page_init()
+
+      this.calling_all_unit()
 
     },
     methods: {
+      page_init() {
+        let option = this.$store.state.pageOptions
+
+        // Init other pages options
+        option.landing.page = 1
+        option.landing.option = 0
+        option.landing.text = ''
+        option.user.page = 1
+        option.user.option = 0
+        option.user.text = ''
+        option.organization.page = 1
+        option.organization.option = 0
+        option.organization.text = ''
+
+        // Check Vuex store for this page values
+        this.page_current = option.company.page
+
+        // Follow inited search options
+        let offset = (this.$store.state.pageOptions.company.page - 1) * this.page_chunk
+        this.temp_option = this.search_option
+
+      },
       // Real-Time custom validation
       error_check(param) {
         if (param === 'phone') {
@@ -572,29 +607,7 @@
           }
         }
       },
-      refresh_organization() {
-        // this.page_id = this.$route.params.organization_id * 1
-
-        // let this_url = 'organization/'
-        //
-        // // Get Organization by page_id
-        // axios.get(this.$store.state.endpoints.baseUrl + this_url + this.page_id)
-        //   .then((response) => {
-        //     this.content_obj = response.data
-        //     this.original_manager = response.data.manager
-        //     // Get access users by organization id
-        //     return axios.get(this.$store.state.endpoints.baseUrl + 'user_access/' + '?organization=' + response.data.id)
-        //   })
-        //   .then((response) => {
-        //     // Filtering allowed managers
-        //     this.marketer = []
-        //     for (let i = 0; i < response.data.results.length; i++) {
-        //       if (response.data.results[i].access === 1) {
-        //         this.marketer.push(response.data.results[i])
-        //       }
-        //     }
-        //   })
-
+      refresh_organization(offset) {
         // Filtered page by user object
         if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
           if (![0, 1].includes(this.user_obj.access_role) && this.user_obj.organization != this.page_id) {
@@ -624,11 +637,17 @@
           })
           .then((response) => {
             // Filtering allowed managers
-            for (let i = 0; i < response.data.results.length; i++) {
-              if (response.data.results[i].info.organization == this.page_id) {
-                this.marketer.push(response.data.results[i])
-                if (response.data.results[i].info.access_role == 0) {
-                  this.original_manager = response.data.results[i].id
+            for (let i = 0; i < response.data.data.results.length; i++) {
+              if (response.data.data.results[i].info.organization == this.page_id) {
+                if (response.data.data.results[i].username == '') {
+                  response.data.data.results[i].username = response.data.data.results[i].email
+                  this.marketer.push(response.data.data.results[i])
+                } else {
+                  this.marketer.push(response.data.data.results[i])
+                }
+
+                if (response.data.data.results[i].info.access_role == 0) {
+                  this.original_manager = response.data.data.results[i].id
                   this.changeable_manager = this.original_manager
                 }
               }
@@ -698,20 +717,62 @@
         let offset = (pageNum - 1) * this.page_chunk
         this.calling_all_unit(offset)
       },
-      calling_all_unit(page) {
+      calling_all_unit(offset) {
+        let pagination = ''
+
+        if (offset) {
+          pagination = '&offset=' + offset
+        }
+
         let org_id = this.$route.params.organization_id * 1
-        let offset = page
-        axios.get(this.$store.state.endpoints.baseUrl + 'organizations/' + '?offset=' + offset + '&' + 'organization' + '=' + org_id)
-          .then((response) => {
-            // Calculation for page_max
-            if (response.data.count % this.page_chunk === 0) {
-              this.page_max = Math.floor(response.data.count / this.page_chunk)
-            } else {
-              this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
-            }
-            // Get all of users in this organization whatever allowed or not
-            this.user_list = response.data.results
+
+
+        // Filtered page by user object
+        if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
+          if (![0, 1].includes(this.user_obj.access_role) && this.user_obj.organization != this.page_id) {
+            this.$router.currentRoute.meta.protect_leave = 'no'
+            this.$router.push({
+              name: 'organization_list'
+            })
+          }
+        }
+
+        // if page int is default, push to list page
+        if (this.page_id === 0) {
+          this.$router.push({
+            name: 'organization_list'
           })
+        }
+
+        // Get Company by page_id
+        this.$store.state.pageOptions.loading = true
+        axios.get(this.$store.state.endpoints.baseUrl + 'organizations/' + this.page_id)
+          .then((response) => {
+            // console.log('company response is? ', response)
+            this.content_obj = response.data.data
+            return axios.get(this.$store.state.endpoints.baseUrl + 'users/?organization=' + this.page_id + pagination)
+          })
+          .catch((error) => {
+            console.log('Mount Get company error', error)
+            this.$store.state.pageOptions.loading = false
+          })
+
+          .then((response) => {
+            console.log('user get response ', response)
+            this.user_list = response.data.data.results
+            this.$store.state.pageOptions.loading = false
+            if (response.data.data.count % this.page_chunk === 0) {
+              console.log(response.data.data.count)
+              this.page_max = Math.floor(response.data.data.count / this.page_chunk)
+            } else {
+              this.page_max = Math.floor(response.data.data.count / this.page_chunk) + 1
+            }
+          })
+          .catch((error) => {
+            console.log('Mount Get user list error', error)
+            this.$store.state.pageOptions.loading = false
+          })
+
       },
       manager_change() {
         if (confirm('조직 관리자를 변경하시겠습니까?')) {

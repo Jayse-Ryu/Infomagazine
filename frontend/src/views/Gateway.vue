@@ -87,14 +87,18 @@
         } else {
           this.user_org = this.org_selected
           let form = {
+            email: this.user_obj.email,
             info: {
               organization: this.org_selected
             }
           }
 
+          console.log(this.user_obj)
+
+
           // // Update actual user
           // axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + '?organization=' + this.org_selected)
-          axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.org_selected + '?organization')
+          axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id + '/', form)
             .then((response) => {
               console.log('updated?', response.data)
             })
