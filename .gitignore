@@ -6,6 +6,8 @@
 out
 gen
 .env
+*-lock.json
+*.lock
 
 docker/dev/sharing
 
