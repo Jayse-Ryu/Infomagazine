@@ -51,7 +51,7 @@ export default new Vuex.Store({
       // localStorage.setItem('token', newToken)
       // state.jwt = newToken
       try {
-        Vue.cookie.set('token', newToken, {expires: '10m'})
+        Vue.cookie.set('token', newToken, {expires: '50m'})
       } catch (error) {
         console.log('Set token cookie error', error)
       }
@@ -69,7 +69,7 @@ export default new Vuex.Store({
     obtainToken(self, data) {
       const decoded = Decoder(data.token)
 
-      console.log('obtain decoded token', decoded)
+      // console.log('obtain decoded token', decoded)
 
       const user = {
         id: decoded.user_id,
@@ -119,7 +119,7 @@ export default new Vuex.Store({
         // Token is existed
         let decoded = Decoder(token)
         let exp = decoded.exp
-        let three_min = 3*60
+        let three_min = 3 * 60
 
         if ((Date.now() / 1000) > exp) {
           // If token is expired

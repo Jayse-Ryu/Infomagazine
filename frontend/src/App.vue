@@ -794,11 +794,13 @@
     border-radius: 5px;
     margin: 1px 3px;
     border: 1px solid #ee5151;
+    word-break: break-word;
     box-sizing: border-box;
   }
 
   /* Tooltip */
   .question {
+    margin-left: 5px;
     vertical-align: text-top !important;
   }
 

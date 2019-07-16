@@ -529,7 +529,7 @@
       error_check(param) {
         if (param === 'phone') {
           // Phone validate
-          console.log('param is phone')
+          // console.log('param is phone')
           if (this.content_obj.org_tel_num !== '') {
             // Allow mobile phone, internet wireless
             let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
@@ -614,9 +614,9 @@
 
         // Get Organization by page_id
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'organizations/' + this.page_id)
+        axios.get(this.$store.state.endpoints.baseUrl + 'organizations/' + this.page_id + '/')
           .then((response) => {
-            console.log('organization response is ', response)
+            // console.log('organization response is ', response)
             this.content_obj = response.data.data
             // Get access users by organization id
             return axios.get(this.$store.state.endpoints.baseUrl + 'users/?organization=' + this.page_id)
@@ -680,7 +680,7 @@
       },
       patch_organization() {
         // // Create an organization myself
-        axios.patch(this.$store.state.endpoints.baseUrl + 'organizations/' + this.page_id, this.content_obj)
+        axios.patch(this.$store.state.endpoints.baseUrl + 'organizations/' + this.page_id + '/', this.content_obj)
           .then((response) => {
             alert('수정되었습니다.')
             // this.original_manager = this.content_obj.manager
@@ -715,7 +715,7 @@
       },
       manager_change() {
         if (confirm('조직 관리자를 변경하시겠습니까?')) {
-          console.log(this.original_manager, '로 변경합니다?')
+          // console.log(this.original_manager, '로 변경합니다?')
           let deactive = {
             info: {
               access_role: 1
@@ -727,9 +727,9 @@
             }
           }
 
-          axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.original_manager, deactive)
+          axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.original_manager + '/', deactive)
             .then(() => {
-              return axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.changeable_manager, activate)
+              return axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.changeable_manager + '/', activate)
             })
             .catch((error) => {
               console.log('Something is wrong on change manager cycle', error)

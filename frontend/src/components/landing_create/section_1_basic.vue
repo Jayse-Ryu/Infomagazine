@@ -5,9 +5,10 @@
       <span>고객업체*</span>
     </label>
 
-    <div class="col-sm-9 mt-sm-3" id="company_name">
+    <div class="col-sm-9 mt-sm-3">
 
-      <select class="form-control" name="company_name" v-model="dynamo_obj.LandingInfo.landing.company">
+      <select class="form-control" name="company_name" id="company_name" :value="company"
+              @change="$emit('update:company', $event.target.value * 1)">
         <option value="-1">업체를 선택하세요</option>
         <option v-for="content in landing_company" :value="content.id">
           {{ content.corp_name }} - {{ content.corp_sub_name }}
@@ -20,8 +21,8 @@
       <span>랜딩페이지 이름*</span>
     </label>
     <div class="col-sm-9 mt-sm-3">
-      <input type="text" :class="duplicated_name_class" id="landing" maxlength="50"
-             v-model="dynamo_obj.LandingInfo.landing.name" @change="check_name">
+      <input type="text" :class="error_label.class.name" id="landing" maxlength="50"
+             :value="name" @change="check_duplication('name')" @keyup="$emit('update:name', $event.target.value)">
     </div>
 
     <label class="col-sm-3 col-form-label-sm mt-3" for="base_url">
@@ -42,8 +43,9 @@
                   }">?</span>
     </label>
     <div class="col-sm-9 mt-sm-3">
-      <input type="text" :class="duplicated_url_class" id="base_url" maxlength="30"
-             v-model="dynamo_obj.LandingInfo.landing.base_url" @change="check_url">
+      <input type="text" :class="error_label.class.base_url" id="base_url" maxlength="30"
+             :value="base_url" @change="check_duplication('url')"
+             @keyup="$emit('update:base_url', $event.target.value)">
     </div>
 
   </div>
@@ -51,19 +53,94 @@
 
 <script>
   export default {
-    name: "section_1_required",
-    data: () => ({}),
+    name: "section_1_basic",
+    props: [
+      'window_width',
+      'company',
+      'name',
+      'base_url',
+      'error_name',
+      'error_base_url',
+      'push_landing'
+    ],
+    data: () => ({
+
+      // Mounted company list
+      landing_company: [],
+      // Tooltip message
+      msg: {
+        base_url: '기본 주소를 지정합니다.'
+      },
+      // Validation visualizer
+      error_label: {
+        class: {
+          name: 'form-control',
+          base_url: 'form-control'
+        }
+      }
+    }),
     mounted() {
+      // Get companies for select
       axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
         .then((response) => {
-          console.log('companies well loaded ? ', response)
-
+          this.landing_company = response.data.data.results
         })
         .catch((error) => {
-          console.log(error)
+          console.log('get companies error', error)
         })
     },
-    methods: {}
+    methods: {
+      // Check exist duplication name, main_url
+      check_duplication(option, value) {
+        if (option === 'name') {
+          if (this.name == '') {
+            this.error_label.class.name = 'form-control'
+            this.$emit('update:error_name', true)
+          } else {
+            axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/')
+              .then((response) => {
+                for (let i = 0; i < response.data.data.length; i++) {
+                  if (response.data.data[i].landing_info.landing.name !== null) {
+                    if ((this.name).toLowerCase() == (response.data.data[i].landing_info.landing.name).toLowerCase()) {
+                      this.error_label.class.name = 'form-control alert-danger'
+                      this.$emit('update:error_name', true)
+                      return false
+                    }
+                  }
+                }
+                this.error_label.class.name = 'form-control alert-success'
+                this.$emit('update:error_name', false)
+                this.push_landing()
+              })
+          }
+        } else if (option === 'url') {
+          if (this.base_url == '') {
+            this.error_label.class.base_url = 'form-control'
+            this.$emit('update:error_base_url', true)
+          } else {
+            axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/')
+              .then((response) => {
+                // // DISABLE UNTIL LANDING LIST SHOWING BASE URL
+                // for (let i = 0; i < response.data.data.length; i++) {
+                //   if (response.data.data[i].landing_info.landing.base_url !== null || response.data.data[i].landing_info.landing.base_url !== '') {
+                //     if ((this.base_url).toLowerCase() == (response.data.data[i].landing_info.landing.base_url).toLowerCase()) {
+                //       this.error_label.class.base_url = 'form-control alert-danger'
+                //       this.$emit('update:error_base_url', true)
+                //       return false
+                //     }
+                //   }
+                // }
+                this.error_label.class.base_url = 'form-control alert-success'
+                this.$emit('update:error_base_url', false)
+                this.push_landing()
+              })
+          }
+        } else if (option === 'company') {
+          this.$emit('update:company', $event.target.value)
+        }
+      },
+    },
+    computed: {}
   }
 </script>
 

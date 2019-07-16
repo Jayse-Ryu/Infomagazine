@@ -287,6 +287,33 @@
 
 <style scoped lang="scss">
 
+  @keyframes Gradient {
+    0% {
+      background-position: 75% 100%
+    }
+    14% {
+      background-position: 20% 50%
+    }
+    28% {
+      background-position: 100% 20%
+    }
+    42% {
+      background-position: 50% 10%
+    }
+    56% {
+      background-position: 90% 50%
+    }
+    70% {
+      background-position: 65% 80%
+    }
+    86% {
+      background-position: 90% 10%
+    }
+    100% {
+      background-position: 75% 100%
+    }
+  }
+
   .main {
     position: fixed;
     width: 100%;
@@ -296,8 +323,14 @@
     top: 0;
     z-index: -1;
     background: linear-gradient(217deg, rgba(2, 0, 36, .8), rgba(255, 0, 0, 0) 70.71%),
-    linear-gradient(127deg, rgba(141, 168, 185, .8), rgba(0, 255, 0, 0) 70.71%),
+    linear-gradient(127deg, rgba(185, 169, 141, .8), rgba(0, 255, 0, 0) 70.71%),
     linear-gradient(336deg, rgba(0, 212, 255, .8), rgba(0, 0, 255, 0) 70.71%);
+    background-size: 180% 180%;
+    animation: Gradient 18s ease-in-out infinite;
+  }
+
+  .login_box {
+
   }
 
   .login_border {
