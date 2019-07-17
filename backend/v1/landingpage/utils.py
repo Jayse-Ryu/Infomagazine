@@ -661,4 +661,4 @@ class LandingPages:
         base_html.head.append(stylesheets)
         scripts = BeautifulSoup(self._scripts_generate(), 'html.parser')
         base_html.body.append(scripts)
-        return str(base_html)
+        return base_html.prettify()

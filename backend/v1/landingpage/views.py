@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action, renderer_classes
 from rest_framework.renderers import StaticHTMLRenderer
 from rest_framework.response import Response
@@ -82,9 +82,9 @@ class LandingPageViewSets(viewsets.ViewSet):
             result = ({}, {'status': status.HTTP_503_SERVICE_UNAVAILABLE})
         return Response(result[0], **result[1])
 
-    @action(detail=True, renderer_classes=[StaticHTMLRenderer])
+    @action(detail=True, renderer_classes=[StaticHTMLRenderer], permission_classes=[permissions.AllowAny])
     def preview(self, request, pk):
-        landing_info ={}
+        landing_info = {}
         # TODO request landing_info로 바꿔야 함
         with open('test.json') as data_file:
             landing_info = json.load(data_file)
