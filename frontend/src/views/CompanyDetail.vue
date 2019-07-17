@@ -159,28 +159,28 @@
               <div class="col-2">{{ content.info.phone_num }}</div>
               <div class="col-2 col-sm-3">
                 <div v-if="content.info.access_role == 0 && content.id != user_obj.id">
-                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('he', content.id)">
+                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('head', content.id)">
                     <div class="promote_btn">관리자</div>
                   </button>
                 </div>
                 <div v-else-if="content.info.access_role == 1 && content.id != user_obj.id">
-                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.user)">
-                    <div class="promote_btn">마케터 강등</div>
+                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('1', content.id)">
+                    <div class="promote_btn">마케터</div>
                   </button>
                 </div>
                 <div v-else-if="content.info.access_role == 2 && content.id != user_obj.id">
-                  <button type="button" class="btn btn-secondary p-0" @click.prevent="promote('de', content.user)">
+                  <button type="button" class="btn btn-secondary p-0" @click.prevent="promote('2', content.id)">
                     <div class="promote_btn">고객</div>
                   </button>
                 </div>
                 <div v-else-if="content.id == user_obj.id">
-                  <button type="button" class="btn btn-info p-0">
+                  <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.id)">
                     <div class="promote_btn">본인</div>
                   </button>
                 </div>
                 <div v-else-if="content.info.access_role == 3">
-                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.user)">
-                    <div class="promote_btn">마케터 승인</div>
+                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('3', content.id)">
+                    <div class="promote_btn">미승인 마케터</div>
                   </button>
                 </div>
               </div>
@@ -212,19 +212,19 @@
               </div>
               <div class="col-4">
                 <div v-if="content.info.access_role == 0">
-                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('he', content.id)">
+                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('head', content.id)">
                     <div class="promote_btn">관리자</div>
                   </button>
                 </div>
                 <div
                   v-else-if="content.info.access_role == 1 && content.id != user_obj.id">
-                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('de', content.id)">
+                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('1', content.id)">
                     <div class="promote_btn">마케터 강등</div>
                   </button>
                 </div>
                 <div
                   v-else-if="content.info.access_role == 2 && content.id != user_obj.id">
-                  <button type="button" class="btn btn-secondary p-0" @click.prevent="promote('de', content.id)">
+                  <button type="button" class="btn btn-secondary p-0" @click.prevent="promote('2', content.id)">
                     <div class="promote_btn">고객</div>
                   </button>
                 </div>
@@ -234,7 +234,7 @@
                   </button>
                 </div>
                 <div v-if="content.info.access_role == 3">
-                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('pr', content.id)">
+                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('3', content.id)">
                     <div class="promote_btn">마케터 승인</div>
                   </button>
                 </div>
@@ -488,7 +488,6 @@
       },
       calling_all_unit(page) {
         // Calling landings with new values
-        // let axios = this.$axios
         let offset = page
         let pagination = ''
 
@@ -525,61 +524,54 @@
             this.$store.state.pageOptions.loading = false
           })
 
-
-        // axios.get(this.$store.state.endpoints.baseUrl + 'user/' + '?offset=' + offset + '&' + 'company' + '=' + this.$route.params.company_id * 1)
-        //   .then((response) => {
-        //     // Calculation for page_max
-        //     if (response.data.count % this.page_chunk === 0) {
-        //       this.page_max = Math.floor(response.data.count / this.page_chunk)
-        //     } else {
-        //       this.page_max = Math.floor(response.data.count / this.page_chunk) + 1
-        //     }
-        //     // Get all of users in this organization whatever allowed or not
-        //     this.user_list = response.data.results
-        //   })
-        //   .catch((error) => {
-        //     console.log('calling all unit function', error)
-        //   })
       },
       promote(option, user) {
-        // head:he me:me demote:de promote:pr
-        let axios = this.$axios
-        if (option == 'he') {
-        } else if (option == 'me') {
-        } else if (option == 'pr') {
-          if (confirm('가입을 승인하시겠습니까?')) {
-            let formData = new FormData()
-            formData.append('access', '2')
-            axios.patch(this.$store.state.endpoints.baseUrl + 'user/' + user + '/', formData)
-              .then((response) => {
-                alert('유저의 가입이 승인되었습니다.')
-                this.calling_all_unit()
-                this.refresh_organization()
+        // OPTION VALUE
+        // head:he
+        // me:me
+        // 1:marketer
+        // 2:client
+        // 3:unauthorized marketer
+
+        if (this.user_obj.is_staff || this.user_obj.is_superuser) {
+          if (option == '1') {
+            if (confirm('해당 마케터를 강등 시키시겠습니까?')) {
+              let formData = {
+                info: {
+                  access_role: 3
+                }
+              }
+              user_update(formData)
+            }
+          } else if (option == '2') {
+            if (confirm('고객 정보를 열람하시겠습니까?')) {
+              this.$router.currentRoute.meta.protect_leave = 'no'
+              this.$router.push({
+                path: 'users/' + user + '/',
               })
-              .catch((error) => {
-                console.log(error)
-                alert('처리중 문제가 발생하였습니다.')
-              })
-          } else {
-            alert('승인 취소됨.')
+            }
+          } else if (option == '3') {
+            if (confirm('해당 마케터의 가입을 승인하시겠습니까?')) {
+              let formData = {
+                info: {
+                  access_role: 1
+                }
+              }
+              user_update(formData)
+            }
           }
-        } else if (option == 'de') {
-          if (confirm('유저를 강등시킵니까?')) {
-            let formData = new FormData()
-            formData.append('access', '-2')
-            axios.patch(this.$store.state.endpoints.baseUrl + this_url + user + '/', formData)
-              .then((response) => {
-                alert('유저가 강등되었습니다.')
-                this.calling_all_unit()
-                this.refresh_organization()
-              })
-              .catch((error) => {
-                console.log(error)
-                alert('처리중 문제가 발생하였습니다.')
-              })
-          } else {
-            alert('강등 취소됨.')
-          }
+        } else {
+          console.log('this user is not admin')
+        }
+
+        let user_update = (formData) => {
+          axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + user + '/', formData)
+            .then((response) => {
+              console.log('let user update response', response)
+            })
+            .catch((error) => {
+              console.log('user update error ', error)
+            })
         }
       }
     },
