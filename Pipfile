@@ -18,12 +18,11 @@ pymongo = "*"
 django-enumfield = "*"
 django-rest-swagger = "*"
 djangorestframework-simplejwt = "*"
-djangorestframework-jwt = "*"
 django-filter = "*"
-djangorestframework = "*"
 dnspython = "*"
 beautifulsoup4 = "*"
 mysqlclient = "*"
+djangorestframework = "==3.9.4"
 
 [requires]
 python_version = "3.7"
