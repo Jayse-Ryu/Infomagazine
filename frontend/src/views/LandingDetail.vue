@@ -221,6 +221,7 @@
           // console.log('response check ', JSON.stringify(response))
           this.dynamo_obj = response.data.data
           this.epoch_time = response.data.data.landing_info.landing.base_url
+          this.validation_back()
         })
         .catch((error) => {
           console.log(error)
@@ -243,6 +244,57 @@
       // }
     },
     methods: {
+      validation_back() {
+        let field = this.dynamo_obj.landing_info.field
+        // Preparing validation list
+        let vali = [
+          'required',
+          'korean_only',
+          'english_only',
+          'number_only',
+          'phone_only',
+          'email',
+          'age_limit',
+          'value_min',
+          'value_max'
+        ]
+
+        // Get one field object
+        for (let i in field) {
+          // Inspect by validation list
+          for (let key in vali) {
+            // Inspect object by a key
+            if (field[i].validation.hasOwnProperty(vali[key])) {
+              // If not value obj, push key true
+              if (vali[key] != 'value_min' && vali[key] != 'value_max') {
+                field[i].validation[vali[key]] = true
+              } else {
+                field[i].validation[vali[key]] = field[i].validation[vali[key]]
+              }
+            } else {
+              // Distinguish object default value by keys
+              let form = {}
+              if (vali[key] == 'value_min') {
+                form = {
+                  value: 0,
+                  option: 'gt'
+                }
+                field[i].validation[vali[key]] = form
+              } else if (vali[key] == 'value_max') {
+                form = {
+                  value: 120,
+                  option: 'lt'
+                }
+                field[i].validation[vali[key]] = form
+              } else {
+                field[i].validation[vali[key]] = false
+              }
+            }
+          }
+          // console.log(field[i].name, field[i].validation)
+          // this.dynamo_obj = this.dynamo_obj
+        }
+      },
       set_field_position(option) {
         if (option == 'form') {
           // Section list short name
@@ -468,6 +520,7 @@
               }
             }
 
+            // Flag true == age_limit is true
             if (flag) {
               for (let k = 0; k < type.length; k++) {
                 if (field.validation.hasOwnProperty(type[k])) {
@@ -483,8 +536,10 @@
             } else {
               for (let k = 0; k < type.length; k++) {
                 if (field.validation.hasOwnProperty(type[k])) {
-                  if (field.validation[type[k]]) {
-                    replace[type[k]] = {}
+                  if (type[k] != 'value_min' && type[k] != 'value_max') {
+                    if (field.validation[type[k]]) {
+                      replace[type[k]] = {}
+                    }
                   }
                 }
               }

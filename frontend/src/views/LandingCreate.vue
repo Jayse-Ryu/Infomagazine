@@ -444,6 +444,7 @@
               }
             }
 
+            // Flag true == age_limit is true
             if (flag) {
               for (let k = 0; k < type.length; k++) {
                 if (field.validation.hasOwnProperty(type[k])) {
@@ -459,8 +460,10 @@
             } else {
               for (let k = 0; k < type.length; k++) {
                 if (field.validation.hasOwnProperty(type[k])) {
-                  if (field.validation[type[k]]) {
-                    replace[type[k]] = {}
+                  if (type[k] != 'value_min' && type[k] != 'value_max') {
+                    if (field.validation[type[k]]) {
+                      replace[type[k]] = {}
+                    }
                   }
                 }
               }
@@ -524,7 +527,7 @@
 
           this.field_validation()
 
-          console.log('landing create object is? ', this.dynamo_obj)
+          // console.log('landing create object is? ', this.dynamo_obj)
 
           axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
             .then(() => {

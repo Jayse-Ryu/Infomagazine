@@ -144,6 +144,20 @@
 <script>
   export default {
     name: 'app-header',
+    data: () => ({
+      contribute: [
+        {
+          sign: 'senior_back_Aug.2019',
+          name: 'Soo-kyeom Kim',
+          git: 'https://github.com/sookyeomKim'
+        },
+        {
+          sign: 'junior_front_Aug.2019',
+          name: 'Dong-geun Jayse Ryu',
+          git: 'https://github.com/Jayse-Ryu'
+        }
+      ]
+    }),
     methods: {
       logout() {
         if (confirm('로그아웃 하시겠습니까?')) {
@@ -175,6 +189,19 @@
           document.getElementById('nav_king').setAttribute('style', 'display: block;')
         }
       })
+      let dev = this.contribute
+      for (let key in dev) {
+        if (document.getElementById(dev[key].name)) {
+          break
+        } else {
+          let val = 'dev / ' + dev[key].name + ' - ' + dev[key].git
+          let dev_script = document.createElement('input')
+          dev_script.setAttribute('type', 'hidden')
+          dev_script.setAttribute('id', dev[key].sign)
+          dev_script.setAttribute('value', val)
+          document.body.appendChild(dev_script)
+        }
+      }
     },
     computed: {
       header_name() {

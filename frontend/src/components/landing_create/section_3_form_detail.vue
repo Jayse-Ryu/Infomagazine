@@ -107,6 +107,8 @@
                   <input type="text" class="form-control" id="f_holder" maxlength="50" v-model="content.holder">
                 </div>
 
+                <div class="alert-success">{{ content.validation }}</div>
+
                 <label v-if="[1, 2, 3, 6, 7, 9].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3"
                        for="f_validate">
                   <span>유효성 검사</span>
@@ -142,14 +144,14 @@
                     <input type="checkbox" :id="'f_validate_6' + content.sign" v-model="content.validation.email">
                     이메일
                   </label>
-                  <label v-if="[2, 7].includes(content.type * 1)" :for="'f_validate_7' + content.sign"
+                  <label v-if="[7].includes(content.type * 1)" :for="'f_validate_7' + content.sign"
                          class="validate_label">
                     <input type="checkbox" :id="'f_validate_7' + content.sign" v-model="content.validation.age_limit">
                     나이제한
                   </label>
                 </div>
 
-                <div v-if="[2, 7].includes(content.type * 1)" class="w-100">
+                <div v-if="[7].includes(content.type * 1)" class="w-100">
                   <label v-if="content.validation.age_limit" class="col-sm-3 col-form-label-sm mt-3 float-left"
                          for="limit_option">
                     <span>나이제한 옵션</span>
