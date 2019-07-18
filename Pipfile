@@ -22,7 +22,7 @@ django-filter = "*"
 dnspython = "*"
 beautifulsoup4 = "*"
 mysqlclient = "*"
-djangorestframework = "==3.9.4"
+djangorestframework = "*"
 
 [requires]
 python_version = "3.7"
