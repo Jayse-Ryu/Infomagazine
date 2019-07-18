@@ -179,6 +179,21 @@
       search_option: 0,
       search_text: '',
     }),
+    mounted() {
+      // Window width calculator
+      let that = this
+      that.$nextTick(function () {
+        window.addEventListener('resize', function (e) {
+          that.window_width = window.innerWidth
+        })
+      })
+
+      // Init other pages options
+      this.page_init()
+
+      // Get organization list
+      this.pagination(this.page_current)
+    },
     methods: {
       page_init() {
         let option = this.$store.state.pageOptions
@@ -289,21 +304,6 @@
             console.log('Get landing crashed', error)
           })
       }
-    },
-    mounted() {
-      // Window width calculator
-      let that = this
-      that.$nextTick(function () {
-        window.addEventListener('resize', function (e) {
-          that.window_width = window.innerWidth
-        })
-      })
-
-      // Init other pages options
-      this.page_init()
-
-      // Get organization list
-      this.calling_all_unit()
     },
     destroyed() {
       // Save values in the store

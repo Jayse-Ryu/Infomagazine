@@ -128,7 +128,7 @@
       this.$store.state.pageOptions.loading = true
       axios.get(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id)
         .then((response) => {
-          console.log('mounted response is ', response)
+          // console.log('mounted response is ', response)
           this.content_obj = response.data.data
           this.$store.state.pageOptions.loading = false
         })

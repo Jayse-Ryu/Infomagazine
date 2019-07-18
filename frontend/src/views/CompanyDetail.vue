@@ -129,6 +129,13 @@
 
         </div>
 
+        <div class="w-100">
+          <router-link to="/users/create/">
+            <button type="button" class="btn btn-info w-100 mb-2">고객 생성</button>
+          </router-link>
+
+        </div>
+
         <!-- Section 2. If width is big -->
         <div v-if="window_width > 1000" class="list_area">
           <div>
@@ -164,7 +171,7 @@
                   </button>
                 </div>
                 <div v-else-if="content.info.access_role == 1 && content.id != user_obj.id">
-                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('1', content.id)">
+                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('1', content.id)">
                     <div class="promote_btn">마케터</div>
                   </button>
                 </div>
@@ -173,14 +180,14 @@
                     <div class="promote_btn">고객</div>
                   </button>
                 </div>
+                <div v-else-if="content.info.access_role == 3 && content.id != user_obj.id">
+                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('3', content.id)">
+                    <div class="promote_btn">미승인 마케터</div>
+                  </button>
+                </div>
                 <div v-else-if="content.id == user_obj.id">
                   <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.id)">
                     <div class="promote_btn">본인</div>
-                  </button>
-                </div>
-                <div v-else-if="content.info.access_role == 3">
-                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('3', content.id)">
-                    <div class="promote_btn">미승인 마케터</div>
                   </button>
                 </div>
               </div>
@@ -211,15 +218,15 @@
                 <router-link :to="'/users/detail/' + content.id">{{ content.username }}</router-link>
               </div>
               <div class="col-4">
-                <div v-if="content.info.access_role == 0">
+                <div v-if="content.info.access_role == 0 && content.id != user_obj.id">
                   <button type="button" class="btn btn-primary p-0" @click.prevent="promote('head', content.id)">
                     <div class="promote_btn">관리자</div>
                   </button>
                 </div>
                 <div
                   v-else-if="content.info.access_role == 1 && content.id != user_obj.id">
-                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('1', content.id)">
-                    <div class="promote_btn">마케터 강등</div>
+                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('1', content.id)">
+                    <div class="promote_btn">마케터</div>
                   </button>
                 </div>
                 <div
@@ -228,14 +235,14 @@
                     <div class="promote_btn">고객</div>
                   </button>
                 </div>
+                <div v-else-if="content.info.access_role == 3 && content.id != user_obj.id">
+                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('3', content.id)">
+                    <div class="promote_btn">미승인 마케터</div>
+                  </button>
+                </div>
                 <div v-else-if="content.id == user_obj.id">
                   <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.id)">
                     <div class="promote_btn">본인</div>
-                  </button>
-                </div>
-                <div v-if="content.info.access_role == 3">
-                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('3', content.id)">
-                    <div class="promote_btn">마케터 승인</div>
                   </button>
                 </div>
               </div>
@@ -395,88 +402,38 @@
           }
         }
       },
-      refresh_organization() {
-        this.page_id = this.$route.params.company_id * 1
-
-        // if page int is default, push to list page
-        if (this.page_id === 0) {
-          this.$router.push({
-            name: 'company_list'
-          })
-        }
-        // get object
-
-        // Get Company by page_id
-        axios.get(this.$store.state.endpoints.baseUrl + 'companies/' + this.page_id)
-          .then((response) => {
-            this.content_obj = response.data
-            this.original_manager = response.data.manager
-            // Get access manager users by organization id
-            return axios.get(this.$store.state.endpoints.baseUrl + 'user_access/' + '?organization=' + response.data.organization)
-          })
-          .then((response) => {
-            // Filtering allowed managers
-            this.marketer = []
-            for (let i = 0; i < response.data.results.length; i++) {
-              if (response.data.results[i].access === 1) {
-                this.marketer.push(response.data.results[i])
-              }
-            }
-          })
-          .catch((error) => {
-            console.log('refresh function', error)
-          })
-      },
       check_organization() {
         // Validate for make an organization
         this.$validator.validateAll()
         // or
         if (confirm('수정하시겠습니까?')) {
-          if (this.content_obj.manager !== this.original_manager) {
-            if (confirm('관리자를 교체하시겠습니까?')) {
-              this.patch_organization()
-            } else {
-              alert('수정이 취소되었습니다.')
-            }
-          } else {
-            this.patch_organization()
-          }
+          // if (this.content_obj.manager !== this.original_manager) {
+          //   if (confirm('관리자를 교체하시겠습니까?')) {
+          //     this.patch_organization()
+          //   } else {
+          //     alert('수정이 취소되었습니다.')
+          //   }
+          // } else {
+          //   this.patch_organization()
+          // }
+          this.patch_organization()
         }
       },
       patch_organization() {
         // Create an organization myself
-        let axios = this.$axios
         let this_url = 'companies/'
-        let formData = new FormData()
-        formData.append('name', this.content_obj.name)
-        formData.append('manager', this.content_obj.manager)
-        if (this.content_obj.sub_name) {
-          formData.append('sub_name', this.content_obj.sub_name)
-        }
-        if (this.content_obj.header) {
-          formData.append('header', this.content_obj.header)
-        }
-        if (this.content_obj.address) {
-          formData.append('address', this.content_obj.address)
-        }
-        if (this.content_obj.corp_num) {
-          formData.append('corp_num', this.content_obj.corp_num)
-        }
-        if (this.content_obj.phone) {
-          formData.append('phone', this.content_obj.phone)
-        }
-        if (this.content_obj.email) {
-          formData.append('email', this.content_obj.email)
-        }
-        axios.patch(this.$store.state.endpoints.baseUrl + this_url + this.page_id + '/', formData)
+
+        this.$store.state.pageOptions.loading = true
+        axios.patch(this.$store.state.endpoints.baseUrl + this_url + this.page_id + '/', this.content_obj)
           .then((response) => {
+            // console.log(response)
             alert('수정되었습니다.')
-            this.original_manager = this.content_obj.manager
-            this.$store.dispatch('getAuthUser')
-            this.refresh_organization()
+            // this.original_manager = this.content_obj.manager
+            this.pagination('1')
           })
           .catch((error) => {
-            console.log(error)
+            console.log('company patch error', error)
+            this.$store.state.pageOptions.loading = false
           })
       },
       pagination(pageNum) {
@@ -509,7 +466,7 @@
           })
 
           .then((response) => {
-            console.log('user get response ', response)
+            // console.log('user get response ', response)
             this.user_list = response.data.data.results
             this.$store.state.pageOptions.loading = false
             if (response.data.data.count % this.page_chunk === 0) {
@@ -541,13 +498,13 @@
                   access_role: 3
                 }
               }
-              user_update(formData)
+              this.user_update(user, formData)
             }
           } else if (option == '2') {
             if (confirm('고객 정보를 열람하시겠습니까?')) {
               this.$router.currentRoute.meta.protect_leave = 'no'
               this.$router.push({
-                path: 'users/' + user + '/',
+                name: 'user_detail', params: {user_id: user}
               })
             }
           } else if (option == '3') {
@@ -557,22 +514,23 @@
                   access_role: 1
                 }
               }
-              user_update(formData)
+              this.user_update(user, formData)
             }
           }
         } else {
-          console.log('this user is not admin')
+          // console.log('this user is not admin')
         }
 
-        let user_update = (formData) => {
-          axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + user + '/', formData)
-            .then((response) => {
-              console.log('let user update response', response)
-            })
-            .catch((error) => {
-              console.log('user update error ', error)
-            })
-        }
+      },
+      user_update(user, formData) {
+        axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + user + '/', formData)
+          .then((response) => {
+            // console.log('let user update response', response)
+            this.pagination(this.page_current)
+          })
+          .catch((error) => {
+            console.log('user update error ', error)
+          })
       }
     },
     computed: {
