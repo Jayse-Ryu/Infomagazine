@@ -163,6 +163,7 @@
       etc_arrow: -1,
       auto_flag: false,
       company_flag: false,
+      temp_obj: {},
       dynamo_obj: {
         company_id: -1,
         created_date: '',
@@ -210,31 +211,8 @@
           that.window_width = window.innerWidth
         })
       })
-      // Get company, manager
-      // Get landing obj from Landing Num
-      this.page_id = this.$route.params.landing_id
-      this.$store.state.pageOptions.loading = true
-      axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id)
-        .then((response) => {
-          this.$store.state.pageOptions.loading = false
-          // console.log('response check ', response)
-          // console.log('response check ', JSON.stringify(response))
-          this.dynamo_obj = response.data.data
-          this.epoch_time = response.data.data.landing_info.landing.base_url
-          this.validation_back()
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$store.state.pageOptions.loading = false
-        })
-      // Get companies from logged in user's organization
-      axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
-        .then((response) => {
-          this.landing_company = response.data.results
-        })
-        .catch((error) => {
-          console.log(error)
-        })
+
+      this.get_objects()
 
       // If not manager, push to db contents
 
@@ -244,8 +222,39 @@
       // }
     },
     methods: {
+      get_objects() {
+        // Get company, manager
+        // Get landing obj from Landing Num
+        this.page_id = this.$route.params.landing_id
+        this.$store.state.pageOptions.loading = true
+        axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id)
+          .then((response) => {
+            this.$store.state.pageOptions.loading = false
+            // console.log('response check ', response)
+            // console.log('response check ', JSON.stringify(response))
+            // this.dynamo_obj = response.data.data
+            this.temp_obj = response.data.data
+            this.epoch_time = response.data.data.landing_info.landing.base_url
+            this.validation_back()
+            // this.dynamo_obj = this.temp_obj
+          })
+          .catch((error) => {
+            console.log(error)
+            this.$store.state.pageOptions.loading = false
+          })
+        // Get companies from logged in user's organization
+        axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
+          .then((response) => {
+            this.landing_company = response.data.results
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+
+      },
       validation_back() {
-        let field = this.dynamo_obj.landing_info.field
+        let field = this.temp_obj.landing_info.field
+        // console.log('temp field', field)
         // Preparing validation list
         let vali = [
           'required',
@@ -291,9 +300,9 @@
               }
             }
           }
-          // console.log(field[i].name, field[i].validation)
-          // this.dynamo_obj = this.dynamo_obj
         }
+        let temp = JSON.stringify(this.temp_obj)
+        this.dynamo_obj = JSON.parse(temp)
       },
       set_field_position(option) {
         if (option == 'form') {

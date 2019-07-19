@@ -1,6 +1,6 @@
 <template>
 
-  <div class="form-group row mb-0" v-if="form_arrow != -1">
+  <div class="form-group row mb-0" v-if="arrow != -1">
     <label class="col-sm-3 col-form-label-sm mt-3" for="db_field">DB 필드</label>
     <form class="col-sm-9 mt-sm-3 row ml-0" v-on:submit.prevent="field_add">
       <select class="form-control col-sm-5 col-md-5" name="company" id="db_field" v-model.number="field_selected">
@@ -31,7 +31,7 @@
           <div class="col-6 p-2 text-center">옵션</div>
         </li>
         <li class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
-            v-for="content in field" v-if="content.form_group_id == form_arrow">
+            v-for="content in field_obj" v-if="content.form_group_id == arrow">
           <div class="col-3 p-2 text-center" v-if="content.type == 1">텍스트 입력</div>
           <div class="col-3 p-2 text-center" v-if="content.type == 2">숫자 입력</div>
           <div class="col-3 p-2 text-center" v-if="content.type == 3">전화번호 입력</div>
@@ -107,7 +107,13 @@
                   <input type="text" class="form-control" id="f_holder" maxlength="50" v-model="content.holder">
                 </div>
 
+                <!---->
+                <!---->
+                <!---->
                 <div class="alert-success">{{ content.validation }}</div>
+                <!---->
+                <!---->
+                <!---->
 
                 <label v-if="[1, 2, 3, 6, 7, 9].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3"
                        for="f_validate">
@@ -179,13 +185,13 @@
                     <input type="number" class="form-control"
                            v-model.number="content.validation.value_max.value">
                     <div class="mt-2">
-                      <label for="limit_option_min_lt" class="validate_label">
-                        <input type="radio" id="limit_option_min_lt" value="lt"
+                      <label :for="'limit_option_min_lt' + content.sign" class="validate_label">
+                        <input type="radio" :id="'limit_option_min_lt' + content.sign" value="lt"
                                v-model="content.validation.value_max.option">
                         <span>미만</span>
                       </label>
-                      <label for="limit_option_min_lte" class="validate_label">
-                        <input type="radio" id="limit_option_min_lte" value="lte"
+                      <label :for="'limit_option_min_lte' + content.sign" class="validate_label">
+                        <input type="radio" :id="'limit_option_min_lte' + content.sign" value="lte"
                                v-model="content.validation.value_max.option">
                         <span>이하</span>
                       </label>
@@ -344,13 +350,69 @@
       field_temp_name: ''
     }),
     mounted() {
-      this.field_obj = this.field
+      this.init_component()
+      // this.validation_back()
     },
     methods: {
       init_component() {
         // Set component object as parent's object
         this.field_obj = []
         this.field_obj = this.field
+      },
+      validation_back() {
+        let field = this.field_obj
+        // console.log(field.length)
+        // Preparing validation list
+        let vali = [
+          'required',
+          'korean_only',
+          'english_only',
+          'number_only',
+          'phone_only',
+          'email',
+          'age_limit',
+          'value_min',
+          'value_max'
+        ]
+
+        // Get one field object
+        for (let i in field) {
+          // Inspect by validation list
+          for (let key in vali) {
+            // Inspect object by a key
+            if (field[i].validation.hasOwnProperty(vali[key])) {
+              // If not value obj, push key true
+              console.log(field[i].validation)
+              if (vali[key] != 'value_min' && vali[key] != 'value_max') {
+                field[i].validation[vali[key]] = true
+              } else {
+                field[i].validation[vali[key]] = field[i].validation[vali[key]]
+              }
+            } else {
+              // Distinguish object default value by keys
+              let form = {}
+              if (vali[key] == 'value_min') {
+                form = {
+                  value: 0,
+                  option: 'gt'
+                }
+                field[i].validation[vali[key]] = form
+              } else if (vali[key] == 'value_max') {
+                form = {
+                  value: 120,
+                  option: 'lt'
+                }
+                field[i].validation[vali[key]] = form
+              } else {
+                field[i].validation[vali[key]] = false
+              }
+            }
+          }
+          // this.dynamo_obj = this.temp_obj
+          // console.log('console field ', field[i])
+          this.$emit('update:field', this.field_obj)
+          this.filter_change()
+        }
       },
       filter_change() {
         this.filtered_fields = []
@@ -646,6 +708,13 @@
           return ''
         }
 
+      }
+    },
+    computed: {
+      arrow () {
+        let arrow = this.form_arrow
+        this.init_component()
+        return arrow
       }
     }
   }
