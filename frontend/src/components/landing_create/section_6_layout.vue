@@ -339,31 +339,31 @@
                   <label for="field_x" class="col-sm-3 col-form-label-sm mt-3">X 좌표</label>
                   <div class="col-sm-9 mt-sm-3">
                     <input type="number" id="field_x" v-model.number="item.position.x" class="form-control"
-                           step="10" @change="push_landing()">
+                           step="10" @keyup="push_landing()">
                   </div>
 
                   <label for="field_y" class="col-sm-3 col-form-label-sm mt-3">Y 좌표</label>
                   <div class="col-sm-9 mt-sm-3">
                     <input type="number" id="field_y" v-model.number="item.position.y" class="form-control"
-                           step="10" @change="push_landing()">
+                           step="10" @keyup="push_landing()">
                   </div>
 
                   <label for="field_w" class="col-sm-3 col-form-label-sm mt-3">필드 너비</label>
                   <div class="col-sm-9 mt-sm-3">
                     <input type="number" id="field_w" v-model.number="item.position.w" class="form-control"
-                           step="10" @change="push_landing()">
+                           step="10" @keyup="push_landing()">
                   </div>
 
                   <label for="field_h" class="col-sm-3 col-form-label-sm mt-3">필드 높이</label>
                   <div class="col-sm-9 mt-sm-3">
                     <input type="number" id="field_h" v-model.number="item.position.h" class="form-control"
-                           step="10" @change="push_landing()">
+                           step="10" @keyup="push_landing()">
                   </div>
 
                   <label for="field_z" class="col-sm-3 col-form-label-sm mt-3">필드 깊이</label>
                   <div class="col-sm-9 mt-sm-3">
                     <input type="number" id="field_z" v-model.number="item.position.z" class="form-control"
-                     @change="push_landing()">
+                     @keyup="push_landing()">
                   </div>
                 </div>
 
@@ -437,31 +437,31 @@
                 <label for="console_x" class="col-sm-3 col-form-label-sm mt-3">X 좌표</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_x" v-model.number="info.position.x" class="form-control"
-                         step="10" @change="push_landing()">
+                         step="10" @keyup="push_landing()">
                 </div>
 
                 <label for="console_y" class="col-sm-3 col-form-label-sm mt-3">Y 좌표</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_y" v-model.number="info.position.y" class="form-control"
-                         step="10" @change="push_landing()">
+                         step="10" @keyup="push_landing()">
                 </div>
 
                 <label for="console_w" class="col-sm-3 col-form-label-sm mt-3">너비</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_w" v-model.number="info.position.w" class="form-control"
-                         step="10" @change="push_landing()">
+                         step="10" @keyup="push_landing()">
                 </div>
 
                 <label for="console_h" class="col-sm-3 col-form-label-sm mt-3">높이</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_h" v-model.number="info.position.h" class="form-control"
-                         step="10" @change="push_landing()">
+                         step="10" @keyup="push_landing()">
                 </div>
 
                 <label for="console_z" class="col-sm-3 col-form-label-sm mt-3">우선순위</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_z" v-model.number="info.position.z" class="form-control"
-                   @change="push_landing()">
+                   @keyup="push_landing()">
                 </div>
               </div>
             </div>

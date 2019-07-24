@@ -160,6 +160,7 @@
         name: true,
         base_url: true,
       },
+      page_id: '',
       epoch_time: 0,
       form_arrow: -1,
       etc_arrow: -1,
@@ -494,7 +495,6 @@
         }
       },
       push_landing(option) {
-        console.log('create push landing', option)
         // option first(mounted) or checked(button clicked)
         // let axios = this.$axios
         const config = {
@@ -523,20 +523,32 @@
               this.$store.state.pageOptions.loading = false
               console.log(error)
             })
-        } else {
-          if (!this.error_label.name && !this.error_label.base_url) {
-            // console.log('Landing pushed! ')
-
-            axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
-              .then(() => {
-                // console.log('landing updated', response)
-                // console.log('landing updated')
-              })
-              .catch((error) => {
-                console.log('Landing update fail', error)
-              })
-          }
         }
+        // else {
+        //   if (!this.page_id) {
+        //     axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+        //       .then((response) => {
+        //         console.log('lan create response', response)
+        //         // this.page_id
+        //       })
+        //       .catch((error) => {
+        //         console.log('Landing update fail', error)
+        //       })
+        //   } else {
+        //     axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
+        //       'company_id': this.dynamo_obj.company_id,
+        //       'landing_pages': this.dynamo_obj.landing_info
+        //     }, config)
+        //       .then(() => {
+        //         // console.log('landing updated', response)
+        //         // console.log('landing updated')
+        //       })
+        //       .catch((error) => {
+        //         console.log('Landing update fail', error)
+        //       })
+        //   }
+        //
+        // }
 
       },
       bye() {

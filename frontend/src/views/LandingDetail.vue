@@ -492,7 +492,7 @@
               }
             }
             field.validation = replace
-            console.log('scr new obj', replace)
+            // console.log('scr new obj', replace)
           } else if (field.type == 5) {
             field.validation = {}
             if (field.default == '') {
@@ -577,7 +577,7 @@
         }
       },
       push_landing(option) {
-        console.log('detail push landing')
+        // console.log('detail push landing')
         // option first(mounted) or checked(button clicked)
         const config = {
           headers: {
@@ -592,7 +592,10 @@
           this.field_validation()
 
           // console.log('landing create object is? ', this.dynamo_obj)
-          axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', this.dynamo_obj, config)
+          axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
+            'company_id': this.dynamo_obj.company_id,
+            'landing_info': this.dynamo_obj.landing_info
+          }, config)
             .then(() => {
               this.$store.state.pageOptions.loading = false
               if (confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
@@ -607,16 +610,19 @@
         } else {
           // console.log('detail is not support auto save')
           // if (!this.error_label.name && !this.error_label.base_url) {
-            // console.log('Landing pushed! ')
+          // console.log('Landing pushed! ')
 
-            axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', this.dynamo_obj, config)
-              .then(() => {
-                console.log('landing updated is done')
-                this.get_objects()
-              })
-              .catch((error) => {
-                console.log('Landing update fail', error)
-              })
+          axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
+            'company_id': this.dynamo_obj.company_id,
+            'landing_info': this.dynamo_obj.landing_info
+          }, config)
+            .then(() => {
+              // console.log('landing updated is done')
+              // this.get_objects()
+            })
+            .catch((error) => {
+              console.log('Landing update fail', error)
+            })
           // }
         }
 
@@ -654,9 +660,13 @@
       back_to_list() {
         let landing_num = this.page_id
         if (confirm('랜딩을 되돌리고 목록으로 돌아갈까요?')) {
-          axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num + '/', this.back_up)
+          axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num + '/',
+            {
+              'company_id': this.company_id,
+              'landing_info': this.back_up.landing_info
+            })
             .then((response) => {
-              console.log(response)
+              // console.log(response)
               this.$router.currentRoute.meta.protect_leave = 'no'
               this.$router.push({name: 'landing_list'})
             })

@@ -110,7 +110,7 @@
                 <!---->
                 <!---->
                 <!---->
-                <div class="alert-success">{{ content.validation }}</div>
+<!--                <div class="alert-success">{{ content.validation }}</div>-->
                 <!---->
                 <!---->
                 <!---->
