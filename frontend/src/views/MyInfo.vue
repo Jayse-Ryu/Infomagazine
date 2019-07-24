@@ -132,6 +132,10 @@
           this.content_obj = response.data.data
           this.$store.state.pageOptions.loading = false
         })
+        .catch((error) => {
+          this.$store.state.pageOptions.loading = false
+          console.log(error)
+        })
     },
     methods: {
       page_init() {
@@ -245,10 +249,12 @@
                   this.$router.push({name: 'gateway'})
                 })
                 .catch((error) => {
+                  this.$store.state.pageOptions.loading = false
                   console.log('Edit error', error)
                 })
             })
             .catch((error) => {
+              this.$store.state.pageOptions.loading = false
               console.log(error)
             })
         }
@@ -256,11 +262,13 @@
       bye() {
         if (confirm('정말 탈퇴하시겠습니까?')) {
           if (this.user_obj.id) {
-            let axios = this.$axios
+            // let axios = this.$axios
+            this.$store.state.pageOptions.loading = true
             axios.delete(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id + '/')
               .then(() => {
                 // Calculation for page_max
                 alert('탈퇴되었습니다.')
+                this.$store.state.pageOptions.loading = false
                 this.$store.commit('removeToken')
                 this.$router.currentRoute.meta.protect_leave = 'no'
                 this.$router.push({
@@ -268,6 +276,7 @@
                 })
               })
               .catch((error) => {
+                this.$store.state.pageOptions.loading = false
                 console.log(error)
               })
           }

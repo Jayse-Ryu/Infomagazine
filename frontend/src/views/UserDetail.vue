@@ -43,18 +43,18 @@
 
           <div v-if="[0,1].includes(content_obj.info.access_role)">
             <div class="form-control border-0 p-0" id="user_access">
-              <div class="badge alert alert-primary mr-3">마케터</div>
+              <div class="badge alert alert-success mr-3">마케터</div>
               <button v-if="content_obj.id != user_obj.id && user_obj.is_staff || user_obj.is_superuser" type="button"
                       class="btn btn-outline-danger" @click.prevent="grade_set(3)">승인취소
               </button>
-              <div v-else-if="content_obj.id == user_obj.id" class="btn btn-primary disabled">본인</div>
+              <div v-else-if="content_obj.id == user_obj.id" class="btn btn-info disabled">본인</div>
               <div v-else class="btn btn-secondary disabled">변경 권한없음</div>
             </div>
           </div>
 
           <div v-else-if="content_obj.info.access_role == 2">
             <div class="form-control border-0 p-0" id="user_access">
-              <div class="badge alert alert-success mr-3">고객</div>
+              <div class="badge alert alert-secondary mr-3">고객</div>
               <!--<button v-if="content_obj.user !== user_obj.id" type="button" class="btn btn-outline-danger"
                       @click.prevent="grade_set(2)">강등
               </button>

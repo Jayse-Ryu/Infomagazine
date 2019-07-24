@@ -1,14 +1,16 @@
-// Official plugins
+// Essential
 import Vue from 'vue'
 import App from './App.vue'
+// Official vue plugins
 import store from './store'
 import router from './router'
+// Official plugins
 import AWS from 'aws-sdk'
 import VeeValidate from 'vee-validate'
 import Paginate from 'vuejs-paginate'
 import VTooltip from 'v-tooltip'
 import VueDraggableResizable from 'vue-draggable-resizable'
-
+// Plugins
 import './plugins/axios'
 import './plugins/vue-cookie'
 import './plugins/date-picker'

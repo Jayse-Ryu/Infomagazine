@@ -71,19 +71,19 @@
               </div>
 
               <div v-if="user_obj.id == content.id" class="col-2 p-0 text-center">
-                <div class="badge badge-dark">본인</div>
+                <div class="badge badge-info">본인</div>
               </div>
               <div v-else-if="[0,1].includes(content.info.access_role)" class="col-2 p-0 text-center">
-                <div class="badge badge-primary">마케터</div>
+                <div class="badge badge-success">마케터</div>
               </div>
               <div v-else-if="content.info.access_role == 3" class="col-2 p-0 text-center">
                 <div class="badge badge-danger">미인증 마케터</div>
               </div>
               <div v-else-if="content.info.access_role == 2" class="col-2 p-0 text-center">
-                <div class="badge badge-success">고객</div>
+                <div class="badge badge-secondary">고객</div>
               </div>
               <div v-else class="col-2 p-0 text-center">
-                <div class="badge badge-success">Nobody</div>
+                <div class="badge badge-dark">Nobody</div>
               </div>
 
               <div v-if="content.info.phone_num" class="col-2 p-0 board_centre">
