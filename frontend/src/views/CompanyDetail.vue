@@ -454,11 +454,11 @@
 
         // Get Company by page_id
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'companies/' + this.page_id)
+        axios.get(this.$store.state.endpoints.baseUrl + 'companies/' + this.page_id + '/')
           .then((response) => {
             // console.log('company response is? ', response)
             this.content_obj = response.data.data
-            return axios.get(this.$store.state.endpoints.baseUrl + 'users/?company=' + this.page_id + pagination)
+            return axios.get(this.$store.state.endpoints.baseUrl + 'users/?company=' + this.page_id + pagination + '/')
           })
           .catch((error) => {
             console.log('Mount Get company error', error)

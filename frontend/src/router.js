@@ -208,9 +208,11 @@ router.beforeEach((to, from, next) => {
       alert('권한이 없는 페이지입니다.')
       from.meta.protect_leave = 'no'
       next({name: 'gateway'})
+      router.push({name: dummy})
     } else {
       alert('권한이 없는 페이지입니다.')
       next({name: 'gateway'})
+      router.push({name: dummy})
     }
   }
 
