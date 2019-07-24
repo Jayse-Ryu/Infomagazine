@@ -69,7 +69,7 @@ class LandingPageViewSets(viewsets.ViewSet):
 
     def update(self, request, pk):
         data = self.landing_pages_model.update(choice_collection='landing_pages', doc_id=pk,
-                                               update={'$set': request.data})
+                                               data_to_update={'$set': request.data})
         result = (
             {
                 'state': True,

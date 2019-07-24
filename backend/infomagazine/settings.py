@@ -125,8 +125,8 @@ CORS_ORIGIN_WHITELIST = tuple(config('CORS_ORIGIN_WHITELIST', cast=Csv()))
 
 # CSRF_TRUSTED_ORIGINS = tuple(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
 
-# LOGIN_URL = '/admin/login/'
-# LOGOUT_URL = '/admin/logout/'
+LOGIN_URL = '/admin/login/'
+LOGOUT_URL = '/admin/logout/'
 
 # Changes the built-in user model to mine
 AUTH_USER_MODEL = 'user.User'
