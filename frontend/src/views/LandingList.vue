@@ -273,6 +273,7 @@
         //   console.log('load about com - Get only Com')
         //   auth_filter = '?company=' + this.user_obj.company
         // }
+        console.log('calling all unit!')
 
         this.$store.state.pageOptions.loading = true
         axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + search_param)

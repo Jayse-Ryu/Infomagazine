@@ -72,6 +72,15 @@ const router = new Router({
       }
     },
     {
+      path: '/landing/preview/:landing_id',
+      name: 'preview',
+      component: () => import('./components/preview/preview.vue'),
+      meta: {
+        signed: true,
+        auth_grade: 'marketer',
+      }
+    },
+    {
       path: '/organization',
       name: 'organization_list',
       component: () => import('./views/OrganizationList.vue'),

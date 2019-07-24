@@ -494,6 +494,7 @@
         }
       },
       push_landing(option) {
+        console.log('create push landing', option)
         // option first(mounted) or checked(button clicked)
         // let axios = this.$axios
         const config = {
@@ -503,24 +504,6 @@
           }
         }
         // Empty objects make as Null
-        // for (let key in this.dynamo_obj.landing_info.landing) {
-        //   if (this.dynamo_obj.landing_info.landing.hasOwnProperty(key)) {
-        //     if (this.dynamo_obj.landing_info.landing[key] === '' && typeof (this.dynamo_obj.landing_info.landing[key]) != 'boolean') {
-        //       this.dynamo_obj.landing_info.landing[key] = null
-        //     }
-        //     // if (key === 'name') {
-        //     //   console.log('key is name~')
-        //     // }
-        //   }
-        // }
-        // for (let key in this.dynamo_obj.landing_info.form) {
-        //   if (this.dynamo_obj.landing_info.form.hasOwnProperty(key)) {
-        //     if (this.dynamo_obj.landing_info.form[key] === '' && typeof (this.dynamo_obj.landing_info.form[key]) != 'boolean') {
-        //       this.dynamo_obj.landing_info.form[key] = null
-        //     }
-        //   }
-        // }
-
         if (option === 'checked') {
           this.dynamo_obj.updated_date = (Date.now()).toString()
           this.$store.state.pageOptions.loading = true

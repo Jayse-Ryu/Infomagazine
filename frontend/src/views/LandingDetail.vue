@@ -82,6 +82,7 @@
         <section_layout
           :window_width="window_width"
           :epoch_time="epoch_time"
+          :page_id="page_id"
           :order.sync="dynamo_obj.landing_info.sections"
           :form.sync="dynamo_obj.landing_info.form"
           :field.sync="dynamo_obj.landing_info.field"
@@ -114,7 +115,7 @@
           <div class="col-12">
             <button type="submit" class="btn btn-primary col-12">수정</button>
             <button type="button" class="btn btn-danger col-12 mt-2" @click="delete_landing">삭제</button>
-            <button type="button" class="btn btn-dark col-12 mt-2" @click="back_to_list">취소</button>
+            <button type="button" class="btn btn-dark col-12 mt-2" @click="back_to_list">되돌리기</button>
           </div>
         </div>
 
@@ -163,6 +164,7 @@
       etc_arrow: -1,
       auto_flag: false,
       company_flag: false,
+      back_up: {},
       temp_obj: {},
       dynamo_obj: {
         company_id: -1,
@@ -212,44 +214,40 @@
         })
       })
 
-      this.get_objects()
-
-      // If not manager, push to db contents
-
-      // if (this.user_obj.access_role != 1 || this.user_obj.access_role != 0) {
-      //   this.$router.currentRoute.meta.protect_leave = 'no'
-      //   this.$router.push({name: 'db_detail', params: {landing_id: this.epoch_time}})
-      // }
+      this.get_objects('mounted')
     },
     methods: {
-      get_objects() {
+      get_objects(moment) {
         // Get company, manager
         // Get landing obj from Landing Num
         this.page_id = this.$route.params.landing_id
-        this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id)
-          .then((response) => {
-            this.$store.state.pageOptions.loading = false
-            // console.log('response check ', response)
-            // console.log('response check ', JSON.stringify(response))
-            // this.dynamo_obj = response.data.data
-            this.temp_obj = response.data.data
-            this.epoch_time = response.data.data.landing_info.landing.base_url
-            this.validation_back()
-            // this.dynamo_obj = this.temp_obj
-          })
-          .catch((error) => {
-            console.log(error)
-            this.$store.state.pageOptions.loading = false
-          })
-        // Get companies from logged in user's organization
-        axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
-          .then((response) => {
-            this.landing_company = response.data.results
-          })
-          .catch((error) => {
-            console.log(error)
-          })
+
+        if (moment == 'mounted') {
+          this.$store.state.pageOptions.loading = true
+          axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id)
+            .then((response) => {
+              this.$store.state.pageOptions.loading = false
+              this.back_up = response.data.data
+              this.temp_obj = response.data.data
+              this.epoch_time = response.data.data.landing_info.landing.base_url
+              this.validation_back()
+            })
+            .catch((error) => {
+              console.log(error)
+              this.$store.state.pageOptions.loading = false
+            })
+        } else {
+          axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id)
+            .then((response) => {
+              this.temp_obj = response.data.data
+              this.epoch_time = response.data.data.landing_info.landing.base_url
+              this.validation_back()
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+        }
+
 
       },
       validation_back() {
@@ -579,55 +577,13 @@
         }
       },
       push_landing(option) {
+        console.log('detail push landing', option)
         // option first(mounted) or checked(button clicked)
         const config = {
           headers: {
             'Content-Type': 'application/json'
           }
         }
-        // this.dynamo_obj.CompanyNum = this.dynamo_obj.landing_info.landing.company.toString()
-        // this.dynamo_obj.LandingNum = this.epoch_time.toString()
-        // this.dynamo_obj.UpdatedTime = (Date.now()).toString()
-        // Empty objects make as Null
-        // for (let key in this.dynamo_obj.landing_info.landing) {
-        //   if (this.dynamo_obj.landing_info.landing.hasOwnProperty(key)) {
-        //     if (this.dynamo_obj.landing_info.landing[key] === '' && typeof (this.dynamo_obj.landing_info.landing[key]) != 'boolean') {
-        //       this.dynamo_obj.landing_info.landing[key] = null
-        //     }
-        //   }
-        // }
-        // for (let key in this.dynamo_obj.landing_info.form) {
-        //   if (this.dynamo_obj.landing_info.form.hasOwnProperty(key)) {
-        //     if (this.dynamo_obj.landing_info.form[key] === '' && typeof (this.dynamo_obj.landing_info.form[key]) != 'boolean') {
-        //       this.dynamo_obj.landing_info.form[key] = null
-        //     }
-        //   }
-        // }
-        // for (let key in this.dynamo_obj.landing_info.field) {
-        //   if (this.dynamo_obj.landing_info.field.hasOwnProperty(key)) {
-        //     for (let j in this.dynamo_obj.landing_info.field[key]) {
-        //       if (this.dynamo_obj.landing_info.field[key][j] === '') {
-        //         this.dynamo_obj.landing_info.field[key][j] = null
-        //       }
-        //     }
-        //   }
-        // }
-        // for (let key in this.dynamo_obj.landing_info.sections) {
-        //   if (this.dynamo_obj.landing_info.sections.hasOwnProperty(key)) {
-        //     for (let j in this.dynamo_obj.landing_info.sections[key]) {
-        //       if (this.dynamo_obj.landing_info.sections[key][j] === '') {
-        //         this.dynamo_obj.landing_info.sections[key][j] = null
-        //       }
-        //     }
-        //   }
-        // }
-        // for (let key in this.dynamo_obj.landing_info.term) {
-        //   if (this.dynamo_obj.landing_info.term.hasOwnProperty(key)) {
-        //     if (this.dynamo_obj.landing_info.term[key] === '' && typeof (this.dynamo_obj.landing_info.term[key]) != 'boolean') {
-        //       this.dynamo_obj.landing_info.term[key] = null
-        //     }
-        //   }
-        // }
 
         if (option === 'checked') {
           this.dynamo_obj.updated_date = (Date.now()).toString()
@@ -636,7 +592,7 @@
           this.field_validation()
 
           // console.log('landing create object is? ', this.dynamo_obj)
-          axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id, this.dynamo_obj, config)
+          axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', this.dynamo_obj, config)
             .then(() => {
               this.$store.state.pageOptions.loading = false
               if (confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
@@ -650,6 +606,18 @@
             })
         } else {
           // console.log('detail is not support auto save')
+          if (!this.error_label.name && !this.error_label.base_url) {
+            // console.log('Landing pushed! ')
+
+            axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+              .then(() => {
+                console.log('landing updated')
+                this.get_objects()
+              })
+              .catch((error) => {
+                console.log('Landing update fail', error)
+              })
+          }
         }
 
       },
@@ -671,22 +639,31 @@
       delete_landing() {
         if (confirm('정말 삭제하시겠습니까?')) {
           let landing_num = this.page_id
-          axios.delete(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num)
+          axios.delete(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num + '/')
             .then(() => {
               alert('삭제되었습니다.')
               this.$router.currentRoute.meta.protect_leave = 'no'
               this.$router.push({name: 'landing_list'})
             })
             .catch((error) => {
-              console.log(error)
+              console.log(error.message)
               alert('삭제 중 에러가 발생하였습니다. 다시 시도해주세요.')
             })
         }
       },
       back_to_list() {
-        if (confirm('목록으로 돌아갈까요?')) {
-          this.$router.currentRoute.meta.protect_leave = 'no'
-          this.$router.push({name: 'landing_list'})
+        let landing_num = this.page_id
+        if (confirm('랜딩을 되돌리고 목록으로 돌아갈까요?')) {
+          axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num + '/', this.back_up)
+            .then((response) => {
+              console.log(response)
+              this.$router.currentRoute.meta.protect_leave = 'no'
+              this.$router.push({name: 'landing_list'})
+            })
+            .catch((error) => {
+              console.log(error.message)
+              alert('복구 중 에러가 발생하였습니다.')
+            })
         }
       }
     },

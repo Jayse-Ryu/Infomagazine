@@ -7,7 +7,7 @@
 
     <div class="col-sm-9 mt-sm-3" id="company_name">
       <select class="form-control" name="company_name" v-model="dynamo.company_id"
-              @change="$emit('update:company', $event.target.value)">
+              @change="company_change()">
         <option value="-1">업체를 선택하세요</option>
         <option v-for="content in landing_company" :value="content.id">
           {{ content.corp_name }} - {{ content.corp_sub_name }}
@@ -70,7 +70,8 @@
       'name',
       'base_url',
       'error_name',
-      'error_base_url'
+      'error_base_url',
+      'push_landing'
     ],
     data: () => ({
 
@@ -102,6 +103,10 @@
             console.log('get companies error', error)
           })
       },
+      company_change() {
+        this.$emit('update:company', this.dynamo.company_id)
+        this.push_landing()
+      },
       check_name() {
         if (this.name == '') {
           this.error_label.class.name = 'form-control'
@@ -120,6 +125,7 @@
               }
               this.error_label.class.name = 'form-control alert-success'
               this.$emit('update:error_name', false)
+              this.push_landing()
             })
         }
       },
@@ -141,6 +147,7 @@
               }
               this.error_label.class.base_url = 'form-control alert-success'
               this.$emit('update:error_base_url', false)
+              this.push_landing()
             })
         }
       }

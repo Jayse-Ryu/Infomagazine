@@ -237,7 +237,7 @@
             this.form_init()
             // Field objs delete also
             // this.field_work(id)
-            // this.push_landing()
+            this.push_landing()
           }
         } else {
           alert('그룹을 먼저 선택하세요.')
@@ -276,7 +276,6 @@
               }
             })
           }
-
 
           let params = {}
 

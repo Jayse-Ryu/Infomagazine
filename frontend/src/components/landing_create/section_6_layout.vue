@@ -38,7 +38,7 @@
 
       <div class="col-sm-12">
         <div class="main_layout" id="main_layout">
-          <div class="basket" :style="{'height': order_wrap_height[index] + 'px'}">
+          <div class="basket" :style="{'height': order_wrap_height[index] + 'px'}" @click="push_landing()">
             <vue-draggable-resizable v-for="(item, index_2) in object"
                                      @activated="order_activated(index, item.sign)"
                                      @deactivated="order_deactivated"
@@ -339,30 +339,31 @@
                   <label for="field_x" class="col-sm-3 col-form-label-sm mt-3">X 좌표</label>
                   <div class="col-sm-9 mt-sm-3">
                     <input type="number" id="field_x" v-model.number="item.position.x" class="form-control"
-                           step="10">
+                           step="10" @change="push_landing()">
                   </div>
 
                   <label for="field_y" class="col-sm-3 col-form-label-sm mt-3">Y 좌표</label>
                   <div class="col-sm-9 mt-sm-3">
                     <input type="number" id="field_y" v-model.number="item.position.y" class="form-control"
-                           step="10">
+                           step="10" @change="push_landing()">
                   </div>
 
                   <label for="field_w" class="col-sm-3 col-form-label-sm mt-3">필드 너비</label>
                   <div class="col-sm-9 mt-sm-3">
                     <input type="number" id="field_w" v-model.number="item.position.w" class="form-control"
-                           step="10">
+                           step="10" @change="push_landing()">
                   </div>
 
                   <label for="field_h" class="col-sm-3 col-form-label-sm mt-3">필드 높이</label>
                   <div class="col-sm-9 mt-sm-3">
                     <input type="number" id="field_h" v-model.number="item.position.h" class="form-control"
-                           step="10">
+                           step="10" @change="push_landing()">
                   </div>
 
                   <label for="field_z" class="col-sm-3 col-form-label-sm mt-3">필드 깊이</label>
                   <div class="col-sm-9 mt-sm-3">
-                    <input type="number" id="field_z" v-model.number="item.position.z" class="form-control">
+                    <input type="number" id="field_z" v-model.number="item.position.z" class="form-control"
+                     @change="push_landing()">
                   </div>
                 </div>
 
@@ -389,7 +390,7 @@
                   비디오 타입
                 </label>
                 <div v-if="info.type == 3" class="col-sm-9 mt-sm-3">
-                  <select id="video_type" class="form-control" v-model.number="info.video_type">
+                  <select id="video_type" class="form-control" v-model.number="info.video_type" @change="push_landing()">
                     <option value="1">Youtube</option>
                     <option value="2">Vimeo</option>
                   </select>
@@ -436,30 +437,31 @@
                 <label for="console_x" class="col-sm-3 col-form-label-sm mt-3">X 좌표</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_x" v-model.number="info.position.x" class="form-control"
-                         step="10">
+                         step="10" @change="push_landing()">
                 </div>
 
                 <label for="console_y" class="col-sm-3 col-form-label-sm mt-3">Y 좌표</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_y" v-model.number="info.position.y" class="form-control"
-                         step="10">
+                         step="10" @change="push_landing()">
                 </div>
 
                 <label for="console_w" class="col-sm-3 col-form-label-sm mt-3">너비</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_w" v-model.number="info.position.w" class="form-control"
-                         step="10">
+                         step="10" @change="push_landing()">
                 </div>
 
                 <label for="console_h" class="col-sm-3 col-form-label-sm mt-3">높이</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_h" v-model.number="info.position.h" class="form-control"
-                         step="10">
+                         step="10" @change="push_landing()">
                 </div>
 
                 <label for="console_z" class="col-sm-3 col-form-label-sm mt-3">우선순위</label>
                 <div class="col-sm-9 mt-sm-3">
-                  <input type="number" id="console_z" v-model.number="info.position.z" class="form-control">
+                  <input type="number" id="console_z" v-model.number="info.position.z" class="form-control"
+                   @change="push_landing()">
                 </div>
               </div>
             </div>
@@ -477,6 +479,7 @@
 
     <div class="col-12 mt-3">
       <button type="button" class="btn btn-info w-100" @click="preview">미리보기</button>
+      <a :href="'/landing/preview/' + page_id" target="_blank"><button type="button" class="btn btn-info w-100 mt-2">미리 테스트 보기</button></a>
     </div>
 
   </div>
@@ -487,6 +490,7 @@
     name: "section_6_layout",
     props: [
       'window_width',
+      'page_id',
       'epoch_time',
       'order',
       'form',
@@ -509,6 +513,7 @@
     }),
     mounted() {
       this.order_obj = this.order
+
     },
     methods: {
       object_init() {
@@ -518,6 +523,7 @@
       call_set() {
         // console.log('call set - (set field, obj init)')
         this.set_field('form')
+        this.push_landing()
         this.object_init()
       },
       // Order handle
@@ -528,12 +534,14 @@
         this.order_obj.push([])
         this.$emit('update:order', this.order_obj)
         this.set_field('form')
+        this.push_landing()
       },
       section_delete(index) {
         this.object_init()
         this.order_obj.splice(index, 1)
         this.$emit('update:order', this.order_obj)
         this.set_field('form')
+        this.push_landing()
       },
       object_add(index) {
         this.object_init()
@@ -594,6 +602,7 @@
         }
 
         this.$emit('update:order', this.order_obj)
+        this.push_landing()
       },
       object_delete(index) {
         this.object_init()
@@ -615,6 +624,7 @@
             this.field_selected = 0
             this.order_activated(0)
             this.set_field('form')
+            this.push_landing()
           }
         } else {
           alert('먼저 레이아웃을 선택하세요.')
@@ -649,6 +659,7 @@
         }
         this.field_selected = 0
         this.$emit('update:order', this.order_obj)
+        this.push_landing()
       },
       order_resize(x, y, w, h) {
         this.object_init()
@@ -670,6 +681,7 @@
         }
         this.field_selected = 0
         this.$emit('update:order', this.order_obj)
+        this.push_landing()
       },
       order_image_change(sign, file) {
         this.object_init()
@@ -821,9 +833,10 @@
       preview() {
         // let axios = this.$axios
         let landing_num = this.$route.params.landing_id
-        axios.get(this.$store.state.endpoints.baseUrl + 'landings/api/' + landing_num + '/?preview=true')
+        axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num + '/preview/')
           .then((response) => {
-            console.log('preview res', response)
+            console.log('preview res', response.data.data)
+            // this.test = response.data.data
           })
           .catch((error) => {
             console.log(error)
