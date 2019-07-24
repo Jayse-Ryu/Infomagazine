@@ -577,7 +577,7 @@
         }
       },
       push_landing(option) {
-        console.log('detail push landing', option)
+        console.log('detail push landing')
         // option first(mounted) or checked(button clicked)
         const config = {
           headers: {
@@ -592,7 +592,7 @@
           this.field_validation()
 
           // console.log('landing create object is? ', this.dynamo_obj)
-          axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', this.dynamo_obj, config)
+          axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', this.dynamo_obj, config)
             .then(() => {
               this.$store.state.pageOptions.loading = false
               if (confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
@@ -606,18 +606,18 @@
             })
         } else {
           // console.log('detail is not support auto save')
-          if (!this.error_label.name && !this.error_label.base_url) {
+          // if (!this.error_label.name && !this.error_label.base_url) {
             // console.log('Landing pushed! ')
 
-            axios.patch(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+            axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', this.dynamo_obj, config)
               .then(() => {
-                console.log('landing updated')
+                console.log('landing updated is done')
                 this.get_objects()
               })
               .catch((error) => {
                 console.log('Landing update fail', error)
               })
-          }
+          // }
         }
 
       },

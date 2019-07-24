@@ -659,7 +659,7 @@
         }
         this.field_selected = 0
         this.$emit('update:order', this.order_obj)
-        this.push_landing()
+        // this.push_landing()
       },
       order_resize(x, y, w, h) {
         this.object_init()
@@ -681,7 +681,7 @@
         }
         this.field_selected = 0
         this.$emit('update:order', this.order_obj)
-        this.push_landing()
+        // this.push_landing()
       },
       order_image_change(sign, file) {
         this.object_init()
