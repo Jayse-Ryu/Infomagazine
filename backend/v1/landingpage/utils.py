@@ -29,14 +29,14 @@ class Scripts:
         return f"""
         $("#form_{section_id}_submit_button").click(function () {{
             var item_group = {json.dumps(converted_item_group)};
-            validation(item_group);
-            call_ajax(item_group)
+            form_{section_id}_validation(item_group);
+            call_form_{section_id}_ajax(item_group)
         }});
         """
 
-    def validation(self):
+    def validation(self, section_id=None):
         return f"""
-        function validation(item_group) {{
+        function form_{section_id}_validation(item_group) {{
             // required
             // korean_only
             // english_only
@@ -130,9 +130,9 @@ class Scripts:
         }}
         """
 
-    def call_ajax(self):
+    def call_ajax(self, section_id=None):
         return f"""
-        function call_ajax(item_group) {{
+        function call_form_{section_id}_ajax(item_group) {{
             var body = {{
                 'data': {{}},
                 'schema': {{}}
@@ -144,7 +144,7 @@ class Scripts:
             }});
             $.ajax({{
                 type: 'post',
-                url: '',
+                url: 'https://api.infomagazine.xyz/test/?test=test',
                 data: body,
                 dataType: 'json',
                 success: function (data) {{
@@ -650,8 +650,8 @@ class LandingPages:
 
                     self.landing_scripts += scripts_generator.submit_event(section_id=section_index,
                                                                            item_group=item_group)
-                    self.landing_scripts += scripts_generator.validation()
-                    self.landing_scripts += scripts_generator.call_ajax()
+                    self.landing_scripts += scripts_generator.validation(section_id=section_index)
+                    self.landing_scripts += scripts_generator.call_ajax(section_id=section_index)
 
                 elif object_type == 3:
                     section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image'})
@@ -661,4 +661,4 @@ class LandingPages:
         base_html.head.append(stylesheets)
         scripts = BeautifulSoup(self._scripts_generate(), 'html.parser')
         base_html.body.append(scripts)
-        return str(base_html)
+        return base_html.prettify()

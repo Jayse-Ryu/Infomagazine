@@ -1,0 +1,28 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+django-silk = "*"
+django-nose = "*"
+coverage = "*"
+
+[packages]
+django = "*"
+python-decouple = "*"
+django-cors-headers = "*"
+django-storages = "*"
+boto3 = "*"
+pymongo = "*"
+django-enumfield = "*"
+django-rest-swagger = "*"
+djangorestframework-simplejwt = "*"
+django-filter = "*"
+dnspython = "*"
+beautifulsoup4 = "*"
+mysqlclient = "*"
+djangorestframework = "*"
+
+[requires]
+python_version = "3.7"
