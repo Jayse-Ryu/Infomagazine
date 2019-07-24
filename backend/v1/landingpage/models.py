@@ -38,10 +38,10 @@ class LandingPage:
             '$currentDate':
                 {
                     'lastModified': True,
-                    'updated_date':
-                        {
-                            '$type': 'timestamp'
-                        }
+                    # 'updated_date':
+                    #     {
+                    #         '$type': 'timestamp'
+                    #     }
                 }
         })
         find_option = ({'_id': ObjectId(doc_id)}, data_to_update, option)
