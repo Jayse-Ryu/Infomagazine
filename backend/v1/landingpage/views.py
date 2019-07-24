@@ -1,3 +1,4 @@
+from bson import ObjectId
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action, renderer_classes
 from rest_framework.renderers import StaticHTMLRenderer
@@ -82,13 +83,47 @@ class LandingPageViewSets(viewsets.ViewSet):
             result = ({}, {'status': status.HTTP_503_SERVICE_UNAVAILABLE})
         return Response(result[0], **result[1])
 
-    @action(detail=True, renderer_classes=[StaticHTMLRenderer], permission_classes=[permissions.AllowAny])
+    # TODO AllowAny 지워야 함
+    @action(detail=True, methods=['GET'], permission_classes=[permissions.AllowAny])
     def preview(self, request, pk):
-        landing_info = {}
-        # TODO request landing_info로 바꿔야 함
-        with open('test.json') as data_file:
-            landing_info = json.load(data_file)
+        if not pk:
+            result = ({
+                          'state': False,
+                          'data': "",
+                          'message': 'not set "pk"'
+                      },
+                      {'status': status.HTTP_400_BAD_REQUEST})
+            return Response(result[0], **result[1])
 
-        landing_pages = LandingPages(landing_info)
-        result = landing_pages.generate()
-        return Response(result)
+        try:
+            landing_info = json.loads(self.landing_pages_model.retrieve(choice_collection='landing_pages', doc_id=pk))
+            if landing_info:
+                # # TODO request landing_info로 바꿔야 함
+                # with open('test.json') as data_file:
+                #     landing_info = json.load(data_file)
+
+                landing_pages = LandingPages(landing_info['landing_info'])
+                result = (
+                    {
+                        'state': True,
+                        'data': landing_pages.generate(),
+                        'message': 'success'
+                    },
+                    {'status': status.HTTP_200_OK})
+            else:
+                result = ({
+                              'state': False,
+                              'data': "",
+                              'message': pk + ' don\'t exist'
+                          },
+                          {'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
+            return Response(result[0], **result[1])
+        except Exception as e:
+            result = (
+                {
+                    'state': False,
+                    'data': '',
+                    'message': str(e)
+                },
+                {'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
+            return Response(result[0], **result[1])

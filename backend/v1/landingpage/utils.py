@@ -144,7 +144,7 @@ class Scripts:
             }});
             $.ajax({{
                 type: 'post',
-                url: 'https://api.infomagazine.xyz/test/?test=test',
+                url: 'https://api.infomagazine.xyz/db/',
                 data: body,
                 dataType: 'json',
                 success: function (data) {{
@@ -264,11 +264,11 @@ class StyleSheet:
 
 class LandingPages:
     def __init__(self, landing_info):
-        self.landing_config = landing_info['landing_info']['landing']
-        self.term_config = landing_info['landing_info']['term']
-        self.form_config_list = landing_info['landing_info']['form']
-        self.field_info_list = landing_info['landing_info']['field']
-        self.section_info_list = landing_info['landing_info']['sections']
+        self.landing_config = landing_info['landing']
+        self.term_config = landing_info['term']
+        self.form_config_list = landing_info['form']
+        self.field_info_list = landing_info['field']
+        self.section_info_list = landing_info['sections']
 
         self.default_html = """
                 <!DOCTYPE html>

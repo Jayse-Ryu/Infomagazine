@@ -71,6 +71,7 @@ NOSE_ARGS = [
 ]
 
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema', # 3.10.x부터 swagger 이용 시 에러가 발생하여 해당 구문 추가
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissions'
@@ -92,12 +93,12 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=50)
 }
 
-SECURE_BROWSER_XSS_FILTER = True
+# SECURE_BROWSER_XSS_FILTER = True
 
 # CORS_ALLOW_CREDENTIALS = True
 #
-SESSION_COOKIE_SAMESITE = 'Strict'
-CSRF_COOKIE_SAMESITE = 'Strict'
+# SESSION_COOKIE_SAMESITE = 'Strict'
+# CSRF_COOKIE_SAMESITE = 'Strict'
 
 # SESSION_COOKIE_SAMESITE = None
 
@@ -124,8 +125,8 @@ CORS_ORIGIN_WHITELIST = tuple(config('CORS_ORIGIN_WHITELIST', cast=Csv()))
 
 # CSRF_TRUSTED_ORIGINS = tuple(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
 
-LOGIN_URL = '/admin/login/'
-LOGOUT_URL = '/admin/logout/'
+# LOGIN_URL = '/admin/login/'
+# LOGOUT_URL = '/admin/logout/'
 
 # Changes the built-in user model to mine
 AUTH_USER_MODEL = 'user.User'
