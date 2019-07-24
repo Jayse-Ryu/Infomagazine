@@ -29,10 +29,23 @@ class LandingPage:
         queryset = dumps(queryset)
         return queryset
 
-    def update(self, choice_collection, doc_id, update, option=None):
-        update.update({'$currentDate': {'lastModified': True}})
-        find_option = ({'_id': ObjectId(doc_id)}, update, option)
-        queryset = self.db[choice_collection].update_one(*find_option)
+    def update(self, choice_collection: str, doc_id: str, data_to_update: dict, option: dict = None) -> dict:
+        if option is None:
+            option = {'returnNewDocument': True}
+        else:
+            option.update({'returnNewDocument': True})
+        data_to_update.update({
+            '$currentDate':
+                {
+                    'lastModified': True,
+                    'updated_date':
+                        {
+                            '$type': 'timestamp'
+                        }
+                }
+        })
+        find_option = ({'_id': ObjectId(doc_id)}, data_to_update, option)
+        queryset = self.db[choice_collection].find_one_and_update(*find_option)
         queryset = dumps(queryset)
         return queryset
 
