@@ -298,7 +298,8 @@
                   <div v-if="form.type == 1" class="etc_layout_cont">
                     <button v-if="form.image_data" type="button" class="btn p-0 etc_button"
                             :style="'z-index:10;'+'min-height: 100%;'">
-                      <img :src="key_to_url(form.image_data)" alt="Etc form image" class="w-100 order_form_button_image">
+                      <img :src="key_to_url(form.image_data)" alt="Etc form image"
+                           class="w-100 order_form_button_image">
                     </button>
                     <button v-else="form.image_data" type="button" class="btn etc_button"
                             :style="'background: rgba('+hex_to_decimal(form.bg_color)+','+form.opacity*0.1+');' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
@@ -310,7 +311,8 @@
                   <div v-if="form.type == 2" class="etc_layout_cont">
                     <button v-if="form.image_data" type="button" class="btn p-0 etc_button"
                             :style="'z-index:10;'+'min-height: 100%;'">
-                      <img :src="key_to_url(form.image_data)" alt="Etc form image" class="w-100 order_form_button_image">
+                      <img :src="key_to_url(form.image_data)" alt="Etc form image"
+                           class="w-100 order_form_button_image">
                     </button>
                     <button v-else type="button" class="btn etc_button"
                             :style="'background: rgba('+hex_to_decimal(form.bg_color)+','+form.opacity*0.1+');' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
@@ -363,7 +365,7 @@
                   <label for="field_z" class="col-sm-3 col-form-label-sm mt-3">필드 깊이</label>
                   <div class="col-sm-9 mt-sm-3">
                     <input type="number" id="field_z" v-model.number="item.position.z" class="form-control"
-                     @keyup="push_landing()">
+                           @keyup="push_landing()">
                   </div>
                 </div>
 
@@ -390,7 +392,8 @@
                   비디오 타입
                 </label>
                 <div v-if="info.type == 3" class="col-sm-9 mt-sm-3">
-                  <select id="video_type" class="form-control" v-model.number="info.video_type" @change="push_landing()">
+                  <select id="video_type" class="form-control" v-model.number="info.video_type"
+                          @change="push_landing()">
                     <option value="1">Youtube</option>
                     <option value="2">Vimeo</option>
                   </select>
@@ -461,7 +464,7 @@
                 <label for="console_z" class="col-sm-3 col-form-label-sm mt-3">우선순위</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_z" v-model.number="info.position.z" class="form-control"
-                   @keyup="push_landing()">
+                         @keyup="push_landing()">
                 </div>
               </div>
             </div>
@@ -477,17 +480,28 @@
 
     </div>
 
-    <div class="col-12 mt-3">
+    <div class="col-12 mt-3" v-if="page_id">
       <button type="button" class="btn btn-info w-100" @click="preview">미리보기</button>
-      <a :href="'/landing/preview/' + page_id" target="_blank"><button type="button" class="btn btn-info w-100 mt-2">미리 테스트 보기</button></a>
     </div>
+
+    <preview
+      v-if="preview_flag"
+      :flag.sync="preview_flag"
+      :html="html_element"
+    />
 
   </div>
 </template>
 
 <script>
+
+  import preview from '@/components/preview/preview.vue'
+
   export default {
     name: "section_6_layout",
+    components: {
+      preview
+    },
     props: [
       'window_width',
       'page_id',
@@ -510,6 +524,8 @@
       section_selected: -1,
       order_selected: 0,
       field_selected: 0,
+      preview_flag: false,
+      html_element: '<p>Not yet!</p>'
     }),
     mounted() {
       this.order_obj = this.order
@@ -706,13 +722,24 @@
 
         for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
           if (this.order_obj[this.section_selected][i].sign == sign && this.order_obj[this.section_selected][i].image_data) {
-            s3.deleteObject({Key: this.order_obj[this.section_selected][i].image_data}, (err, data) => {
-              if (err) {
-                alert('There was an error deleting your photo: ', err.message)
-              } else {
-                this.order_obj[this.section_selected][i].image_data = null
-              }
-            })
+            if (this.order_obj[this.section_selected][i].image_data.indexOf('assets') > -1) {
+              s3.deleteObject({Key: this.order_obj[this.section_selected][i].image_data}, (err, data) => {
+                if (err) {
+                  alert('There was an error deleting your photo: ', err.message)
+                } else {
+                  this.order_obj[this.section_selected][i].image_data = null
+                }
+              })
+            } else {
+              s3.deleteObject({Key: 'assets' + this.order_obj[this.section_selected][i].image_data}, (err, data) => {
+                if (err) {
+                  alert('There was an error deleting your photo: ', err.message)
+                } else {
+                  this.order_obj[this.section_selected][i].image_data = null
+                }
+              })
+            }
+
           }
         }
 
@@ -740,7 +767,7 @@
           } else {
             for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
               if (this.order_obj[this.section_selected][i].sign == sign) {
-                this.order_obj[this.section_selected][i].image_data = params.Key
+                this.order_obj[this.section_selected][i].image_data = params.Key.replace('assets/', '/')
               }
             }
             this.$emit('update:order', this.order_obj)
@@ -774,7 +801,11 @@
 
         for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
           if (this.order_obj[this.section_selected][i].sign == sign) {
-            photoKey = this.order_obj[this.section_selected][i].image_data
+            if (this.order_obj[this.section_selected][i].image_data.indexOf('assets') > -1) {
+              photoKey = this.order_obj[this.section_selected][i].image_data
+            } else {
+              photoKey = 'assets' + this.order_obj[this.section_selected][i].image_data
+            }
           }
         }
 
@@ -806,21 +837,41 @@
       },
       key_to_url(key) {
         if (key != null) {
-          let divided = key.split('/')
-          let url = 'https://'
+          if (key.indexOf('assets') > -1) {
+            let divided = key.split('/')
+            let url = 'https://'
 
-          if (this.updated_date == '') {
-            url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
-          } else {
-            for (let i = 0; i < divided.length; i++) {
-              if (i == 0) {
-                url += (divided[i] + '.infomagazine.xyz')
-              } else {
-                url += ('/' + divided[i])
+            if (this.updated_date == '') {
+              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+            } else {
+              for (let i = 0; i < divided.length; i++) {
+                if (i == 0) {
+                  url += (divided[i] + '.infomagazine.xyz')
+                  // url += ('assets' + '.infomagazine.xyz')
+                } else {
+                  url += ('/' + divided[i])
+                }
               }
             }
+            return url
+          } else {
+            let divided = key.split('/')
+            let url = 'https://'
+
+            if (this.updated_date == '') {
+              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
+            } else {
+              for (let i = 0; i < divided.length; i++) {
+                if (i == 0) {
+                  // url += (divided[i] + '.infomagazine.xyz')
+                  url += ('assets' + '.infomagazine.xyz')
+                } else {
+                  url += ('/' + divided[i])
+                }
+              }
+            }
+            return url
           }
-          return url
         } else {
           return ''
         }
@@ -835,10 +886,11 @@
         let landing_num = this.$route.params.landing_id
         axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num + '/preview/')
           .then((response) => {
-            console.log('preview res', response.data.data)
-            // this.test = response.data.data
+            this.html_element = response.data.data
+            this.preview_flag = true
           })
           .catch((error) => {
+            alert('미리보기 생성 중 오류가 발생하였습니다.')
             console.log(error)
           })
       },

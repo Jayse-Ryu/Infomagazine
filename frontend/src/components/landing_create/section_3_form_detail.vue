@@ -110,7 +110,7 @@
                 <!---->
                 <!---->
                 <!---->
-<!--                <div class="alert-success">{{ content.validation }}</div>-->
+                <!--                <div class="alert-success">{{ content.validation }}</div>-->
                 <!---->
                 <!---->
                 <!---->
@@ -597,14 +597,26 @@
 
         for (let i = 0; i < this.field_obj.length; i++) {
           if (this.field_obj[i].sign == sign && this.field_obj[i].image_data) {
-            s3.deleteObject({Key: this.field_obj[i].image_data}, (err, data) => {
-              if (err) {
-                alert('There was an error deleting your photo: ', err.message)
-              } else {
-                this.field_obj[i].image_data = null
-                this.field_obj[i].image_url = null
-              }
-            })
+            if (this.field_obj[i].image_data.indexOf('assets') > -1) {
+              s3.deleteObject({Key: this.field_obj[i].image_data}, (err, data) => {
+                if (err) {
+                  alert('There was an error deleting your photo: ', err.message)
+                } else {
+                  this.field_obj[i].image_data = null
+                  this.field_obj[i].image_url = null
+                }
+              })
+            } else {
+              s3.deleteObject({Key: 'assets' + this.field_obj[i].image_data}, (err, data) => {
+                if (err) {
+                  alert('There was an error deleting your photo: ', err.message)
+                } else {
+                  this.field_obj[i].image_data = null
+                  this.field_obj[i].image_url = null
+                }
+              })
+            }
+
           }
         }
 
@@ -633,8 +645,8 @@
           } else {
             for (let i = 0; i < this.field_obj.length; i++) {
               if (this.field_obj[i].sign == sign) {
-                this.field_obj[i].image_data = params.Key
-                this.field_obj[i].image_url = params.Key
+                this.field_obj[i].image_data = params.Key.replace('assets/', '/')
+                this.field_obj[i].image_url = params.Key.replace('assets/', '/')
               }
             }
             this.$emit('update:field', this.field_obj)
@@ -666,7 +678,12 @@
 
         for (let i = 0; i < this.field_obj.length; i++) {
           if (this.field_obj[i].sign == sign) {
-            let photoKey = this.field_obj[i].image_data
+            let photoKey = ''
+            if(this.field_obj[i].image_data.indexOf('assets') > -1) {
+              photoKey = this.field_obj[i].image_data
+            } else {
+              photoKey = 'assets' + this.field_obj[i].image_data
+            }
 
             s3.deleteObject({Key: photoKey}, (err, data) => {
               if (err) {
@@ -688,22 +705,41 @@
       },
       key_to_url(key) {
         if (key != null) {
-          let divided = key.split('/')
-          let url = 'https://'
+          if (key.indexOf('assets') > -1) {
+            let divided = key.split('/')
+            let url = 'https://'
 
-          if (this.updated_date == '') {
-            url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
-          } else {
-            for (let i = 0; i < divided.length; i++) {
-              if (i == 0) {
-                url += (divided[i] + '.infomagazine.xyz')
-              } else {
-                url += ('/' + divided[i])
+            if (this.updated_date == '') {
+              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+            } else {
+              for (let i = 0; i < divided.length; i++) {
+                if (i == 0) {
+                  url += (divided[i] + '.infomagazine.xyz')
+                  // url += ('assets' + '.infomagazine.xyz')
+                } else {
+                  url += ('/' + divided[i])
+                }
               }
             }
-          }
+            return url
+          } else {
+            let divided = key.split('/')
+            let url = 'https://'
 
-          return url
+            if (this.updated_date == '') {
+              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
+            } else {
+              for (let i = 0; i < divided.length; i++) {
+                if (i == 0) {
+                  // url += (divided[i] + '.infomagazine.xyz')
+                  url += ('assets' + '.infomagazine.xyz')
+                } else {
+                  url += ('/' + divided[i])
+                }
+              }
+            }
+            return url
+          }
         } else {
           return ''
         }
@@ -711,7 +747,7 @@
       }
     },
     computed: {
-      arrow () {
+      arrow() {
         let arrow = this.form_arrow
         this.init_component()
         return arrow

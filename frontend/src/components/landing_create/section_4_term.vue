@@ -99,15 +99,25 @@
         )
 
         if (this.term.image_data) {
-          s3.deleteObject({Key: this.term.image_data}, (err, data) => {
-            if (err) {
-              alert('There was an error deleting your photo: ', err.message)
-            } else {
-              this.term.image_data = null
-            }
-          })
-        }
+          if (this.term.image_data.indexOf('assets') > -1) {
+            s3.deleteObject({Key: this.term.image_data}, (err, data) => {
+              if (err) {
+                alert('There was an error deleting your photo: ', err.message)
+              } else {
+                this.term.image_data = null
+              }
+            })
+          } else {
+            s3.deleteObject({Key: 'assets' + this.term.image_data}, (err, data) => {
+              if (err) {
+                alert('There was an error deleting your photo: ', err.message)
+              } else {
+                this.term.image_data = null
+              }
+            })
+          }
 
+        }
 
         let params = {}
 
@@ -132,7 +142,7 @@
             console.log('S3 method error occurred', error)
           } else {
             // console.log('S3 method success', data)
-            this.term.image_data = params.Key
+            this.term.image_data = params.Key.replace('assets/', '/')
             this.push_landing()
           }
         })
@@ -157,7 +167,12 @@
           }
         )
 
-        let photoKey = this.term.image_data
+        let photoKey = ''
+        if (this.term.image_data.indexOf('assets') > -1) {
+          photoKey = this.term.image_data
+        } else {
+          photoKey = 'assets' + this.term.image_data
+        }
 
         if (photoKey) {
           s3.deleteObject({Key: photoKey}, (err, data) => {
@@ -176,22 +191,41 @@
       },
       key_to_url(key) {
         if (key != null) {
-          let divided = key.split('/')
-          let url = 'https://'
+          if (key.indexOf('assets') > -1) {
+            let divided = key.split('/')
+            let url = 'https://'
 
-          if (this.updated_date == '') {
-            url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
-          } else {
-            for (let i = 0; i < divided.length; i++) {
-              if (i == 0) {
-                url += (divided[i] + '.infomagazine.xyz')
-              } else {
-                url += ('/' + divided[i])
+            if (this.updated_date == '') {
+              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+            } else {
+              for (let i = 0; i < divided.length; i++) {
+                if (i == 0) {
+                  url += (divided[i] + '.infomagazine.xyz')
+                  // url += ('assets' + '.infomagazine.xyz')
+                } else {
+                  url += ('/' + divided[i])
+                }
               }
             }
-          }
+            return url
+          } else {
+            let divided = key.split('/')
+            let url = 'https://'
 
-          return url
+            if (this.updated_date == '') {
+              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
+            } else {
+              for (let i = 0; i < divided.length; i++) {
+                if (i == 0) {
+                  // url += (divided[i] + '.infomagazine.xyz')
+                  url += ('assets' + '.infomagazine.xyz')
+                } else {
+                  url += ('/' + divided[i])
+                }
+              }
+            }
+            return url
+          }
         } else {
           return ''
         }
