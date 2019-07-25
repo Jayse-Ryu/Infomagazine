@@ -3,7 +3,8 @@
 
     <header class="preview_head row" id="preview_head">
       <h3 class="head_title col-6 m-0">랜딩 미리보기</h3>
-      <button class="head_button btn btn-danger col-6 m-0" type="button" @click="$emit('update:flag', false)">미리보기 닫기</button>
+      <button class="head_button btn btn-danger col-6 m-0" type="button" @click="$emit('update:flag', false)">미리보기 닫기
+      </button>
     </header>
 
     <iframe id="preview_frame" class="resize_frame" width="80%" height="80%"></iframe>
@@ -19,7 +20,7 @@
       'html'
     ],
     mounted() {
-      if(this.execute) {
+      if (this.execute) {
         this.make_preview()
       }
     },
@@ -30,6 +31,8 @@
       make_preview() {
         let frame = document.getElementById('preview_frame')
 
+        let resize_helper = '<div style="width: 18px; height: 18px; position: absolute; bottom: 0; right: 0; background-color: rgba(0,0,0,0.5); color: #f7f7f7;"></div>'
+
         let head_from = (this.html.indexOf('<head') + 6)
         let head_to = this.html.lastIndexOf('</head>')
         let head_string = this.html.substring(head_from, head_to)
@@ -37,6 +40,7 @@
         let body_from = (this.html.indexOf('<body') + 6)
         let body_to = this.html.lastIndexOf('</body>')
         let body_string = this.html.substring(body_from, body_to)
+        body_string += resize_helper
 
         frame.contentDocument.head.innerHTML = head_string
         frame.contentDocument.body.innerHTML = body_string
@@ -58,13 +62,14 @@
     height: 100%;
     top: 0;
     left: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     z-index: 1000;
   }
 
   .preview_head {
     width: 100%;
     padding: 4% 2%;
+
     .head_title {
       color: #efefef;
     }
