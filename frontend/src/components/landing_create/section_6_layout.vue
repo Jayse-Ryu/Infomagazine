@@ -884,13 +884,16 @@
       preview() {
         // let axios = this.$axios
         let landing_num = this.$route.params.landing_id
+        this.$store.state.pageOptions.loading = true
         axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num + '/preview/')
           .then((response) => {
+            this.$store.state.pageOptions.loading = false
             this.html_element = response.data.data
             this.preview_flag = true
           })
           .catch((error) => {
             alert('미리보기 생성 중 오류가 발생하였습니다.')
+            this.$store.state.pageOptions.loading = false
             console.log(error)
           })
       },
