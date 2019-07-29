@@ -30,9 +30,10 @@
     }),
     methods: {
       make_preview() {
+
         let frame = document.getElementById('preview_frame')
 
-        let resize_helper = '<div id="resize_helper" style="width: 18px; height: 18px; position: fixed; bottom: 0; right: 0; background-color: rgba(0,0,0,0.5); color: #f7f7f7;"></div>'
+        let resize_helper = '<div id="resize_helper" st yle="width: 18px; height: 18px; position: fixed; bottom: 0; right: 0; background-color: rgba(0,0,0,0.5); color: #f7f7f7;"></div>'
 
         let head_from = (this.html.indexOf('<head') + 6)
         let head_to = this.html.lastIndexOf('</head>')
