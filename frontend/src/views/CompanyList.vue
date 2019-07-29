@@ -21,8 +21,8 @@
         <div class="form-group search_group ml-auto text-center p-0 col-sm-12 col-md-4">
           <select class="search_option" id="src_gbn" v-model="temp_option">
             <option value="0" selected>검색 옵션</option>
-            <option value="1">업체</option>
-            <option value="2">담당조직</option>
+            <option value="1">업체명</option>
+            <!--<option value="2">담당조직</option>-->
           </select>
           <input type="text" class="search_text" v-model="temp_text" placeholder="검색">
           <button type="submit" class="search_btn">

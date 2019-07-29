@@ -15,7 +15,7 @@
       </select>
     </div>
 
-    <label class="col-sm-3 col-form-label-sm mt-3" for="in_db">
+    <!--<label class="col-sm-3 col-form-label-sm mt-3" for="in_db">
       <span>레이아웃 내 DB</span>
       <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
             v-tooltip="{
@@ -37,9 +37,9 @@
         <input type="checkbox" id="in_db" v-model="landing.inner_db">
         <span class="slider round"></span>
       </label>
-    </div>
+    </div>-->
 
-    <label class="col-sm-3 col-form-label-sm mt-3" for="in_company">
+    <!--<label class="col-sm-3 col-form-label-sm mt-3" for="in_company">
       <span>사업자 표기</span>
       <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
             v-tooltip="{
@@ -61,7 +61,7 @@
         <input type="checkbox" id="in_company" v-model="landing.show_company">
         <span class="slider round"></span>
       </label>
-    </div>
+    </div>-->
 
     <label class="col-sm-3 col-form-label-sm mt-3" for="is_hijack">
       <span>후팝업</span>
