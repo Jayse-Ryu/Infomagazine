@@ -597,8 +597,11 @@
             'landing_info': this.dynamo_obj.landing_info
           }, config)
             .then(() => {
-              // this.$store.state.pageOptions.loading = false
-              this.make_file()
+              this.$store.state.pageOptions.loading = false
+              // this.make_file()
+              if (confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
+                this.bye()
+              }
             })
             .catch((error) => {
               alert('랜딩 수정이 실패하였습니다.')
@@ -625,58 +628,58 @@
         }
 
       },
-      make_file(option) {
-        axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/preview/')
-          .then((response) => {
-            let key = require('../../vue_env')
-
-            let html = response.data.data
-
-            AWS.config.update({
-              region: key.BucketRegion,
-              credentials: new AWS.CognitoIdentityCredentials({
-                IdentityPoolId: key.IdentityPoolId
-              })
-            })
-
-            let s3 = new AWS.S3(
-              {
-                apiVersion: '2008-10-17',
-                params: {
-                  Bucket: key.AWS_STORAGE_BUCKET_NAME
-                }
-              }
-            )
-
-            let file = new File([html], this.page_id + '.html')
-
-            let params = {
-              Key: 'assets/images/landing/created/' + this.page_id + '/' + file.name,
-              ContentType: file.type,
-              Body: file,
-              ACL: 'public-read'
-            }
-
-            s3.upload(params, (error, data) => {
-              if (error) {
-                console.log('S3 method error occurred', error)
-                this.$store.state.pageOptions.loading = false
-              } else {
-                console.log('data result', data)
-                this.$store.state.pageOptions.loading = false
-                if (confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
-                  this.bye()
-                }
-              }
-            })
-
-          })
-          .catch((error) => {
-            console.log(error)
-            alert('랜딩생성 중 에러가 발생하였습니다.')
-            this.$store.state.pageOptions.loading = false
-          })
-      },
+      // make_file(option) {
+      //   axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/preview/')
+      //     .then((response) => {
+      //       let key = require('../../vue_env')
+      //
+      //       let html = response.data.data
+      //
+      //       AWS.config.update({
+      //         region: key.BucketRegion,
+      //         credentials: new AWS.CognitoIdentityCredentials({
+      //           IdentityPoolId: key.IdentityPoolId
+      //         })
+      //       })
+      //
+      //       let s3 = new AWS.S3(
+      //         {
+      //           apiVersion: '2008-10-17',
+      //           params: {
+      //             Bucket: key.AWS_STORAGE_BUCKET_NAME
+      //           }
+      //         }
+      //       )
+      //
+      //       let file = new File([html], this.page_id + '.html')
+      //
+      //       let params = {
+      //         Key: 'assets/images/landing/created/' + this.page_id + '/' + file.name,
+      //         ContentType: file.type,
+      //         Body: file,
+      //         ACL: 'public-read'
+      //       }
+      //
+      //       s3.upload(params, (error, data) => {
+      //         if (error) {
+      //           console.log('S3 method error occurred', error)
+      //           this.$store.state.pageOptions.loading = false
+      //         } else {
+      //           console.log('data result', data)
+      //           this.$store.state.pageOptions.loading = false
+      //           if (confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
+      //             this.bye()
+      //           }
+      //         }
+      //       })
+      //
+      //     })
+      //     .catch((error) => {
+      //       console.log(error)
+      //       alert('랜딩생성 중 에러가 발생하였습니다.')
+      //       this.$store.state.pageOptions.loading = false
+      //     })
+      // },
       /* e */
       /* n */
       /* d */
