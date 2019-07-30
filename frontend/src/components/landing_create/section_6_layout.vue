@@ -62,7 +62,7 @@
               <!-- Order layout for image -->
               <img v-if="item.type == 1 && !item.image_data" src="../../assets/logo1.png" alt="logo_none"
                    style="width: 100%; height: 100%; object-fit: contain;">
-              <img v-if="item.type == 1 && item.image_data" :src="key_to_url(item.image_data)" alt="logo_in"
+              <img v-if="item.type == 1 && item.image_data" :src="item.image_data" alt="logo_in"
                    style="width: 100%; height: 100%; object-fit: contain;">
 
               <!-- Order layout for form group -->
@@ -249,7 +249,7 @@
                           <!-- submit with image -->
                           <button v-else-if="field.type == 8 && field.image_data" type="button"
                                   class="btn w-100 p-0 h-100" style="background: transparent;">
-                            <img :src="key_to_url(field.image_data)" alt="button image"
+                            <img :src="field.image_data" alt="button image"
                                  class="w-100 order_form_button_image">
                           </button>
                         </div>
@@ -298,7 +298,7 @@
                   <div v-if="form.type == 1" class="etc_layout_cont">
                     <button v-if="form.image_data" type="button" class="btn p-0 etc_button"
                             :style="'z-index:10;'+'min-height: 100%;'">
-                      <img :src="key_to_url(form.image_data)" alt="Etc form image"
+                      <img :src="form.image_data" alt="Etc form image"
                            class="w-100 order_form_button_image">
                     </button>
                     <button v-else="form.image_data" type="button" class="btn etc_button"
@@ -311,7 +311,7 @@
                   <div v-if="form.type == 2" class="etc_layout_cont">
                     <button v-if="form.image_data" type="button" class="btn p-0 etc_button"
                             :style="'z-index:10;'+'min-height: 100%;'">
-                      <img :src="key_to_url(form.image_data)" alt="Etc form image"
+                      <img :src="form.image_data" alt="Etc form image"
                            class="w-100 order_form_button_image">
                     </button>
                     <button v-else type="button" class="btn etc_button"
@@ -722,43 +722,22 @@
 
         for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
           if (this.order_obj[this.section_selected][i].sign == sign && this.order_obj[this.section_selected][i].image_data) {
-            if (this.order_obj[this.section_selected][i].image_data.indexOf('assets') > -1) {
-              s3.deleteObject({Key: this.order_obj[this.section_selected][i].image_data}, (err, data) => {
-                if (err) {
-                  alert('There was an error deleting your photo: ', err.message)
-                } else {
-                  this.order_obj[this.section_selected][i].image_data = null
-                }
-              })
-            } else {
-              s3.deleteObject({Key: 'assets' + this.order_obj[this.section_selected][i].image_data}, (err, data) => {
-                if (err) {
-                  alert('There was an error deleting your photo: ', err.message)
-                } else {
-                  this.order_obj[this.section_selected][i].image_data = null
-                }
-              })
-            }
-
+            s3.deleteObject({Key: this.order_obj[this.section_selected][i].image_data.replace('https://assets.infomagazine.xyz', 'assets')}, (err, data) => {
+              if (err) {
+                alert('There was an error deleting your photo: ', err.message)
+              } else {
+                this.order_obj[this.section_selected][i].image_data = null
+              }
+            })
           }
         }
 
         let params = {}
 
-        if (this.updated_date) {
-          params = {
-            Key: 'assets/images/landing/' + this.epoch_time + '/section/' + Date.now() + '_' + file.name,
-            ContentType: file.type,
-            Body: file,
-            ACL: 'public-read'
-          }
-        } else {
-          params = {
-            Key: 'assets/images/landing/preview/' + this.epoch_time + '/section/' + Date.now() + '_' + file.name,
-            ContentType: file.type,
-            Body: file,
-            ACL: 'public-read'
-          }
+        params = {
+          Key: 'https://assets.infomagazine.xyz/images/landing/' + this.page_id + '/section/' + file.name + '_' + Date.now(),
+          ContentType: file.type,
+          Body: file
         }
 
         s3.upload(params, (error, data) => {
@@ -767,7 +746,7 @@
           } else {
             for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
               if (this.order_obj[this.section_selected][i].sign == sign) {
-                this.order_obj[this.section_selected][i].image_data = params.Key.replace('assets/', '/')
+                this.order_obj[this.section_selected][i].image_data = params.Key
               }
             }
             this.$emit('update:order', this.order_obj)
@@ -801,11 +780,7 @@
 
         for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
           if (this.order_obj[this.section_selected][i].sign == sign) {
-            if (this.order_obj[this.section_selected][i].image_data.indexOf('assets') > -1) {
-              photoKey = this.order_obj[this.section_selected][i].image_data
-            } else {
-              photoKey = 'assets' + this.order_obj[this.section_selected][i].image_data
-            }
+            photoKey = this.order_obj[this.section_selected][i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
           }
         }
 
@@ -835,48 +810,48 @@
         // console.log(sign)
         this.field_selected = sign
       },
-      key_to_url(key) {
-        if (key != null) {
-          if (key.indexOf('assets') > -1) {
-            let divided = key.split('/')
-            let url = 'https://'
-
-            if (this.updated_date == '') {
-              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
-            } else {
-              for (let i = 0; i < divided.length; i++) {
-                if (i == 0) {
-                  url += (divided[i] + '.infomagazine.xyz')
-                  // url += ('assets' + '.infomagazine.xyz')
-                } else {
-                  url += ('/' + divided[i])
-                }
-              }
-            }
-            return url
-          } else {
-            let divided = key.split('/')
-            let url = 'https://'
-
-            if (this.updated_date == '') {
-              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
-            } else {
-              for (let i = 0; i < divided.length; i++) {
-                if (i == 0) {
-                  // url += (divided[i] + '.infomagazine.xyz')
-                  url += ('assets' + '.infomagazine.xyz')
-                } else {
-                  url += ('/' + divided[i])
-                }
-              }
-            }
-            return url
-          }
-        } else {
-          return ''
-        }
-
-      },
+      // key_to_url(key) {
+      //   if (key != null) {
+      //     if (key.indexOf('assets') > -1) {
+      //       let divided = key.split('/')
+      //       let url = 'https://'
+      //
+      //       if (this.updated_date == '') {
+      //         url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+      //       } else {
+      //         for (let i = 0; i < divided.length; i++) {
+      //           if (i == 0) {
+      //             url += (divided[i] + '.infomagazine.xyz')
+      //             // url += ('assets' + '.infomagazine.xyz')
+      //           } else {
+      //             url += ('/' + divided[i])
+      //           }
+      //         }
+      //       }
+      //       return url
+      //     } else {
+      //       let divided = key.split('/')
+      //       let url = 'https://'
+      //
+      //       if (this.updated_date == '') {
+      //         url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
+      //       } else {
+      //         for (let i = 0; i < divided.length; i++) {
+      //           if (i == 0) {
+      //             // url += (divided[i] + '.infomagazine.xyz')
+      //             url += ('assets' + '.infomagazine.xyz')
+      //           } else {
+      //             url += ('/' + divided[i])
+      //           }
+      //         }
+      //       }
+      //       return url
+      //     }
+      //   } else {
+      //     return ''
+      //   }
+      //
+      // },
       hex_to_decimal(hex) {
         let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
         return parseInt(result[1], 16) + ', ' + parseInt(result[2], 16) + ', ' + parseInt(result[3], 16)
