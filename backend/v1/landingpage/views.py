@@ -1,8 +1,9 @@
 import collections
 import time
+import boto3
 from functools import wraps
 
-from bson import ObjectId
+from decouple import config
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action, renderer_classes
 from rest_framework.renderers import StaticHTMLRenderer
@@ -69,9 +70,6 @@ class LandingPageViewSetsUtils(viewsets.ViewSet):
     permission_classes = (custom_permissions.IsMarketer,)
     return_value_formatter = ReturnValuesFormatter
 
-    def get_formatter(self):
-        return self.return_value_formatter()
-
     def get_landing_data(self, landing_detail=None, is_generate=False):
         if landing_detail['state']:
             landing_pages = LandingGenerator(landing_detail['data']['landing_info'], is_generate=is_generate)
@@ -132,14 +130,26 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
         return response_data
 
     @action(detail=True, methods=['POST'], )
+    @response_decorator()
     def generate(self, request, pk):
-        response_formatter = self.get_formatter()
         get_detail = self.retrieve(request, pk)
-        data = self.get_landing_data(landing_detail=get_detail.data, is_generate=True)
-        response_formatter.values_to_return = {
-            'state': data['state'],
-            'data': data['data'],
-            'message': data['message'],
-            'options': data['options']
-        }
-        return Response(**response_formatter.generate())
+        response_data = self.get_landing_data(landing_detail=get_detail.data, is_generate=True)
+        s3 = boto3.client(
+            's3',
+            aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+            region_name='ap-northeast-2'
+        )
+        landing_id = get_detail.data['data']['_id']['$oid']
+        landing_base_url = get_detail.data['data']['landing_info']['landing']['base_url']
+        epoch_time = time.time()
+        landing_url = f'''landings/{landing_id}/{landing_base_url}_{str(epoch_time)}.html'''
+        s3_response_data = s3.put_object(Body=response_data['data'], Bucket=config('AWS_STORAGE_BUCKET_NAME'),
+                                         Key=landing_url,
+                                         ContentType='text/html')
+        if type(s3_response_data['ResponseMetadata']['HTTPStatusCode']) == 200:
+            return {'state': True, 'data': landing_url, 'message': 'Succeed.',
+                    'options': {'status': status.HTTP_200_OK}}
+        else:
+            return {'state': False, 'data': landing_url, 'message': 'Failed.',
+                    'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
