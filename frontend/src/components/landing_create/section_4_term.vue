@@ -114,7 +114,7 @@
         let params = {}
 
         params = {
-          Key: 'https://assets.infomagazine.xyz/images/landing/' + this.page_id + '/term/' + file.name + '_' + Date.now(),
+          Key: 'assets/images/landing/' + this.page_id + '/term/' + file.name + '_' + Date.now(),
           ContentType: file.type,
           Body: file
         }
@@ -124,7 +124,7 @@
             console.log('S3 method error occurred', error)
           } else {
             // console.log('S3 method success', data)
-            this.term.image_data = params.Key
+            this.term.image_data = params.Key.replace('assets/', 'https://assets.infomagazine.xyz/')
             this.push_landing()
           }
         })

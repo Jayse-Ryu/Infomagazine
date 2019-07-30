@@ -281,7 +281,7 @@
           let params = {}
 
           params = {
-            Key: 'https://assets.infomagazine.xyz/images/landing/' + this.page_id + '/etc/' + file.name + '_' + Date.now(),
+            Key: 'assets/images/landing/' + this.page_id + '/etc/' + file.name + '_' + Date.now(),
             ContentType: file.type,
             Body: file
           }
@@ -291,7 +291,7 @@
             if (error) {
               console.log('S3 method error occurred', error)
             } else {
-              this.form_selected.image_data = params.Key
+              this.form_selected.image_data = params.Key.replace('assets/', 'https://assets.infomagazine.xyz/')
               this.$emit('update:etc', this.form_obj)
               this.push_landing()
             }

@@ -615,7 +615,7 @@
         let params = {}
 
         params = {
-          Key: 'https://assets.infomagazine.xyz/images/landing/' + this.page_id + '/field/' + file.name + '_' + Date.now(),
+          Key: 'assets/images/landing/' + this.page_id + '/field/' + file.name + '_' + Date.now(),
           ContentType: file.type,
           Body: file
         }
@@ -626,7 +626,7 @@
           } else {
             for (let i = 0; i < this.field_obj.length; i++) {
               if (this.field_obj[i].sign == sign) {
-                this.field_obj[i].image_data = params.Key
+                this.field_obj[i].image_data = params.Key.replace('assets/', 'https://assets.infomagazine.xyz/')
               }
             }
             this.$emit('update:field', this.field_obj)

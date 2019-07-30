@@ -735,7 +735,7 @@
         let params = {}
 
         params = {
-          Key: 'https://assets.infomagazine.xyz/images/landing/' + this.page_id + '/section/' + file.name + '_' + Date.now(),
+          Key: 'assets/images/landing/' + this.page_id + '/section/' + file.name + '_' + Date.now(),
           ContentType: file.type,
           Body: file
         }
@@ -746,7 +746,7 @@
           } else {
             for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
               if (this.order_obj[this.section_selected][i].sign == sign) {
-                this.order_obj[this.section_selected][i].image_data = params.Key
+                this.order_obj[this.section_selected][i].image_data = params.Key.replace('assets/', 'https://assets.infomagazine.xyz/')
               }
             }
             this.$emit('update:order', this.order_obj)
