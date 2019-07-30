@@ -263,7 +263,8 @@ class StyleSheet:
 
 
 class LandingPages:
-    def __init__(self, landing_info):
+    def __init__(self, landing_info, is_generate=False):
+        self.is_generate = is_generate
         self.landing_config = landing_info['landing']
         self.term_config = landing_info['term']
         self.form_config_list = landing_info['form']
@@ -409,7 +410,7 @@ class LandingPages:
         <script src="https://assets.infomagazine.xyz/vendor/js/jquery-3.4.1.js"></script>
         """
         self.landing_scripts = """"""
-        self.landing_info = landing_info
+
 
     def _scripts_generate(self):
         default_scripts = self.default_scripts
@@ -591,74 +592,81 @@ class LandingPages:
 
         main_container = base_html.new_tag('main', attrs={'class': 'section-container'})
         base_html.body.append(main_container)
-        style_sheet_generator = StyleSheet()
-        scripts_generator = Scripts()
 
-        for section_index, section in enumerate(self.section_info_list):  # 섹션 생성
-            section_h = section[0]['section_h']
-            self.layout_stylesheets += style_sheet_generator.section_height(section_id=section_index,
-                                                                            section_h=section_h)
-            landing_section = base_html.new_tag('section',
-                                                attrs={'class': 'landing-section', 'data-section-id': section_index})
-            main_container.append(landing_section)
+        try:
+            style_sheet_generator = StyleSheet()
+            scripts_generator = Scripts()
 
-            for object_index, section_object_info in enumerate(section):  # 객체 생성
-                self.layout_stylesheets += style_sheet_generator.object_block_size(section_id=section_index,
-                                                                                   object_id=object_index,
-                                                                                   layout_info=section_object_info)
-                section_object_block = base_html.new_tag('div', attrs={'class': 'landing-object-block',
-                                                                       'data-object-id': object_index})
-                landing_section.append(section_object_block)
-                object_type = section_object_info['type']
-                self.layout_stylesheets += style_sheet_generator.object_by_type_size(object_type=object_type,
-                                                                                     section_id=section_index,
-                                                                                     object_id=object_index,
-                                                                                     layout_info=section_object_info)
-                if object_type == 1:
-                    section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image'})
-                    section_object_block.append(section_object_by_type)
+            for section_index, section in enumerate(self.section_info_list):  # 섹션 생성
+                section_h = section[0]['section_h']
+                self.layout_stylesheets += style_sheet_generator.section_height(section_id=section_index,
+                                                                                section_h=section_h)
+                landing_section = base_html.new_tag('section',
+                                                    attrs={'class': 'landing-section',
+                                                           'data-section-id': section_index})
+                main_container.append(landing_section)
 
-                elif object_type == 2:
-                    form_group_id = section_object_info['form_group_id']
-                    self.layout_stylesheets += style_sheet_generator.field_label_size(section_id=section_index,
-                                                                                      object_id=object_index,
-                                                                                      field_info_list=self.field_info_list,
-                                                                                      form_group_id=form_group_id)
-                    section_object_by_type = base_html.new_tag('form', attrs={'class': 'object-type-form'})
-                    section_object_block.append(section_object_by_type)
-                    generated_field_list = [self._db_form_field_generator(style_sheet_generator,
-                                                                          scripts_generator,
-                                                                          base_html,
-                                                                          section_id=section_index,
-                                                                          object_id=object_index,
-                                                                          object_w=section_object_info['position']['w'],
-                                                                          object_h=section_object_info['position']['h'],
-                                                                          field_id=field_index,
-                                                                          field_info=field,
-                                                                          field_position_set=next(
-                                                                              item for item in
-                                                                              section_object_info['fields']
-                                                                              if item["sign"] == field['sign']))
-                                            for field_index, field
-                                            in enumerate(self.field_info_list)
-                                            if int(field['form_group_id']) == int(form_group_id)]
+                for object_index, section_object_info in enumerate(section):  # 객체 생성
+                    self.layout_stylesheets += style_sheet_generator.object_block_size(section_id=section_index,
+                                                                                       object_id=object_index,
+                                                                                       layout_info=section_object_info)
+                    section_object_block = base_html.new_tag('div', attrs={'class': 'landing-object-block',
+                                                                           'data-object-id': object_index})
+                    landing_section.append(section_object_block)
+                    object_type = section_object_info['type']
+                    self.layout_stylesheets += style_sheet_generator.object_by_type_size(object_type=object_type,
+                                                                                         section_id=section_index,
+                                                                                         object_id=object_index,
+                                                                                         layout_info=section_object_info)
+                    if object_type == 1:
+                        section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image'})
+                        section_object_block.append(section_object_by_type)
 
-                    item_group = []
-                    for generated_field, item in generated_field_list:
-                        section_object_by_type.append(generated_field)
-                        item_group.append(item)
+                    elif object_type == 2:
+                        form_group_id = section_object_info['form_group_id']
+                        self.layout_stylesheets += style_sheet_generator.field_label_size(section_id=section_index,
+                                                                                          object_id=object_index,
+                                                                                          field_info_list=self.field_info_list,
+                                                                                          form_group_id=form_group_id)
+                        section_object_by_type = base_html.new_tag('form', attrs={'class': 'object-type-form'})
+                        section_object_block.append(section_object_by_type)
+                        generated_field_list = [self._db_form_field_generator(style_sheet_generator,
+                                                                              scripts_generator,
+                                                                              base_html,
+                                                                              section_id=section_index,
+                                                                              object_id=object_index,
+                                                                              object_w=section_object_info['position'][
+                                                                                  'w'],
+                                                                              object_h=section_object_info['position'][
+                                                                                  'h'],
+                                                                              field_id=field_index,
+                                                                              field_info=field,
+                                                                              field_position_set=next(
+                                                                                  item for item in
+                                                                                  section_object_info['fields']
+                                                                                  if item["sign"] == field['sign']))
+                                                for field_index, field
+                                                in enumerate(self.field_info_list)
+                                                if int(field['form_group_id']) == int(form_group_id)]
 
-                    self.landing_scripts += scripts_generator.submit_event(section_id=section_index,
-                                                                           item_group=item_group)
-                    self.landing_scripts += scripts_generator.validation(section_id=section_index)
-                    self.landing_scripts += scripts_generator.call_ajax(section_id=section_index)
+                        item_group = []
+                        for generated_field, item in generated_field_list:
+                            section_object_by_type.append(generated_field)
+                            item_group.append(item)
 
-                elif object_type == 3:
-                    section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image'})
-                    section_object_block.append(section_object_by_type)
+                        self.landing_scripts += scripts_generator.submit_event(section_id=section_index,
+                                                                               item_group=item_group)
+                        self.landing_scripts += scripts_generator.validation(section_id=section_index)
+                        self.landing_scripts += scripts_generator.call_ajax(section_id=section_index)
 
-        stylesheets = BeautifulSoup(self._stylesheets_generate(), 'html.parser')
-        base_html.head.append(stylesheets)
-        scripts = BeautifulSoup(self._scripts_generate(), 'html.parser')
-        base_html.body.append(scripts)
-        return base_html.prettify()
+                    elif object_type == 3:
+                        section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image'})
+                        section_object_block.append(section_object_by_type)
+
+            stylesheets = BeautifulSoup(self._stylesheets_generate(), 'html.parser')
+            base_html.head.append(stylesheets)
+            scripts = BeautifulSoup(self._scripts_generate(), 'html.parser')
+            base_html.body.append(scripts)
+            return {'state': True, 'data': base_html.prettify(), 'message': 'Succeed.'}
+        except Exception as e:
+            return {'state': False, 'data': '', 'message': str(e)}
