@@ -513,8 +513,9 @@
           // console.log('landing create object is? ', this.dynamo_obj)
 
           axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
-            .then(() => {
+            .then((response) => {
               this.$store.state.pageOptions.loading = false
+              this.page_id = response.data.data.inserted_id
               alert('랜딩이 생성되었습니다.')
               this.bye()
             })
@@ -525,31 +526,29 @@
             })
         }
         else {
-          // if (!this.page_id) {
-          //   axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
-          //     .then((response) => {
-          //       console.log('lan create response', response)
-          //       // this.page_id
-          //     })
-          //     .catch((error) => {
-          //       console.log('Landing update fail', error)
-          //     })
-          // } else {
-          //   axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
-          //     'company_id': this.dynamo_obj.company_id,
-          //     'landing_pages': this.dynamo_obj.landing_info
-          //   }, config)
-          //     .then(() => {
-          //       // console.log('landing updated', response)
-          //       // console.log('landing updated')
-          //     })
-          //     .catch((error) => {
-          //       console.log('Landing update fail', error)
-          //     })
-          // }
+          if (!this.page_id) {
+            axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+              .then((response) => {
+                this.page_id = response.data.data.inserted_id
+                // this.page_id
+              })
+              .catch((error) => {
+                console.log('Landing update fail', error)
+              })
+          } else {
+            axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
+              'company_id': this.dynamo_obj.company_id,
+              'landing_pages': this.dynamo_obj.landing_info
+            }, config)
+              .then(() => {
+
+              })
+              .catch((error) => {
+                console.log('Landing update fail', error)
+              })
+          }
 
         }
-
       },
       // make_file(option) {
       //   axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/preview/')
