@@ -1,3 +1,5 @@
+import json
+
 import pymongo
 from bson import ObjectId
 from bson.json_util import dumps
@@ -16,38 +18,51 @@ class LandingPage:
     def list(self, choice_collection, projection=None):
         find_option = ({}, projection,)
         queryset = self.db[choice_collection].find(*find_option)
+        if queryset is None:
+            return {'state': False, 'data': '', 'message': 'Data that does not exist.'}
         queryset = dumps(queryset)
-        return queryset
+        return {'state': True, 'data': json.loads(queryset), 'message': 'Succeed.'}
 
     def create(self, choice_collection, document):
         queryset = self.db[choice_collection].insert_one(document)
-        return queryset.acknowledged
+        if queryset.acknowledged:
+            return {'state': True, 'data': {'inserted_id': str(queryset.inserted_id)}, 'message': 'Succeed.'}
+        else:
+            return {'state': False, 'data': '', 'message': 'Failed.'}
 
     def retrieve(self, choice_collection, doc_id, projection=None):
-        find_option = ({'_id': ObjectId(doc_id)}, projection,)
-        queryset = self.db[choice_collection].find_one(*find_option)
-        queryset = dumps(queryset)
-        return queryset
+        if ObjectId.is_valid(doc_id):
+            find_option = ({'_id': ObjectId(doc_id)}, projection,)
+            queryset = self.db[choice_collection].find_one(*find_option)
+            if queryset is None:
+                return {'state': False, 'data': '', 'message': 'Data that does not exist.'}
+            queryset = dumps(queryset)
+            return {'state': True, 'data': json.loads(queryset), 'message': 'Succeed.'}
+        else:
+            return {'state': False, 'data': '', 'message': 'Invalid a object id.'}
 
     def update(self, choice_collection: str, doc_id: str, data_to_update: dict, option: dict = None) -> dict:
-        if option is None:
-            option = {'returnNewDocument': True}
+        if ObjectId.is_valid(doc_id):
+            if option is None:
+                option = {'returnNewDocument': True}
+            else:
+                option.update({'returnNewDocument': True})
+            data_to_update.update({
+                '$currentDate':
+                    {
+                        'lastModified': True,
+                        # 'updated_date':
+                        #     {
+                        #         '$type': 'timestamp'
+                        #     }
+                    }
+            })
+            find_option = ({'_id': ObjectId(doc_id)}, data_to_update, option)
+            queryset = self.db[choice_collection].find_one_and_update(*find_option)
+            queryset = dumps(queryset)
+            return {'state': True, 'data': json.loads(queryset), 'message': 'Succeed.'}
         else:
-            option.update({'returnNewDocument': True})
-        data_to_update.update({
-            '$currentDate':
-                {
-                    'lastModified': True,
-                    # 'updated_date':
-                    #     {
-                    #         '$type': 'timestamp'
-                    #     }
-                }
-        })
-        find_option = ({'_id': ObjectId(doc_id)}, data_to_update, option)
-        queryset = self.db[choice_collection].find_one_and_update(*find_option)
-        queryset = dumps(queryset)
-        return queryset
+            return {'state': False, 'data': '', 'message': 'Invalid a object id.'}
 
     def destroy(self):
         pass
