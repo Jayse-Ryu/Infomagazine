@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework.utils import json
 
 import v1.permissions as custom_permissions
-from v1.landingpage.models import LandingPage
-from v1.landingpage.utils import LandingPages
+from v1.landingpage.models import LandingPage as LandingModel
+from v1.landingpage.utils import LandingPage as LandingGenerator
 
 
 def response_decorator():
@@ -65,7 +65,7 @@ class ReturnValuesFormatter:
 
 
 class LandingPageViewSetsUtils(viewsets.ViewSet):
-    landing_pages_model = LandingPage(choice_db='infomagazine')
+    landing_pages_model = LandingModel(choice_db='infomagazine')
     permission_classes = (custom_permissions.IsMarketer,)
     return_value_formatter = ReturnValuesFormatter
 
@@ -74,7 +74,7 @@ class LandingPageViewSetsUtils(viewsets.ViewSet):
 
     def get_landing_data(self, landing_detail=None, is_generate=False):
         if landing_detail['state']:
-            landing_pages = LandingPages(landing_detail['data']['landing_info'],is_generate=is_generate)
+            landing_pages = LandingGenerator(landing_detail['data']['landing_info'], is_generate=is_generate)
             lading_page_generated = landing_pages.generate()
             lading_page_generated.update(
                 {'options': {'status': status.HTTP_200_OK} if landing_detail['state'] else {
