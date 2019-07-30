@@ -15,7 +15,6 @@
         <h5>기본정보</h5>
         <section_basic
           :window_width="window_width"
-          :page_id="page_id"
           :dynamo="dynamo_obj"
           :company.sync="dynamo_obj.company_id"
           :name.sync="dynamo_obj.landing_info.landing.name"
@@ -37,6 +36,7 @@
         />
         <section_form_detail
           :window_width="window_width"
+          :page_id.sync="page_id"
           :epoch_time="epoch_time"
           :updated_date="dynamo_obj.updated_date"
           :form_arrow.sync="form_arrow"
@@ -50,6 +50,7 @@
         <h5>기타 폼</h5>
         <section_form_control_etc
           :etc.sync="dynamo_obj.landing_info.etc"
+          :page_id.sync="page_id"
           :etc_arrow.sync="etc_arrow"
           :epoch_time="epoch_time"
           :updated_date="dynamo_obj.updated_date"
@@ -60,6 +61,7 @@
 
         <h5>추가내용</h5>
         <section_term ref="term_comp"
+                      :page_id.sync="page_id"
                       :epoch_time="epoch_time"
                       :landing="dynamo_obj.landing_info.landing"
                       :term.sync="dynamo_obj.landing_info.term"
@@ -95,6 +97,7 @@
 
         <section_layout_opt
           :window_width.sync="window_width"
+          :page_id.sync="page_id"
           :epoch_time="epoch_time"
           :updated_date="dynamo_obj.updated_date"
           :landing.sync="dynamo_obj.landing_info.landing"

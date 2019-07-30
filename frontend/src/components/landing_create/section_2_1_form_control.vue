@@ -89,7 +89,7 @@
     <label v-if="etc_arrow * 1 !== -1" class="col-sm-3 col-form-label-sm mt-3" for="term_img_preview">미리보기</label>
     <div v-if="etc_arrow * 1 !== -1" class="col-sm-9 mt-sm-3 row ml-0" id="term_img_preview">
       <div v-if="form_selected.image_data" class="term_preview_wrap">
-        <img class="term_preview" :src="key_to_url(form_selected.image_data)" alt="기타 폼 이미지 미리보기">
+        <img class="term_preview" :src="form_selected.image_data" alt="기타 폼 이미지 미리보기">
       </div>
       <div v-else class="form-control">
         <div>등록된 파일이 없습니다</div>
@@ -107,6 +107,7 @@
   export default {
     name: "section_2_form_control_etc",
     props: [
+      'page_id',
       'etc',
       'etc_arrow',
       'epoch_time',
@@ -266,53 +267,31 @@
           )
 
           if (this.form_selected.image_data) {
-            if (this.form_selected.image_data.indexOf('assets') > -1) {
-              s3.deleteObject({
-                Key: this.form_selected.image_data
-              }, (err, data) => {
-                if (err) {
-                  alert('There was an error deleting your photo: ', err.message)
-                } else {
-                  this.form_selected.image_data = null
-                }
-              })
-            } else {
-              s3.deleteObject({
-                Key: 'assets' + this.form_selected.image_data
-              }, (err, data) => {
-                if (err) {
-                  alert('There was an error deleting your photo: ', err.message)
-                } else {
-                  this.form_selected.image_data = null
-                }
-              })
-            }
+            s3.deleteObject({
+              Key: this.form_selected.image_data.replace('https://assets.infomagazine.xyz', 'assets')
+            }, (err, data) => {
+              if (err) {
+                alert('There was an error deleting your photo: ', err.message)
+              } else {
+                this.form_selected.image_data = null
+              }
+            })
           }
 
           let params = {}
 
-          if (this.updated_date) {
-            params = {
-              Key: 'assets/images/landing/' + this.epoch_time + '/etc/' + Date.now() + '_' + file.name,
-              ContentType: file.type,
-              Body: file,
-              ACL: 'public-read'
-            }
-          } else {
-            params = {
-              Key: 'assets/images/landing/preview/' + this.epoch_time + '/etc/' + Date.now() + '_' + file.name,
-              ContentType: file.type,
-              Body: file,
-              ACL: 'public-read'
-            }
+          params = {
+            Key: 'https://assets.infomagazine.xyz/images/landing/' + this.page_id + '/etc/' + file.name + '_' + Date.now(),
+            ContentType: file.type,
+            Body: file
           }
+
 
           s3.upload(params, (error, data) => {
             if (error) {
               console.log('S3 method error occurred', error)
             } else {
-              // console.log('S3 method success', data)
-              this.form_selected.image_data = params.Key.replace('assets/', '/')
+              this.form_selected.image_data = params.Key
               this.$emit('update:etc', this.form_obj)
               this.push_landing()
             }
@@ -343,12 +322,7 @@
             }
           )
 
-          let photoKey = ''
-          if (this.form_selected.image_data.indexOf('assets') > -1) {
-            photoKey = this.form_selected.image_data
-          } else {
-            photoKey = 'assets' + this.form_selected.image_data
-          }
+          let photoKey = this.form_selected.image_data.replace('https://assets.infomagazine.xyz', 'assets')
 
           if (photoKey) {
             s3.deleteObject({Key: photoKey}, (err, data) => {
@@ -367,47 +341,47 @@
         }
 
       },
-      key_to_url(key) {
-        if (key != null) {
-          if (key.indexOf('assets') > -1) {
-            let divided = key.split('/')
-            let url = 'https://'
-
-            if (this.updated_date == '') {
-              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
-            } else {
-              for (let i = 0; i < divided.length; i++) {
-                if (i == 0) {
-                  url += (divided[i] + '.infomagazine.xyz')
-                  // url += ('assets' + '.infomagazine.xyz')
-                } else {
-                  url += ('/' + divided[i])
-                }
-              }
-            }
-            return url
-          } else {
-            let divided = key.split('/')
-            let url = 'https://'
-
-            if (this.updated_date == '') {
-              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
-            } else {
-              for (let i = 0; i < divided.length; i++) {
-                if (i == 0) {
-                  // url += (divided[i] + '.infomagazine.xyz')
-                  url += ('assets' + '.infomagazine.xyz')
-                } else {
-                  url += ('/' + divided[i])
-                }
-              }
-            }
-            return url
-          }
-        } else {
-          return ''
-        }
-      }
+      // key_to_url(key) {
+      //   if (key != null) {
+      //     if (key.indexOf('assets') > -1) {
+      //       let divided = key.split('/')
+      //       let url = 'https://'
+      //
+      //       if (this.updated_date == '') {
+      //         url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+      //       } else {
+      //         for (let i = 0; i < divided.length; i++) {
+      //           if (i == 0) {
+      //             url += (divided[i] + '.infomagazine.xyz')
+      //             // url += ('assets' + '.infomagazine.xyz')
+      //           } else {
+      //             url += ('/' + divided[i])
+      //           }
+      //         }
+      //       }
+      //       return url
+      //     } else {
+      //       let divided = key.split('/')
+      //       let url = 'https://'
+      //
+      //       if (this.updated_date == '') {
+      //         url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
+      //       } else {
+      //         for (let i = 0; i < divided.length; i++) {
+      //           if (i == 0) {
+      //             // url += (divided[i] + '.infomagazine.xyz')
+      //             url += ('assets' + '.infomagazine.xyz')
+      //           } else {
+      //             url += ('/' + divided[i])
+      //           }
+      //         }
+      //       }
+      //       return url
+      //     }
+      //   } else {
+      //     return ''
+      //   }
+      // }
     }
   }
 </script>

@@ -39,7 +39,7 @@
       <label class="col-sm-3 col-form-label-sm mt-3" for="term_img_preview">미리보기</label>
       <div class="col-sm-9 mt-sm-3 row ml-0" id="term_img_preview">
         <div v-if="term.image_data" class="term_preview_wrap">
-          <img class="term_preview" :src="key_to_url(term.image_data)" alt="약관 이미지 미리보기">
+          <img class="term_preview" :src="term.image_data" alt="약관 이미지 미리보기">
         </div>
         <div v-else class="form-control">
           <div>등록된 파일이 없습니다</div>
@@ -72,6 +72,7 @@
     name: "section_3_term",
     props: [
       'epoch_time',
+      'page_id',
       'updated_date',
       'landing',
       'term',
@@ -99,42 +100,23 @@
         )
 
         if (this.term.image_data) {
-          if (this.term.image_data.indexOf('assets') > -1) {
-            s3.deleteObject({Key: this.term.image_data}, (err, data) => {
-              if (err) {
-                alert('There was an error deleting your photo: ', err.message)
-              } else {
-                this.term.image_data = null
-              }
-            })
-          } else {
-            s3.deleteObject({Key: 'assets' + this.term.image_data}, (err, data) => {
-              if (err) {
-                alert('There was an error deleting your photo: ', err.message)
-              } else {
-                this.term.image_data = null
-              }
-            })
-          }
+          let photo_key = this.term.image_data.replace('https://assets.infomagazine.xyz', 'assets')
+          s3.deleteObject({Key: photo_key}, (err, data) => {
+            if (err) {
+              alert('There was an error deleting your photo: ', err.message)
+            } else {
+              this.term.image_data = null
+            }
+          })
 
         }
 
         let params = {}
 
-        if (this.updated_date) {
-          params = {
-            Key: 'assets/images/landing/' + this.epoch_time + '/term/' + Date.now() + '_' + file.name,
-            ContentType: file.type,
-            Body: file,
-            ACL: 'public-read'
-          }
-        } else {
-          params = {
-            Key: 'assets/images/landing/preview/' + this.epoch_time + '/term/' + Date.now() + '_' + file.name,
-            ContentType: file.type,
-            Body: file,
-            ACL: 'public-read'
-          }
+        params = {
+          Key: 'https://assets.infomagazine.xyz/images/landing/' + this.page_id + '/term/' + file.name + '_' + Date.now(),
+          ContentType: file.type,
+          Body: file
         }
 
         s3.upload(params, (error, data) => {
@@ -142,7 +124,7 @@
             console.log('S3 method error occurred', error)
           } else {
             // console.log('S3 method success', data)
-            this.term.image_data = params.Key.replace('assets/', '/')
+            this.term.image_data = params.Key
             this.push_landing()
           }
         })
@@ -167,12 +149,7 @@
           }
         )
 
-        let photoKey = ''
-        if (this.term.image_data.indexOf('assets') > -1) {
-          photoKey = this.term.image_data
-        } else {
-          photoKey = 'assets' + this.term.image_data
-        }
+        let photoKey = this.term.image_data.replace('https://assets.infomagazine.xyz', 'assets')
 
         if (photoKey) {
           s3.deleteObject({Key: photoKey}, (err, data) => {
@@ -189,47 +166,47 @@
         }
 
       },
-      key_to_url(key) {
-        if (key != null) {
-          if (key.indexOf('assets') > -1) {
-            let divided = key.split('/')
-            let url = 'https://'
-
-            if (this.updated_date == '') {
-              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
-            } else {
-              for (let i = 0; i < divided.length; i++) {
-                if (i == 0) {
-                  url += (divided[i] + '.infomagazine.xyz')
-                  // url += ('assets' + '.infomagazine.xyz')
-                } else {
-                  url += ('/' + divided[i])
-                }
-              }
-            }
-            return url
-          } else {
-            let divided = key.split('/')
-            let url = 'https://'
-
-            if (this.updated_date == '') {
-              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
-            } else {
-              for (let i = 0; i < divided.length; i++) {
-                if (i == 0) {
-                  // url += (divided[i] + '.infomagazine.xyz')
-                  url += ('assets' + '.infomagazine.xyz')
-                } else {
-                  url += ('/' + divided[i])
-                }
-              }
-            }
-            return url
-          }
-        } else {
-          return ''
-        }
-      }
+      // key_to_url(key) {
+      //   if (key != null) {
+      //     if (key.indexOf('assets') > -1) {
+      //       let divided = key.split('/')
+      //       let url = 'https://'
+      //
+      //       if (this.updated_date == '') {
+      //         url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+      //       } else {
+      //         for (let i = 0; i < divided.length; i++) {
+      //           if (i == 0) {
+      //             url += (divided[i] + '.infomagazine.xyz')
+      //             // url += ('assets' + '.infomagazine.xyz')
+      //           } else {
+      //             url += ('/' + divided[i])
+      //           }
+      //         }
+      //       }
+      //       return url
+      //     } else {
+      //       let divided = key.split('/')
+      //       let url = 'https://'
+      //
+      //       if (this.updated_date == '') {
+      //         url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
+      //       } else {
+      //         for (let i = 0; i < divided.length; i++) {
+      //           if (i == 0) {
+      //             // url += (divided[i] + '.infomagazine.xyz')
+      //             url += ('assets' + '.infomagazine.xyz')
+      //           } else {
+      //             url += ('/' + divided[i])
+      //           }
+      //         }
+      //       }
+      //       return url
+      //     }
+      //   } else {
+      //     return ''
+      //   }
+      // }
     }
   }
 </script>

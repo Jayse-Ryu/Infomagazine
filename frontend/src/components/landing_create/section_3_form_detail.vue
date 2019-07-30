@@ -297,7 +297,7 @@
 
                   <div class="col-12 p-0" id="term_img_preview">
                     <div v-if="content.image_data" class="term_preview_wrap">
-                      <img class="term_preview" :src="key_to_url(content.image_data)" alt="약관 이미지 미리보기">
+                      <img class="term_preview" :src="content.image_data" alt="약관 이미지 미리보기">
                     </div>
                     <div v-else class="form-control">
                       <div>등록된 파일이 없습니다</div>
@@ -332,6 +332,7 @@
     name: "section_3_form_detail",
     props: [
       'window_width',
+      'page_id',
       'epoch_time',
       'updated_date',
       'form_arrow',
@@ -597,47 +598,27 @@
 
         for (let i = 0; i < this.field_obj.length; i++) {
           if (this.field_obj[i].sign == sign && this.field_obj[i].image_data) {
-            if (this.field_obj[i].image_data.indexOf('assets') > -1) {
-              s3.deleteObject({Key: this.field_obj[i].image_data}, (err, data) => {
-                if (err) {
-                  alert('There was an error deleting your photo: ', err.message)
-                } else {
-                  this.field_obj[i].image_data = null
-                  this.field_obj[i].image_url = null
-                }
-              })
-            } else {
-              s3.deleteObject({Key: 'assets' + this.field_obj[i].image_data}, (err, data) => {
-                if (err) {
-                  alert('There was an error deleting your photo: ', err.message)
-                } else {
-                  this.field_obj[i].image_data = null
-                  this.field_obj[i].image_url = null
-                }
-              })
-            }
+
+            let photokey = this.field_obj[i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
+            s3.deleteObject({Key: photokey}, (err, data) => {
+              if (err) {
+                alert('There was an error deleting your photo: ', err.message)
+              } else {
+                this.field_obj[i].image_data = null
+                this.field_obj[i].image_url = null
+              }
+            })
 
           }
         }
 
         let params = {}
 
-        if (this.updated_date) {
-          params = {
-            Key: 'assets/images/landing/' + this.epoch_time + '/field/' + Date.now() + '_' + file.name,
-            ContentType: file.type,
-            Body: file,
-            ACL: 'public-read'
-          }
-        } else {
-          params = {
-            Key: 'assets/images/landing/preview/' + this.epoch_time + '/field/' + Date.now() + '_' + file.name,
-            ContentType: file.type,
-            Body: file,
-            ACL: 'public-read'
-          }
+        params = {
+          Key: 'https://assets.infomagazine.xyz/images/landing/' + this.page_id + '/field/' + file.name + '_' + Date.now(),
+          ContentType: file.type,
+          Body: file
         }
-
 
         s3.upload(params, (error, data) => {
           if (error) {
@@ -645,8 +626,7 @@
           } else {
             for (let i = 0; i < this.field_obj.length; i++) {
               if (this.field_obj[i].sign == sign) {
-                this.field_obj[i].image_data = params.Key.replace('assets/', '/')
-                this.field_obj[i].image_url = params.Key.replace('assets/', '/')
+                this.field_obj[i].image_data = params.Key
               }
             }
             this.$emit('update:field', this.field_obj)
@@ -678,12 +658,8 @@
 
         for (let i = 0; i < this.field_obj.length; i++) {
           if (this.field_obj[i].sign == sign) {
-            let photoKey = ''
-            if(this.field_obj[i].image_data.indexOf('assets') > -1) {
-              photoKey = this.field_obj[i].image_data
-            } else {
-              photoKey = 'assets' + this.field_obj[i].image_data
-            }
+
+            let photoKey = this.field_obj[i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
 
             s3.deleteObject({Key: photoKey}, (err, data) => {
               if (err) {
@@ -693,8 +669,6 @@
 
                 document.getElementById('field_file_input_' + sign).value = ''
                 this.field_obj[i].image_data = null
-                this.field_obj[i].image_url = null
-
                 this.$emit('update:field', this.field_obj)
                 this.push_landing()
               }
@@ -703,48 +677,48 @@
           }
         }
       },
-      key_to_url(key) {
-        if (key != null) {
-          if (key.indexOf('assets') > -1) {
-            let divided = key.split('/')
-            let url = 'https://'
-
-            if (this.updated_date == '') {
-              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
-            } else {
-              for (let i = 0; i < divided.length; i++) {
-                if (i == 0) {
-                  url += (divided[i] + '.infomagazine.xyz')
-                  // url += ('assets' + '.infomagazine.xyz')
-                } else {
-                  url += ('/' + divided[i])
-                }
-              }
-            }
-            return url
-          } else {
-            let divided = key.split('/')
-            let url = 'https://'
-
-            if (this.updated_date == '') {
-              url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
-            } else {
-              for (let i = 0; i < divided.length; i++) {
-                if (i == 0) {
-                  // url += (divided[i] + '.infomagazine.xyz')
-                  url += ('assets' + '.infomagazine.xyz')
-                } else {
-                  url += ('/' + divided[i])
-                }
-              }
-            }
-            return url
-          }
-        } else {
-          return ''
-        }
-
-      }
+      // key_to_url(key) {
+      //   if (key != null) {
+      //     if (key.indexOf('assets') > -1) {
+      //       let divided = key.split('/')
+      //       let url = 'https://'
+      //
+      //       if (this.updated_date == '') {
+      //         url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+      //       } else {
+      //         for (let i = 0; i < divided.length; i++) {
+      //           if (i == 0) {
+      //             url += (divided[i] + '.infomagazine.xyz')
+      //             // url += ('assets' + '.infomagazine.xyz')
+      //           } else {
+      //             url += ('/' + divided[i])
+      //           }
+      //         }
+      //       }
+      //       return url
+      //     } else {
+      //       let divided = key.split('/')
+      //       let url = 'https://'
+      //
+      //       if (this.updated_date == '') {
+      //         url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
+      //       } else {
+      //         for (let i = 0; i < divided.length; i++) {
+      //           if (i == 0) {
+      //             // url += (divided[i] + '.infomagazine.xyz')
+      //             url += ('assets' + '.infomagazine.xyz')
+      //           } else {
+      //             url += ('/' + divided[i])
+      //           }
+      //         }
+      //       }
+      //       return url
+      //     }
+      //   } else {
+      //     return ''
+      //   }
+      //
+      // }
     },
     computed: {
       arrow() {
