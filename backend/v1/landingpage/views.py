@@ -1,3 +1,7 @@
+import collections
+import time
+from functools import wraps
+
 from bson import ObjectId
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action, renderer_classes
@@ -6,30 +10,92 @@ from rest_framework.response import Response
 from rest_framework.utils import json
 
 import v1.permissions as custom_permissions
-from v1.landingpage.models import LandingPage
-from v1.landingpage.utils import LandingPages
+from v1.landingpage.models import LandingPage as LandingModel
+from v1.landingpage.utils import LandingPage as LandingGenerator
 
 
-class LandingPageViewSets(viewsets.ViewSet):
-    landing_pages_model = LandingPage(choice_db='infomagazine')
+def response_decorator():
+    def wrapper(func):
+        @wraps(func)
+        def decorator(*args, **kwargs):
+            data = func(*args, **kwargs)
+            response_formatter = ReturnValuesFormatter()
+
+            response_formatter.values_to_return = {
+                'state': data['state'],
+                'data': data['data'],
+                'message': data['message'],
+                'options': data['options']
+            }
+            return Response(**response_formatter.generate())
+
+        return decorator
+
+    return wrapper
+
+
+class ReturnValuesFormatter:
+    def __init__(self):
+        self._values_to_return = None
+
+    @property
+    def values_to_return(self):
+        return self._values_to_return
+
+    @values_to_return.setter
+    def values_to_return(self, set_values):
+        values_to_return_named_tuple = collections.namedtuple('values_to_return',
+                                                              ['state',
+                                                               'data',
+                                                               'message',
+                                                               'options'])
+        self._values_to_return = values_to_return_named_tuple(**set_values)
+
+    def generate(self):
+        formatted_values = {
+            'data':
+                {
+                    'state': self._values_to_return.state,
+                    'data': self._values_to_return.data,
+                    'message': self._values_to_return.message
+                }
+        }
+        formatted_values.update(self._values_to_return.options)
+        return formatted_values
+
+
+class LandingPageViewSetsUtils(viewsets.ViewSet):
+    landing_pages_model = LandingModel(choice_db='infomagazine')
     permission_classes = (custom_permissions.IsMarketer,)
+    return_value_formatter = ReturnValuesFormatter
 
+    def get_formatter(self):
+        return self.return_value_formatter()
+
+    def get_landing_data(self, landing_detail=None, is_generate=False):
+        if landing_detail['state']:
+            landing_pages = LandingGenerator(landing_detail['data']['landing_info'], is_generate=is_generate)
+            lading_page_generated = landing_pages.generate()
+            lading_page_generated.update(
+                {'options': {'status': status.HTTP_200_OK} if landing_detail['state'] else {
+                    'status': status.HTTP_500_INTERNAL_SERVER_ERROR}})
+            return lading_page_generated
+        else:
+            landing_detail.update({'options': {'status': status.HTTP_200_OK} if landing_detail['state'] else {
+                'status': status.HTTP_404_NOT_FOUND}})
+            return landing_detail
+
+
+class LandingPageViewSets(LandingPageViewSetsUtils):
+    @response_decorator()
     def list(self, request):
         projection = {'_id': 1, 'landing_info.landing.name': 1, 'landing_info.landing.views': 1}
-        data = self.landing_pages_model.list(choice_collection='landing_pages', projection=projection)
-        result = (
-            {
-                'state': True,
-                'data': json.loads(data),
-                'message': 'success'
-            },
-            {'status': status.HTTP_201_CREATED}
-        )
+        response_data = self.landing_pages_model.list(choice_collection='landing_pages', projection=projection)
+        response_data.update({"options": {'status': status.HTTP_200_OK} if response_data['state'] else {
+            'status': status.HTTP_404_NOT_FOUND}})
+        return response_data
 
-        if not data:
-            result = ({}, {'status': status.HTTP_503_SERVICE_UNAVAILABLE})
-        return Response(result[0], **result[1])
-
+    @response_decorator()
     def create(self, request):
         body = json.loads(request.body)
         document = {
@@ -37,93 +103,43 @@ class LandingPageViewSets(viewsets.ViewSet):
             "landing_info": body['landing_info'],
             "updated_date": body['updated_date']
         }
-        data = self.landing_pages_model.create(choice_collection='landing_pages', document=document)
+        response_data = self.landing_pages_model.create(choice_collection='landing_pages', document=document)
+        response_data.update({"options": {'status': status.HTTP_201_CREATED} if response_data['state'] else {
+            'status': status.HTTP_503_SERVICE_UNAVAILABLE}})
+        return response_data
 
-        result = (
-            {
-                'state': True,
-                'data': None,
-                'message': 'success'
-            },
-            {'status': status.HTTP_201_CREATED}
-        )
-
-        if not data:
-            result = ({}, {'status': status.HTTP_503_SERVICE_UNAVAILABLE})
-        return Response(result[0], **result[1])
-
+    @response_decorator()
     def retrieve(self, request, pk):
-        data = self.landing_pages_model.retrieve(choice_collection='landing_pages', doc_id=pk)
-        result = (
-            {
-                'state': True,
-                'data': json.loads(data),
-                'message': 'success'
-            },
-            {'status': status.HTTP_201_CREATED}
-        )
+        response_data = self.landing_pages_model.retrieve(choice_collection='landing_pages', doc_id=pk)
+        response_data.update({"options": {'status': status.HTTP_200_OK} if response_data['state'] else {
+            'status': status.HTTP_404_NOT_FOUND}})
+        return response_data
 
-        if not data:
-            result = ({}, {'status': status.HTTP_503_SERVICE_UNAVAILABLE})
-        return Response(result[0], **result[1])
-
+    @response_decorator()
     def update(self, request, pk):
-        data = self.landing_pages_model.update(choice_collection='landing_pages', doc_id=pk,
-                                               data_to_update={'$set': request.data})
-        result = (
-            {
-                'state': True,
-                'data': json.loads(data),
-                'message': 'success'
-            },
-            {'status': status.HTTP_201_CREATED}
-        )
-
-        if not data:
-            result = ({}, {'status': status.HTTP_503_SERVICE_UNAVAILABLE})
-        return Response(result[0], **result[1])
+        response_data = self.landing_pages_model.update(choice_collection='landing_pages', doc_id=pk,
+                                                        data_to_update={'$set': request.data})
+        response_data.update({"options": {'status': status.HTTP_200_OK} if response_data['state'] else {
+            'status': status.HTTP_404_NOT_FOUND}})
+        return response_data
 
     # TODO AllowAny 지워야 함
-    @action(detail=True, methods=['GET'], permission_classes=[permissions.AllowAny])
+    @action(detail=True, permission_classes=[permissions.AllowAny])
+    @response_decorator()
     def preview(self, request, pk):
-        if not pk:
-            result = ({
-                          'state': False,
-                          'data': "",
-                          'message': 'not set "pk"'
-                      },
-                      {'status': status.HTTP_400_BAD_REQUEST})
-            return Response(result[0], **result[1])
+        get_detail = self.retrieve(request, pk)
+        response_data = self.get_landing_data(landing_detail=get_detail.data)
+        return response_data
 
-        try:
-            landing_info = json.loads(self.landing_pages_model.retrieve(choice_collection='landing_pages', doc_id=pk))
-            if landing_info:
-                # # TODO request landing_info로 바꿔야 함
-                # with open('test.json') as data_file:
-                #     landing_info = json.load(data_file)
-
-                landing_pages = LandingPages(landing_info['landing_info'])
-                result = (
-                    {
-                        'state': True,
-                        'data': landing_pages.generate(),
-                        'message': 'success'
-                    },
-                    {'status': status.HTTP_200_OK})
-            else:
-                result = ({
-                              'state': False,
-                              'data': "",
-                              'message': pk + ' don\'t exist'
-                          },
-                          {'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
-            return Response(result[0], **result[1])
-        except Exception as e:
-            result = (
-                {
-                    'state': False,
-                    'data': '',
-                    'message': str(e)
-                },
-                {'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
-            return Response(result[0], **result[1])
+    @action(detail=True, methods=['POST'], )
+    def generate(self, request, pk):
+        response_formatter = self.get_formatter()
+        get_detail = self.retrieve(request, pk)
+        data = self.get_landing_data(landing_detail=get_detail.data, is_generate=True)
+        response_formatter.values_to_return = {
+            'state': data['state'],
+            'data': data['data'],
+            'message': data['message'],
+            'options': data['options']
+        }
+        return Response(**response_formatter.generate())
