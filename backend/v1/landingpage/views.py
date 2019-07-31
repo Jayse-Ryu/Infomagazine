@@ -148,7 +148,7 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
         landing_id = get_detail.data['data']['_id']['$oid']
         landing_base_url = get_detail.data['data']['landing_info']['landing']['base_url']
         epoch_time = time.time()
-        landing_url = f'''landings/{landing_id}/{landing_base_url}_{str(epoch_time)}.html'''
+        landing_url = f'''landings/{landing_id}/{landing_base_url}_{str(int(epoch_time))}.html'''
         s3_response_data = s3.put_object(Body=response_data['data'], Bucket=config('AWS_STORAGE_BUCKET_NAME'),
                                          Key=landing_url,
                                          ContentType='text/html')
