@@ -611,7 +611,6 @@
 
             // let photokey = this.field_obj[i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
             // this.file_manage('delete', 'field', photokey)
-
             // async function sync_file() {
             //   try {
             //     const do = await this.file_manage('delete', 'field', photokey)
@@ -656,15 +655,15 @@
           }
         })
 
-        if (this.file_manage('upload', 'field', file)) {
-          for (let i = 0; i < this.field_obj.length; i++) {
-            if (this.field_obj[i].sign == sign) {
-              this.field_obj[i].image_data = params.Key.replace('assets/', 'https://assets.infomagazine.xyz/')
-            }
-          }
-          this.$emit('update:field', this.field_obj)
-          this.push_landing()
-        }
+        // if (this.file_manage('upload', 'field', file)) {
+        //   for (let i = 0; i < this.field_obj.length; i++) {
+        //     if (this.field_obj[i].sign == sign) {
+        //       this.field_obj[i].image_data = params.Key.replace('assets/', 'https://assets.infomagazine.xyz/')
+        //     }
+        //   }
+        //   this.$emit('update:field', this.field_obj)
+        //   this.push_landing()
+        // }
 
       },
       field_file_delete(sign) {

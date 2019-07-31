@@ -518,18 +518,31 @@
 
           // console.log('landing create object is? ', this.dynamo_obj)
 
-          axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
-            .then((response) => {
-              this.$store.state.pageOptions.loading = false
-              this.page_id = response.data.data.inserted_id
-              alert('랜딩이 생성되었습니다.')
-              this.bye()
-            })
-            .catch((error) => {
-              alert('랜딩 생성이 실패하였습니다.')
-              this.$store.state.pageOptions.loading = false
-              console.log(error)
-            })
+          if (!this.page_id) {
+            axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+              .then((response) => {
+                this.$store.state.pageOptions.loading = false
+                this.page_id = response.data.data.inserted_id
+                alert('랜딩이 생성되었습니다.')
+                this.bye()
+              })
+              .catch((error) => {
+                alert('랜딩 생성이 실패하였습니다.')
+                this.$store.state.pageOptions.loading = false
+                console.log(error)
+              })
+          } else {
+            axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
+              'company_id': this.dynamo_obj.company_id,
+              'landing_pages': this.dynamo_obj.landing_info
+            }, config)
+              .then(() => {
+
+              })
+              .catch((error) => {
+                console.log('Landing update fail', error)
+              })
+          }
         } else {
           if (!this.page_id) {
             axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)

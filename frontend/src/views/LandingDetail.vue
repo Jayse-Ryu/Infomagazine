@@ -15,6 +15,7 @@
         <h5>기본정보</h5>
         <section_basic
           :window_width="window_width"
+          :page_id.sync="page_id"
           :dynamo="dynamo_obj"
           :company.sync="dynamo_obj.company_id"
           :name.sync="dynamo_obj.landing_info.landing.name"
