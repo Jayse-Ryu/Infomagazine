@@ -708,6 +708,7 @@
               return 'success'
             }
           })
+
         } else if (request === 'delete') {
           let photokey = file
           s3.deleteObject({Key: photokey}, (err, data) => {
@@ -723,7 +724,7 @@
       generate() {
         axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/generate/')
           .then((response) => {
-            console.log(response)
+            console.log('created', response)
           })
           .catch((error) => {
             console.log(error)
