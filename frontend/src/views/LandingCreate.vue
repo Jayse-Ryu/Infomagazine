@@ -116,7 +116,7 @@
         <div class="form-group row">
           <div class="col-12">
             <button type="submit" class="btn btn-primary col-12">생성</button>
-            <button type="button" v-if="page_id" class="btn btn-info col-12 mt-2" @click="generate">생성하기</button>
+            <button type="button" v-if="page_id" class="btn btn-info col-12 mt-2" @click="generate">파일 생성하기</button>
             <button type="button" class="btn btn-dark col-12 mt-2" @click="back_to_list">취소</button>
           </div>
         </div>

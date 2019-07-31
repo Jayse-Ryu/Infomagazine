@@ -119,7 +119,7 @@
         <div class="form-group row">
           <div class="col-12">
             <button type="submit" class="btn btn-primary col-12">수정</button>
-            <button type="button" class="btn btn-info col-12 mt-2" @click="generate">생성하기</button>
+            <button type="button" class="btn btn-info col-12 mt-2" @click="generate">파일 생성하기</button>
             <button type="button" class="btn btn-danger col-12 mt-2" @click="delete_landing">삭제</button>
             <button type="button" class="btn btn-dark col-12 mt-2" @click="back_to_list">되돌리기</button>
           </div>
