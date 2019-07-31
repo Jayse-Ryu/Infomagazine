@@ -121,6 +121,13 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
             'status': status.HTTP_404_NOT_FOUND}})
         return response_data
 
+    @response_decorator()
+    def destroy(self, request, pk):
+        response_data = self.landing_pages_model.destroy(choice_collection='landing_pages', doc_id=pk)
+        response_data.update({"options": {'status': status.HTTP_204_NO_CONTENT} if response_data['state'] else {
+            'status': status.HTTP_404_NOT_FOUND}})
+        return response_data
+
     @action(detail=True)
     @response_decorator()
     def preview(self, request, pk):
