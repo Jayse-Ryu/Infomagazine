@@ -165,3 +165,24 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
         else:
             return {'state': False, 'data': '', 'message': 'Failed.',
                     'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
+
+    @action(detail=True, methods=['GET'], )
+    @response_decorator()
+    def url_list(self, request, pk):
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+            region_name='ap-northeast-2'
+        )
+        s3_response = s3_client.list_objects(Bucket=config('AWS_STORAGE_BUCKET_NAME'),
+                                             Prefix='landings/' + pk + '/')
+
+        if s3_response['ResponseMetadata']['HTTPStatusCode'] == 200:
+            url_list_do_handling = [url['Key'].replace('landings/', 'https://landings.infomagazine.xyz/') for url in
+                                    s3_response.get('Contents', []) if url]
+            return {'state': True, 'data': url_list_do_handling, 'message': 'Succeed.',
+                    'options': {'status': status.HTTP_200_OK}}
+        else:
+            return {'state': False, 'data': '', 'message': 'Failed.',
+                    'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
