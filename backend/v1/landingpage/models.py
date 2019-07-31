@@ -64,5 +64,12 @@ class LandingPage:
         else:
             return {'state': False, 'data': '', 'message': 'Invalid a object id.'}
 
-    def destroy(self):
-        pass
+    def destroy(self, choice_collection: str, doc_id: str) -> dict:
+        if ObjectId.is_valid(doc_id):
+            queryset = self.db[choice_collection].delete_one({'_id': ObjectId(doc_id)})
+            if queryset.acknowledged:
+                return {'state': True, 'data': {'deleted_id': doc_id}, 'message': 'Succeed.'}
+            else:
+                return {'state': False, 'data': '', 'message': 'Failed.'}
+        else:
+            return {'state': False, 'data': '', 'message': 'Invalid a object id.'}
