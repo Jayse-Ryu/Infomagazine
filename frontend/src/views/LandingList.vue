@@ -188,6 +188,21 @@
       search_option: 0,
       search_text: '',
     }),
+    mounted() {
+      // Window width calculator
+      let that = this
+      that.$nextTick(function () {
+        window.addEventListener('resize', function (e) {
+          that.window_width = window.innerWidth
+        })
+      })
+
+      // Init other pages options
+      this.page_init()
+
+      // Get landing list
+      this.calling_all_unit()
+    },
     methods: {
       page_init() {
         let option = this.$store.state.pageOptions
@@ -237,6 +252,7 @@
       calling_all_unit(offset) {
         // Calling landings with new values
         // let auth_filter = ''
+        let pagination = ''
         let search_param = ''
 
         // (For Pagination check)
@@ -277,12 +293,35 @@
         // }
         // console.log('calling all unit!')
 
+        if (offset) {
+          pagination = '?offset=' + offset
+        }
+
+        // Set search option
+        if (this.search_option == 1 && this.search_text !== '') {
+          if (pagination) {
+            search_param = '&name=' + this.search_text
+          } else {
+            search_param = '?name=' + this.search_text
+          }
+        }
+
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + search_param)
+        axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + pagination + search_param)
           .then((response) => {
             this.$store.state.pageOptions.loading = false
             // console.log('get landing response', response)
             this.content_obj = response.data.data
+            if (response.data.data.count) {
+              if (response.data.data.count % this.page_chunk === 0) {
+                this.page_max = Math.floor(response.data.data.count / this.page_chunk)
+              } else {
+                this.page_max = Math.floor(response.data.data.count / this.page_chunk) + 1
+              }
+            } else {
+              this.page_max = 1
+            }
+
           })
           .catch((error) => {
             this.$store.state.pageOptions.loading = false
@@ -290,21 +329,6 @@
           })
 
       }
-    },
-    mounted() {
-      // Init other pages options
-      this.page_init()
-
-      // Window width calculator
-      let that = this
-      that.$nextTick(function () {
-        window.addEventListener('resize', function (e) {
-          that.window_width = window.innerWidth
-        })
-      })
-
-      // Get landing list
-      this.calling_all_unit()
     },
     destroyed() {
       // Save page option values in the store
