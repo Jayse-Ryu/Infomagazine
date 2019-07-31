@@ -20,6 +20,8 @@ class Default:
 
                     <!-- Control the behavior of search engine crawling and indexing -->
                     <meta name="robots" content="index,follow"><!-- All Search Engines -->
+                    <link rel="shortcut icon" href="https://landings.infomagazine.xyz/favicon.ico" type="image/x-icon">
+                    <link rel="icon" href="https://landings.infomagazine.xyz/favicon.ico" type="image/x-icon">
                 </head>
                 <body>
                 </body>

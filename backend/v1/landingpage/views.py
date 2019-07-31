@@ -141,48 +141,53 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
         response_data = self.get_landing_data(landing_detail=get_detail.data)
         return Response(response_data['data'])
 
-    @action(detail=True, methods=['POST'], )
+    @action(detail=True, methods=['GET', 'POST', 'DELETE'], )
     @response_decorator()
-    def generate(self, request, pk):
-        get_detail = self.retrieve(request, pk)
-        response_data = self.get_landing_data(landing_detail=get_detail.data, is_generate=True)
-        s3 = boto3.client(
-            's3',
-            aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
-            aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
-            region_name='ap-northeast-2'
-        )
-        landing_id = get_detail.data['data']['_id']['$oid']
-        landing_base_url = get_detail.data['data']['landing_info']['landing']['base_url']
-        epoch_time = time.time()
-        landing_url = f'''landings/{landing_id}/{landing_base_url}_{str(int(epoch_time))}.html'''
-        s3_response_data = s3.put_object(Body=response_data['data'], Bucket=config('AWS_STORAGE_BUCKET_NAME'),
-                                         Key=landing_url,
-                                         ContentType='text/html')
-        if s3_response_data['ResponseMetadata']['HTTPStatusCode'] == 200:
-            return {'state': True, 'data': landing_url, 'message': 'Succeed.',
-                    'options': {'status': status.HTTP_200_OK}}
-        else:
-            return {'state': False, 'data': '', 'message': 'Failed.',
-                    'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
-
-    @action(detail=True, methods=['GET'], )
-    @response_decorator()
-    def url_list(self, request, pk):
+    def landing_urls(self, request, pk):
         s3_client = boto3.client(
             's3',
             aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
             aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
             region_name='ap-northeast-2'
         )
-        s3_response = s3_client.list_objects(Bucket=config('AWS_STORAGE_BUCKET_NAME'),
-                                             Prefix='landings/' + pk + '/')
+        if request.method == 'GET':
+            s3_response = s3_client.list_objects(Bucket=config('AWS_STORAGE_BUCKET_NAME'),
+                                                 Prefix='landings/' + pk + '/')
+            if s3_response['ResponseMetadata']['HTTPStatusCode'] == 200:
+                url_list_do_handling = [url['Key'].replace('landings/', 'https://landings.infomagazine.xyz/') for url in
+                                        s3_response.get('Contents', []) if url]
+                return {'state': True, 'data': url_list_do_handling, 'message': 'Succeed.',
+                        'options': {'status': status.HTTP_200_OK}}
+            else:
+                return {'state': False, 'data': '', 'message': 'Failed.',
+                        'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
 
-        if s3_response['ResponseMetadata']['HTTPStatusCode'] == 200:
-            url_list_do_handling = [url['Key'].replace('landings/', 'https://landings.infomagazine.xyz/') for url in
-                                    s3_response.get('Contents', []) if url]
-            return {'state': True, 'data': url_list_do_handling, 'message': 'Succeed.',
-                    'options': {'status': status.HTTP_200_OK}}
-        else:
-            return {'state': False, 'data': '', 'message': 'Failed.',
-                    'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
+        elif request.method == 'POST':
+            get_detail = self.retrieve(request, pk)
+            response_data = self.get_landing_data(landing_detail=get_detail.data, is_generate=True)
+            landing_id = get_detail.data['data']['_id']['$oid']
+            landing_base_url = get_detail.data['data']['landing_info']['landing']['base_url']
+            epoch_time = time.time()
+            landing_url = f'''landings/{landing_id}/{landing_base_url}_{str(int(epoch_time))}.html'''
+            s3_response_data = s3_client.put_object(Body=response_data['data'],
+                                                    Bucket=config('AWS_STORAGE_BUCKET_NAME'),
+                                                    Key=landing_url,
+                                                    ContentType='text/html')
+            if s3_response_data['ResponseMetadata']['HTTPStatusCode'] == 200:
+                return {'state': True, 'data': landing_url, 'message': 'Succeed.',
+                        'options': {'status': status.HTTP_200_OK}}
+            else:
+                return {'state': False, 'data': '', 'message': 'Failed.',
+                        'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
+
+        elif request.method == 'DELETE':
+            lading_url = request.data['landing_url']
+            landing_url = lading_url.replace('https://landings.infomagazine.xyz/', 'landings/')
+            s3_response = s3_client.delete_object(Bucket=config('AWS_STORAGE_BUCKET_NAME'),
+                                                  Key=landing_url)
+            if s3_response['ResponseMetadata']['HTTPStatusCode'] == 204:
+                return {'state': True, 'data': '', 'message': 'Succeed.',
+                        'options': {'status': status.HTTP_204_NO_CONTENT}}
+            else:
+                return {'state': False, 'data': '', 'message': 'Failed.',
+                        'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
