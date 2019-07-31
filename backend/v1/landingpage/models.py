@@ -15,7 +15,7 @@ class LandingPage:
 
         self.db = client[choice_db]
 
-    def list(self, choice_collection, projection=None):
+    def list(self, choice_collection: str, projection: dict = None) -> dict:
         find_option = ({}, projection,)
         queryset = self.db[choice_collection].find(*find_option)
         if queryset is None:
@@ -23,14 +23,14 @@ class LandingPage:
         queryset = dumps(queryset)
         return {'state': True, 'data': json.loads(queryset), 'message': 'Succeed.'}
 
-    def create(self, choice_collection, document):
+    def create(self, choice_collection: str, document: dict) -> dict:
         queryset = self.db[choice_collection].insert_one(document)
         if queryset.acknowledged:
             return {'state': True, 'data': {'inserted_id': str(queryset.inserted_id)}, 'message': 'Succeed.'}
         else:
             return {'state': False, 'data': '', 'message': 'Failed.'}
 
-    def retrieve(self, choice_collection, doc_id, projection=None):
+    def retrieve(self, choice_collection: str, doc_id: str, projection: dict = None) -> dict:
         if ObjectId.is_valid(doc_id):
             find_option = ({'_id': ObjectId(doc_id)}, projection,)
             queryset = self.db[choice_collection].find_one(*find_option)

@@ -121,13 +121,18 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
             'status': status.HTTP_404_NOT_FOUND}})
         return response_data
 
-    # TODO AllowAny 지워야 함
-    @action(detail=True, permission_classes=[permissions.AllowAny])
+    @action(detail=True)
     @response_decorator()
     def preview(self, request, pk):
         get_detail = self.retrieve(request, pk)
         response_data = self.get_landing_data(landing_detail=get_detail.data)
         return response_data
+
+    @action(detail=True, renderer_classes=[StaticHTMLRenderer], permission_classes=[permissions.AllowAny])
+    def test_preview(self, request, pk):
+        get_detail = self.retrieve(request, pk)
+        response_data = self.get_landing_data(landing_detail=get_detail.data)
+        return Response(response_data['data'])
 
     @action(detail=True, methods=['POST'], )
     @response_decorator()
@@ -151,5 +156,5 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
             return {'state': True, 'data': landing_url, 'message': 'Succeed.',
                     'options': {'status': status.HTTP_200_OK}}
         else:
-            return {'state': False, 'data': landing_url, 'message': 'Failed.',
+            return {'state': False, 'data': '', 'message': 'Failed.',
                     'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
