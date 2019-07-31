@@ -431,6 +431,76 @@ class Script(Default):
         """
         self.landing_scripts += result
 
+    def _js_call_ajax_by_phone_auth(self, section_id=None):
+        result = f"""
+                function call_form_{section_id}_ajax(item_group) {{
+                    var IMP = window.IMP;
+                    IMP.init("imp77156252");
+                    IMP.certification({{ // param
+                        merchant_uid: "axa_img_tnk",
+                        phone: $("#first_user_phone_1").val() + $("#first_user_phone_2").val() + $("#first_user_phone_3").val()
+                    }}, function (rsp) {{ // callback
+                        if (rsp.success) {{
+                            $.ajax({{
+                                type: 'get',
+                                url: 'http://www.infomagazine.xyz/api/v1/iamport/',
+                                data: {{imp_uid: rsp.imp_uid}},
+                                dataType: 'json',
+                                success: function (data) {{
+                                    if (data) {{
+                                        first_db_reg_ajax(data.data['name'], data.data['birth'], data.data['gender'])
+                                        var body = {{
+                                            'data': {{
+                                                'form_{section_id}_name': data.data['name'],
+                                                'form_{section_id}_birth': data.data['birth'],
+                                                'form_{section_id}_gender': data.data['gender'],
+                                            }},
+                                            'schema': {{
+                                                'form_{section_id}_name': '이름',
+                                                'form_{section_id}_birth': '생년월일',
+                                                'form_{section_id}_gender': '성별',
+                                            }}
+                                        }};
+                                        Object.entries(item_group).forEach(function (item) {{
+                                            var _target = eval(item[1]['target']);
+                                            body['data'][item[0]] = _target.val();
+                                            body['schema'][item[0]] = _target.attr('data-label-name');
+                                        }});
+                                        $.ajax({{
+                                            type: 'post',
+                                            url: 'https://api.infomagazine.xyz/db/',
+                                            data: body,
+                                            dataType: 'json',
+                                            success: function (data) {{
+                                                if (data) {{
+                                                    alert('신청이 완료되었습니다.');
+                                                }} else {{
+                                                    alert("이미 신청하셨습니다.");
+                                                }}
+                                            }},
+                                            error: function (data) {{
+                                                alert('에러');
+                                            }}
+                                        }})
+                                    }} else {{
+                                        alert("인증 정보를 얻는데 실패하였습니다.");
+                                    }}
+                                }},
+                                error: function (data) {{
+                                    alert('일시적인 오류로 신청이 안 되었습니다.');
+                                }}
+                            }})
+                            // first_db_reg_ajax()
+                        }} else if (rsp.error_code === "F0000") {{
+                            alert("인증 취소");
+                        }} else {{
+                            alert("인증에 실패하였습니다. 에러 내용: " + rsp.error_msg);
+                        }}
+                    }});
+                }}
+                """
+        self.landing_scripts += result
+
     def _scripts_generate(self):
         result = self.default_scripts
         result += f"""
@@ -455,6 +525,7 @@ class LandingPage(StyleSheet, Script):
         self.is_generate = is_generate
 
         self.is_datepicker_to_add = False
+        self.is_phone_auth_to_add = False
 
     def _db_form_field_generator(self, base_html, section_id=None,
                                  object_id=None, object_w=None,
