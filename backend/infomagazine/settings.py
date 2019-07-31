@@ -90,7 +90,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.SlidingToken',),
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=50)
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=300)
 }
 
 # SECURE_BROWSER_XSS_FILTER = True
