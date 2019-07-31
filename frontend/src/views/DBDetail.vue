@@ -268,7 +268,7 @@
         this.landing_id = this.$route.params.landing_id
         axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.landing_id)
           .then((response) => {
-            console.log(response)
+            // console.log(response)
             this.landing_obj = response.data.data
             // Call get resources after data loaded
             this.get_resources_key()

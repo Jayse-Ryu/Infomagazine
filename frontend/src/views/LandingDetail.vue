@@ -116,6 +116,12 @@
 
         <hr>
 
+        <section_url_list
+          :page_id.sync="page_id"
+        />
+
+        <hr>
+
         <div class="form-group row">
           <div class="col-12">
             <button type="submit" class="btn btn-primary col-12">수정</button>
@@ -144,6 +150,7 @@
   import section_layout from '@/components/landing_create/section_6_layout.vue'
   import section_layout_opt from '@/components/landing_create/section_7_layout_opt.vue'
   import section_page_opt from '@/components/landing_create/section_8_page_opt.vue'
+  import section_url_list from '@/components/landing_create/section_9_url_list.vue'
 
   export default {
     name: "landing_detail",
@@ -156,7 +163,8 @@
       section_page_source,
       section_layout,
       section_layout_opt,
-      section_page_opt
+      section_page_opt,
+      section_url_list
     },
     data: () => ({
       window_width: window.innerWidth,
