@@ -41,6 +41,7 @@
           :updated_date="dynamo_obj.updated_date"
           :form_arrow.sync="form_arrow"
           :field.sync="dynamo_obj.landing_info.field"
+          :file_manage="file_manage"
           :set_field="set_field_position"
           :push_landing="push_landing"
         />
@@ -117,6 +118,7 @@
         <div class="form-group row">
           <div class="col-12">
             <button type="submit" class="btn btn-primary col-12">수정</button>
+            <button type="button" class="btn btn-info col-12 mt-2" @click="generate">생성하기</button>
             <button type="button" class="btn btn-danger col-12 mt-2" @click="delete_landing">삭제</button>
             <button type="button" class="btn btn-dark col-12 mt-2" @click="back_to_list">되돌리기</button>
           </div>
@@ -391,9 +393,6 @@
           }// get section
         }
       },
-      // Create Landing Start
-      // Create Landing Start
-      // Create Landing Start
       landing_check() {
         // Start validate before create
         this.$validator.validateAll()
@@ -602,9 +601,10 @@
             .then(() => {
               this.$store.state.pageOptions.loading = false
               // this.make_file()
-              if (confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
-                this.bye()
-              }
+              // if (confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
+              //   this.bye()
+              // }
+              alert('랜딩이 수정되었습니다.')
             })
             .catch((error) => {
               alert('랜딩 수정이 실패하였습니다.')
@@ -631,21 +631,6 @@
         }
 
       },
-      /* e */
-      /* n */
-      /* d */
-      // After Create
-      // After Create
-      // After Create
-      bye() {
-        this.$router.currentRoute.meta.protect_leave = 'no'
-        this.$router.push({
-          name: 'landing_list',
-        })
-      },
-      /* e */
-      /* n */
-      /* d */
       delete_landing() {
         if (confirm('정말 삭제하시겠습니까?')) {
           let landing_num = this.page_id
@@ -679,6 +664,70 @@
               alert('복구 중 에러가 발생하였습니다.')
             })
         }
+      },
+      bye() {
+        this.$router.currentRoute.meta.protect_leave = 'no'
+        this.$router.push({
+          name: 'landing_list',
+        })
+      },
+      file_manage(request, option, file) {
+        let key = require('../../vue_env')
+
+        AWS.config.update({
+          region: key.BucketRegion,
+          credentials: new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: key.IdentityPoolId
+          })
+        })
+
+        let s3 = new AWS.S3(
+          {
+            apiVersion: '2008-10-17',
+            params: {
+              Bucket: key.AWS_STORAGE_BUCKET_NAME
+            }
+          }
+        )
+
+        if (request === 'upload') {
+          let params = {}
+
+          let file_name = file.name.split('.')[0] + '_' + Date.now() + '.' + file.name.split('.')[1]
+          params = {
+            Key: 'assets/images/landing/' + this.page_id + '/field/' + file_name,
+            ContentType: file.type,
+            Body: file
+          }
+
+          s3.upload(params, (error, data) => {
+            if (error) {
+              console.log('S3 upload error occurred', error)
+              return 'fail'
+            } else {
+              return 'success'
+            }
+          })
+        } else if (request === 'delete') {
+          let photokey = file
+          s3.deleteObject({Key: photokey}, (err, data) => {
+            if (err) {
+              alert('There was an error deleting your photo: ', err.message)
+              return 'fail'
+            } else {
+              return 'success'
+            }
+          })
+        }
+      },
+      generate() {
+        axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/generate/')
+          .then((response) => {
+            console.log(response)
+          })
+          .catch((error) => {
+            console.log(error)
+          })
       }
     },
     computed: {

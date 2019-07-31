@@ -191,7 +191,7 @@
                                  placeholder="Datepicker" :id="'label'+field.name">
 
                           <div v-if="field.type == 9" :id="'label'+field.name"
-                               class="form-check-inline d-flex flex-wrap justify-content-end h-100">
+                               class="form-check-inline h-100">
                             <div class="p-2">
                               <label class="form-check-label" :for="'term' + field.name">
                                 <input class="form-check-input" type="checkbox" :id="'term'+field.name" value="1">
