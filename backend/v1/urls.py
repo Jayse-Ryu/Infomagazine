@@ -12,7 +12,7 @@ router = DefaultRouter()
 router.register(r'users', UserViewSets, basename='user')
 router.register(r'organizations', OrganizationViewSets, basename='organization')
 router.register(r'companies', CompanyViewSets, basename='company')
-router.register(r'landing_pages', LandingPageViewSets, basename='landing_page')
+router.register(r'landing_pages', LandingPageViewSets, basename='landing-page')
 
 api_urlpatterns = ([
                        path('', include((router.urls, 'router'), namespace='router')),

@@ -141,7 +141,7 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
         response_data = self.get_landing_data(landing_detail=get_detail.data)
         return Response(response_data['data'])
 
-    @action(detail=True, methods=['GET', 'POST', 'DELETE'], )
+    @action(detail=True, methods=['GET', 'POST'])
     @response_decorator()
     def landing_urls(self, request, pk):
         s3_client = boto3.client(
@@ -180,13 +180,20 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
                 return {'state': False, 'data': '', 'message': 'Failed.',
                         'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
 
-        elif request.method == 'DELETE':
-            lading_url = request.data['landing_url']
-            landing_url = lading_url.replace('https://landings.infomagazine.xyz/', 'landings/')
+    @action(detail=True, methods=['DELETE'], url_path='landing_urls/(?P<landing_url>[^/.]+)')
+    @response_decorator()
+    def landing_urls_detail(self, request, pk, landing_url):
+        if request.method == 'DELETE':
+            s3_client = boto3.client(
+                's3',
+                aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+                aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+                region_name='ap-northeast-2'
+            )
             s3_response = s3_client.delete_object(Bucket=config('AWS_STORAGE_BUCKET_NAME'),
-                                                  Key=landing_url)
+                                                  Key='landings/' + pk + '/' + landing_url + '.html')
             if s3_response['ResponseMetadata']['HTTPStatusCode'] == 204:
-                return {'state': True, 'data': '', 'message': 'Succeed.',
+                return {'state': True, 'data': landing_url, 'message': 'Succeed.',
                         'options': {'status': status.HTTP_204_NO_CONTENT}}
             else:
                 return {'state': False, 'data': '', 'message': 'Failed.',
