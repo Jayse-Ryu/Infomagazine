@@ -118,6 +118,8 @@
 
         <section_url_list
           :page_id.sync="page_id"
+          :url_list.sync="url_list"
+          :del_url="del_url_list"
         />
 
         <hr>
@@ -216,7 +218,8 @@
           sections: [],
           views: 0
         }
-      }
+      },
+      url_list: []
     }),
     mounted() {
       // Window width calculator
@@ -245,6 +248,7 @@
               this.temp_obj = response.data.data
               this.epoch_time = response.data.data.landing_info.landing.base_url
               this.validation_back()
+              this.get_url_list()
             })
             .catch((error) => {
               console.log(error)
@@ -256,13 +260,12 @@
               this.temp_obj = response.data.data
               this.epoch_time = response.data.data.landing_info.landing.base_url
               this.validation_back()
+              this.get_url_list()
             })
             .catch((error) => {
               console.log(error)
             })
         }
-
-
       },
       validation_back() {
         let field = this.temp_obj.landing_info.field
@@ -733,11 +736,31 @@
       generate() {
         axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/generate/')
           .then((response) => {
-            console.log('created', response)
+            // console.log('created', response)
+            this.get_url_list()
           })
           .catch((error) => {
             console.log(error)
           })
+      },
+      get_url_list () {
+        this.url_list = []
+        axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id + '/url_list/')
+          .then((response) => {
+            this.url_list = response.data.data
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      },
+      del_url_list () {
+        // axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id + '/url_list/')
+        //   .then((response) => {
+        //     this.url_list = response.data.data
+        //   })
+        //   .catch((error) => {
+        //     console.log(error)
+        //   })
       }
     },
     computed: {
