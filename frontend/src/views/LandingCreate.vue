@@ -116,6 +116,7 @@
         <div class="form-group row">
           <div class="col-12">
             <button type="submit" class="btn btn-primary col-12">생성</button>
+            <button type="button" v-if="page_id" class="btn btn-info col-12 mt-2" @click="generate">생성하기</button>
             <button type="button" class="btn btn-dark col-12 mt-2" @click="back_to_list">취소</button>
           </div>
         </div>
@@ -529,8 +530,7 @@
               this.$store.state.pageOptions.loading = false
               console.log(error)
             })
-        }
-        else {
+        } else {
           if (!this.page_id) {
             axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
               .then((response) => {
@@ -576,6 +576,15 @@
           name: 'landing_list',
         })
       },
+      generate() {
+        axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/generate/')
+          .then((response) => {
+            console.log('created', response)
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      }
     },
     computed: {
       user_obj() {

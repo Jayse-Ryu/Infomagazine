@@ -280,8 +280,10 @@
 
           let params = {}
 
+          let file_name = file.name.split('.')[0] + '_' + Date.now() + '.' + file.name.split('.')[1]
+
           params = {
-            Key: 'assets/images/landing/' + this.page_id + '/etc/' + file.name + '_' + Date.now(),
+            Key: 'assets/images/landing/' + this.page_id + '/etc/' + file_name,
             ContentType: file.type,
             Body: file
           }

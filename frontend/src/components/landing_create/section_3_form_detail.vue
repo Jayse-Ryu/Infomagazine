@@ -579,50 +579,50 @@
       field_file_add(sign, file) {
         this.init_component()
 
-        // let key = require('../../../vue_env')
-        //
-        // AWS.config.update({
-        //   region: key.BucketRegion,
-        //   credentials: new AWS.CognitoIdentityCredentials({
-        //     IdentityPoolId: key.IdentityPoolId
-        //   })
-        // })
-        //
-        // let s3 = new AWS.S3(
-        //   {
-        //     apiVersion: '2008-10-17',
-        //     params: {
-        //       Bucket: key.AWS_STORAGE_BUCKET_NAME
-        //     }
-        //   }
-        // )
+        let key = require('../../../vue_env')
+
+        AWS.config.update({
+          region: key.BucketRegion,
+          credentials: new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: key.IdentityPoolId
+          })
+        })
+
+        let s3 = new AWS.S3(
+          {
+            apiVersion: '2008-10-17',
+            params: {
+              Bucket: key.AWS_STORAGE_BUCKET_NAME
+            }
+          }
+        )
 
         for (let i = 0; i < this.field_obj.length; i++) {
           if (this.field_obj[i].sign == sign && this.field_obj[i].image_data) {
 
-            // let photokey = this.field_obj[i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
-            // s3.deleteObject({Key: photokey}, (err, data) => {
-            //   if (err) {
-            //     alert('There was an error deleting your photo: ', err.message)
-            //   } else {
-            //     this.field_obj[i].image_data = null
-            //   }
-            // })
-
             let photokey = this.field_obj[i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
+            s3.deleteObject({Key: photokey}, (err, data) => {
+              if (err) {
+                alert('There was an error deleting your photo: ', err.message)
+              } else {
+                this.field_obj[i].image_data = null
+              }
+            })
+
+            // let photokey = this.field_obj[i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
             // this.file_manage('delete', 'field', photokey)
 
-            async function sync_file() {
-              try {
-                const todo = await this.file_manage('delete', 'field', photokey)
-                console.log('async aa')
-                console.log(todo)
-                return todo
-              } catch (error) {
-                console.log("Error occurred", error)
-              }
-            }
-            sync_file()
+            // async function sync_file() {
+            //   try {
+            //     const do = await this.file_manage('delete', 'field', photokey)
+            //     console.log('async aa')
+            //     console.log(do)
+            //     return do
+            //   } catch (error) {
+            //     console.log("Error occurred", error)
+            //   }
+            // }
+            // sync_file()
 
             // if (this.file_manage('delete', 'field', photokey)) {
             //   this.field_obj[i].image_data = null
@@ -633,28 +633,28 @@
           }
         }
 
-        // let params = {}
-        //
-        // let file_name = file.name.split('.')[0] + '_' + Date.now() + '.' + file.name.split('.')[1]
-        // params = {
-        //   Key: 'assets/images/landing/' + this.page_id + '/field/' + file_name,
-        //   ContentType: file.type,
-        //   Body: file
-        // }
-        //
-        // s3.upload(params, (error, data) => {
-        //   if (error) {
-        //     console.log('S3 upload error occurred', error)
-        //   } else {
-        //     for (let i = 0; i < this.field_obj.length; i++) {
-        //       if (this.field_obj[i].sign == sign) {
-        //         this.field_obj[i].image_data = params.Key.replace('assets/', 'https://assets.infomagazine.xyz/')
-        //       }
-        //     }
-        //     this.$emit('update:field', this.field_obj)
-        //     this.push_landing()
-        //   }
-        // })
+        let params = {}
+
+        let file_name = file.name.split('.')[0] + '_' + Date.now() + '.' + file.name.split('.')[1]
+        params = {
+          Key: 'assets/images/landing/' + this.page_id + '/field/' + file_name,
+          ContentType: file.type,
+          Body: file
+        }
+
+        s3.upload(params, (error, data) => {
+          if (error) {
+            console.log('S3 upload error occurred', error)
+          } else {
+            for (let i = 0; i < this.field_obj.length; i++) {
+              if (this.field_obj[i].sign == sign) {
+                this.field_obj[i].image_data = params.Key.replace('assets/', 'https://assets.infomagazine.xyz/')
+              }
+            }
+            this.$emit('update:field', this.field_obj)
+            this.push_landing()
+          }
+        })
 
         if (this.file_manage('upload', 'field', file)) {
           for (let i = 0; i < this.field_obj.length; i++) {
