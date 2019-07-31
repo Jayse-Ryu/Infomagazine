@@ -152,7 +152,7 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
         s3_response_data = s3.put_object(Body=response_data['data'], Bucket=config('AWS_STORAGE_BUCKET_NAME'),
                                          Key=landing_url,
                                          ContentType='text/html')
-        if type(s3_response_data['ResponseMetadata']['HTTPStatusCode']) == 200:
+        if s3_response_data['ResponseMetadata']['HTTPStatusCode'] == 200:
             return {'state': True, 'data': landing_url, 'message': 'Succeed.',
                     'options': {'status': status.HTTP_200_OK}}
         else:
