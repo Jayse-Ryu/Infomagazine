@@ -121,8 +121,7 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
             'status': status.HTTP_404_NOT_FOUND}})
         return response_data
 
-    # TODO AllowAny 지워야 함
-    @action(detail=True, permission_classes=[permissions.AllowAny])
+    @action(detail=True)
     @response_decorator()
     def preview(self, request, pk):
         get_detail = self.retrieve(request, pk)
@@ -151,5 +150,5 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
             return {'state': True, 'data': landing_url, 'message': 'Succeed.',
                     'options': {'status': status.HTTP_200_OK}}
         else:
-            return {'state': False, 'data': landing_url, 'message': 'Failed.',
+            return {'state': False, 'data': '', 'message': 'Failed.',
                     'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
