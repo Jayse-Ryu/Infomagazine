@@ -177,8 +177,11 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
         )
         s3_response = s3_client.list_objects(Bucket=config('AWS_STORAGE_BUCKET_NAME'),
                                              Prefix='landings/' + pk + '/')
+
         if s3_response['ResponseMetadata']['HTTPStatusCode'] == 200:
-            return {'state': True, 'data': s3_response.get('Contents', []), 'message': 'Succeed.',
+            url_list_do_handling = [url['Key'].replace('landings/', 'https://landings.infomagazine.xyz/') for url in
+                                    s3_response.get('Contents', []) if url]
+            return {'state': True, 'data': url_list_do_handling, 'message': 'Succeed.',
                     'options': {'status': status.HTTP_200_OK}}
         else:
             return {'state': False, 'data': '', 'message': 'Failed.',
