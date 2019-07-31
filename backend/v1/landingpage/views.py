@@ -128,6 +128,12 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
         response_data = self.get_landing_data(landing_detail=get_detail.data)
         return response_data
 
+    @action(detail=True, renderer_classes=[StaticHTMLRenderer], permission_classes=[permissions.AllowAny])
+    def test_preview(self, request, pk):
+        get_detail = self.retrieve(request, pk)
+        response_data = self.get_landing_data(landing_detail=get_detail.data)
+        return Response(response_data['data'])
+
     @action(detail=True, methods=['POST'], )
     @response_decorator()
     def generate(self, request, pk):

@@ -223,7 +223,7 @@ class StyleSheet(Default):
         section[data-section-id="{section_id}"] > div[data-object-id="{object_id}"] > form > div[data-form-filed-id="{field_id}"] {{
             top: {field_y_ratio}%;
             left: {field_x_ratio}%;
-            width: 80%;
+            width: {field_w_ratio}%;
         }}
         """
         self.layout_stylesheets += result
@@ -236,13 +236,20 @@ class StyleSheet(Default):
         label_len_list = list(set(field_name_list))
         label_len_list.sort()
 
+        # 적정 라벨 넓이 계산
+        is_long_spacing = False
         standard_len = label_len_list[0]
-        diff_tmp = 0
+        diff_tmp = standard_len
         for index in range(1, len(label_len_list)):
             diff = label_len_list[index] - label_len_list[index - 1]
+
+            if diff == diff_tmp or (diff < diff_tmp and not is_long_spacing):
+                standard_len = label_len_list[index]
+
             if diff > diff_tmp:
-                diff_tmp = diff
                 standard_len = label_len_list[index - 1]
+                is_long_spacing = True
+            diff_tmp = diff
 
         result = f"""
         section[data-section-id="{section_id}"] > div[data-object-id="{object_id}"] .form-group-prepend {{
