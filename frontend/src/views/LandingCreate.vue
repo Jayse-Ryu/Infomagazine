@@ -322,10 +322,10 @@
         if (this.dynamo_obj.company_id == -1) {
           alert('업체를 선택하세요!')
           document.getElementById('company_id').focus()
-        } else if (this.dynamo_obj.landing_info.landing.manager == -1) {
+        } /*else if (this.dynamo_obj.landing_info.landing.manager == -1) {
           alert('관리자를 선택하세요!')
           document.getElementById('manager').focus()
-        } else if (!this.dynamo_obj.landing_info.landing.name) {
+        }*/ else if (!this.dynamo_obj.landing_info.landing.name) {
           alert('랜딩페이지 이름을 입력하세요!')
           document.getElementById('landing').focus()
         } else if (this.duplicated_name_flag) {

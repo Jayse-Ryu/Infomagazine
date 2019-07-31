@@ -115,6 +115,34 @@
                 <!---->
                 <!---->
 
+
+                <label v-if="[3].includes(content.type * 1)"
+                       class="col-sm-3 col-form-label-sm mt-3"
+                       :for="'phone_switch'+content.sign">
+                  <span>통신사 본인인증</span>
+                  <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
+                        v-tooltip="{
+                              content: msg.phone_auth,
+                              placement: 'right',
+                              offset: 5,
+                              trigger: 'hover',
+                              }">?</span>
+                  <span class="question badge btn-secondary p-1 align-middle" v-else
+                        v-tooltip="{
+                              content: msg.phone_auth,
+                              placement: 'right',
+                              offset: 5,
+                              trigger: 'click',
+                              }">?</span>
+                </label>
+                <div v-if="[3].includes(content.type * 1)" class="col-sm-9 mt-sm-3">
+                  <label class="switch" :for="'phone_switch'+content.sign">
+                    <input type="checkbox" :id="'phone_switch'+content.sign" v-model="content.phone_auth">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+
                 <label v-if="[1, 2, 3, 6, 7, 9].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3"
                        for="f_validate">
                   <span>유효성 검사</span>
@@ -344,7 +372,8 @@
     data: () => ({
       msg: {
         holder: 'Place holder입니다. 텍스트 입력 전 설명 혹은, 약관의 라벨에 기입됩니다.',
-        list: '선택 옵션을 선택하고 제공할 수 있습니다.'
+        list: '선택 옵션을 선택하고 제공할 수 있습니다.',
+        phone_auth: '통신사가 제공하는 본인인증 서비스의 사용여부를 결정합니다. 본인인증을 할 경우 이름, 성별, 생일정보의 기입이 자동으로 이루어집니다.'
       },
       field_obj: [],
       filtered_fields: [],
@@ -480,6 +509,7 @@
                 opacity: '10',
                 list: [],
                 default: '',
+                phone_auth: false,
                 image_data: null
               })
               this.$emit('update:field', this.field_obj)
@@ -518,6 +548,7 @@
                 opacity: '10',
                 list: [],
                 default: '',
+                phone_auth: false,
                 image_data: null
               })
               this.$emit('update:field', this.field_obj)

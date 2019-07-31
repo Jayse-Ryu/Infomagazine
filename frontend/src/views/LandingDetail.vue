@@ -401,10 +401,10 @@
         if (this.dynamo_obj.landing_info.landing.company == -1) {
           alert('업체를 선택하세요!')
           document.getElementById('company_id').focus()
-        } else if (this.dynamo_obj.landing_info.landing.manager == -1) {
+        } /*else if (this.dynamo_obj.landing_info.landing.manager == -1) {
           alert('관리자를 선택하세요!')
           document.getElementById('manager').focus()
-        } else if (!this.dynamo_obj.landing_info.landing.name) {
+        }*/ else if (!this.dynamo_obj.landing_info.landing.name) {
           alert('랜딩페이지 이름을 입력하세요!')
           document.getElementById('landing').focus()
         } else if (this.duplicated_name_flag) {
@@ -635,7 +635,7 @@
       delete_landing() {
         if (confirm('정말 삭제하시겠습니까?')) {
           let landing_num = this.page_id
-          axios.delete(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num + '/')
+          axios.delete(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/')
             .then(() => {
               alert('삭제되었습니다.')
               this.$router.currentRoute.meta.protect_leave = 'no'
@@ -650,7 +650,7 @@
       back_to_list() {
         let landing_num = this.page_id
         if (confirm('랜딩을 되돌리고 목록으로 돌아갈까요?')) {
-          axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num + '/',
+          axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/',
             {
               'company_id': this.company_id,
               'landing_info': this.back_up.landing_info
