@@ -756,9 +756,7 @@
         let cutter = 'https://landings.infomagazine.xyz/' + this.page_id + '/'
         let url_done = key.replace(cutter, '')
 
-        // console.log('key', url_done.split('.')[0])
-
-        axios.delete(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/?' + url_done + '/')
+        axios.delete(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/' + url_done.split('.')[0] + '/')
           .then((response) => {
             this.get_url_list()
           })
