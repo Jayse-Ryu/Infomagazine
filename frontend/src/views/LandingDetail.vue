@@ -781,6 +781,17 @@
           }
         } else {
           user_json = JSON.parse(local_user)
+          axios.get(this.$store.state.endpoints.baseUrl + 'users/' + user_json.id + '/')
+            .then((response) => {
+              if (response.data.data.info.organization) {
+                user_json['organization'] = response.data.data.info.organization
+              } else if (response.data.data.info.company) {
+                user_json['company'] = response.data.data.info.company
+              }
+            })
+            .catch((error) => {
+              console.log('Get user info error', error)
+            })
         }
 
         return user_json

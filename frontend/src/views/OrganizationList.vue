@@ -137,22 +137,29 @@
   export default {
     name: "Organization_list",
     created() {
-      this.$store.state.pageOptions.loading = true
-      // Filtering non authorize users first
-      if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
-        // alert('권한이 없습니다.')
-        this.$store.state.pageOptions.loading = false
-        if ([0, 1].includes(this.user_obj.access_role)) {
-          this.$router.push({
-            path: '/organization/detail/' + this.user_obj.organization
-          })
-        } else {
-          this.$router.push({
-            name: 'gateway'
-          })
-        }
-      }
-      this.$store.state.pageOptions.loading = false
+      // this.$store.state.pageOptions.loading = true
+      // // Filtering non authorize users first
+      // if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
+      //   // alert('권한이 없습니다.')
+      //   this.$store.state.pageOptions.loading = false
+      //   if ([0, 1].includes(this.user_obj.access_role)) {
+      //     axios.get(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id)
+      //       .then((response) => {
+      //         console.log(response)
+      //       })
+      //       .catch((error) => {
+      //         console.log(error)
+      //       })
+      //     this.$router.push({
+      //       path: '/organization/detail/' + this.user_obj.organization
+      //     })
+      //   } else {
+      //     this.$router.push({
+      //       name: 'gateway'
+      //     })
+      //   }
+      // }
+      // this.$store.state.pageOptions.loading = false
     },
     data: () => ({
       window_width: window.innerWidth,
@@ -174,7 +181,32 @@
           that.window_width = window.innerWidth
         })
       })
-
+      ///////////////////
+      this.$store.state.pageOptions.loading = true
+      // Filtering non authorize users first
+      console.log(this.user_obj)
+      if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
+        // alert('권한이 없습니다.')
+        this.$store.state.pageOptions.loading = false
+        if ([0, 1].includes(this.user_obj.access_role)) {
+          axios.get(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id)
+            .then((response) => {
+              console.log(response)
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+          this.$router.push({
+            path: '/organization/detail/' + this.user_obj.organization
+          })
+        } else {
+          this.$router.push({
+            name: 'gateway'
+          })
+        }
+      }
+      this.$store.state.pageOptions.loading = false
+      /////////////////////
       // Init other pages options
       this.page_init()
 
@@ -312,6 +344,17 @@
           }
         } else {
           user_json = JSON.parse(local_user)
+          axios.get(this.$store.state.endpoints.baseUrl + 'users/' + user_json.id + '/')
+            .then((response) => {
+              if (response.data.data.info.organization) {
+                user_json['organization'] = response.data.data.info.organization
+              } else if (response.data.data.info.company) {
+                user_json['company'] = response.data.data.info.company
+              }
+            })
+            .catch((error) => {
+              console.log('Get user info error', error)
+            })
         }
 
         return user_json
