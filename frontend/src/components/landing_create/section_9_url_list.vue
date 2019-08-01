@@ -17,7 +17,7 @@
         <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-around p-1"
             v-for="item in url_list">
           <a :href="item" target="_blank" class="col-11" style="word-break: break-all;">{{ item }}</a>
-          <button type="button" class="btn btn-sm btn-danger p-0 col-1" @click="delete_url">삭제</button>
+          <button type="button" class="btn btn-sm btn-danger p-0 col-1" @click="delete_url(item)">삭제</button>
         </li>
       </ul>
     </div>
@@ -36,8 +36,8 @@
 
     },
     methods: {
-      delete_url() {
-        this.del_url()
+      delete_url(key) {
+        this.del_url(key)
       }
     },
     computed: {

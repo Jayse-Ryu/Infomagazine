@@ -601,7 +601,7 @@
         })
       },
       generate() {
-        axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/generate/')
+        axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/')
           .then((response) => {
             // console.log('created', response)
             this.get_url_list()
@@ -611,8 +611,7 @@
           })
       },
       get_url_list() {
-        this.url_list = []
-        axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id + '/url_list/')
+        axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/')
           .then((response) => {
             this.url_list = response.data.data
           })
@@ -620,14 +619,17 @@
             console.log(error)
           })
       },
-      del_url_list() {
-        // axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id + '/url_list/')
-        //   .then((response) => {
-        //     this.url_list = response.data.data
-        //   })
-        //   .catch((error) => {
-        //     console.log(error)
-        //   })
+      del_url_list(key) {
+        let cutter = 'https://landings.infomagazine.xyz/' + this.page_id + '/'
+        let url_done = key.replace(cutter, '')
+
+        axios.delete(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/' + url_done + '/')
+          .then((response) => {
+            this.get_url_list()
+          })
+          .catch((error) => {
+            console.log(error)
+          })
       }
     },
     computed: {
