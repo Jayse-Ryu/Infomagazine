@@ -860,7 +860,7 @@
       },
       preview() {
         // let axios = this.$axios
-        let landing_num = this.$route.params.landing_id
+        let landing_num = this.page_id
         this.$store.state.pageOptions.loading = true
         axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + landing_num + '/preview/')
           .then((response) => {

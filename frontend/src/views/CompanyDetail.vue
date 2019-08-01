@@ -270,7 +270,7 @@
         <!-- Submit button -->
         <div class="mt-1 mb-2">
           <button type="submit" class="btn btn-primary col">수정</button>
-          <!--<button type="button">업체 삭제</button>-->
+          <button type="button" class="btn btn-danger mt-2 col" @click="delete_organization">업체 삭제</button>
           <router-link to="/organization">
             <button class="btn btn-dark col mt-2">취소</button>
           </router-link>
@@ -435,6 +435,27 @@
             console.log('company patch error', error)
             this.$store.state.pageOptions.loading = false
           })
+      },
+      delete_organization() {
+        if(confirm('업체를 삭제하시겠습니까?')) {
+          // Create an organization myself
+        let this_url = 'companies/'
+
+        this.$store.state.pageOptions.loading = true
+        axios.delete(this.$store.state.endpoints.baseUrl + this_url + this.page_id + '/')
+          .then((response) => {
+            // console.log(response)
+            alert('삭제되었습니다.')
+            this.$router.currentRoute.meta.protect_leave = 'no'
+            this.$router.push({
+              name: 'company_list',
+            })
+          })
+          .catch((error) => {
+            console.log('company patch error', error)
+            this.$store.state.pageOptions.loading = false
+          })
+        }
       },
       pagination(pageNum) {
         // when page is first, max ~ max-(chunk*current)+1

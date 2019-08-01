@@ -632,10 +632,6 @@
             'company_id': this.dynamo_obj.company_id,
             'landing_info': this.dynamo_obj.landing_info
           }, config)
-            .then(() => {
-              // console.log('landing updated is done')
-              // this.get_objects()
-            })
             .catch((error) => {
               console.log('Landing update fail', error)
             })
@@ -734,16 +730,21 @@
         }
       },
       generate() {
-        axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/')
-          .then((response) => {
-            // console.log('created', response)
-            this.get_url_list()
-          })
-          .catch((error) => {
-            console.log(error)
-          })
+        if (this.dynamo_obj.landing_info.landing.base_url) {
+          axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/')
+            .then((response) => {
+              // console.log('created', response)
+              this.get_url_list()
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+        } else {
+          alert('메인 Url을 먼저 입력하세요!')
+          document.getElementById('base_url').focus()
+        }
       },
-      get_url_list () {
+      get_url_list() {
         axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/')
           .then((response) => {
             this.url_list = response.data.data
@@ -752,7 +753,7 @@
             console.log(error)
           })
       },
-      del_url_list (key) {
+      del_url_list(key) {
         let cutter = 'https://landings.infomagazine.xyz/' + this.page_id + '/'
         let url_done = key.replace(cutter, '')
 

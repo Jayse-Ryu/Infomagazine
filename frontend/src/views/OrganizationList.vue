@@ -184,18 +184,10 @@
       ///////////////////
       this.$store.state.pageOptions.loading = true
       // Filtering non authorize users first
-      console.log(this.user_obj)
       if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
         // alert('권한이 없습니다.')
         this.$store.state.pageOptions.loading = false
         if ([0, 1].includes(this.user_obj.access_role)) {
-          axios.get(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id)
-            .then((response) => {
-              console.log(response)
-            })
-            .catch((error) => {
-              console.log(error)
-            })
           this.$router.push({
             path: '/organization/detail/' + this.user_obj.organization
           })

@@ -12,7 +12,6 @@ export default new Vuex.Store({
     // authUser: localStorage.getItem('authUser'),
     // authUser: Vue.cookie.get('authUser'),
     // authUser: {},
-    userInfo: {},
     isAuthenticated: false,
     endpoints: {
       obtainJWT: 'http://localhost/api/v1/auth/',
@@ -57,9 +56,6 @@ export default new Vuex.Store({
         console.log('Set token cookie error', error)
       }
     },
-    setInfo(state, {userInfo}) {
-      Vue.set(state, 'userInfo', JSON.stringify(userInfo))
-    },
     removeToken(state) {
       localStorage.removeItem('authUser')
       // state.authUser = {}
@@ -80,7 +76,6 @@ export default new Vuex.Store({
         is_superuser: decoded.is_superuser,
         is_staff: decoded.is_staff,
         access_role: decoded.access_role,
-        info: info
       }
 
       this.commit('setToken', data.token)
@@ -91,14 +86,6 @@ export default new Vuex.Store({
 
       // axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
       axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
-
-      axios.get(this.state.endpoints.baseUrl + 'users/' + decoded.user_id + '/')
-        .then((response) => {
-          this.commit('userInfo', response.data.data.info)
-        })
-        .catch((error) => {
-          console.log('Set token organization error', error)
-        })
 
       return true
     },
