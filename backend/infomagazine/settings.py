@@ -30,7 +30,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = True
 
 # ALLOWED_HOSTS = tuple(config('ALLOWED_HOSTS', cast=Csv()))
-ALLOWED_HOSTS = tuple(config('ALLOWED_HOSTS', cast=Csv()))
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -121,7 +121,7 @@ SIMPLE_JWT = {
 # TODO prod상에서 꼭 명시 - 서브도메인 지원을 위해
 # CSRF_COOKIE_DOMAIN = config('CSRF_COOKIE_DOMAIN')
 
-CORS_ORIGIN_WHITELIST = tuple(config('CORS_ORIGIN_WHITELIST', cast=Csv()))
+# CORS_ORIGIN_WHITELIST = tuple(config('CORS_ORIGIN_WHITELIST', cast=Csv()))
 
 # CSRF_TRUSTED_ORIGINS = tuple(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
 
