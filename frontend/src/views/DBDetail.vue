@@ -84,16 +84,6 @@
               <div class="col-4 p-0">123</div>
               <div class="col-4 p-0">28</div>
             </li>
-            <li class="list-group-item list-group-item-action d-inline-flex justify-content-around p-1">
-              <div class="col-4 p-0">main_url</div>
-              <div class="col-4 p-0">123</div>
-              <div class="col-4 p-0">28</div>
-            </li>
-            <li class="list-group-item list-group-item-action d-inline-flex justify-content-around p-1">
-              <div class="col-4 p-0">main_url</div>
-              <div class="col-4 p-0">123</div>
-              <div class="col-4 p-0">28</div>
-            </li>
           </ul>
         </div>
 
@@ -266,9 +256,9 @@
     methods: {
       get_db_list() {
         this.landing_id = this.$route.params.landing_id
-        axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.landing_id)
+        axios.get(this.$store.state.endpoints.baseUrl + 'db/' + this.landing_id + '/')
           .then((response) => {
-            // console.log(response)
+            console.log(response.data.data)
             this.landing_obj = response.data.data
             // Call get resources after data loaded
             this.get_resources_key()

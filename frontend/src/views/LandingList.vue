@@ -131,12 +131,14 @@
             <div v-if="[0, 1].includes(user_obj.access_role) || user_obj.is_staff || user_obj.is_superuser"
                  class="col-5 p-0">
               <router-link :to="'/landing/detail/' + content._id.$oid">
-                {{ content.landing_info.landing.name }}
+                <span v-if="content.landing_info.landing.name">{{ content.landing_info.landing.name }}</span>
+                <span v-else>이름 없음</span>
               </router-link>
             </div>
             <div v-else class="col-5 p-0">
               <router-link :to="'/landing/detail/' + content._id.$oid">
-                {{ content.landing_info.landing.name }}
+                <span v-if="content.landing_info.landing.name">{{ content.landing_info.landing.name }}</span>
+                <span v-else>이름 없음</span>
               </router-link>
             </div>
             <div class="col-3 p-0">{{ content.landing_info.landing.manager_name }}</div>

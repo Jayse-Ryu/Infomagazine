@@ -5,7 +5,8 @@
 *.iml
 out
 gen
-.env
+*.env
+*.env.production
 
 docker/dev/sharing
 
@@ -13,4 +14,3 @@ backend/settings.ini
 
 frontend/node_modules
 frontend/dist
-frontend/vue_env.json

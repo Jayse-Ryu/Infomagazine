@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import router from './router'
+// import router from './router'
 import Decoder from 'jwt-decode'
 import VueCookie from 'vue-cookie'
 
@@ -14,9 +14,9 @@ export default new Vuex.Store({
     // authUser: {},
     isAuthenticated: false,
     endpoints: {
-      obtainJWT: 'http://localhost/api/v1/auth/',
-      refreshJWT: 'http://localhost/api/v1/auth/refresh/',
-      baseUrl: 'http://localhost/api/v1/'
+      obtainJWT: process.env.VUE_APP_ENV_obtainJWT,
+      refreshJWT: process.env.VUE_APP_ENV_refreshJWT,
+      baseUrl: process.env.VUE_APP_ENV_baseUrl
     },
     pageOptions: {
       loading: false,

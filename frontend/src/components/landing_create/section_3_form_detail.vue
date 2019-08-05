@@ -610,12 +610,10 @@
       field_file_add(sign, file) {
         this.init_component()
 
-        let key = require('../../../vue_env')
-
         AWS.config.update({
-          region: key.BucketRegion,
+          region: process.env.VUE_APP_ENV_BucketRegion,
           credentials: new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: key.IdentityPoolId
+            IdentityPoolId: process.env.VUE_APP_ENV_IdentityPoolId
           })
         })
 
@@ -623,7 +621,7 @@
           {
             apiVersion: '2008-10-17',
             params: {
-              Bucket: key.AWS_STORAGE_BUCKET_NAME
+              Bucket: process.env.VUE_APP_ENV_AWS_STORAGE_BUCKET_NAME
             }
           }
         )
@@ -700,12 +698,10 @@
       field_file_delete(sign) {
         this.init_component()
 
-        let key = require('../../../vue_env')
-
         AWS.config.update({
-          region: key.BucketRegion,
+          region: process.env.VUE_APP_ENV_BucketRegion,
           credentials: new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: key.IdentityPoolId
+            IdentityPoolId: process.env.VUE_APP_ENV_IdentityPoolId
           })
         })
 
@@ -713,7 +709,7 @@
           {
             apiVersion: '2008-10-17',
             params: {
-              Bucket: key.AWS_STORAGE_BUCKET_NAME
+              Bucket: process.env.VUE_APP_ENV_AWS_STORAGE_BUCKET_NAME
             }
           }
         )

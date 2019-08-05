@@ -248,12 +248,11 @@
         if (this.etc_arrow > -1) {
           this.form_init()
           /* When file data changed */
-          let key = require('../../../vue_env')
 
           AWS.config.update({
-            region: key.BucketRegion,
+            region: process.env.VUE_APP_ENV_BucketRegion,
             credentials: new AWS.CognitoIdentityCredentials({
-              IdentityPoolId: key.IdentityPoolId
+              IdentityPoolId: process.env.VUE_APP_ENV_IdentityPoolId
             })
           })
 
@@ -261,7 +260,7 @@
             {
               apiVersion: '2008-10-17',
               params: {
-                Bucket: key.AWS_STORAGE_BUCKET_NAME
+                Bucket: process.env.VUE_APP_ENV_AWS_STORAGE_BUCKET_NAME
               }
             }
           )
@@ -306,12 +305,11 @@
 
         if (this.etc_arrow > -1) {
           this.form_init()
-          let key = require('../../../vue_env')
 
           AWS.config.update({
-            region: key.BucketRegion,
+            region: process.env.VUE_APP_ENV_BucketRegion,
             credentials: new AWS.CognitoIdentityCredentials({
-              IdentityPoolId: key.IdentityPoolId
+              IdentityPoolId: process.env.VUE_APP_ENV_IdentityPoolId
             })
           })
 
@@ -319,7 +317,7 @@
             {
               apiVersion: '2008-10-17',
               params: {
-                Bucket: key.AWS_STORAGE_BUCKET_NAME
+                Bucket: process.env.VUE_APP_ENV_AWS_STORAGE_BUCKET_NAME
               }
             }
           )
