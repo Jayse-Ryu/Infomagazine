@@ -260,6 +260,7 @@
           .then((response) => {
             console.log(response.data.data)
             this.landing_obj = response.data.data
+            this.db_list = response.data.data.data
             // Call get resources after data loaded
             this.get_resources_key()
           })
