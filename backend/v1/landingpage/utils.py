@@ -413,6 +413,8 @@ class Script(Default):
                 body['data'][item[0]] = _target.val();
                 body['schema'][item[0]] = _target.attr('data-label-name');
             }});
+            body['landing_id'] = window.location.pathname.split('/')[1];
+            body['registered_date'] = new Date().format("yyyy-MM-dd hh:mm:ss");
             $.ajax({{
                 type: 'post',
                 url: 'https://serverlessapi.infomagazine.xyz/db/',
