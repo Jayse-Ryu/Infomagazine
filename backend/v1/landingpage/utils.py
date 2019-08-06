@@ -417,8 +417,10 @@ class Script(Default):
             body['registered_date'] = String(Date.now());
             $.ajax({{
                 type: 'post',
+                accept: "application/json",
+                contentType: "application/json; charset=utf-8",
                 url: 'https://serverlessapi.infomagazine.xyz/db/',
-                data: body,
+                data: JSON.stringify(body),
                 dataType: 'json',
                 success: function (data) {{
                     if (data) {{
