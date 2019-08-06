@@ -23,6 +23,7 @@ dnspython = "*"
 beautifulsoup4 = "*"
 mysqlclient = "*"
 djangorestframework = "*"
+django-mysql = "*"
 
 [requires]
 python_version = "3.7"

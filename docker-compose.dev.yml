@@ -8,15 +8,16 @@ services:
       dockerfile: ./docker/dev/nginx/Dockerfile
     volumes:
       - ./frontend:/home/webapp
-      - ./docker/dev/sharing/tmp:/tmp
+      - tmp_data:/tmp
 
-  APIService:
+  APIServer:
     image: "infomagazine_api_service:dev_v${VERSION}"
     build:
       context: .
       dockerfile: ./docker/dev/web/Dockerfile
-    ports:
-      - '3032:3032'
     volumes:
       - ./backend:/home/api
-      - ./docker/dev/sharing/tmp:/tmp
+      - tmp_data:/tmp
+
+volumes:
+  tmp_data:

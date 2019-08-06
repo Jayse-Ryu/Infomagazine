@@ -1,6 +1,9 @@
 FROM python:3.7
 
-COPY . ./home
+COPY ./Pipfile /home
+COPY ./Pipfile.lock /home
+COPY ./backend /home/api
+COPY ./docker/prod /home/docker
 
 WORKDIR /home
 
@@ -8,7 +11,7 @@ RUN pip install --upgrade pip
 
 RUN pip install pipenv
 
-RUN pipenv install --system
+RUN pipenv install --system --dev
 
 RUN apt-get update && apt-get install -y uwsgi-plugin-python3 \
     && apt-get install -y uwsgi-plugin-python && apt-get install -y vim \
@@ -16,6 +19,6 @@ RUN apt-get update && apt-get install -y uwsgi-plugin-python3 \
 
 RUN pip install uwsgi && pip install git+https://github.com/Supervisor/supervisor
 
-RUN chmod +x /home/docker/prod/config/run.sh
+RUN chmod +x /home/docker/config/run.sh
 
-CMD /home/docker/prod/config/run.sh
+CMD /home/docker/config/run.sh

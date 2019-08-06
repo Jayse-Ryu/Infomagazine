@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  WebServer:
+    image: "${WEB_SERVER_ECR_URL}:v${VERSION}"
+    build:
+      context: .
+      dockerfile: docker/prod/nginx/Dockerfile
+    volumes:
+      - tmp_data:/tmp
+
+  APIServer:
+    image: "${API_SERVER_ECR_URL}:v${VERSION}"
+    build:
+      context: .
+      dockerfile: docker/prod/web/Dockerfile
+    volumes:
+      - tmp_data:/tmp
+
+volumes:
+  tmp_data:

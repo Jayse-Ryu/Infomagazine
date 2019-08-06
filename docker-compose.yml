@@ -2,17 +2,15 @@ version: '3.7'
 
 services:
   WebServer:
-    ports:
-      - '80:80'
     networks:
       - backend
     restart: on-failure
-    links:
-      - APIService
+    ports:
+      - '80:8080'
     depends_on:
-      - APIService
+      - APIServer
 
-  APIService:
+  APIServer:
     networks:
       - backend
     tty: true
