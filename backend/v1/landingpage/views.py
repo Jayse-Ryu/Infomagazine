@@ -15,24 +15,40 @@ from v1.landingpage.models import LandingPage as LandingModel
 from v1.landingpage.utils import LandingPage as LandingGenerator
 
 
-def response_decorator():
-    def wrapper(func):
-        @wraps(func)
-        def decorator(*args, **kwargs):
-            data = func(*args, **kwargs)
-            response_formatter = ReturnValuesFormatter()
+# def response_decorator():
+#     def wrapper(func):
+#         @wraps(func)
+#         def decorator(*args, **kwargs):
+#             data = func(*args, **kwargs)
+#             response_formatter = ReturnValuesFormatter()
+#
+#             response_formatter.values_to_return = {
+#                 'state': data['state'],
+#                 'data': data['data'],
+#                 'message': data['message'],
+#                 'options': data['options']
+#             }
+#             return Response(**response_formatter.generate())
+#
+#         return decorator
+#
+#     return wrapper
 
-            response_formatter.values_to_return = {
-                'state': data['state'],
-                'data': data['data'],
-                'message': data['message'],
-                'options': data['options']
-            }
-            return Response(**response_formatter.generate())
+def response_decorator(func):
+    @wraps(func)
+    def decorator(*args, **kwargs):
+        data = func(*args, **kwargs)
+        response_formatter = ReturnValuesFormatter()
 
-        return decorator
+        response_formatter.values_to_return = {
+            'state': data['state'],
+            'data': data['data'],
+            'message': data['message'],
+            'options': data['options']
+        }
+        return Response(**response_formatter.generate())
 
-    return wrapper
+    return decorator
 
 
 class ReturnValuesFormatter:
@@ -85,7 +101,7 @@ class LandingPageViewSetsUtils(viewsets.ViewSet):
 
 
 class LandingPageViewSets(LandingPageViewSetsUtils):
-    @response_decorator()
+    @response_decorator
     def list(self, request):
         projection = {'_id': 1, 'landing_info.landing.name': 1, 'landing_info.landing.views': 1}
         response_data = self.landing_pages_model.list(choice_collection='landing_pages', projection=projection)
@@ -93,7 +109,7 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
             'status': status.HTTP_404_NOT_FOUND}})
         return response_data
 
-    @response_decorator()
+    @response_decorator
     def create(self, request):
         body = json.loads(request.body)
         document = {
@@ -106,14 +122,14 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
             'status': status.HTTP_503_SERVICE_UNAVAILABLE}})
         return response_data
 
-    @response_decorator()
+    @response_decorator
     def retrieve(self, request, pk):
         response_data = self.landing_pages_model.retrieve(choice_collection='landing_pages', doc_id=pk)
         response_data.update({"options": {'status': status.HTTP_200_OK} if response_data['state'] else {
             'status': status.HTTP_404_NOT_FOUND}})
         return response_data
 
-    @response_decorator()
+    @response_decorator
     def update(self, request, pk):
         response_data = self.landing_pages_model.update(choice_collection='landing_pages', doc_id=pk,
                                                         data_to_update={'$set': request.data})
@@ -121,7 +137,7 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
             'status': status.HTTP_404_NOT_FOUND}})
         return response_data
 
-    @response_decorator()
+    @response_decorator
     def destroy(self, request, pk):
         response_data = self.landing_pages_model.destroy(choice_collection='landing_pages', doc_id=pk)
         response_data.update({"options": {'status': status.HTTP_204_NO_CONTENT} if response_data['state'] else {
@@ -129,7 +145,7 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
         return response_data
 
     @action(detail=True)
-    @response_decorator()
+    @response_decorator
     def preview(self, request, pk):
         get_detail = self.retrieve(request, pk)
         response_data = self.get_landing_data(landing_detail=get_detail.data)
@@ -142,7 +158,7 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
         return Response(response_data['data'])
 
     @action(detail=True, methods=['GET', 'POST'])
-    @response_decorator()
+    @response_decorator
     def landing_urls(self, request, pk):
         s3_client = boto3.client(
             's3',
@@ -181,7 +197,7 @@ class LandingPageViewSets(LandingPageViewSetsUtils):
                         'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
 
     @action(detail=True, methods=['DELETE'], url_path='landing_urls/(?P<landing_url>[^/.]+)')
-    @response_decorator()
+    @response_decorator
     def landing_urls_detail(self, request, pk, landing_url):
         if request.method == 'DELETE':
             s3_client = boto3.client(

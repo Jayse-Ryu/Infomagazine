@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Third party Lib
+    'django_mysql',
+
     # Test
     'django_nose',
 
@@ -57,6 +60,7 @@ INSTALLED_APPS = [
     'v1.user',
     'v1.organization',
     'v1.company',
+    'v1.db',
 
     # AWS Management
     'storages',
@@ -71,7 +75,7 @@ NOSE_ARGS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema', # 3.10.x부터 swagger 이용 시 에러가 발생하여 해당 구문 추가
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',  # 3.10.x부터 swagger 이용 시 에러가 발생하여 해당 구문 추가
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissions'
@@ -121,9 +125,8 @@ SIMPLE_JWT = {
 # TODO prod상에서 꼭 명시 - 서브도메인 지원을 위해
 # CSRF_COOKIE_DOMAIN = config('CSRF_COOKIE_DOMAIN')
 
-# CORS_ORIGIN_WHITELIST = tuple(config('CORS_ORIGIN_WHITELIST', cast=Csv()))
-
-# CSRF_TRUSTED_ORIGINS = tuple(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
+CORS_ORIGIN_WHITELIST = tuple(config('CORS_ORIGIN_WHITELIST', cast=Csv()))
+CSRF_TRUSTED_ORIGINS = tuple(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
 
 LOGIN_URL = '/admin/login/'
 LOGOUT_URL = '/admin/logout/'
@@ -176,6 +179,8 @@ DATABASES = {
         'PORT': config('DB_PORT'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+            'connect_timeout': 5,
         },
     }
 }

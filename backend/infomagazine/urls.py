@@ -21,7 +21,7 @@ from v1.urls import api_urlpatterns as api_1
 
 urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
-    path('api/v1/', include(api_1, namespace='v1'))
+    path('v1/', include(api_1, namespace='v1'))
 ]
 
 if settings.DEBUG:

@@ -415,7 +415,7 @@ class Script(Default):
             }});
             $.ajax({{
                 type: 'post',
-                url: 'https://api.infomagazine.xyz/db/',
+                url: 'https://serverlessapi.infomagazine.xyz/db/',
                 data: body,
                 dataType: 'json',
                 success: function (data) {{
@@ -445,7 +445,7 @@ class Script(Default):
                         if (rsp.success) {{
                             $.ajax({{
                                 type: 'get',
-                                url: 'http://www.infomagazine.xyz/api/v1/iamport/',
+                                url: '',
                                 data: {{imp_uid: rsp.imp_uid}},
                                 dataType: 'json',
                                 success: function (data) {{

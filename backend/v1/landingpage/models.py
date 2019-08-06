@@ -1,8 +1,10 @@
 import json
-
 import pymongo
 from bson import ObjectId
 from bson.json_util import dumps
+from django.core.validators import MinLengthValidator
+from django.db import models
+from django_mysql.models import JSONField
 
 from infomagazine.settings import MONGO_CLOUD_ACCOUNT, MONGO_CLOUD_PASSWD
 
