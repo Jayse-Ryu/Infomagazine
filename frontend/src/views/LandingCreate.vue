@@ -258,7 +258,6 @@
             if (field[i].validation.hasOwnProperty(vali[key])) {
               // If not value obj, push key true
               if (vali[key] != 'value_min' && vali[key] != 'value_max') {
-                console.log('check?', vali[key])
                 field[i].validation[vali[key]] = true
               } else {
                 field[i].validation[vali[key]] = field[i].validation[vali[key]]
