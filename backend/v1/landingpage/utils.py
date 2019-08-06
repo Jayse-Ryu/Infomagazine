@@ -410,11 +410,11 @@ class Script(Default):
             }};
             Object.entries(item_group).forEach(function (item) {{
                 var _target = eval(item[1]['target']);
-                body['data'][item[0]] = _target.val();
+                body['data'][item[0]] = String(_target.val());
                 body['schema'][item[0]] = _target.attr('data-label-name');
             }});
             body['landing_id'] = window.location.pathname.split('/')[1];
-            body['registered_date'] = new Date().format("yyyy-MM-dd hh:mm:ss");
+            body['registered_date'] = String(Date.now());
             $.ajax({{
                 type: 'post',
                 url: 'https://serverlessapi.infomagazine.xyz/db/',
