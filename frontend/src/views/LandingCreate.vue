@@ -233,6 +233,60 @@
       this.dynamo_obj.created_date = this.epoch_time.toString()
     },
     methods: {
+      validation_back() {
+
+        let field = this.dynamo_obj.landing_info.field
+        // console.log('temp field', field)
+        // Preparing validation list
+        let vali = [
+          'required',
+          'korean_only',
+          'english_only',
+          'number_only',
+          'phone_only',
+          'email',
+          'age_limit',
+          'value_min',
+          'value_max'
+        ]
+
+        // Get one field object
+        for (let i in field) {
+          // Inspect by validation list
+          for (let key in vali) {
+            // Inspect object by a key
+            if (field[i].validation.hasOwnProperty(vali[key])) {
+              // If not value obj, push key true
+              if (vali[key] != 'value_min' && vali[key] != 'value_max') {
+                console.log('check?', vali[key])
+                field[i].validation[vali[key]] = true
+              } else {
+                field[i].validation[vali[key]] = field[i].validation[vali[key]]
+              }
+            } else {
+              // Distinguish object default value by keys
+              let form = {}
+              if (vali[key] == 'value_min') {
+                form = {
+                  value: 0,
+                  option: 'gt'
+                }
+                field[i].validation[vali[key]] = form
+              } else if (vali[key] == 'value_max') {
+                form = {
+                  value: 120,
+                  option: 'lt'
+                }
+                field[i].validation[vali[key]] = form
+              } else {
+                field[i].validation[vali[key]] = false
+              }
+            }
+          }
+        }
+        let temp = JSON.stringify(this.dynamo_obj)
+        this.dynamo_obj = JSON.parse(temp)
+      },
       set_field_position(option) {
         if (option == 'form') {
           // Section list short name
@@ -539,6 +593,7 @@
               .catch((error) => {
                 alert('랜딩 생성 중 오류가 발생하였습니다.')
                 this.$store.state.pageOptions.loading = false
+                this.validation_back()
                 console.log(error)
               })
           } else {
@@ -549,28 +604,38 @@
               .then(() => {
                 alert('랜딩이 생성되었습니다.')
                 this.$store.state.pageOptions.loading = false
+                this.validation_back()
                 this.bye()
               })
               .catch((error) => {
                 alert('랜딩 생성 중 오류가 발생하였습니다.')
                 console.log('Landing update fail', error)
+                this.validation_back()
                 this.$store.state.pageOptions.loading = false
               })
           }
         } else {
+
+          this.field_validation()
+
           if (!this.page_id) {
             axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
               .then((response) => {
                 this.page_id = response.data.data.inserted_id
+                this.validation_back()
               })
               .catch((error) => {
                 console.log('Landing update fail', error)
+                this.validation_back()
               })
           } else {
             axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
               'company_id': this.dynamo_obj.company_id,
               'landing_info': this.dynamo_obj.landing_info
             }, config)
+              .then(() => {
+                this.validation_back()
+              })
               .catch((error) => {
                 console.log('Landing update fail', error)
               })
@@ -601,6 +666,7 @@
       },
       generate() {
         if (this.dynamo_obj.landing_info.landing.base_url) {
+          this.push_landing()
           axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/')
             .then((response) => {
               // console.log('created', response)

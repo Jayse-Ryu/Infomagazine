@@ -247,7 +247,7 @@
               this.back_up = response.data.data
               this.temp_obj = response.data.data
               this.epoch_time = response.data.data.landing_info.landing.base_url
-              this.validation_back()
+              this.validation_back('first')
               this.get_url_list()
             })
             .catch((error) => {
@@ -267,57 +267,111 @@
             })
         }
       },
-      validation_back() {
-        let field = this.temp_obj.landing_info.field
-        // console.log('temp field', field)
-        // Preparing validation list
-        let vali = [
-          'required',
-          'korean_only',
-          'english_only',
-          'number_only',
-          'phone_only',
-          'email',
-          'age_limit',
-          'value_min',
-          'value_max'
-        ]
+      validation_back(option) {
+        if (option == 'first') {
+          let field = this.temp_obj.landing_info.field
+          // console.log('temp field', field)
+          // Preparing validation list
+          let vali = [
+            'required',
+            'korean_only',
+            'english_only',
+            'number_only',
+            'phone_only',
+            'email',
+            'age_limit',
+            'value_min',
+            'value_max'
+          ]
 
-        // Get one field object
-        for (let i in field) {
-          // Inspect by validation list
-          for (let key in vali) {
-            // Inspect object by a key
-            if (field[i].validation.hasOwnProperty(vali[key])) {
-              // If not value obj, push key true
-              if (vali[key] != 'value_min' && vali[key] != 'value_max') {
-                field[i].validation[vali[key]] = true
-              } else {
-                field[i].validation[vali[key]] = field[i].validation[vali[key]]
-              }
-            } else {
-              // Distinguish object default value by keys
-              let form = {}
-              if (vali[key] == 'value_min') {
-                form = {
-                  value: 0,
-                  option: 'gt'
+          // Get one field object
+          for (let i in field) {
+            // Inspect by validation list
+            for (let key in vali) {
+              // Inspect object by a key
+              if (field[i].validation.hasOwnProperty(vali[key])) {
+                // If not value obj, push key true
+                if (vali[key] != 'value_min' && vali[key] != 'value_max') {
+                  field[i].validation[vali[key]] = true
+                } else {
+                  field[i].validation[vali[key]] = field[i].validation[vali[key]]
                 }
-                field[i].validation[vali[key]] = form
-              } else if (vali[key] == 'value_max') {
-                form = {
-                  value: 120,
-                  option: 'lt'
-                }
-                field[i].validation[vali[key]] = form
               } else {
-                field[i].validation[vali[key]] = false
+                // Distinguish object default value by keys
+                let form = {}
+                if (vali[key] == 'value_min') {
+                  form = {
+                    value: 0,
+                    option: 'gt'
+                  }
+                  field[i].validation[vali[key]] = form
+                } else if (vali[key] == 'value_max') {
+                  form = {
+                    value: 120,
+                    option: 'lt'
+                  }
+                  field[i].validation[vali[key]] = form
+                } else {
+                  field[i].validation[vali[key]] = false
+                }
               }
             }
           }
+          let temp = JSON.stringify(this.temp_obj)
+          this.dynamo_obj = JSON.parse(temp)
+        } else {
+          let field = this.dynamo_obj.landing_info.field
+          // console.log('temp field', field)
+          // Preparing validation list
+          let vali = [
+            'required',
+            'korean_only',
+            'english_only',
+            'number_only',
+            'phone_only',
+            'email',
+            'age_limit',
+            'value_min',
+            'value_max'
+          ]
+
+          // Get one field object
+          for (let i in field) {
+            // Inspect by validation list
+            for (let key in vali) {
+              // Inspect object by a key
+              if (field[i].validation.hasOwnProperty(vali[key])) {
+                // If not value obj, push key true
+                if (vali[key] != 'value_min' && vali[key] != 'value_max') {
+                  field[i].validation[vali[key]] = true
+                } else {
+                  field[i].validation[vali[key]] = field[i].validation[vali[key]]
+                }
+              } else {
+                // Distinguish object default value by keys
+                let form = {}
+                if (vali[key] == 'value_min') {
+                  form = {
+                    value: 0,
+                    option: 'gt'
+                  }
+                  field[i].validation[vali[key]] = form
+                } else if (vali[key] == 'value_max') {
+                  form = {
+                    value: 120,
+                    option: 'lt'
+                  }
+                  field[i].validation[vali[key]] = form
+                } else {
+                  field[i].validation[vali[key]] = false
+                }
+              }
+            }
+          }
+          let temp = JSON.stringify(this.dynamo_obj)
+          this.dynamo_obj = JSON.parse(temp)
         }
-        let temp = JSON.stringify(this.temp_obj)
-        this.dynamo_obj = JSON.parse(temp)
+
       },
       set_field_position(option) {
         if (option == 'form') {
@@ -616,23 +670,31 @@
               // if (confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
               //   this.bye()
               // }
+              this.validation_back()
               alert('랜딩이 수정되었습니다.')
             })
             .catch((error) => {
               alert('랜딩 수정이 실패하였습니다.')
               this.$store.state.pageOptions.loading = false
               console.log(error)
+              this.validation_back()
             })
         } else {
           // console.log('detail is not support auto save')
           // if (!this.error_label.name && !this.error_label.base_url) {
           // console.log('Landing pushed! ')
 
+          this.field_validation()
+
           axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
             'company_id': this.dynamo_obj.company_id,
             'landing_info': this.dynamo_obj.landing_info
           }, config)
+            .then(() => {
+              this.validation_back()
+            })
             .catch((error) => {
+              this.validation_back()
               console.log('Landing update fail', error)
             })
           // }
@@ -730,9 +792,9 @@
       },
       generate() {
         if (this.dynamo_obj.landing_info.landing.base_url) {
+          this.push_landing()
           axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/')
             .then((response) => {
-              // console.log('created', response)
               this.get_url_list()
             })
             .catch((error) => {
