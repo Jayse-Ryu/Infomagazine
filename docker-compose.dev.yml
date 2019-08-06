@@ -7,7 +7,6 @@ services:
       context: .
       dockerfile: ./docker/dev/nginx/Dockerfile
     volumes:
-      - ./frontend:/home/webapp
       - tmp_data:/tmp
 
   APIServer:
