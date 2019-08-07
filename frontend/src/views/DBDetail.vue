@@ -251,6 +251,13 @@
           that.window_width = window.innerWidth
         })
       })
+      axios.get(this.$store.state.endpoints.baseUrl + 'db/')
+        .then((response) => {
+          console.log('db get res ', response)
+        })
+        .catch((error) => {
+          console.log('db get err', error)
+        })
       this.get_db_list()
     },
     methods: {
