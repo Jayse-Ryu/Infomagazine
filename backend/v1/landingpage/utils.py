@@ -297,9 +297,11 @@ class Script(Default):
 
         result = f"""
         $("#form_{section_id}_submit_button").click(function () {{
+            var $this = $(this);
+            $this.attr("disabled",true);
             var item_group = {json.dumps(converted_item_group)};
             form_{section_id}_validation(item_group);
-            call_form_{section_id}_ajax(item_group)
+            call_form_{section_id}_ajax($this,item_group)
         }});
         """
         self.landing_scripts += result
@@ -403,7 +405,7 @@ class Script(Default):
 
     def _js_call_ajax(self, section_id=None):
         result = f"""
-        function call_form_{section_id}_ajax(item_group) {{
+        function call_form_{section_id}_ajax($this,item_group) {{
             var body = {{
                 'data': {{}},
                 'schema': {{}}
@@ -431,6 +433,8 @@ class Script(Default):
                 error: function (data) {{
                     alert('에러');
                 }}
+            }}).always(function () {{
+                $this.removeAttr('disabled')
             }})
         }}
         """
