@@ -744,7 +744,7 @@ class LandingPage(StyleSheet, Script):
                         item_group = []
                         for generated_field, item in generated_field_list:
                             section_object_by_type.append(generated_field)
-                            if not None:
+                            if item is not None:
                                 item_group.append(item)
 
                         self._js_submit_event(section_id=section_index,
