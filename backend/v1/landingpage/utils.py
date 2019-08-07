@@ -410,15 +410,14 @@ class Script(Default):
             }};
             Object.entries(item_group).forEach(function (item) {{
                 var _target = eval(item[1]['target']);
-                body['data'][item[0]] = String(_target.val());
+                body['data'][item[0]] = _target.val();
                 body['schema'][item[0]] = _target.attr('data-label-name');
             }});
             body['landing_id'] = window.location.pathname.split('/')[1];
             body['registered_date'] = String(Date.now());
             $.ajax({{
-                type: 'post',
-                accept: "application/json",
-                contentType: "application/json; charset=utf-8",
+                method: 'POST',
+                contentType: "application/json; charset=utf-8", // MIME type to request
                 url: 'https://serverlessapi.infomagazine.xyz/db/',
                 data: JSON.stringify(body),
                 dataType: 'json',
@@ -668,12 +667,16 @@ class LandingPage(StyleSheet, Script):
                                                           'data-label-name': field_info['name']})
             form_group.append(input_tag)
             form_group.append(label_tag)
-        return form_group, {
-            'name': field_id,
-            'type': field_info['type'],
-            'target': f"""$('#{field_id}')""",
-            'validation': list(field_info['validation'].keys())
-        }
+
+        if field_type in [8, 9]:
+            return form_group, None
+        else:
+            return form_group, {
+                'name': field_id,
+                'type': field_info['type'],
+                'target': f"""$('#{field_id}')""",
+                'validation': list(field_info['validation'].keys())
+            }
 
     def generate(self):
         """
@@ -741,7 +744,8 @@ class LandingPage(StyleSheet, Script):
                         item_group = []
                         for generated_field, item in generated_field_list:
                             section_object_by_type.append(generated_field)
-                            item_group.append(item)
+                            if not None:
+                                item_group.append(item)
 
                         self._js_submit_event(section_id=section_index,
                                               item_group=item_group)
