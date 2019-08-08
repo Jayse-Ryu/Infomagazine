@@ -9,7 +9,7 @@ class LandingPageDBViewSets(CustomModelViewSet):
     serializer_class = LandingPageDBSerializer
 
     def get_queryset(self):
-        return LandingPageDB.objects.filter(landing_id=self.kwargs['company_pk'])
+        return LandingPageDB.objects.filter(landing_id=self.kwargs['landing_page_pk'])
 
     # def get_queryset(self):
     #     if self.request.method == 'GET':
