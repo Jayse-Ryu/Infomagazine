@@ -81,7 +81,7 @@ class ReturnValuesFormatter:
         return formatted_values
 
 
-class LandingPageViewSetsUtils(viewsets.ViewSet):
+class _LandingPageViewSetsUtils(viewsets.ViewSet):
     landing_pages_model = LandingModel(choice_db='infomagazine')
     permission_classes = (custom_permissions.IsMarketer,)
     return_value_formatter = ReturnValuesFormatter
@@ -100,7 +100,7 @@ class LandingPageViewSetsUtils(viewsets.ViewSet):
             return landing_detail
 
 
-class LandingPageViewSets(LandingPageViewSetsUtils):
+class LandingPageViewSets(_LandingPageViewSetsUtils):
     @response_decorator
     def list(self, request):
         projection = {'_id': 1, 'landing_info.landing.name': 1, 'landing_info.landing.views': 1}

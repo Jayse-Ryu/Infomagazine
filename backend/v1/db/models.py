@@ -9,7 +9,7 @@ class LandingPageDB(models.Model):
     schema = JSONField()
     user_agent = models.CharField(blank=True, max_length=256)
     ip_v4_address = models.CharField(blank=True, max_length=19, validators=[MinLengthValidator(19)])
-    registered_date = models.DateTimeField()
+    registered_date = models.CharField(max_length=13)
 
     class Meta:
         db_table = 'landing_page_db'
