@@ -13,6 +13,8 @@ class OrganizationViewSets(CustomModelViewSet):
     filterset_class = OrganizationFilter
 
     def get_permissions(self):
-        if self.request.method in ['GET']:
-            return [custom_permissions.IsGuest()]
+        if self.action in ['list']:
+            return [permissions.IsAdminUser()]
+        elif self.action in ['retrieve']:
+            return [custom_permissions.IsMarketer()]
         return [permissions.IsAdminUser()]
