@@ -24,6 +24,7 @@ beautifulsoup4 = "*"
 mysqlclient = "*"
 djangorestframework = "*"
 django-mysql = "*"
+drf-nested-routers = "*"
 
 [requires]
 python_version = "3.7"

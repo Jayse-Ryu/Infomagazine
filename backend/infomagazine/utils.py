@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import connection, transaction
 from django.http import Http404
 
+from rest_framework import routers
 from rest_framework import exceptions
 from rest_framework.response import Response
 
@@ -45,3 +46,18 @@ def custom_exception_handler(exc, context):
         return Response({'state': False, 'data': None, 'message': data}, status=exc.status_code, headers=headers)
 
     return None
+
+
+class DefaultRouter(routers.DefaultRouter):
+    """
+    Extends `DefaultRouter` class to add a method for extending url routes from another router.
+    """
+
+    def extend(self, router):
+        """
+        Extend the routes with url routes of the passed in router.
+
+        Args:
+             router: SimpleRouter instance containing route definitions.
+        """
+        self.registry.extend(router.registry)

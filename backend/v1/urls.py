@@ -1,21 +1,25 @@
 from django.conf import settings
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 
-from v1.company.views import CompanyViewSets
-from v1.landingpage.views import LandingPageViewSets
-from v1.organization.views import OrganizationViewSets
-from v1.user.views import UserViewSets
+from infomagazine.utils import DefaultRouter
+
+from v1.db.urls import router as db_router, companies_router
+from v1.landingpage.urls import router as landingpage_router
+from v1.organization.urls import router as organization_router
+from v1.user.urls import router as user_router
 from v1.views import custom_token_obtain_sliding, custom_token_refresh_sliding
+from v1.company.urls import router as company_router
 
 router = DefaultRouter()
-router.register(r'users', UserViewSets, basename='user')
-router.register(r'organizations', OrganizationViewSets, basename='organization')
-router.register(r'companies', CompanyViewSets, basename='company')
-router.register(r'landing_pages', LandingPageViewSets, basename='landing-page')
+router.extend(user_router)
+router.extend(organization_router)
+router.extend(company_router)
+router.extend(landingpage_router)
+router.extend(db_router)
 
 api_urlpatterns = ([
-                       path('', include((router.urls, 'router'), namespace='router')),
+                       path('', include((router.urls, 'root_router'), namespace='router')),
+                       path('', include((companies_router.urls, 'companies_router'), namespace='companies_router')),
                        path('auth/', custom_token_obtain_sliding, name='token_obtain_sliding'),
                        path('auth/refresh/', custom_token_refresh_sliding, name='token_refresh_sliding')
                    ], 'v1')
