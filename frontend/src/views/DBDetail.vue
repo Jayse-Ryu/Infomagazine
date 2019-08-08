@@ -194,6 +194,18 @@
     data: () => ({
       window_width: window.innerWidth,
       landing_id: '0',
+      temp: {
+        id: '99',
+        landing_id: '123',
+        url: 'main',
+        created_date: '1562728468',
+        data: {
+          이름: '류동근',
+          연락처: '01088988898',
+          성별: '남자',
+          지역: '서울'
+        }
+      },
       landing_obj: {
         landing_info: {
           landing: {}
