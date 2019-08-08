@@ -20,7 +20,7 @@
           <div class="col-sm-9 mt-sm-3">
             <select class="form-control col-md-12 m-auto" name="org_manager" id="org_manager"
                     v-model="create_obj.org_manager">
-              <option value="0" selected>추후에 선택합니다</option>
+              <option value="-1" selected>추후에 선택합니다</option>
               <option v-for="item in marketer_list" :value="item.id">
                 {{ item.username }} / {{ item.email }}
               </option>
@@ -153,11 +153,11 @@
     }),
     mounted() {
       // Get marketer users for set as a manager
-      axios.get(this.$store.state.endpoints.baseUrl + 'users/')
+      axios.get(this.$store.state.endpoints.baseUrl + 'users/?limit=9999999999')
         .then((response) => {
           let short = response.data.data.results
-          for(let i = 0; i < short.length; i ++) {
-            if([1,3].includes(short[i].info.access_role)) {
+          for (let i = 0; i < short.length; i++) {
+            if ([1, 3].includes(short[i].info.access_role)) {
               // marketer or guest
               if (short[i].username == '') {
                 short[i].username = '이름없음'
@@ -246,9 +246,14 @@
         if (confirm('조직을 생성하시겠습니까?')) {
           this.$store.state.pageOptions.loading = true
           axios.post(this.$store.state.endpoints.baseUrl + 'organizations/', this.create_obj)
-            .then(() => {
+            .then((response) => {
               alert('조직이 생성되었습니다.')
               this.$store.state.pageOptions.loading = false
+              return axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.create_obj.org_manager + '/', {
+                'info': {access_role: 0, organization: response.data.data.id}
+              })
+            })
+            .then(() => {
               this.$router.currentRoute.meta.protect_leave = 'no'
               this.$router.push({
                 name: 'organization_list'

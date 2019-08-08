@@ -255,6 +255,7 @@
 
         <div class="mt-1 mb-2">
           <button type="submit" class="btn btn-primary col">수정</button>
+          <button v-if="user_obj.access_role == 0 || user_obj.is_staff" type="button" class="btn btn-danger col mt-2" @click="delete_org()">삭제</button>
           <router-link to="/organization">
             <button class="btn btn-dark col mt-2">취소</button>
           </router-link>
@@ -760,6 +761,21 @@
           .catch((error) => {
             console.log('user update error ', error)
           })
+      },
+      delete_org() {
+        if(confirm('조직을 삭제 하시겠습니까?')) {
+          axios.delete(this.$store.state.endpoints.baseUrl + 'organizations/' + this.page_id)
+            .then((response) => {
+              alert('조직이 삭제되었습니다.')
+              this.$router.currentRoute.meta.protect_leave = 'no'
+              this.$router.push({
+                name: 'organization_list'
+              })
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+        }
       }
     },
     computed: {

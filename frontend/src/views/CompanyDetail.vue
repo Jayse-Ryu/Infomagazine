@@ -479,7 +479,7 @@
           .then((response) => {
             // console.log('company response is? ', response)
             this.content_obj = response.data.data
-            return axios.get(this.$store.state.endpoints.baseUrl + 'users/?company=' + this.page_id + pagination + '/')
+            return axios.get(this.$store.state.endpoints.baseUrl + 'users/?company=' + this.page_id + pagination)
           })
           .catch((error) => {
             console.log('Mount Get company error', error)

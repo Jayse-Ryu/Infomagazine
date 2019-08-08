@@ -17,7 +17,7 @@
                  class="col-form-label-sm col-sm-3 mt-3">
             <span>관리 조직 <span class="alert alert-danger p-0">(Staff Only)</span></span>
           </label>
-          <div class="col-sm-9 mt-sm-3">
+          <div v-if="user_obj.is_staff" class="col-sm-9 mt-sm-3">
             <select name="set_org" id="set_org" class="form-control" v-model="create_obj.org_id">
               <option value="0" selected>선택하세요</option>
               <option v-for="item in organization_list" :value="item.id">
