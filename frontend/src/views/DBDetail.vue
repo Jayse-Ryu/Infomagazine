@@ -29,7 +29,7 @@
                 class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1 font-weight-bold border-0">
                 <div class="col-3 p-0 col-sm-3">{{ landing_obj.company_id }}</div>
                 <div class="col-3 p-0 col-sm-4">{{ landing_obj.landing_info.landing.name }}</div>
-                <div class="col-3 p-0">{{ landing_obj.landing_info.landing.manager }}</div>
+                <div class="col-3 p-0">{{ manager_name }}</div>
                 <div class="col-1 p-0 board_centre">{{ landing_obj.landing_info.views }}</div>
                 <div class="col-1 p-0 board_centre">{{ landing_obj.landing_info.views }}</div>
               </li>
@@ -67,22 +67,20 @@
       <hr>
 
       <section class="section section_box">
-        <h5>Url 상태</h5>
+        <h5>DB 개요</h5>
 
         <div class="list_area">
           <div class="list_header">
             <div class="list-group-item text-center d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
                  style="border-radius: 0; width:100%;">
-              <div class="col-4 p-0">URL</div>
-              <div class="col-4 p-0">조회수</div>
-              <div class="col-4 p-0">DB 수</div>
+              <div class="col-6 p-0">디바이스 종류</div>
+              <div class="col-6 p-0">IP 종류</div>
             </div>
           </div>
           <ul class="text-center list-group list-group-flush text-center">
             <li class="list-group-item list-group-item-action d-inline-flex justify-content-around p-1">
-              <div class="col-4 p-0">main_url</div>
-              <div class="col-4 p-0">123</div>
-              <div class="col-4 p-0">28</div>
+              <div class="col-6 p-0">{{ db_inspect.agent }} 가지</div>
+              <div class="col-6 p-0">{{ db_inspect.ip }} 가지</div>
             </li>
           </ul>
         </div>
@@ -199,46 +197,11 @@
           landing: {}
         }
       },
-      db_list: [
-        {
-          이름: '류동근',
-          연락처: '01088988898',
-          성별: '남자',
-          지역: '서울',
-          created_date: '1562728468',
-          url: 'url_1'
-        },
-        {
-          이름: '아무개',
-          연락처: '',
-          성별: '남자',
-          지역: '서울',
-          문의사항: '테스트가 되나요?',
-          created_date: '1562735504',
-          url: 'url_1'
-        },
-        {
-          이름: '고양이',
-          연락처: null,
-          성별: '수컷',
-          지역: '집',
-          문의사항: 'ㅇ러293런ㄹ어2',
-          좋아: false,
-          created_date: '1394104654',
-          url: 'url_1'
-        },
-        {
-          이름: '강아지',
-          연락처: '01083981872',
-          성별: '암컷',
-          지역: '우리집',
-          좋아: true,
-          created_date: '1552231881',
-          url: 'url_1'
-        },
-      ],
+      manager_name: '없음',
+      db_list: [],
       db_keys: [],
       db_vals: [],
+      db_inspect: {},
       start_time: '',
       finish_time: '',
       language: lang.ko
@@ -256,17 +219,33 @@
     methods: {
       get_db_list() {
         this.landing_id = this.$route.params.landing_id
-        axios.get(this.$store.state.endpoints.baseUrl + 'db/' + this.landing_id + '/')
+        axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.landing_id + '/')
           .then((response) => {
-            console.log(response.data.data)
             this.landing_obj = response.data.data
-            this.db_list = response.data.data.data
-            // Call get resources after data loaded
-            this.get_resources_key()
+            return axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.landing_id + '/landing_dbs/?limit=999999999&offset=0')
           })
           .catch((error) => {
-            console.log(error)
+            console.log('get landing', error)
           })
+          .then((response) => {
+            this.db_list = response.data.data.results
+            // Call get resources after data loaded
+            this.get_resources_key()
+            this.db_analytics()
+            if (this.landing_obj.landing_info.landing.manager > -1) {
+              return axios.get(this.$store.state.endpoints.baseUrl + 'users/' + this.landing_obj.landing_info.landing.manager + '/')
+            } else {
+              this.manager_name = '매니저 없음'
+            }
+          })
+          .then((response) => {
+            // console.log('get user res ', response)
+            // this.manager_name = response.data.data.username
+          })
+          .catch((error) => {
+            console.log('get db', error)
+          })
+
       },
       get_resources_key() {
         this.db_keys = []
@@ -274,26 +253,29 @@
 
         // Get only obje keys for pretty list
         for (let index in this.db_list) {
+
           // Extract db object by index
           if (this.db_list.hasOwnProperty(index)) {
             // Set db keys from one db object
             for (let key in this.db_list[index]) {
-              // if db object has that extracted key
-              if (this.db_list[index].hasOwnProperty(key)) {
-                // if db_keys array not have this key yet, push. ot not.
-                if (!this.db_keys.includes(key)) {
-                  this.db_keys.push(key)
+              if (key === 'db') {
+                for (let inner in this.db_list[index][key]) {
+                  if (this.db_list[index][key].hasOwnProperty(inner)) {
+                    if (!this.db_keys.includes(inner)) {
+                      this.db_keys.push(inner)
+                    }
+                  }
                 }
               }
             }
-            // Push url and date fields to backward
-            this.db_keys.splice(this.db_keys.indexOf('url'), 1)
-            this.db_keys.push('url')
-            this.db_keys.splice(this.db_keys.indexOf('created_date'), 1)
-            this.db_keys.push('created_date')
           }
+          // ext
         }
-        // /get key
+        // // Push url and date fields to backward
+        // this.db_keys.splice(this.db_keys.indexOf('url'), 1)
+        // this.db_keys.push('url')
+        this.db_keys.splice(this.db_keys.indexOf('신청일'), 1)
+        this.db_keys.push('신청일')
 
         this.get_resources_val()
       },
@@ -308,35 +290,37 @@
             let month_array = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
             let date_obj = ''
             val_obj.push({})
-            // Inspect by key name
-            for (let i = 0; i < this.db_keys.length; i++) {
-              // If this object has this key
-              if (this.db_list[index].hasOwnProperty(this.db_keys[i])) {
 
-                // If key is created date
-                if (this.db_keys[i] == 'created_date') {
-                  date_obj = ''
-                  // Epoch time string length must be 13
-                  if (this.db_list[index][this.db_keys[i]].length == 10) {
-                    date_obj = new Date(this.db_list[index][this.db_keys[i]] * 1000)
+            for (let key in this.db_list[index]) {
+              if (key === 'db') {
+                // Inspect by key name
+                for (let i = 0; i < this.db_keys.length; i++) {
+                  // If this object has this key
+                  if (this.db_list[index][key].hasOwnProperty(this.db_keys[i])) {
+                    // If key is created date
+                    val_obj[index][this.db_keys[i]] = this.db_list[index][key][this.db_keys[i]]
+                  } else if (this.db_keys[i] === '신청일') {
+                    date_obj = ''
+                    // Epoch time string length must be 13
+                    if (this.db_list[index]['registered_date'].length == 10) {
+                      date_obj = new Date(this.db_list[index]['registered_date'] * 1000)
+                    } else {
+                      let double = Math.pow(10, this.db_list[index]['registered_date'].length - 10)
+                      date_obj = new Date(this.db_list[index]['registered_date'] * (1000 / double))
+                    }
+                    // Make date string
+                    let date_str = date_obj.getFullYear() + '-' + month_array[date_obj.getMonth()] + '-' + date_obj.getDate()
+
+                    val_obj[index][this.db_keys[i]] = date_str
+                    //Date val done
                   } else {
-                    let double = Math.pow(10, this.db_list[index][this.db_keys[i]].length - 10)
-                    date_obj = new Date(this.db_list[index][this.db_keys[i]] * (1000 / double))
+                    // If db[index] dont have this key[i]
+                    val_obj[index][this.db_keys[i]] = (' ')
                   }
-                  // Make date string
-                  let date_str = date_obj.getFullYear() + '-' + month_array[date_obj.getMonth()] + '-' + date_obj.getDate()
-
-                  val_obj[index][this.db_keys[i]] = date_str
-                  //Date val done
-                } else {
-                  val_obj[index][this.db_keys[i]] = this.db_list[index][this.db_keys[i]]
                 }
-
-              } else {
-                // If db[index] dont have this key[i]
-                val_obj[index][this.db_keys[i]] = (' ')
               }
-            }
+            }// for
+
           }
         }
 
@@ -347,7 +331,7 @@
             for (let i in val_obj) {
               let from_t = new Date(this.start_time).setHours(0, 0, 0, 0)
               let to_t = new Date(this.finish_time).setHours(0, 0, 0, 0)
-              let value_t = new Date(val_obj[i]['created_date']).setHours(0, 0, 0, 0)
+              let value_t = new Date(val_obj[i]['신청일']).setHours(0, 0, 0, 0)
 
               if (!(from_t <= value_t && value_t <= to_t)) {
                 val_obj.splice(i, 1)
@@ -393,6 +377,30 @@
           this.finish_time = new Date(to)
           this.get_resources_key()
         }
+      },
+      db_analytics() {
+        let agent_all = []
+        let agent_inspect = []
+        let ip_all = []
+        let ip_inspect = []
+        for (let index in this.db_list) {
+          agent_all.push(this.db_list[index]['user_agent'])
+          if (!agent_inspect.includes(this.db_list[index]['user_agent'])) {
+            agent_inspect.push(this.db_list[index]['user_agent'])
+          }
+
+          ip_all.push(this.db_list[index]['ip_v4_address'])
+          if (!ip_inspect.includes(this.db_list[index]['ip_v4_address'])) {
+            ip_inspect.push(this.db_list[index]['ip_v4_address'])
+          }
+
+        }
+        // console.log('all', agent_all)
+        // console.log('inspect', agent_inspect)
+        // console.log('all', ip_all)
+        // console.log('inspect', ip_inspect)
+        this.db_inspect['agent'] = agent_inspect.length
+        this.db_inspect['ip'] = ip_inspect.length
       }
     },
     computed: {
