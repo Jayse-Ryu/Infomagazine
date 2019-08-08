@@ -6,20 +6,23 @@ import boto3
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-HEADERS = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": os.getenv('WHITE_LIST')
-}
 
-
-def _response_format(status_code: int = None, state: bool = True, message: str = None) -> dict:
+def _response_format(status_code: int = None, state: bool = True, message: str = None,
+                     custom_headers: dict = None) -> dict:
+    headers = {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": os.getenv('WHITE_LIST'),
+        "Access-Control-Allow-Headers": "Content-Type"
+    }
+    if custom_headers is not None:
+        headers.update(custom_headers)
     body = {
         "state": state,
         "message": message
     }
     return {
         "statusCode": status_code,
-        "headers": HEADERS,
+        "headers": headers,
         "body": json.dumps(body)
     }
 
@@ -32,7 +35,8 @@ def _send_to_sqs(event):
     headers = event['headers']
     user_agent = headers['user-agent']
     ip_v4_address = headers['x-forwarded-for'].split(",")[0]
-    body = json.loads(event['body'])
+    event_body = event['body']
+    body = json.loads(event_body)
 
     if _db_validate(body.keys()):
         return _response_format(status_code=500, message='유효한 db가 아닙니다.')
@@ -52,7 +56,7 @@ def _send_to_sqs(event):
                                     region_name='ap-northeast-2')
     sqs_client = session.client('sqs')
     response = sqs_client.send_message(
-        QueueUrl=os.getenv('SQL_URL'),
+        QueueUrl='https://sqs.ap-northeast-2.amazonaws.com/590908818913/test-sqs',
         DelaySeconds=0,
         MessageBody=json.dumps(body_to_send)
     )
@@ -63,7 +67,9 @@ def _send_to_sqs(event):
 
 
 def lambda_handler(event, context):
-    if event['body']:
-        _response_format(status_code=500, message='입력할 db가 없습니다.')
+    if event['httpMethod'] == 'OPTIONS':
+        return _response_format(status_code=200, custom_headers={"Cache-Control": "max-age=31536000"})
+    if not event['body']:
+        return _response_format(status_code=500, message='입력할 db가 없습니다.')
 
     return _send_to_sqs(event)
