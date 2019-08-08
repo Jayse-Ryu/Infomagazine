@@ -54,12 +54,12 @@ class UserViewSets(CustomModelViewSet):
         return Response(result, status=status.HTTP_200_OK)
 
     def get_permissions(self):
-        if self.action in ['create', 'email_check']:
+        if self.action in ['create']:
             return [permissions.AllowAny()]
         elif self.action in ['update', 'partial_update']:
             return [permissions.IsAuthenticated()]
-        elif self.action in ['create_client']:
-            return [custom_permissions.IsMarketer()]
+        elif self.action in ['retrieve']:
+            return [permissions.IsAuthenticated()]
         return [permissions.IsAdminUser()]
 
     def get_serializer_context(self):
@@ -69,7 +69,7 @@ class UserViewSets(CustomModelViewSet):
             'view': self
         }
 
-        if self.action not in ['create', 'create_client', 'list'] and 'pk' in self.kwargs:
+        if self.action not in ['list', 'create', 'create_client'] and 'pk' in self.kwargs:
             context.update({'pk': self.kwargs['pk']})
 
         return context

@@ -419,10 +419,9 @@ class Script(Default):
             body['registered_date'] = String(Date.now());
             $.ajax({{
                 method: 'POST',
-                contentType: "application/json; charset=utf-8", // MIME type to request
+                contentType: "application/json;", // MIME type to request
                 url: 'https://serverlessapi.infomagazine.xyz/db/',
                 data: JSON.stringify(body),
-                dataType: 'json',
                 success: function (data) {{
                     if (data) {{
                         alert('신청이 완료되었습니다.');
