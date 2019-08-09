@@ -8,12 +8,19 @@
     </div>
 
     <div class="container m-auto text-center">
-      <div v-if="user_org == null || user_org == -1" class="select_org">
+      <div v-if="!$store.state.user_campaign.organization >= 0" class="select_org">
         <h3 class="w-100 mb-4">환영합니다 <span class="text-info">{{ user_name }}</span> 마케터님</h3>
         <p class="mb-2">인포매거진은 마케팅 업체인 <span class="text-success">조직</span>과</p>
         <p class="mb-2">고객 업체인 <span class="text-success">업체</span>로 구분되어 있습니다.</p>
         <p class="mb-4">본인이 속한 조직을 선택하여 가입을 완료하세요!</p>
-        <select class="form-control col-md-11 m-auto" name="org_list" id="org_list"
+
+        <input v-if="organization_list.length*1 == 0" class="form-control col-md-11 m-auto" type="text" v-model="search" placeholder="사업자 번호">
+        <button v-if="organization_list.length*1 == 0" type="button" class="w-100 btn btn-primary mt-3 col-md-11" @click="org_search">사업자 번호 검색</button>
+
+        <select v-if="organization_list.length*1 > 1"
+                class="form-control col-md-11 m-auto"
+                name="org_list"
+                id="org_list"
                 v-model="org_selected">
           <option value="-1" selected>조직을 선택하세요</option>
           <option v-for="item in organization_list" :value="item.id">
@@ -21,17 +28,17 @@
           </option>
         </select>
 
-        <button type="button" class="w-100 btn btn-primary mt-3 col-md-11" @click="org_select">선택하기</button>
+        <button v-if="organization_list.length*1 > 1" type="button" class="w-100 btn btn-primary mt-3 col-md-11" @click="org_select">선택하기</button>
+        <button v-if="organization_list.length*1 > 1" type="button" class="w-100 btn btn-dark mt-3 col-md-11 mt-2" @click="org_reset">돌아가기</button>
       </div>
 
       <div v-else>
-        <div v-for="org in organization_list">
-          <h4 v-if="org.id == user_org">
-            <span class="text-info">{{ user_name }}</span> 마케터님은 현재
-            <span class="text-primary">{{ org.org_name }} ({{ org.org_sub_name }})</span>
-            에 승인대기 중 입니다.</h4>
-          <p class="mt-4" v-if="org.id == user_org">관리자 승인 후 서비스 이용 가능합니다.</p>
-        </div>
+        <h4>
+          <span class="text-info">{{ user_name }}</span> 마케터님은 현재
+          <span class="text-primary">{{ requested.org_name }} ({{ requested.org_sub_name }})</span>
+          에 승인대기 중 입니다.
+        </h4>
+        <p class="mt-4">관리자 승인 후 서비스 이용 가능합니다.</p>
       </div>
     </div>
   </div>
@@ -43,8 +50,9 @@
     data: () => ({
       user_name: '',
       org_selected: -1,
-      user_org: -1,
-      organization_list: []
+      organization_list: [],
+      requested: {},
+      search: ''
     }),
     mounted() {
       this.check_access()
@@ -55,14 +63,6 @@
         this.user_name = this.user_obj.username
       }
 
-      // Get organization!
-      axios.get(this.$store.state.endpoints.baseUrl + 'organizations/')
-        .then((response) => {
-          this.organization_list = response.data.data.results
-        })
-        .catch((error) => {
-          console.log('Error occurred from get organization', error)
-        })
     },
     methods: {
       info_update(id) {
@@ -93,29 +93,55 @@
           }
         }
       },
+      org_search() {
+        let crn = this.search
+
+        axios.get(this.$store.state.endpoints.baseUrl + 'organizations/?org_crn=' + crn.replace(/-/gi, '') + '/')
+          .then((response) => {
+            console.log(response.data.data.results)
+            if (response.data.count == 0) {
+              alert('해당하는 조직이 없습니다.')
+            } else if (response.data.count == 1) {
+              let name = response.data.data.results[0].org_name
+              if (confirm(name + ' 조직에 가입하시겠습니까?')) {
+                this.user_patch(response.data.data.results[0].id)
+              }
+            } else {
+              this.organization_list = response.data.data.results
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      },
       org_select() {
         if (this.org_selected == -1) {
           alert('조직을 선택해주세요.')
           document.getElementById('org_list').focus()
         } else {
-          this.user_org = this.org_selected
-          let form = {
-            email: this.user_obj.email,
-            info: {
-              organization: this.org_selected
-            }
-          }
-
-          console.log(this.user_obj)
-
-
-          // // Update actual user
-          // axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + '?organization=' + this.org_selected)
-          axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id + '/', form)
-            .then((response) => {
-              console.log('updated?', response.data)
-            })
+          this.user_patch(this.org_selected)
         }
+      },
+      user_patch(id) {
+        // // Update actual user
+        let form = {
+          email: this.user_obj.email,
+          info: {
+            organization: id
+          }
+        }
+
+        axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id + '/', form)
+          .then((response) => {
+            console.log('updated?', response.data)
+          })
+          .catch((error) => {
+            console.log('An error occurred during patch user.', error)
+          })
+      },
+      org_reset() {
+        this.organization_list = []
+        this.search = ''
       }
     },
     computed: {

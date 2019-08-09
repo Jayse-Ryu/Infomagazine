@@ -78,14 +78,16 @@
           </div>
 
           <label for="org_corp" class="col-form-label-sm col-sm-3 mt-3">
-            <span>사업자 번호</span>
+            <span>사업자 번호*</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
-            <input class="form-control" id="org_corp" name="org_corp" type="text"
+            <input :class="error_label.class.corp" id="org_corp" name="org_corp" type="text"
                    v-model="create_obj.org_crn"
                    placeholder="사업자 번호를 입력하세요"
                    autofocus="autofocus"
-                   maxlength="50">
+                   maxlength="50"
+                   required
+                   @keyup="error_check('corp')">
           </div>
 
           <label for="org_phone" class="col-form-label-sm col-sm-3 mt-3">
@@ -131,11 +133,13 @@
       error_label: {
         org_name: true,
         org_tel_num: false,
+        org_corp: false,
         // org_email: false,
         class: {
           name: 'form-control',
           tel_num: 'form-control',
           // email: 'form-control'
+          corp: 'form-control'
         }
       },
       create_obj: {
@@ -147,7 +151,7 @@
         org_tel_num: '',
         org_email: '',
         org_desc: '',
-        org_manager: 0
+        org_manager: -1
       },
       marketer_list: []
     }),
@@ -240,6 +244,14 @@
             this.error_label.org_name = false
             this.error_label.class.name = 'form-control alert-info'
           }
+        } else if (param === 'corp') {
+          if (this.create_obj.org_crn === '') {
+            this.error_label.org_corp = true
+            this.error_label.class.corp = 'form-control alert-danger'
+          } else {
+            this.error_label.org_corp = false
+            this.error_label.class.corp = 'form-control alert-info'
+          }
         }
       },
       before_create_organization() {
@@ -247,9 +259,12 @@
         if (this.error_label.org_tel_num) {
           alert('전화번호 형식을 확인해주세요!')
           document.getElementById('org_phone').focus()
-        } else if (this.error_label.name) {
+        } else if (this.error_label.org_name) {
           alert('조직 이름을 입력하세요!')
           document.getElementById('org_name').focus()
+        } else if (this.error_label.org_corp) {
+          alert('사업자번호를 입력하세요!')
+          document.getElementById('org_corp').focus()
         } else {
           this.create_organization()
         }

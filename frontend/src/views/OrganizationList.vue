@@ -145,14 +145,13 @@
         if ([0, 1].includes(this.user_obj.access_role)) {
           axios.get(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id)
             .then((response) => {
-              console.log(response)
+              this.$router.push({
+                path: '/organization/detail/' + response.data.data.info.organization
+              })
             })
             .catch((error) => {
               console.log(error)
             })
-          this.$router.push({
-            path: '/organization/detail/' + this.$store.state.user_campaign.organization
-          })
         } else {
           this.$router.push({
             name: 'gateway'
@@ -182,7 +181,6 @@
         })
       })
       ///////////////////
-      console.log('list access?', this.user_obj.access_role)
       this.$store.state.pageOptions.loading = true
       // Filtering non authorize users first
       if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
