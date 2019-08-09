@@ -52,7 +52,8 @@
         <!-- /Staff area -->
 
         <!-- Not staff User area -->
-        <div v-else-if="user_obj && !user_obj.is_staff && !user_obj.is_superuser" class="collapse navbar-collapse" id="navbarCollapse">
+        <div v-else-if="user_obj && !user_obj.is_staff && !user_obj.is_superuser" class="collapse navbar-collapse"
+             id="navbarCollapse">
 
           <!-- user is marketer. 0 owner / 1 marketer -->
           <ul v-if="[0,1].includes(user_obj.access_role)"
@@ -63,7 +64,7 @@
               </router-link>
             </li>
             <li class="navbar-item">
-              <router-link :to="'/organization/detail/' + user_obj.organization">
+              <router-link :to="'/organization/detail/' + $store.state.user_campaign.organization">
                 <div class="nav-link text-center">관리소속</div>
               </router-link>
             </li>
@@ -158,19 +159,6 @@
         }
       ]
     }),
-    methods: {
-      logout() {
-        if (confirm('로그아웃 하시겠습니까?')) {
-          this.$store.commit('removeToken')
-          if (this.$router.currentRoute.meta.protect_leave === 'yes') {
-            this.$router.currentRoute.meta.protect_leave = 'no'
-          }
-          this.$router.push({
-            name: 'sign_in'
-          })
-        }
-      }
-    },
     mounted() {
       let block = [
         '',
@@ -203,6 +191,32 @@
         }
       }
     },
+    methods: {
+      logout() {
+        if (confirm('로그아웃 하시겠습니까?')) {
+          this.$store.commit('removeToken')
+          if (this.$router.currentRoute.meta.protect_leave === 'yes') {
+            this.$router.currentRoute.meta.protect_leave = 'no'
+          }
+          this.$router.push({
+            name: 'sign_in'
+          })
+        }
+      },
+      info_update(id) {
+        axios.get(this.$store.state.endpoints.baseUrl + 'users/' + id + '/')
+          .then((response) => {
+            if (response.data.data.info.organization) {
+              this.$store.state.user_campaign.organization = response.data.data.info.organization
+            } else if (response.data.data.info.company) {
+              this.$store.state.user_campaign.company = response.data.data.info.company
+            }
+          })
+          .catch((error) => {
+            console.log('Get user info error', error)
+          })
+      }
+    },
     computed: {
       header_name() {
         let local_user = localStorage.getItem('authUser')
@@ -228,25 +242,14 @@
           user_json = {
             'is_staff': false,
             'is_superuser': false,
-            'info':
-              {
-                'access_role': 3
-              },
-            'failed': true
+            'access_role': 3,
+            'failed': true,
+            'organization': -1,
+            'company': -1
           }
         } else {
           user_json = JSON.parse(local_user)
-          axios.get(this.$store.state.endpoints.baseUrl + 'users/' + user_json.id + '/')
-            .then((response) => {
-              if (response.data.data.info.organization) {
-                user_json['organization'] = response.data.data.info.organization
-              } else if (response.data.data.info.company) {
-                user_json['company'] = response.data.data.info.company
-              }
-            })
-            .catch((error) => {
-              console.log('Get user info error', error)
-            })
+          this.info_update(user_json.id)
         }
         return user_json
       }

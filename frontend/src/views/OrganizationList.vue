@@ -137,29 +137,29 @@
   export default {
     name: "Organization_list",
     created() {
-      // this.$store.state.pageOptions.loading = true
-      // // Filtering non authorize users first
-      // if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
-      //   // alert('권한이 없습니다.')
-      //   this.$store.state.pageOptions.loading = false
-      //   if ([0, 1].includes(this.user_obj.access_role)) {
-      //     axios.get(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id)
-      //       .then((response) => {
-      //         console.log(response)
-      //       })
-      //       .catch((error) => {
-      //         console.log(error)
-      //       })
-      //     this.$router.push({
-      //       path: '/organization/detail/' + this.user_obj.organization
-      //     })
-      //   } else {
-      //     this.$router.push({
-      //       name: 'gateway'
-      //     })
-      //   }
-      // }
-      // this.$store.state.pageOptions.loading = false
+      this.$store.state.pageOptions.loading = true
+      // Filtering non authorize users first
+      if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
+        // alert('권한이 없습니다.')
+        this.$store.state.pageOptions.loading = false
+        if ([0, 1].includes(this.user_obj.access_role)) {
+          axios.get(this.$store.state.endpoints.baseUrl + 'users/' + this.user_obj.id)
+            .then((response) => {
+              console.log(response)
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+          this.$router.push({
+            path: '/organization/detail/' + this.$store.state.user_campaign.organization
+          })
+        } else {
+          this.$router.push({
+            name: 'gateway'
+          })
+        }
+      }
+      this.$store.state.pageOptions.loading = false
     },
     data: () => ({
       window_width: window.innerWidth,
@@ -182,6 +182,7 @@
         })
       })
       ///////////////////
+      console.log('list access?', this.user_obj.access_role)
       this.$store.state.pageOptions.loading = true
       // Filtering non authorize users first
       if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
@@ -196,16 +197,31 @@
             name: 'gateway'
           })
         }
-      }
-      this.$store.state.pageOptions.loading = false
-      /////////////////////
-      // Init other pages options
-      this.page_init()
+      } else {
+        this.$store.state.pageOptions.loading = false
+        /////////////////////
+        // Init other pages options
+        this.page_init()
 
-      // Get organization list
-      this.pagination(this.page_current)
+        // Get organization list
+        this.pagination(this.page_current)
+      }
+
     },
     methods: {
+      info_update(id) {
+        axios.get(this.$store.state.endpoints.baseUrl + 'users/' + id + '/')
+          .then((response) => {
+            if (response.data.data.info.organization) {
+              this.$store.state.user_campaign.organization = response.data.data.info.organization
+            } else if (response.data.data.info.company) {
+              this.$store.state.user_campaign.company = response.data.data.info.company
+            }
+          })
+          .catch((error) => {
+            console.log('Get user info error', error)
+          })
+      },
       page_init() {
         let option = this.$store.state.pageOptions
 
@@ -302,7 +318,6 @@
             this.$store.state.pageOptions.loading = false
             this.content_obj = response.data.data.results
             if (response.data.data.count % this.page_chunk === 0) {
-              console.log(response.data.data.count)
               this.page_max = Math.floor(response.data.data.count / this.page_chunk)
             } else {
               this.page_max = Math.floor(response.data.data.count / this.page_chunk) + 1
@@ -332,21 +347,13 @@
             'is_staff': false,
             'is_superuser': false,
             'access_role': 3,
-            'failed': true
+            'failed': true,
+            'organization': -1,
+            'company': -1
           }
         } else {
           user_json = JSON.parse(local_user)
-          axios.get(this.$store.state.endpoints.baseUrl + 'users/' + user_json.id + '/')
-            .then((response) => {
-              if (response.data.data.info.organization) {
-                user_json['organization'] = response.data.data.info.organization
-              } else if (response.data.data.info.company) {
-                user_json['company'] = response.data.data.info.company
-              }
-            })
-            .catch((error) => {
-              console.log('Get user info error', error)
-            })
+          this.info_update(user_json.id)
         }
 
         return user_json

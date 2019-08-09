@@ -18,6 +18,10 @@ export default new Vuex.Store({
       refreshJWT: process.env.VUE_APP_ENV_refreshJWT,
       baseUrl: process.env.VUE_APP_ENV_baseUrl
     },
+    user_campaign: {
+      organization: -1,
+      company: -1
+    },
     pageOptions: {
       loading: false,
       landing: {

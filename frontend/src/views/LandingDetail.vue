@@ -234,6 +234,19 @@
       this.get_objects('mounted')
     },
     methods: {
+      info_update(id) {
+        axios.get(this.$store.state.endpoints.baseUrl + 'users/' + id + '/')
+          .then((response) => {
+            if (response.data.data.info.organization) {
+              this.$store.state.user_campaign.organization = response.data.data.info.organization
+            } else if (response.data.data.info.company) {
+              this.$store.state.user_campaign.company = response.data.data.info.company
+            }
+          })
+          .catch((error) => {
+            console.log('Get user info error', error)
+          })
+      },
       get_objects(moment) {
         // Get company, manager
         // Get landing obj from Landing Num
@@ -843,17 +856,7 @@
           }
         } else {
           user_json = JSON.parse(local_user)
-          axios.get(this.$store.state.endpoints.baseUrl + 'users/' + user_json.id + '/')
-            .then((response) => {
-              if (response.data.data.info.organization) {
-                user_json['organization'] = response.data.data.info.organization
-              } else if (response.data.data.info.company) {
-                user_json['company'] = response.data.data.info.company
-              }
-            })
-            .catch((error) => {
-              console.log('Get user info error', error)
-            })
+          this.info_update(user_json.id)
         }
 
         return user_json
