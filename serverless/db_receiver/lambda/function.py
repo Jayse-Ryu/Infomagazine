@@ -10,11 +10,13 @@ logger.setLevel(logging.INFO)
 def _response_format(status_code: int = None, state: bool = None, message: str = None,
                      headers: dict = None) -> dict:
     dict_to_return = {
-        "statusCode": status_code,
-        "headers": headers,
+        "statusCode": status_code
     }
 
-    if state:
+    if headers:
+        dict_to_return.update({"headers": headers})
+
+    if message:
         body = {
             "state": state,
             "message": message
@@ -66,26 +68,29 @@ def _send_to_sqs(event, response_headers):
 
 
 def lambda_handler(event, context):
-    request_headers = event['headers']
-    origin = request_headers['origin']
-    response_headers = {
-        "Access-Control-Allow-Origin": os.getenv('WHITE_LIST'),
-    }
-    if event['httpMethod'] == 'OPTIONS':
-        if origin == os.getenv('WHITE_LIST'):
-            response_headers.update({
-                "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Allow-Max-Age": "86400",
-                "Content-Length": "0"
-            })
-            return _response_format(status_code=200, headers=response_headers)
-        else:
-            return _response_format(status_code=403, headers=response_headers)
-    elif event['httpMethod'] == 'POST':
-        if origin == os.getenv('WHITE_LIST'):
-            if not event['body']:
-                return _response_format(status_code=500, message='빈 데이터를 보내고 있습니다.')
-            return _send_to_sqs(event, response_headers)
-        else:
-            return _response_format(status_code=403, headers=response_headers, state=False, message='접근 제한')
+    try:
+        request_headers = event['headers']
+        origin = request_headers['origin']
+        response_headers = {
+            "Access-Control-Allow-Origin": os.getenv('WHITE_LIST'),
+        }
+        if event['httpMethod'] == 'OPTIONS':
+            if origin == os.getenv('WHITE_LIST'):
+                response_headers.update({
+                    "Access-Control-Allow-Methods": "POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Max-Age": "86400",
+                    "Content-Length": "0"
+                })
+                return _response_format(status_code=200, headers=response_headers)
+            else:
+                return _response_format(status_code=403, state=False, message="접근 제한")
+        elif event['httpMethod'] == 'POST':
+            if origin == os.getenv('WHITE_LIST'):
+                if not event['body']:
+                    return _response_format(status_code=500, state=False, message='빈 데이터')
+                return _send_to_sqs(event, response_headers)
+            else:
+                return _response_format(status_code=403, state=False, message="접근 제한")
+    except:
+        return _response_format(status_code=500, state=False, message="에러")

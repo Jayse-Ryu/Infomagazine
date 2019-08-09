@@ -29,6 +29,6 @@ class CompanyViewSets(CustomModelViewSet):
         return self.queryset.all()
 
     def get_permissions(self):
-        if self.action in ['retrieve', 'update', 'partial_update']:
+        if self.action in ['retrieve']:
             return [custom_permissions.IsClient()]
         return [custom_permissions.IsMarketer()]
