@@ -183,6 +183,11 @@
                     <input type="checkbox" :id="'f_validate_7' + content.sign" v-model="content.validation.age_limit">
                     나이제한
                   </label>
+                  <label v-if="[1, 2, 3].includes(content.type * 1)" :for="'f_validate_8' + content.sign"
+                         class="validate_label">
+                    <input type="checkbox" :id="'f_validate_8' + content.sign" v-model="content.validation.duplication_check">
+                    나이제한
+                  </label>
                 </div>
 
                 <div v-if="[7].includes(content.type * 1)" class="w-100">

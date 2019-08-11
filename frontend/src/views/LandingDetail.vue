@@ -292,6 +292,7 @@
             'number_only',
             'phone_only',
             'email',
+            'duplication_check',
             'age_limit',
             'value_min',
             'value_max'
@@ -343,6 +344,7 @@
             'number_only',
             'phone_only',
             'email',
+            'duplication_check',
             'age_limit',
             'value_min',
             'value_max'
@@ -514,9 +516,9 @@
         }
       },
       field_validation() {
-        let type_text = ['required', 'korean_only', 'english_only', 'number_only', 'email']
-        let type_num = ['required', 'number_only']
-        let type_tel = ['required', 'phone_only']
+        let type_text = ['required', 'korean_only', 'english_only', 'number_only', 'email', 'duplication_check']
+        let type_num = ['required', 'number_only', 'duplication_check']
+        let type_tel = ['required', 'phone_only', 'duplication_check']
         let type_scr = ['required']
         let type_chk = ['required']
         let type_date = ['required', 'age_limit', 'value_min', 'value_max']
