@@ -35,7 +35,8 @@ def _send_to_sqs(event, response_headers):
 
     db_key_list = body.keys()
     if 'data' not in db_key_list or 'schema' not in db_key_list:
-        return _response_format(status_code=500, headers=response_headers, state=False, message='유효한 db가 아닙니다.')
+        return _response_format(status_code=500, headers=response_headers, state=False, message='유효한 db가 아닙니다')
+
     rds_connection = pymysql.connect(os.getenv('DB_HOST'), user=os.getenv('DB_USER'),
                                      password=os.getenv('DB_PASSWD'), database=os.getenv('DB_DATABASE'),
                                      connect_timeout=5,
@@ -60,7 +61,7 @@ def _send_to_sqs(event, response_headers):
                 break
 
     if exist_check:
-        return _response_format(status_code=500, headers=response_headers, state=False, message='이미 등록된 DB.')
+        return _response_format(status_code=200, headers=response_headers, state=False, message='이미 등록됐습니다')
 
     body_to_send = {
         "landing_id": body['landing_id'],
@@ -82,20 +83,19 @@ def _send_to_sqs(event, response_headers):
         MessageBody=json.dumps(body_to_send)
     )
     if response['ResponseMetadata']['HTTPStatusCode'] == 200:
-        response_headers.update({
-            "Content-Type": "application/json",
-        })
-        return _response_format(status_code=200, headers=response_headers, state=True, message='신청이 완료됐습니다.')
+        return _response_format(status_code=200, headers=response_headers, state=True, message='신청이 완료됐습니다')
     else:
-        return _response_format(status_code=500, headers=response_headers, state=False, message='오류.')
+        return _response_format(status_code=500, headers=response_headers, message='신청 실패')
 
 
 def lambda_handler(event, context):
+    response_headers = {
+        "Access-Control-Allow-Origin": os.getenv('WHITE_LIST'),
+        "Content-Type": "application/json"
+    }
     try:
-        response_headers = {
-            "Access-Control-Allow-Origin": os.getenv('WHITE_LIST'),
-        }
         if event['httpMethod'] == 'OPTIONS':
+            del response_headers['Content-Type']
             response_headers.update({
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type",
@@ -105,8 +105,8 @@ def lambda_handler(event, context):
             return _response_format(status_code=200, headers=response_headers)
         elif event['httpMethod'] == 'POST':
             if not event['body']:
-                return _response_format(status_code=500, headers=response_headers, state=False, message='빈 데이터')
+                return _response_format(status_code=500, headers=response_headers, message='빈 데이터')
             return _send_to_sqs(event, response_headers)
     except Exception as e:
         logger.warning(str(e))
-        return _response_format(status_code=500)
+        return _response_format(status_code=500, headers=response_headers, message='서버 오류')
