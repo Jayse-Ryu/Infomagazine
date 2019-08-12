@@ -54,11 +54,11 @@ class UserViewSets(CustomModelViewSet):
         return Response(result, status=status.HTTP_200_OK)
 
     def get_permissions(self):
-        if self.action == 'list':
+        if self.action in ['list', 'create_client']:
             permission_classes = [custom_permissions.IsMarketer]
         elif self.action in ['retrieve', 'create', 'update', 'partial_update']:
             permission_classes = [permissions.IsAuthenticated]
-        elif self.action == 'create':
+        elif self.action in ['create', 'email_check']:
             permission_classes = [permissions.AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
