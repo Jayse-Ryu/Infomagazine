@@ -11,9 +11,9 @@ from rest_framework.response import Response
 from rest_framework.utils import json
 
 import v1.permissions as custom_permissions
+from v1.company.models import Company
 from v1.landingpage.models import LandingPage as LandingModel
 from v1.landingpage.utils import LandingPage as LandingGenerator
-
 
 # def response_decorator():
 #     def wrapper(func):
@@ -33,6 +33,8 @@ from v1.landingpage.utils import LandingPage as LandingGenerator
 #         return decorator
 #
 #     return wrapper
+from v1.user.models import AccessRole
+
 
 def response_decorator(func):
     @wraps(func)
@@ -102,9 +104,21 @@ class _LandingPageViewSetsUtils(viewsets.ViewSet):
 
 class LandingPageViewSets(_LandingPageViewSetsUtils):
     @response_decorator
-    def list(self, request):
+    def list(self, request, *args, **kwargs):
         projection = {'_id': 1, 'landing_info.landing.name': 1, 'landing_info.landing.views': 1}
-        response_data = self.landing_pages_model.list(choice_collection='landing_pages', projection=projection)
+        if not request.user.is_staff:
+            filter_fields = {
+                'users__info__organization_id': request.user.info.organization_id,
+            }
+            if request.user.info.access_role == AccessRole.CLIENT:
+                filter_fields.update({'users__id': request.user.id})
+            users_rel_comp_id = Company.objects.filter(**filter_fields).values("id").distinct()
+            users_rel_comp_id_list = [item['id'] for item in users_rel_comp_id]
+            query_option = {"company_id": {"$in": users_rel_comp_id_list}}
+            response_data = self.landing_pages_model.list(choice_collection='landing_pages', query=query_option,
+                                                          projection=projection)
+        else:
+            response_data = self.landing_pages_model.list(choice_collection='landing_pages', projection=projection)
         response_data.update({"options": {'status': status.HTTP_200_OK} if response_data['state'] else {
             'status': status.HTTP_404_NOT_FOUND}})
         return response_data
@@ -214,3 +228,7 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
             else:
                 return {'state': False, 'data': '', 'message': 'Failed.',
                         'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
+
+    def get_permissions(self):
+        permission_classes = [custom_permissions.IsClient]
+        return [permission() for permission in permission_classes]

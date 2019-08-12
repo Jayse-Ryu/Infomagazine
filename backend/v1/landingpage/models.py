@@ -17,8 +17,10 @@ class LandingPage:
 
         self.db = client[choice_db]
 
-    def list(self, choice_collection: str, projection: dict = None) -> dict:
-        find_option = ({}, projection,)
+    def list(self, choice_collection: str, projection: dict = None, query: dict = None) -> dict:
+        if query is None:
+            query = {}
+        find_option = (query, projection,)
         queryset = self.db[choice_collection].find(*find_option)
         if queryset is None:
             return {'state': False, 'data': '', 'message': 'Data that does not exist.'}

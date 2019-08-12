@@ -126,7 +126,7 @@ SIMPLE_JWT = {
 # CSRF_COOKIE_DOMAIN = config('CSRF_COOKIE_DOMAIN')
 
 CORS_ORIGIN_WHITELIST = tuple(config('CORS_ORIGIN_WHITELIST', cast=Csv()))
-CSRF_TRUSTED_ORIGINS = tuple(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
+# CSRF_TRUSTED_ORIGINS = tuple(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
 
 LOGIN_URL = '/admin/login/'
 LOGOUT_URL = '/admin/logout/'
