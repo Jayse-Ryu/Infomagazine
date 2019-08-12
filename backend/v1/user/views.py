@@ -12,7 +12,7 @@ class UserViewSets(CustomModelViewSet):
     queryset = User.objects.select_related('info').all()
     serializer_class = UserSerializer
 
-    @action(detail=False, methods=['POST'], permission_classes=[custom_permissions.IsMarketer])
+    @action(detail=False, methods=['POST'])
     def create_client(self, request):
         serializer = CreateClientSerializer(data=request.data, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
@@ -27,7 +27,7 @@ class UserViewSets(CustomModelViewSet):
 
         return Response(result, status=status.HTTP_201_CREATED, headers=headers)
 
-    @action(detail=False, methods=['GET'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, methods=['GET'])
     def email_check(self, request):
         get_qs = request.query_params.dict()
         result = {
