@@ -674,7 +674,7 @@
 
         // Get Company by page_id
         this.$store.state.pageOptions.loading = true
-        axios.get(this.$store.state.endpoints.baseUrl + 'organizations/' + this.page_id)
+        axios.get(this.$store.state.endpoints.baseUrl + 'organizations/' + this.page_id + '/')
           .then((response) => {
             // console.log('company response is? ', response)
             this.content_obj = response.data.data

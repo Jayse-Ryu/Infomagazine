@@ -254,7 +254,7 @@
 
         if (moment == 'mounted') {
           this.$store.state.pageOptions.loading = true
-          axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id)
+          axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id + '/')
             .then((response) => {
               this.$store.state.pageOptions.loading = false
               this.back_up = response.data.data
@@ -268,7 +268,7 @@
               this.$store.state.pageOptions.loading = false
             })
         } else {
-          axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id)
+          axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.$route.params.landing_id + '/')
             .then((response) => {
               this.temp_obj = response.data.data
               this.epoch_time = response.data.data.landing_info.landing.base_url
