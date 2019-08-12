@@ -1,3 +1,5 @@
+from rest_framework import permissions
+
 import v1.permissions as custom_permissions
 from v1.company.models import Company
 from v1.company.serializers import CompanySerializer
@@ -29,6 +31,8 @@ class CompanyViewSets(CustomModelViewSet):
         return self.queryset.all()
 
     def get_permissions(self):
-        if self.action in ['retrieve']:
-            return [custom_permissions.IsClient()]
-        return [custom_permissions.IsMarketer()]
+        if self.action == 'retrieve':
+            permission_classes = [custom_permissions.IsClient]
+        else:
+            permission_classes = [custom_permissions.IsMarketer]
+        return [permission() for permission in permission_classes]

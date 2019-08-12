@@ -2,6 +2,7 @@ import os
 import logging
 import json
 import boto3
+import pymysql
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -25,10 +26,6 @@ def _response_format(status_code: int = None, state: bool = None, message: str =
     return dict_to_return
 
 
-def _db_validate(db):
-    return 'data' not in db or 'schema' not in db
-
-
 def _send_to_sqs(event, response_headers):
     headers = event['headers']
     user_agent = headers['user-agent']
@@ -36,8 +33,34 @@ def _send_to_sqs(event, response_headers):
     event_body = event['body']
     body = json.loads(event_body)
 
-    if _db_validate(body.keys()):
-        return _response_format(status_code=500, message='유효한 db가 아닙니다.')
+    db_key_list = body.keys()
+    if 'data' not in db_key_list or 'schema' not in db_key_list:
+        return _response_format(status_code=500, headers=response_headers, state=False, message='유효한 db가 아닙니다.')
+    rds_connection = pymysql.connect(os.getenv('DB_HOST'), user=os.getenv('DB_USER'),
+                                     password=os.getenv('DB_PASSWD'), database=os.getenv('DB_DATABASE'),
+                                     connect_timeout=5,
+                                     charset='utf8mb4')
+
+    exist_check = False
+    with rds_connection.cursor(pymysql.cursors.DictCursor) as cursor:
+        for key, item in body['schema'].items():
+            if item in ['전화번호', '핸드폰번호']:
+                key_to_search = key
+                value_to_search = body['data'][key_to_search]
+                json_exist_sql_command = f"""
+                                SELECT COUNT(*) AS '__count'
+                                FROM `landing_page_db` db
+                                WHERE landing_id = '{body['landing_id']}' 
+                                AND JSON_EXTRACT(db.data, "$.{key_to_search}") = '{value_to_search}'
+                            """
+                cursor.execute(json_exist_sql_command)
+                get_count = cursor.fetchone()
+                if get_count['__count'] > 0:
+                    exist_check = True
+                break
+
+    if exist_check:
+        return _response_format(status_code=500, headers=response_headers, state=False, message='이미 등록된 DB.')
 
     body_to_send = {
         "landing_id": body['landing_id'],
@@ -69,28 +92,21 @@ def _send_to_sqs(event, response_headers):
 
 def lambda_handler(event, context):
     try:
-        request_headers = event['headers']
-        origin = request_headers['origin']
         response_headers = {
             "Access-Control-Allow-Origin": os.getenv('WHITE_LIST'),
         }
         if event['httpMethod'] == 'OPTIONS':
-            if origin == os.getenv('WHITE_LIST'):
-                response_headers.update({
-                    "Access-Control-Allow-Methods": "POST, OPTIONS",
-                    "Access-Control-Allow-Headers": "Content-Type",
-                    "Access-Control-Allow-Max-Age": "86400",
-                    "Content-Length": "0"
-                })
-                return _response_format(status_code=200, headers=response_headers)
-            else:
-                return _response_format(status_code=403, state=False, message="접근 제한")
+            response_headers.update({
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Max-Age": "86400",
+                "Content-Length": "0"
+            })
+            return _response_format(status_code=200, headers=response_headers)
         elif event['httpMethod'] == 'POST':
-            if origin == os.getenv('WHITE_LIST'):
-                if not event['body']:
-                    return _response_format(status_code=500, state=False, message='빈 데이터')
-                return _send_to_sqs(event, response_headers)
-            else:
-                return _response_format(status_code=403, state=False, message="접근 제한")
-    except:
-        return _response_format(status_code=500, state=False, message="에러")
+            if not event['body']:
+                return _response_format(status_code=500, headers=response_headers, state=False, message='빈 데이터')
+            return _send_to_sqs(event, response_headers)
+    except Exception as e:
+        logger.warning(str(e))
+        return _response_format(status_code=500)

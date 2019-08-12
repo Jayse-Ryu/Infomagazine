@@ -54,13 +54,15 @@ class UserViewSets(CustomModelViewSet):
         return Response(result, status=status.HTTP_200_OK)
 
     def get_permissions(self):
-        if self.action in ['create']:
-            return [permissions.AllowAny()]
-        elif self.action in ['update', 'partial_update']:
-            return [permissions.IsAuthenticated()]
-        elif self.action in ['retrieve']:
-            return [permissions.IsAuthenticated()]
-        return [permissions.IsAdminUser()]
+        if self.action == 'list':
+            permission_classes = [custom_permissions.IsMarketer]
+        elif self.action in ['retrieve', 'create', 'update', 'partial_update']:
+            permission_classes = [permissions.IsAuthenticated]
+        elif self.action == 'create':
+            permission_classes = [permissions.AllowAny]
+        else:
+            permission_classes = [permissions.IsAdminUser]
+        return [permission() for permission in permission_classes]
 
     def get_serializer_context(self):
         context = {

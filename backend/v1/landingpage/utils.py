@@ -325,10 +325,10 @@ class Script(Default):
             var tel_num_list = [];
             var age_limit_list = [];
             var checked_list = [];
-            Object.entries(item_group).forEach(function (item) {{
-                var _target = eval(item[1]['target']);
-                if (item[1]['validation'].indexOf('required') !== -1) {{
-                    if (item[1]['validation'].indexOf('checked') !== -1){{
+            $.each(item_group,function(key,value){{
+                var _target = eval(value['target']);
+                if (value['validation'].indexOf('required') !== -1) {{
+                    if (value['validation'].indexOf('checked') !== -1){{
                         if(!_target.is(":checked")){{
                             checked_list.push(_target.attr('data-label-name'))
                         }}
@@ -337,37 +337,37 @@ class Script(Default):
                         required_list.push(_target.attr('data-label-name'));
                     }}
                 }}
-                if (item[1]['validation'].indexOf('korean_only') !== -1) {{
+                if (value['validation'].indexOf('korean_only') !== -1) {{
                     var only_korean_regex = /[^가-힣]/;
                     if (only_korean_regex.test(_target.val())) {{
                         only_korean_list.push(_target.attr('data-label-name'));
                     }}
                 }}
-                if (item[1]['validation'].indexOf('english_only') !== -1) {{
+                if (value['validation'].indexOf('english_only') !== -1) {{
                     var only_english_regex = /[^a-zA-Z]/;
                     if (only_english_regex.test(_target.val())) {{
                         only_english_list.push(_target.attr('data-label-name'));
                     }}
                 }}
-                if (item[1]['validation'].indexOf('number_only') !== -1) {{
+                if (value['validation'].indexOf('number_only') !== -1) {{
                     var only_num_regex = /[^0-9]/;
                     if (only_num_regex.test(_target.val())) {{
                         only_num_list.push(_target.attr('data-label-name'));
                     }}
                 }}
-                if (item[1]['validation'].indexOf('email') !== -1) {{
+                if (value['validation'].indexOf('email') !== -1) {{
                     var email_regex = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{{2,3}}$/i;
                     if (!email_regex.test(_target.val())) {{
                         email_list.push(_target.attr('data-label-name'));
                     }}
                 }}
-                if (item[1]['validation'].indexOf('phone_only') !== -1) {{
+                if (value['validation'].indexOf('phone_only') !== -1) {{
                     var tel_num_regex = /^(010)\d{{3,4}}\d{{4}}$/;
                     if (!tel_num_regex.test(_target.val())) {{
                         tel_num_list.push(_target.attr('data-label-name'));
                     }}
                 }}
-                if (item[1]['validation'].indexOf('age_limit') !== -1) {{
+                if (value['validation'].indexOf('age_limit') !== -1) {{
                     var now_date = new Date();
                     var birthday_date = new Date(_target.val());
                     var new_now_date = new Date(now_date.getUTCFullYear() + "-" + (now_date.getUTCMonth() + 1) + "-" + now_date.getUTCDate());
@@ -410,10 +410,10 @@ class Script(Default):
                 'data': {{}},
                 'schema': {{}}
             }};
-            Object.entries(item_group).forEach(function (item) {{
-                var _target = eval(item[1]['target']);
-                body['data'][item[0]] = _target.val();
-                body['schema'][item[0]] = _target.attr('data-label-name');
+            $.each(item_group,function(key,value){{
+                var _target = eval(value['target']);
+                body['data'][key] = _target.val();
+                body['schema'][key] = _target.attr('data-label-name');
             }});
             body['landing_id'] = window.location.pathname.split('/')[1];
             body['registered_date'] = String(Date.now());
