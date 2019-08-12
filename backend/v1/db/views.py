@@ -32,6 +32,9 @@ class LandingPageDBViewSets(CustomModelViewSet):
     #     return self.queryset.all()
 
     def get_permissions(self):
-        if self.action in ['retrieve']:
-            return [custom_permissions.IsClient()]
-        return [custom_permissions.IsMarketer()]
+        if self.action == 'retrieve':
+            permission_classes = [custom_permissions.IsClient]
+        else:
+            permission_classes = [custom_permissions.IsMarketer]
+
+        return [permission() for permission in permission_classes]
