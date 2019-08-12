@@ -22,6 +22,7 @@
           <select class="search_option" id="src_gbn" v-model="temp_option">
             <option value="0" selected>검색 옵션</option>
             <option value="1">업체명</option>
+            <option value="2">상호명</option>
             <!--<option value="2">담당조직</option>-->
           </select>
           <input type="text" class="search_text" v-model="temp_text" placeholder="검색">
@@ -242,14 +243,19 @@
           pagination = '?offset=' + offset
         }
         // Set search option
-        if (this.search_option == 1) {
+        if (this.search_option == 1 || this.search_text != '') {
           if (pagination) {
-            search_param = '&name=' + this.search_text
+            search_param = '&corp_name=' + this.search_text
           } else {
-            search_param = '?name=' + this.search_text
+            search_param = '?corp_name=' + this.search_text
+          }
+        } else if (this.search_option == 1 || this.search_text != '') {
+          if (pagination) {
+            search_param = '&corp_sub_name=' + this.search_text
+          } else {
+            search_param = '?corp_sub_name=' + this.search_text
           }
         }
-
         // if (this.user_obj.is_staff || this.user_obj.is_superuser) {
         //   console.log('Staff user - Get All')
         //   auth_filter = '?true'

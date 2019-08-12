@@ -268,13 +268,13 @@
 
           // console.log('it will send', this.create_obj)
 
-          axios.post(this.$store.state.endpoints.baseUrl + 'users/client/', this.create_obj)
+          axios.post(this.$store.state.endpoints.baseUrl + 'users/create_client/', this.create_obj)
             .then(() => {
               alert('고객 계정이 생성되었습니다.')
               this.$store.state.pageOptions.loading = false
               this.$router.currentRoute.meta.protect_leave = 'no'
               this.$router.push({
-                name: 'user_list'
+                name: 'company_list'
               })
             })
             .catch((error) => {

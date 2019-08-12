@@ -179,7 +179,7 @@
       })
       let dev = this.contribute
       for (let key in dev) {
-        if (document.getElementById(dev[key].name)) {
+        if (document.getElementById(dev[key].sign)) {
           break
         } else {
           let val = 'dev / ' + dev[key].name + ' - ' + dev[key].git

@@ -22,6 +22,7 @@
           <select class="search_option" id="src_gbn" v-model="temp_option">
             <option value="0" selected>검색 옵션</option>
             <option value="1">이름</option>
+            <option value="2">상호명</option>
           </select>
           <input type="text" class="search_text" v-model="temp_text" placeholder="검색">
           <button type="submit" class="search_btn">
@@ -300,7 +301,9 @@
 
         if (offset) {
           pagination = '?offset=' + offset
-        }
+        } /*else {
+          pagination = '?offset=0'
+        }*/
         // Set search option
         if (this.search_option == 1 && this.search_text !== '') {
           if (pagination) {
@@ -308,7 +311,15 @@
           } else {
             search_param = '?org_name=' + this.search_text
           }
+        } else if (this.search_option == 2 && this.search_text !== '') {
+          if (pagination) {
+            search_param = '&org_sub_name=' + this.search_text
+          } else {
+            search_param = '?org_sub_name=' + this.search_text
+          }
         }
+
+        // console.log('off search =', pagination + search_param)
 
         this.$store.state.pageOptions.loading = true
         axios.get(this.$store.state.endpoints.baseUrl + 'organizations/' + pagination + search_param)

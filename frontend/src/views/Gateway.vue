@@ -7,8 +7,10 @@
       <router-link to="/gateway">홈페이지</router-link>
     </div>
 
+    <input type="hidden" :value="$store.state.user_campaign.organization">
+
     <div class="container m-auto text-center">
-      <div v-if="$store.state.user_campaign.organization*1 == 0" class="select_org">
+      <div v-if="$store.state.user_campaign.organization <= 0" class="select_org">
         <h3 class="w-100 mb-4">환영합니다 <span class="text-info">{{ user_name }}</span> 마케터님</h3>
         <p class="mb-2">인포매거진은 마케팅 업체인 <span class="text-success">조직</span>과</p>
         <p class="mb-2">고객 업체인 <span class="text-success">업체</span>로 구분되어 있습니다.</p>
