@@ -81,7 +81,7 @@
           <div class="col-sm-9 mt-sm-3">
             <input :class="error_label.class.phone" id="user_phone" name="user_phone"
                    type="number"
-                   v-model="create_obj.phone_num"
+                   v-model="create_obj.info.phone_num"
                    placeholder="연락처를 입력하세요"
                    autofocus="autofocus"
                    maxlength="16"
@@ -166,10 +166,10 @@
       },
       error_check(param) {
         if (param === 'phone') {
-          if (this.create_obj.phone_num !== '') {
+          if (this.create_obj.info.phone_num !== '') {
             // Allow mobile phone, internet wireless only
             let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
-            let tel_num = this.create_obj.phone_num
+            let tel_num = this.create_obj.info.phone_num
             let test_flag = regular_tel.test(tel_num)
             if (!test_flag) {
               this.error_label.phone = true

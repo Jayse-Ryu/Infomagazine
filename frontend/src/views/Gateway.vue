@@ -95,7 +95,7 @@
             this.$router.push({
               name: 'landing_list'
             })
-          } else if (this.user_obj.access_role == 0 || this.user_obj.access_role == 1) {
+          } else if ([0, 1, 2].includes(this.user_obj.access_role)) {
             // Marketer but already got access from staff.
             this.$router.push({
               name: 'landing_list'
