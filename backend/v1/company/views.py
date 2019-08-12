@@ -15,12 +15,13 @@ class CompanyViewSets(CustomModelViewSet):
 
     def get_queryset(self):
         if self.action == 'list':
-            filter_fields = {
-                'users__info__organization_id': self.request.user.info.organization_id,
-            }
-            if self.request.user.info.access_role == AccessRole.CLIENT:
-                filter_fields.update({'users__id': self.request.user_id})
-            return self.queryset.filter(**filter_fields).distinct()
+            if not self.request.user.is_staff:
+                filter_fields = {
+                    'users__info__organization_id': self.request.user.info.organization_id,
+                }
+                if self.request.user.info.access_role == AccessRole.CLIENT:
+                    filter_fields.update({'users__id': self.request.user_id})
+                return self.queryset.filter(**filter_fields).distinct()
         return self.queryset.all()
 
     def get_permissions(self):
