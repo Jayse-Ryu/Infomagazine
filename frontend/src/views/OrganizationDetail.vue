@@ -11,7 +11,7 @@
     <div class="container">
       <!-- 1. Provide edit form for staff or owner -->
       <form v-if="user_obj.is_staff || user_obj.is_superuser ||
-            user_obj.info.access_role == 0 || user_obj.info.organization == page_id"
+            user_obj.access_role == 0 || $store.state.user_campaign.organization == page_id"
             class="m-auto" v-on:submit.prevent="check_organization">
         <div class="form-group row">
 
@@ -263,7 +263,7 @@
       </form>
 
       <!-- 2. Provide only info for normal marketer, prevent form at all -->
-      <div v-else-if="user_obj.info.access_role == 1 && user_obj.info.organization == page_id" class="m-auto">
+      <div v-else-if="user_obj.access_role == 1 && $store.state.user_campaign.organization == page_id" class="m-auto">
         <div class="form-group row">
 
           <label for="org_id2" class="col-form-label-sm col-sm-3 mt-3">조직 번호</label>
@@ -657,7 +657,7 @@
 
         // Filtered page by user object
         if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
-          if (![0, 1].includes(this.user_obj.access_role) && this.user_obj.organization != this.page_id) {
+          if (![0, 1].includes(this.user_obj.access_role) && this.$store.state.user_campaign.organization != this.page_id) {
             this.$router.currentRoute.meta.protect_leave = 'no'
             this.$router.push({
               name: 'organization_list'

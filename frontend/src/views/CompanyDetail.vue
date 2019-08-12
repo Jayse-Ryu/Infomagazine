@@ -12,7 +12,7 @@
 
     <div class="container">
       <!-- 1. If user is this company's organization's marketer or staff, superuser -->
-      <form v-if="user_obj.is_staff || user_obj.is_superuser || [0,1].includes(user_obj.info.access_role)"
+      <form v-if="user_obj.is_staff || user_obj.is_superuser || [0,1].includes(user_obj.access_role)"
             class="m-auto" v-on:submit.prevent="check_organization">
 
         <div class="form-group row">
@@ -578,9 +578,7 @@
           user_json = {
             'is_staff': false,
             'is_superuser': false,
-            'info': {
-              'access_role': 3
-            },
+            'access_role': 3,
             'failed': true
           }
         } else {
