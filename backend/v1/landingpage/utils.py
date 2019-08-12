@@ -423,14 +423,16 @@ class Script(Default):
                 url: 'https://serverlessapi.infomagazine.xyz/db/',
                 data: JSON.stringify(body),
                 success: function (data) {{
-                    if (data) {{
-                        alert('신청이 완료되었습니다.');
+                    if (data['state']) {{
+                        alert(data['message']);
                     }} else {{
-                        alert("이미 신청하셨습니다.");
+                        alert(data['message']);
                     }}
                 }},
                 error: function (data) {{
-                    alert('에러');
+                    var response = data.responseText;
+                    var parsed_response = $.parseJSON(response)
+                    alert(parsed_response['message']);
                 }}
             }}).always(function () {{
                 $this.removeAttr('disabled')

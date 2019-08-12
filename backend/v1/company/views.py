@@ -1,6 +1,7 @@
 from rest_framework import permissions
 
 import v1.permissions as custom_permissions
+from v1.company.filters import CompanyFilter
 from v1.company.models import Company
 from v1.company.serializers import CompanySerializer
 from infomagazine.custom_packages import CustomModelViewSet
@@ -9,6 +10,7 @@ from infomagazine.custom_packages import CustomModelViewSet
 class CompanyViewSets(CustomModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
+    filterset_class = CompanyFilter
 
     def get_queryset(self):
         if self.request.method == 'GET':
