@@ -5,6 +5,7 @@ from v1.company.filters import CompanyFilter
 from v1.company.models import Company
 from v1.company.serializers import CompanySerializer
 from infomagazine.custom_packages import CustomModelViewSet
+from v1.user.models import AccessRole
 
 
 class CompanyViewSets(CustomModelViewSet):
@@ -13,23 +14,13 @@ class CompanyViewSets(CustomModelViewSet):
     filterset_class = CompanyFilter
 
     def get_queryset(self):
-        if self.request.method == 'GET':
-            request = self.request
-
-            get_qs = request.query_params.dict()
-
+        if self.action == 'list':
             filter_fields = {
-                'users__info__organization_id': request.user.info.organization_id,
-                'users__info__access_role__in': [0, 1]
+                'users__info__organization_id': self.request.user.info.organization_id,
             }
-
-            if 'detail' in get_qs:
-                del get_qs['detail']
-                filter_fields.update({'users__id': request.user.id})
-
-            filter_fields.update({key + "__contains": value for key, value in get_qs.items()})
-
-            return self.queryset.filter(**filter_fields)
+            if self.request.user.info.access_role == AccessRole.CLIENT:
+                filter_fields.update({'users__id': self.request.user_id})
+            return self.queryset.filter(**filter_fields).distinct()
         return self.queryset.all()
 
     def get_permissions(self):
