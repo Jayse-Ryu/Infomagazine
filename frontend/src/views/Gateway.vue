@@ -19,7 +19,7 @@
         <input v-if="organization_list.length*1 == 0" class="form-control col-md-11 m-auto" type="text" v-model="search"
                placeholder="사업자 번호">
         <button v-if="organization_list.length*1 == 0" type="button" class="w-100 btn btn-primary mt-3 col-md-11"
-                @click="org_search">사업자 번호 검색
+                @click="org_search">가입 신청
         </button>
 
         <select v-if="organization_list.length*1 > 1"

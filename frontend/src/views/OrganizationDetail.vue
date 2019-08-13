@@ -651,10 +651,6 @@
       calling_all_unit(offset) {
         let pagination = ''
 
-        if (offset) {
-          pagination = '&offset=' + offset
-        }
-
         let org_id = this.$route.params.organization_id * 1
 
 

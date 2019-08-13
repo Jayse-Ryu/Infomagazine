@@ -228,6 +228,7 @@
             console.log('get landing', error)
           })
           .then((response) => {
+            console.log('db gathering', response.data.data.results)
             this.db_list = response.data.data.results
             // Call get resources after data loaded
             this.get_resources_key()
