@@ -30,11 +30,12 @@
           </div>
 
           <label for="org_sub" class="col-form-label-sm col-sm-3 mt-3">
-            <span>상호명 (마케팅명)</span>
+            <span>상호명 (마케팅명)*</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
             <div class="error_label" v-if="errors.has('org_sub')">{{errors.first('org_sub')}}</div>
             <input class="form-control" id="org_sub" name="org_sub" type="text"
+                   required
                    v-model="create_obj.org_sub_name"
                    placeholder="상호명을 입력하세요"
                    autofocus="autofocus"
@@ -43,10 +44,11 @@
           </div>
 
           <label for="org_header" class="col-form-label-sm col-sm-3 mt-3">
-            <span>대표자</span>
+            <span>대표자*</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
             <input class="form-control" id="org_header" name="org_header" type="text"
+                   required
                    v-model="create_obj.org_header"
                    placeholder="조직 대표자를 입력하세요"
                    autofocus="autofocus"
@@ -55,10 +57,11 @@
           </div>
 
           <label for="org_addr" class="col-form-label-sm col-sm-3 mt-3">
-            <span>주소</span>
+            <span>주소*</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
             <input class="form-control" id="org_addr" name="org_addr" type="text"
+                   required
                    v-model="create_obj.org_address"
                    placeholder="주소를 입력하세요"
                    autofocus="autofocus"
@@ -79,7 +82,7 @@
           </div>
 
           <label for="org_phone" class="col-form-label-sm col-sm-3 mt-3">
-            <span>연락처</span>
+            <span>연락처*</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
             <input :class="error_label.class.tel_num" id="org_phone" name="org_phone"
@@ -88,6 +91,7 @@
                    placeholder="연락처를 입력하세요"
                    autofocus="autofocus"
                    maxlength="16"
+                   required
                    @keyup="error_check('phone')">
           </div>
 
