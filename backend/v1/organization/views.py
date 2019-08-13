@@ -17,6 +17,8 @@ class OrganizationViewSets(CustomModelViewSet):
             permission_classes = [custom_permissions.IsGuest]
         elif self.action == 'retrieve':
             permission_classes = [custom_permissions.IsMarketer]
+        elif self.action in ['update', 'partial_update']:
+            permission_classes = [custom_permissions.IsOwner]
         else:
             permission_classes = [permissions.IsAdminUser]
         return [permission() for permission in permission_classes]
