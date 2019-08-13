@@ -1,0 +1,13 @@
+from django_filters import rest_framework as filters
+
+from v1.user.models import User
+
+
+class UserFilter(filters.FilterSet):
+    email = filters.CharFilter(field_name='email', lookup_expr='contains')
+    username = filters.CharFilter(field_name='username', lookup_expr='contains')
+    organization = filters.NumberFilter(field_name='info', lookup_expr='organization_id')
+
+    class Meta:
+        model = User
+        fields = ['email', 'username', 'organization']

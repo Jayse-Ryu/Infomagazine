@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 import v1.permissions as custom_permissions
 from infomagazine.custom_packages import CustomModelViewSet
+from v1.user.filters import UserFilter
 from v1.user.models import User
 from v1.user.serializers import UserSerializer, CreateClientSerializer
 
@@ -11,6 +12,7 @@ from v1.user.serializers import UserSerializer, CreateClientSerializer
 class UserViewSets(CustomModelViewSet):
     queryset = User.objects.select_related('info').all()
     serializer_class = UserSerializer
+    filterset_class = UserFilter
 
     @action(detail=False, methods=['POST'])
     def create_client(self, request):

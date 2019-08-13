@@ -205,7 +205,7 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
                                                     ContentType='text/html')
             if s3_response_data['ResponseMetadata']['HTTPStatusCode'] == 200:
                 return {'state': True, 'data': landing_url, 'message': 'Succeed.',
-                        'options': {'status': status.HTTP_200_OK}}
+                        'options': {'status': status.HTTP_201_CREATED}}
             else:
                 return {'state': False, 'data': '', 'message': 'Failed.',
                         'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
