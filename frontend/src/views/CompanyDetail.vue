@@ -450,25 +450,25 @@
           })
       },
       delete_organization() {
-        if(confirm('업체를 삭제하시겠습니까?')) {
+        if (confirm('업체를 삭제하시겠습니까?')) {
           // Create an organization myself
-        let this_url = 'companies/'
+          let this_url = 'companies/'
 
-        this.$store.state.pageOptions.loading = true
-        axios.delete(this.$store.state.endpoints.baseUrl + this_url + this.page_id + '/')
-          .then((response) => {
-            // console.log(response)
-            alert('삭제되었습니다.')
-            this.$store.state.pageOptions.loading = false
-            this.$router.currentRoute.meta.protect_leave = 'no'
-            this.$router.push({
-              name: 'company_list',
+          this.$store.state.pageOptions.loading = true
+          axios.delete(this.$store.state.endpoints.baseUrl + this_url + this.page_id + '/')
+            .then((response) => {
+              // console.log(response)
+              alert('삭제되었습니다.')
+              this.$store.state.pageOptions.loading = false
+              this.$router.currentRoute.meta.protect_leave = 'no'
+              this.$router.push({
+                name: 'company_list',
+              })
             })
-          })
-          .catch((error) => {
-            console.log('company patch error', error)
-            this.$store.state.pageOptions.loading = false
-          })
+            .catch((error) => {
+              console.log('company patch error', error)
+              this.$store.state.pageOptions.loading = false
+            })
         }
       },
       pagination(pageNum) {
@@ -525,8 +525,8 @@
         // 2:client
         // 3:unauthorized marketer
 
-        if (this.user_obj.is_staff || this.user_obj.is_superuser) {
-          if (option == '1') {
+        if (option == '1') {
+          if (this.user_obj.is_staff || this.user_obj.is_superuser) {
             if (confirm('해당 마케터를 강등 시키시겠습니까?')) {
               let formData = {
                 info: {
@@ -535,25 +535,38 @@
               }
               this.user_update(user, formData)
             }
-          } else if (option == '2') {
-            if (confirm('고객 정보를 열람하시겠습니까?')) {
-              this.$router.currentRoute.meta.protect_leave = 'no'
-              this.$router.push({
-                name: 'user_detail', params: {user_id: user}
-              })
-            }
-          } else if (option == '3') {
-            if (confirm('해당 마케터의 가입을 승인하시겠습니까?')) {
-              let formData = {
-                info: {
-                  access_role: 1
-                }
-              }
-              this.user_update(user, formData)
-            }
+          } else {
+            alert('권한이 없습니다.')
           }
-        } else {
-          // console.log('this user is not admin')
+        } else if (option == '2') {
+          // if (confirm('고객 정보를 열람하시겠습니까?')) {
+          //   this.$router.currentRoute.meta.protect_leave = 'no'
+          //   this.$router.push({
+          //     name: 'user_detail', params: {user_id: user}
+          //   })
+          // }
+          if(confirm('고객을 삭제하시겠습니까?')) {
+            this.$store.state.pageOptions.loading = true
+            axios.delete(this.$store.state.endpoints.baseUrl + 'users/' + user + '/')
+              .then(() => {
+                alert('삭제되었습니다.')
+                this.$store.state.pageOptions.loading = false
+                this.pagination(this.page_current)
+              })
+              .catch((error) => {
+                console.log(error)
+                this.$store.state.pageOptions.loading = false
+              })
+          }
+        } else if (option == '3') {
+          if (confirm('해당 마케터의 가입을 승인하시겠습니까?')) {
+            let formData = {
+              info: {
+                access_role: 1
+              }
+            }
+            this.user_update(user, formData)
+          }
         }
 
       },

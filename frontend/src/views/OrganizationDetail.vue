@@ -255,7 +255,8 @@
 
         <div class="mt-1 mb-2">
           <button type="submit" class="btn btn-primary col">수정</button>
-          <button v-if="user_obj.access_role == 0 || user_obj.is_staff" type="button" class="btn btn-danger col mt-2"
+          <button v-if="user_obj.is_staff || user_obj.is_superuser"
+                  type="button" class="btn btn-danger col mt-2"
                   @click="delete_org()">삭제
           </button>
           <router-link to="/organization">
