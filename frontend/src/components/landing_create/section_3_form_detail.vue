@@ -16,7 +16,7 @@
         <option value="9">약관 동의</option>
       </select>
       <div class="margin_div"></div>
-      <input type="text" class="form-control col-sm-7 col-md-5" placeholder="필드이름" maxlength="10"
+      <input type="text" class="form-control col-sm-7 col-md-5" placeholder="필드이름" maxlength="1000"
              v-model="field_temp_name">
       <div class="margin_div"></div>
       <button type="submit" class="btn btn-primary col-md-1 p-0">추가</button>
@@ -82,7 +82,7 @@
 
                 <label class="col-sm-3 col-form-label-sm mt-3" for="f_name">필드 이름*</label>
                 <div class="col-sm-9 mt-sm-3">
-                  <input type="text" class="form-control" id="f_name" maxlength="10" v-model="content.name">
+                  <input type="text" class="form-control" id="f_name" maxlength="1000" v-model="content.name">
                 </div>
 
                 <label v-if="content.type != 5 && content.type != 6 && content.type != 8"
@@ -104,7 +104,7 @@
                               }">?</span>
                 </label>
                 <div v-if="content.type != 5 && content.type != 6 && content.type != 8" class="col-sm-9 mt-sm-3">
-                  <input type="text" class="form-control" id="f_holder" maxlength="50" v-model="content.holder">
+                  <input type="text" class="form-control" id="f_holder" maxlength="1000" v-model="content.holder">
                 </div>
 
                 <!---->
