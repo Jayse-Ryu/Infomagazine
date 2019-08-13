@@ -225,9 +225,9 @@
           axios.get(this.$store.state.endpoints.baseUrl + 'organizations/')
             .then((response) => {
               let duplicated = false
-              if (response.data.results.length) {
-                for (let i = 0; i < response.data.results.length; i++) {
-                  if (this.create_obj.org_name == response.data.results[i].org_name) {
+              if (response.data.data.results.length) {
+                for (let i = 0; i < response.data.data.results.length; i++) {
+                  if (this.create_obj.org_name == response.data.data.results[i].org_name) {
                     duplicated = true
                   }
                 }
