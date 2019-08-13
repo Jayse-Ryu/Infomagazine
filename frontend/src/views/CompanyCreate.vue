@@ -243,8 +243,8 @@
           axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
             .then((response) => {
               let duplicated = false
-              for (let i = 0; i < response.data.results.length; i++) {
-                if (this.create_obj.corp_name == response.data.results[i].corp_name) {
+              for (let i = 0; i < response.data.data.results.length; i++) {
+                if (this.create_obj.corp_name == response.data.data.results[i].corp_name) {
                   duplicated = true
                 }
               }

@@ -145,6 +145,7 @@
       axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
         .then((response) => {
           this.company_list = response.data.data.results
+          this.create_obj.company_id = this.$store.state.user_create.id
         })
         .catch((error) => {
           console.log('Get company error', error)
@@ -270,6 +271,7 @@
 
           axios.post(this.$store.state.endpoints.baseUrl + 'users/create_client/', this.create_obj)
             .then(() => {
+              this.$store.state.user_create.id = 0
               alert('고객 계정이 생성되었습니다.')
               this.$store.state.pageOptions.loading = false
               this.$router.currentRoute.meta.protect_leave = 'no'

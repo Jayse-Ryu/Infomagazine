@@ -22,6 +22,9 @@ export default new Vuex.Store({
       organization: -1,
       company: -1
     },
+    user_create: {
+      id: 0
+    },
     pageOptions: {
       loading: false,
       landing: {

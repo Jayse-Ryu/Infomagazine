@@ -134,10 +134,7 @@
         </div>
 
         <div class="w-100">
-          <router-link to="/users/create/">
-            <button type="button" class="btn btn-info w-100 mb-2">고객 생성</button>
-          </router-link>
-
+          <button type="button" class="btn btn-info w-100 mb-2" @click="user_create">고객 생성</button>
         </div>
 
         <!-- Section 2. If width is big -->
@@ -157,7 +154,8 @@
                 class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
               <div class="col-12 text-center">데이터가 존재하지 않습니다.</div>
             </li>
-            <li v-else-if="user_obj.is_staff || user_obj.is_superuser" class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
+            <li v-else-if="user_obj.is_staff || user_obj.is_superuser"
+                class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
                 v-for="content in user_list">
               <div class="col-2 col-sm-1">{{ content.id }}</div>
               <div class="col-3 col-sm-3">
@@ -364,6 +362,7 @@
           email: 'form-control'
         }
       },
+      original_name: '',
       page_id: 0,
       content_obj: [],
       marketer: [],
@@ -472,9 +471,29 @@
           if (this.content_obj.corp_name === '') {
             this.error_label.name = true
             this.error_label.class.name = 'form-control alert-danger'
-          } else {
+          } else if (this.content_obj.corp_name === this.original_name) {
             this.error_label.name = false
             this.error_label.class.name = 'form-control alert-info'
+          } else {
+            axios.get(this.$store.state.endpoints.baseUrl + 'companies/')
+              .then((response) => {
+                let duplicated = false
+                for (let i = 0; i < response.data.data.results.length; i++) {
+                  if (this.content_obj.corp_name == response.data.data.results[i].corp_name) {
+                    duplicated = true
+                  }
+                }
+                if (duplicated) {
+                  this.error_label.name = true
+                  this.error_label.class.name = 'form-control alert-danger'
+                } else {
+                  this.error_label.name = false
+                  this.error_label.class.name = 'form-control alert-info'
+                }
+              })
+              .catch((error) => {
+                console.log('get company error', error)
+              })
           }
         }
       },
@@ -556,6 +575,9 @@
           .then((response) => {
             // console.log('company response is? ', response)
             this.content_obj = response.data.data
+            if (!this.original_name.length > 0) {
+              this.original_name = response.data.data.corp_name
+            }
             return axios.get(this.$store.state.endpoints.baseUrl + 'users/?company=' + this.page_id + pagination)
           })
           .catch((error) => {
@@ -642,6 +664,13 @@
           .catch((error) => {
             console.log('user update error ', error)
           })
+      },
+      user_create() {
+        this.$store.state.user_create.id = this.page_id
+
+        this.$router.push({
+          name: 'user_create'
+        })
       }
     },
     computed: {
