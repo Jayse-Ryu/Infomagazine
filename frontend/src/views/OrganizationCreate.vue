@@ -14,18 +14,6 @@
 
       <form class="m-auto" v-on:submit.prevent="before_create_organization">
         <div class="form-group row">
-          <label for="org_manager" class="col-form-label-sm col-sm-3 mt-3">
-            <span>조직 관리 마케터</span>
-          </label>
-          <div class="col-sm-9 mt-sm-3">
-            <select class="form-control col-md-12 m-auto" name="org_manager" id="org_manager"
-                    v-model="create_obj.org_manager">
-              <option value="-1" selected>추후에 선택합니다</option>
-              <option v-for="item in marketer_list" :value="item.id">
-                {{ item.username }} / {{ item.email }}
-              </option>
-            </select>
-          </div>
 
           <label for="org_name" class="col-form-label-sm col-sm-3 mt-3">
             <span>조직 이름*</span>
@@ -112,6 +100,19 @@
                    placeholder="조직 설명을 적어주세요"
                    autofocus="autofocus"
                    maxlength="200">
+          </div>
+
+          <label for="org_manager" class="col-form-label-sm col-sm-3 mt-3">
+            <span>조직 관리 마케터</span>
+          </label>
+          <div class="col-sm-9 mt-sm-3">
+            <select class="form-control col-md-12 m-auto" name="org_manager" id="org_manager"
+                    v-model="create_obj.org_manager">
+              <option value="-1" selected>추후에 선택합니다</option>
+              <option v-for="item in marketer_list" :value="item.id">
+                {{ item.username }} / {{ item.email }}
+              </option>
+            </select>
           </div>
 
         </div>
