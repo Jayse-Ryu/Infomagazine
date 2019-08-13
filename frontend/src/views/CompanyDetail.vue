@@ -375,7 +375,7 @@
           // Phone validate
           if (this.content_obj.corp_num !== '') {
             // Allow mobile phone, internet wireless
-            let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
+            let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(02\d{3,4})|(0[31|32|33|41|42|43|44|51|52|53|54|55|61|62|63|64]\d{3,4})|(070\d{4}))(\d{4})$/
             let tel_num = this.content_obj.corp_num
             let test_flag = regular_tel.test(tel_num)
             if (!test_flag) {

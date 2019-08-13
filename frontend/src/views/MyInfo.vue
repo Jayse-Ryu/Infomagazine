@@ -175,7 +175,7 @@
       error_check(param) {
         if (param === 'phone') {
           if (this.content_obj.info.phone_num !== '') {
-            let rgTel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
+            let rgTel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(02\d{3,4})|(0[31|32|33|41|42|43|44|51|52|53|54|55|61|62|63|64]\d{3,4})|(070\d{4}))(\d{4})$/
             let strValue = this.content_obj.info.phone_num
             let test_flag = rgTel.test(strValue)
             if (!test_flag) {

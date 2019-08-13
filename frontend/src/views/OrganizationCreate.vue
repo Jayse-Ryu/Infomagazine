@@ -34,12 +34,13 @@
           </label>
           <div class="col-sm-9 mt-sm-3">
             <div class="error_label" v-if="errors.has('org_sub')">{{errors.first('org_sub')}}</div>
-            <input class="form-control" id="org_sub" name="org_sub" type="text"
+            <input :class="error_label.class.sub_name" id="org_sub" name="org_sub" type="text"
                    required
                    v-model="create_obj.org_sub_name"
                    placeholder="상호명을 입력하세요"
                    autofocus="autofocus"
                    maxlength="100"
+                   @keyup="error_check('sub_name')"
             >
           </div>
 
@@ -111,7 +112,7 @@
           </label>
           <div class="col-sm-9 mt-sm-3">
             <select class="form-control col-md-12 m-auto" name="org_manager" id="org_manager"
-                    v-model="create_obj.org_manager">
+                    v-model="org_manager">
               <option value="-1" selected>추후에 선택합니다</option>
               <option v-for="item in marketer_list" :value="item.id">
                 {{ item.username }} / {{ item.email }}
@@ -137,13 +138,13 @@
       // For organization create
       error_label: {
         org_name: true,
+        org_sub_name: true,
         org_tel_num: false,
         org_corp: false,
-        // org_email: false,
         class: {
           name: 'form-control',
+          sub_name: 'form-control',
           tel_num: 'form-control',
-          // email: 'form-control'
           corp: 'form-control'
         }
       },
@@ -154,10 +155,9 @@
         org_address: '',
         org_crn: '',
         org_tel_num: '',
-        org_email: '',
-        org_desc: '',
-        org_manager: -1
+        org_desc: ''
       },
+      org_manager: -1,
       marketer_list: []
     }),
     mounted() {
@@ -206,7 +206,7 @@
           // console.log('param is phone')
           if (this.create_obj.org_tel_num !== '') {
             // Allow mobile phone, internet wireless
-            let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
+            let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(02\d{3,4})|(0[31|32|33|41|42|43|44|51|52|53|54|55|61|62|63|64]\d{3,4})|(070\d{4}))(\d{4})$/
             let tel_num = this.create_obj.org_tel_num
             let test_flag = regular_tel.test(tel_num)
             if (!test_flag) {
@@ -254,6 +254,39 @@
             this.error_label.org_name = false
             this.error_label.class.name = 'form-control alert-info'
           }
+        } else if (param === 'sub_name') {
+          axios.get(this.$store.state.endpoints.baseUrl + 'organizations/')
+            .then((response) => {
+              let duplicated = false
+              if (response.data.data.results.length) {
+                for (let i = 0; i < response.data.data.results.length; i++) {
+                  if (this.create_obj.org_sub_name == response.data.data.results[i].org_sub_name) {
+                    duplicated = true
+                  }
+                }
+              }
+              if (duplicated) {
+                this.error_label.org_sub_name = true
+                this.error_label.class.sub_name = 'form-control alert-danger'
+              } else if (this.create_obj.org_sub_name === '') {
+                this.error_label.org_sub_name = true
+                this.error_label.class.sub_name = 'form-control alert-danger'
+              } else {
+                this.error_label.org_sub_name = false
+                this.error_label.class.sub_name = 'form-control alert-info'
+              }
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+          // Org name validate
+          if (this.create_obj.org_name === '') {
+            this.error_label.org_name = true
+            this.error_label.class.name = 'form-control alert-danger'
+          } else {
+            this.error_label.org_name = false
+            this.error_label.class.name = 'form-control alert-info'
+          }
         } else if (param === 'corp') {
           if (this.create_obj.org_crn === '') {
             this.error_label.org_corp = true
@@ -285,24 +318,16 @@
           this.$store.state.pageOptions.loading = true
           axios.post(this.$store.state.endpoints.baseUrl + 'organizations/', this.create_obj)
             .then((response) => {
-              alert('조직이 생성되었습니다.')
-              this.$store.state.pageOptions.loading = false
-              if (this.create_obj.org_manager > 0) {
-                return axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.create_obj.org_manager + '/', {
-                  'info': {access_role: 0, organization: response.data.data.id}
-                })
+              if (this.org_manager > 0) {
+                this.set_manager(response.data.data.id)
               } else {
+                alert('조직이 생성되었습니다.')
+                this.$store.state.pageOptions.loading = false
                 this.$router.currentRoute.meta.protect_leave = 'no'
                 this.$router.push({
                   name: 'organization_list'
                 })
               }
-            })
-            .then(() => {
-              this.$router.currentRoute.meta.protect_leave = 'no'
-              this.$router.push({
-                name: 'organization_list'
-              })
             })
             .catch((error) => {
               alert('조직 생성 중 오류가 발생하였습니다.')
@@ -310,6 +335,22 @@
               console.log(error)
             })
         }
+      },
+      set_manager(org_id) {
+        axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.org_manager + '/', {
+          'info': {access_role: 0, organization: org_id}
+        })
+          .then(() => {
+            alert('조직이 생성되었습니다.')
+            this.$store.state.pageOptions.loading = false
+            this.$router.currentRoute.meta.protect_leave = 'no'
+            this.$router.push({
+              name: 'organization_list'
+            })
+          })
+          .catch((error) => {
+            console.log(error)
+          })
       }
     },
     computed: {
