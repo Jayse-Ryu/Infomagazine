@@ -7,7 +7,8 @@ class UserFilter(filters.FilterSet):
     email = filters.CharFilter(field_name='email', lookup_expr='contains')
     username = filters.CharFilter(field_name='username', lookup_expr='contains')
     organization = filters.NumberFilter(field_name='info', lookup_expr='organization_id')
+    access_role = filters.NumberFilter(field_name='info', lookup_expr='access_role')
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'organization']
+        fields = ['email', 'username', 'organization', 'access_role']
