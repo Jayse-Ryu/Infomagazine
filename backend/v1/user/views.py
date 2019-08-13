@@ -56,7 +56,7 @@ class UserViewSets(CustomModelViewSet):
         return Response(result, status=status.HTTP_200_OK)
 
     def get_permissions(self):
-        if self.action in ['list', 'create_client']:
+        if self.action in ['list', 'create_client', 'destroy']:
             permission_classes = [custom_permissions.IsMarketer]
         elif self.action in ['retrieve', 'update', 'partial_update']:
             permission_classes = [permissions.IsAuthenticated]
