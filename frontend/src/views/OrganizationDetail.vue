@@ -653,13 +653,7 @@
       calling_all_unit(offset) {
         let pagination = ''
 
-        // axios.get(this.$store.state.endpoints.baseUrl + 'users/')
-        //   .then((response) => {
-        //     console.log('test', response.data.data)
-        //   })
-
         let org_id = this.$route.params.organization_id * 1
-
 
         // Filtered page by user object
         if (!this.user_obj.is_staff && !this.user_obj.is_superuser) {
@@ -676,6 +670,10 @@
           this.$router.push({
             name: 'organization_list'
           })
+        }
+
+        if (offset) {
+          pagination = '&offset=' + offset
         }
 
         // Get Company by page_id
@@ -709,11 +707,17 @@
 
       },
       manager_setting() {
-        axios.get(this.$store.state.endpoints.baseUrl + 'users/?offset=0&limit=999999999999&access_role=1&organization=' + this.page_id)
+        axios.get(this.$store.state.endpoints.baseUrl + 'users/?offset=0&limit=999999999999&access_role=0,1&organization=' + this.page_id)
           .then((response) => {
             let res = response.data.data.results
+            /*let marketers = []
+            for (let j in res) {
+              if ([0, 1].includes(res[j].info.access_role)) {
+                marketers.push(res[j])
+              }
+            }*/
             this.marketer = res
-            for (let i in response.data.data.results) {
+            for (let i in res) {
               if (res[i].info.access_role == 0) {
                 this.original_manager = res[i].id
                 this.changeable_manager = res[i].id
@@ -739,18 +743,31 @@
               }
             }
 
-            axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.original_manager + '/', deactive)
-              .then(() => {
-                return axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.changeable_manager + '/', activate)
-              })
-              .catch((error) => {
-                console.log('Something is wrong on change manager cycle', error)
-              })
-              .then(() => {
-                alert('조직 관리자가 변경되었습니다.')
-                this.manager_setting()
-                this.pagination(this.page_current)
-              })
+            if (this.original_manager > 0) {
+              axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.original_manager + '/', deactive)
+                .then(() => {
+                  return axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.changeable_manager + '/', activate)
+                })
+                .catch((error) => {
+                  console.log('Something is wrong on change manager cycle', error)
+                })
+                .then(() => {
+                  alert('조직 관리자가 변경되었습니다.')
+                  this.manager_setting()
+                  this.pagination(this.page_current)
+                })
+            } else {
+              axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.changeable_manager + '/', activate)
+                .then(() => {
+                  alert('조직 관리자가 변경되었습니다.')
+                  this.manager_setting()
+                  this.pagination(this.page_current)
+                })
+                .catch((error) => {
+                  console.log(error)
+                })
+            }
+
           }
         }
       },
@@ -812,6 +829,7 @@
           .then((response) => {
             // console.log('let user update response', response)
             this.pagination(this.page_current)
+            this.manager_setting()
           })
           .catch((error) => {
             console.log('user update error ', error)
