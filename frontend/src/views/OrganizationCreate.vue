@@ -86,7 +86,7 @@
           </label>
           <div class="col-sm-9 mt-sm-3">
             <input :class="error_label.class.tel_num" id="org_phone" name="org_phone"
-                   type="number"
+                   type="tel"
                    v-model="create_obj.org_tel_num"
                    placeholder="연락처를 입력하세요"
                    autofocus="autofocus"
@@ -203,7 +203,7 @@
       error_check(param) {
         if (param === 'phone') {
           // Phone validate
-          console.log('param is phone')
+          // console.log('param is phone')
           if (this.create_obj.org_tel_num !== '') {
             // Allow mobile phone, internet wireless
             let regular_tel = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4})|(070\d{4}))(\d{4})$/
@@ -225,9 +225,11 @@
           axios.get(this.$store.state.endpoints.baseUrl + 'organizations/')
             .then((response) => {
               let duplicated = false
-              for (let i = 0; i < response.data.results.length; i++) {
-                if (this.create_obj.org_name == response.data.results[i].org_name) {
-                  duplicated = true
+              if (response.data.results.length) {
+                for (let i = 0; i < response.data.results.length; i++) {
+                  if (this.create_obj.org_name == response.data.results[i].org_name) {
+                    duplicated = true
+                  }
                 }
               }
               if (duplicated) {
@@ -240,6 +242,9 @@
                 this.error_label.org_name = false
                 this.error_label.class.name = 'form-control alert-info'
               }
+            })
+            .catch((error) => {
+              console.log(error)
             })
           // Org name validate
           if (this.create_obj.org_name === '') {
@@ -282,9 +287,16 @@
             .then((response) => {
               alert('조직이 생성되었습니다.')
               this.$store.state.pageOptions.loading = false
-              return axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.create_obj.org_manager + '/', {
-                'info': {access_role: 0, organization: response.data.data.id}
-              })
+              if (this.create_obj.org_manager > 0) {
+                return axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.create_obj.org_manager + '/', {
+                  'info': {access_role: 0, organization: response.data.data.id}
+                })
+              } else {
+                this.$router.currentRoute.meta.protect_leave = 'no'
+                this.$router.push({
+                  name: 'organization_list'
+                })
+              }
             })
             .then(() => {
               this.$router.currentRoute.meta.protect_leave = 'no'
