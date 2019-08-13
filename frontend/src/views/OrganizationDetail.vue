@@ -26,7 +26,7 @@
                     v-model="changeable_manager"
                     @change="manager_change()">
               <option value="0">관리자 없음</option>
-              <option v-for="item in marketer" :value="item.user">{{ item.username }}</option>
+              <option v-for="item in marketer" :value="item.id">{{ item.username }}</option>
             </select>
           </div>
 
@@ -276,10 +276,10 @@
 
           <label for="org_manager2" class="col-form-label-sm col-sm-3 mt-3">조직 관리 마케터</label>
           <div class="col-sm-9 mt-sm-3">
-            <div class="form-control" id="org_manager2" v-for="user in marketer"
-                 v-if="user.info.access_role == 0">
-              <span>{{ content_obj.username }}</span>
-            </div>
+            <select class="form-control" name="org_manager" id="org_manager" v-model="changeable_manager" disabled>
+              <option value="0">관리자 없음</option>
+              <option v-for="item in marketer" :value="item.id">{{ item.username }}</option>
+            </select>
           </div>
 
           <label for="org_name2" class="col-form-label-sm col-sm-3 mt-3">조직 이름*</label>
@@ -527,6 +527,8 @@
 
       this.calling_all_unit()
 
+      this.manager_setting()
+
     },
     methods: {
       info_update(id) {
@@ -651,6 +653,11 @@
       calling_all_unit(offset) {
         let pagination = ''
 
+        // axios.get(this.$store.state.endpoints.baseUrl + 'users/')
+        //   .then((response) => {
+        //     console.log('test', response.data.data)
+        //   })
+
         let org_id = this.$route.params.organization_id * 1
 
 
@@ -701,27 +708,50 @@
           })
 
       },
+      manager_setting() {
+        axios.get(this.$store.state.endpoints.baseUrl + 'users/?offset=0&limit=999999999999&access_role=1&organization=' + this.page_id)
+          .then((response) => {
+            let res = response.data.data.results
+            this.marketer = res
+            for (let i in response.data.data.results) {
+              if (res[i].info.access_role == 0) {
+                this.original_manager = res[i].id
+                this.changeable_manager = res[i].id
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      },
       manager_change() {
-        if (confirm('조직 관리자를 변경하시겠습니까?')) {
-          // console.log(this.original_manager, '로 변경합니다?')
-          let deactive = {
-            info: {
-              access_role: 1
+        if (this.original_manager != this.changeable_manager) {
+          if (confirm('조직 관리자를 변경하시겠습니까?')) {
+            // console.log(this.original_manager, '로 변경합니다?')
+            let deactive = {
+              info: {
+                access_role: 1
+              }
             }
-          }
-          let activate = {
-            info: {
-              access_role: 0
+            let activate = {
+              info: {
+                access_role: 0
+              }
             }
-          }
 
-          axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.original_manager + '/', deactive)
-            .then(() => {
-              return axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.changeable_manager + '/', activate)
-            })
-            .catch((error) => {
-              console.log('Something is wrong on change manager cycle', error)
-            })
+            axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.original_manager + '/', deactive)
+              .then(() => {
+                return axios.patch(this.$store.state.endpoints.baseUrl + 'users/' + this.changeable_manager + '/', activate)
+              })
+              .catch((error) => {
+                console.log('Something is wrong on change manager cycle', error)
+              })
+              .then(() => {
+                alert('조직 관리자가 변경되었습니다.')
+                this.manager_setting()
+                this.pagination(this.page_current)
+              })
+          }
         }
       },
       promote(option, user) {
