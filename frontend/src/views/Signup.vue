@@ -94,12 +94,12 @@
 
           <div class="form-group block">
             <label for="phone" class="col-sm-12 control-label">전화번호*
-              <div class="error_label" v-if="error_label.phone">전화번호 형식을 확인해주세요. (010~9, 070)</div>
+              <div class="error_label" v-if="error_label.phone">전화번호 형식을 확인해주세요. (010~9, 070, 지역번호)</div>
             </label>
             <div class="col-sm-12">
               <input :class="error_label.class.phone"
                      v-model="content_obj.info.phone_num"
-                     type="number"
+                     type="tel"
                      placeholder="연락처를 입력하세요."
                      autofocus="autofocus"
                      maxlength="16"

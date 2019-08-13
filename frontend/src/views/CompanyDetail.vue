@@ -40,7 +40,23 @@
                    @keyup="error_check('name')">
           </div>
 
-          <label for="org_sub" class="col-form-label-sm col-sm-3 mt-3">업체 상호명</label>
+          <label for="org_sub" class="col-form-label-sm col-sm-3 mt-3">
+            <span>상호명 (마케팅명)</span>
+            <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
+                  v-tooltip="{
+                  content: msg.sub_name,
+                  placement: 'right',
+                  offset: 5,
+                  trigger: 'hover',
+                  }">?</span>
+            <span class="question badge btn-secondary p-1" v-else
+                  v-tooltip="{
+                  content: msg.sub_name,
+                  placement: 'right',
+                  offset: 5,
+                  trigger: 'click',
+                  }">?</span>
+          </label>
           <div class="col-sm-9 mt-sm-3">
             <input type="text" class="form-control" id="org_sub" name="org_sub"
                    v-model="content_obj.corp_sub_name"
@@ -78,25 +94,13 @@
           <label for="org_phone" class="col-form-label-sm col-sm-3 mt-3">연락처</label>
           <div class="col-sm-9 mt-sm-3">
             <div class="error_label" v-if="errors.has('org_phone')">전화번호를 확인하세요</div>
-            <input type="number" :class="error_label.class.phone" id="org_phone" name="org_phone"
+            <input type="tel" :class="error_label.class.phone" id="org_phone" name="org_phone"
                    v-model="content_obj.corp_num"
                    placeholder="연락처를 입력하세요"
                    autofocus="autofocus"
                    maxlength="16"
                    v-validate="'numeric|max:16'"
                    @keyup="error_check('phone')">
-          </div>
-
-          <label for="org_email" class="col-form-label-sm col-sm-3 mt-3">이메일</label>
-          <div class="col-sm-9 mt-sm-3">
-            <div class="error_label" v-if="errors.has('org_email')">이메일 형식을 확인하세요</div>
-            <input type="email" :class="error_label.class.email" id="org_email" name="org_email"
-                   v-model="content_obj.corp_email"
-                   placeholder="이메일을 입력하세요"
-                   maxlength="50"
-                   autofocus="autofocus"
-                   v-validate="'email'"
-                   @keyup="error_check('email')">
           </div>
 
           <label for="org_desc" class="col-form-label-sm col-sm-3 mt-3">설명</label>
@@ -290,6 +294,10 @@
   export default {
     name: "company_detail",
     data: () => ({
+      window_width: window.innerWidth,
+      msg: {
+        sub_name: '상호명은 랜딩 페이지의 url로 쓰입니다. ex) 상호명이 test_landing인 경우 https://landings.infomagazine.xyz/abc123/test_landing_123.html'
+      },
       error_label: {
         name: false,
         phone: false,
@@ -301,7 +309,6 @@
         }
       },
       page_id: 0,
-      window_width: window.innerWidth,
       content_obj: [],
       marketer: [],
       original_manager: 0,
@@ -545,7 +552,7 @@
           //     name: 'user_detail', params: {user_id: user}
           //   })
           // }
-          if(confirm('고객을 삭제하시겠습니까?')) {
+          if (confirm('고객을 삭제하시겠습니까?')) {
             this.$store.state.pageOptions.loading = true
             axios.delete(this.$store.state.endpoints.baseUrl + 'users/' + user + '/')
               .then(() => {

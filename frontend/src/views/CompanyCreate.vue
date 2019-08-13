@@ -42,6 +42,20 @@
 
           <label for="corp_sub" class="col-form-label-sm col-sm-3 mt-3">
             <span>상호명 (마케팅명)</span>
+            <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
+                  v-tooltip="{
+                  content: msg.sub_name,
+                  placement: 'right',
+                  offset: 5,
+                  trigger: 'hover',
+                  }">?</span>
+            <span class="question badge btn-secondary p-1" v-else
+                  v-tooltip="{
+                  content: msg.sub_name,
+                  placement: 'right',
+                  offset: 5,
+                  trigger: 'click',
+                  }">?</span>
           </label>
           <div class="col-sm-9 mt-sm-3">
             <div class="error_label" v-if="errors.has('corp_sub')">{{errors.first('corp_sub')}}</div>
@@ -91,25 +105,12 @@
           </label>
           <div class="col-sm-9 mt-sm-3">
             <input :class="error_label.class.tel_num" id="corp_phone" name="corp_phone"
-                   type="number"
+                   type="tel"
                    v-model="create_obj.corp_num"
                    placeholder="연락처를 입력하세요"
                    autofocus="autofocus"
                    maxlength="16"
                    @keyup="error_check('phone')">
-          </div>
-
-          <label for="corp_email" class="col-form-label-sm col-sm-3 mt-3">
-            <span>이메일</span>
-          </label>
-          <div class="col-sm-9 mt-sm-3">
-            <input :class="error_label.class.email" id="corp_email" name="corp_email" type="email"
-                   v-model="create_obj.corp_email"
-                   placeholder="이메일을 입력하세요"
-                   maxlength="50"
-                   autofocus="autofocus"
-                   v-validate="'email'"
-                   @keyup="error_check('email')">
           </div>
 
           <label for="corp_desc" class="col-form-label-sm col-sm-3 mt-3">
@@ -140,6 +141,10 @@
     name: "company_create",
     data: () => ({
       // For company create
+      window_width: window.innerWidth,
+      msg: {
+        sub_name: '상호명은 랜딩 페이지의 url로 쓰입니다. ex) 상호명이 test_landing인 경우 https://landings.infomagazine.xyz/abc123/test_landing_123.html'
+      },
       organization_list: [],
       error_label: {
         corp_name: true,
@@ -164,6 +169,13 @@
       },
     }),
     mounted() {
+      // Window width calculator
+      let that = this
+      that.$nextTick(function () {
+        window.addEventListener('resize', function (e) {
+          that.window_width = window.innerWidth
+        })
+      })
       // Get organization for admin users set org themselves
       if (this.user_obj.is_staff || this.user_obj.is_superuser) {
         axios.get(this.$store.state.endpoints.baseUrl + 'organizations/')
