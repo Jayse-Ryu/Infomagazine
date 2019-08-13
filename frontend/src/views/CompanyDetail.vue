@@ -157,7 +157,7 @@
                 class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
               <div class="col-12 text-center">데이터가 존재하지 않습니다.</div>
             </li>
-            <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
+            <li v-else-if="user_obj.is_staff || user_obj.is_superuser" class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
                 v-for="content in user_list">
               <div class="col-2 col-sm-1">{{ content.id }}</div>
               <div class="col-3 col-sm-3">
@@ -170,27 +170,83 @@
               <div class="col-2">{{ content.info.phone_num }}</div>
               <div class="col-2 col-sm-3">
                 <div v-if="content.info.access_role == 0 && content.id != user_obj.id">
-                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('head', content.id)">
+                  <button type="button" class="btn text-primary p-0" @click.prevent="promote('head', content.id)">
+                    <div class="promote_btn">조직 관리자</div>
+                  </button>
+                </div>
+                <div v-else-if="content.info.access_role == 1 && content.id != user_obj.id">
+                  <button type="button" class="btn text-success p-0">
+                    <div class="promote_btn">마케터</div>
+                  </button>
+                  <button type="button" class="btn btn-danger p-0 ml-1" @click.prevent="promote('1', content.id)">
+                    <div class="promote_btn">강등</div>
+                  </button>
+                </div>
+                <div v-else-if="content.info.access_role == 2 && content.id != user_obj.id">
+                  <button type="button" class="btn text-secondary p-0">
+                    <div class="promote_btn">고객</div>
+                  </button>
+                  <button type="button" class="btn btn-danger p-0 ml-1" @click.prevent="promote('2', content.id)">
+                    <div class="promote_btn">삭제</div>
+                  </button>
+                </div>
+                <div v-else-if="content.info.access_role == 3 && content.id != user_obj.id">
+                  <button type="button" class="btn text-danger p-0">
+                    <div class="promote_btn">마케터</div>
+                  </button>
+                  <button type="button" class="btn btn-success p-0 ml-1" @click.prevent="promote('3', content.id)">
+                    <div class="promote_btn">승인</div>
+                  </button>
+                </div>
+                <div v-else-if="content.id == user_obj.id">
+                  <button type="button" class="btn text-info p-0" @click.prevent="promote('me', content.id)">
+                    <div class="promote_btn">본인</div>
+                  </button>
+                </div>
+              </div>
+            </li>
+            <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
+                v-for="content in user_list">
+              <div class="col-2 col-sm-1">{{ content.id }}</div>
+              <div class="col-3 col-sm-3 text-primary">
+                <div style="word-break: break-all;">{{ content.email }}</div>
+              </div>
+              <div class="col-3 col-sm-3 text-primary">
+                <div>{{ content.username }}</div>
+              </div>
+              <div class="col-2">{{ content.info.phone_num }}</div>
+              <div class="col-2 col-sm-3">
+                <div v-if="content.info.access_role == 0 && content.id != user_obj.id">
+                  <button type="button" class="btn text-primary p-0" @click.prevent="promote('head', content.id)">
                     <div class="promote_btn">관리자</div>
                   </button>
                 </div>
                 <div v-else-if="content.info.access_role == 1 && content.id != user_obj.id">
-                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('1', content.id)">
+                  <button type="button" class="btn text-success p-0">
                     <div class="promote_btn">마케터</div>
+                  </button>
+                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('1', content.id)">
+                    <div class="promote_btn">강등</div>
                   </button>
                 </div>
                 <div v-else-if="content.info.access_role == 2 && content.id != user_obj.id">
-                  <button type="button" class="btn btn-secondary p-0" @click.prevent="promote('2', content.id)">
+                  <button type="button" class="btn text-secondary p-0">
                     <div class="promote_btn">고객</div>
+                  </button>
+                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('2', content.id)">
+                    <div class="promote_btn">삭제</div>
                   </button>
                 </div>
                 <div v-else-if="content.info.access_role == 3 && content.id != user_obj.id">
-                  <button type="button" class="btn btn-danger p-0" @click.prevent="promote('3', content.id)">
-                    <div class="promote_btn">미승인 마케터</div>
+                  <button type="button" class="btn text-danger p-0">
+                    <div class="promote_btn">마케터</div>
+                  </button>
+                  <button type="button" class="btn btn-success p-0" @click.prevent="promote('3', content.id)">
+                    <div class="promote_btn">승인</div>
                   </button>
                 </div>
                 <div v-else-if="content.id == user_obj.id">
-                  <button type="button" class="btn btn-info p-0" @click.prevent="promote('me', content.id)">
+                  <button type="button" class="btn text-info p-0" @click.prevent="promote('me', content.id)">
                     <div class="promote_btn">본인</div>
                   </button>
                 </div>
