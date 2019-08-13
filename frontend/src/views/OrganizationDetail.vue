@@ -11,7 +11,7 @@
     <div class="container">
       <!-- 1. Provide edit form for staff or owner -->
       <form v-if="user_obj.is_staff || user_obj.is_superuser ||
-            user_obj.access_role == 0 || $store.state.user_campaign.organization == page_id"
+            (user_obj.access_role == 0 && $store.state.user_campaign.organization == page_id)"
             class="m-auto" v-on:submit.prevent="check_organization">
         <div class="form-group row">
 
@@ -205,7 +205,7 @@
               </div>
               <div class="col-4">
                 <div v-if="content.info.access_role == 0 && user_obj.id != content.id">
-                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('head', content.user)">
+                  <button type="button" class="btn btn-primary p-0" @click.prevent="promote('head', content.id)">
                     <div class="promote_btn">조직관리자</div>
                   </button>
                 </div>
@@ -255,7 +255,9 @@
 
         <div class="mt-1 mb-2">
           <button type="submit" class="btn btn-primary col">수정</button>
-          <button v-if="user_obj.access_role == 0 || user_obj.is_staff" type="button" class="btn btn-danger col mt-2" @click="delete_org()">삭제</button>
+          <button v-if="user_obj.access_role == 0 || user_obj.is_staff" type="button" class="btn btn-danger col mt-2"
+                  @click="delete_org()">삭제
+          </button>
           <router-link to="/organization">
             <button class="btn btn-dark col mt-2">취소</button>
           </router-link>
@@ -733,8 +735,8 @@
         // 2:client
         // 3:unauthorized marketer
 
-        if (this.user_obj.is_staff || this.user_obj.is_superuser) {
-          if (option == '1') {
+        if (option == '1') {
+          if (this.user_obj.is_staff || this.user_obj.is_superuser || this.user_obj.access_role == 0) {
             if (confirm('해당 마케터를 강등 시키시겠습니까?')) {
               let formData = {
                 info: {
@@ -743,25 +745,38 @@
               }
               this.user_update(user, formData)
             }
-          } else if (option == '2') {
-            if (confirm('고객 정보를 열람하시겠습니까?')) {
-              this.$router.currentRoute.meta.protect_leave = 'no'
-              this.$router.push({
-                name: 'user_detail', params: {user_id: user}
-              })
-            }
-          } else if (option == '3') {
-            if (confirm('해당 마케터의 가입을 승인하시겠습니까?')) {
-              let formData = {
-                info: {
-                  access_role: 1
-                }
-              }
-              this.user_update(user, formData)
-            }
+          } else {
+            alert('권한이 없습니다.')
           }
-        } else {
-          // console.log('this user is not admin')
+        } else if (option == '2') {
+          // if (confirm('고객 정보를 열람하시겠습니까?')) {
+          //   this.$router.currentRoute.meta.protect_leave = 'no'
+          //   this.$router.push({
+          //     name: 'user_detail', params: {user_id: user}
+          //   })
+          // }
+          if (confirm('고객을 삭제하시겠습니까?')) {
+            this.$store.state.pageOptions.loading = true
+            axios.delete(this.$store.state.endpoints.baseUrl + 'users/' + user + '/')
+              .then(() => {
+                alert('삭제되었습니다.')
+                this.$store.state.pageOptions.loading = false
+                this.pagination(this.page_current)
+              })
+              .catch((error) => {
+                this.$store.state.pageOptions.loading = false
+                console.log(error)
+              })
+          }
+        } else if (option == '3') {
+          if (confirm('해당 마케터의 가입을 승인하시겠습니까?')) {
+            let formData = {
+              info: {
+                access_role: 1
+              }
+            }
+            this.user_update(user, formData)
+          }
         }
 
       },
@@ -776,16 +791,19 @@
           })
       },
       delete_org() {
-        if(confirm('조직을 삭제 하시겠습니까?')) {
+        if (confirm('조직을 삭제 하시겠습니까?')) {
+          this.$store.state.pageOptions.loading = true
           axios.delete(this.$store.state.endpoints.baseUrl + 'organizations/' + this.page_id + '/')
             .then((response) => {
               alert('조직이 삭제되었습니다.')
+              this.$store.state.pageOptions.loading = false
               this.$router.currentRoute.meta.protect_leave = 'no'
               this.$router.push({
                 name: 'organization_list'
               })
             })
             .catch((error) => {
+              this.$store.state.pageOptions.loading = false
               console.log(error)
             })
         }

@@ -459,6 +459,7 @@
           .then((response) => {
             // console.log(response)
             alert('삭제되었습니다.')
+            this.$store.state.pageOptions.loading = false
             this.$router.currentRoute.meta.protect_leave = 'no'
             this.$router.push({
               name: 'company_list',
