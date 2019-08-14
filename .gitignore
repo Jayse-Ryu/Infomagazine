@@ -14,3 +14,5 @@ backend/settings.ini
 
 frontend/node_modules
 frontend/dist
+
+serverless/*/layers/*.zip

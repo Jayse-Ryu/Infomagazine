@@ -28,6 +28,7 @@ def _response_format(status_code: int = None, state: bool = None, message: str =
 
 def _send_to_sqs(event, response_headers):
     headers = event['headers']
+    referer = headers['referer']
     user_agent = headers['user-agent']
     ip_v4_address = headers['x-forwarded-for'].split(",")[0]
     event_body = event['body']
@@ -69,8 +70,17 @@ def _send_to_sqs(event, response_headers):
         "data": body['data'],
         "schema": body['schema'],
         "user_agent": user_agent,
-        "ip_v4_address": ip_v4_address
+        "ip_v4_address": ip_v4_address,
+        "cloudfront-is-desktop-viewer": headers['cloudfront-is-desktop-viewer'],
+        "cloudfront-is-mobile-viewer": headers['cloudfront-is-mobile-viewer'],
+        "cloudfront-is-smarttv-viewer": headers['cloudfront-is-smarttv-viewer'],
+        "cloudfront-is-tablet-viewer": headers['cloudfront-is-tablet-viewer']
     }
+
+    try:
+        body_to_send.update({"referer": referer.split("/")[4]})
+    except Exception as e:
+        logger.warning(str(e))
 
     session = boto3.session.Session(aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
                                     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
@@ -78,7 +88,7 @@ def _send_to_sqs(event, response_headers):
                                     region_name='ap-northeast-2')
     sqs_client = session.client('sqs')
     response = sqs_client.send_message(
-        QueueUrl='https://sqs.ap-northeast-2.amazonaws.com/590908818913/test-sqs',
+        QueueUrl=os.getenv('SQL_URL'),
         DelaySeconds=0,
         MessageBody=json.dumps(body_to_send)
     )
