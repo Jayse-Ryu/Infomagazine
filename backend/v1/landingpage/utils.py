@@ -300,7 +300,7 @@ class Script(Default):
             var $this = $(this);
             $this.attr("disabled",true);
             var item_group = {json.dumps(converted_item_group)};
-            form_{section_id}_validation(item_group);
+            form_{section_id}_validation($this,item_group);
             call_form_{section_id}_ajax($this,item_group)
         }});
         """
@@ -308,7 +308,7 @@ class Script(Default):
 
     def _js_validation(self, section_id=None):
         result = f"""
-        function form_{section_id}_validation(item_group) {{
+        function form_{section_id}_validation($this, item_group) {{
             // required
             // korean_only
             // english_only
@@ -395,6 +395,7 @@ class Script(Default):
                             list_total += (", " + list[i])
                         }}
                     }}
+                    $this.removeAttr('disabled')
                     alert(list_total + message);
                     throw list_total + message;
                 }}
@@ -424,6 +425,9 @@ class Script(Default):
                 data: JSON.stringify(body),
                 success: function (data) {{
                     if (data['state']) {{
+                        if (typeof fbq != 'undefined') {{
+                            fbq('track', 'CompleteRegistration');
+                        }}
                         alert(data['message']);
                     }} else {{
                         alert(data['message']);
@@ -667,9 +671,12 @@ class LandingPage(StyleSheet, Script):
             label_tag = base_html.new_tag('label', attrs={'for': field_id,
                                                           'class': 'form-group-label'})
             label_tag.string = field_info['holder']
-            input_tag = base_html.new_tag('input', attrs={'type': 'checkbox',
-                                                          'id': field_id,
-                                                          'data-label-name': field_info['name']})
+            checkbox_option = {'type': 'checkbox',
+                               'id': field_id,
+                               'data-label-name': field_info['name']}
+            if field_info['default']:
+                checkbox_option.update({'checked': 'checked'})
+            input_tag = base_html.new_tag('input', attrs=checkbox_option)
             form_group.append(input_tag)
             form_group.append(label_tag)
 
@@ -683,14 +690,17 @@ class LandingPage(StyleSheet, Script):
                 'validation': list(field_info['validation'].keys())
             }
 
+    def _bs_converter(self, tag_string):
+        return BeautifulSoup(tag_string, 'html.parser')
+
     def generate(self):
         """
         object_type == 1 : 이미지 객체
         object_type == 2 : 폼 객체
         object_type == 3 : 비디오 객체
-
+¬
         """
-        base_html = BeautifulSoup(self.default_html, 'html.parser')
+        base_html = self._bs_converter(self.default_html)
 
         main_container = base_html.new_tag('main', attrs={'class': 'section-container'})
         base_html.body.append(main_container)
@@ -761,10 +771,17 @@ class LandingPage(StyleSheet, Script):
                         section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image'})
                         section_object_block.append(section_object_by_type)
 
+            header_script = self._bs_converter(
+                self.landing_config['header_script'] if self.landing_config['header_script'] else "")
+            body_script = self._bs_converter(
+                self.landing_config['body_script'] if self.landing_config['body_script'] else "")
+
             stylesheets = BeautifulSoup(self._stylesheets_generate(), 'html.parser')
             base_html.head.append(stylesheets)
+            base_html.head.append(header_script)
             scripts = BeautifulSoup(self._scripts_generate(), 'html.parser')
             base_html.body.append(scripts)
+            base_html.body.append(body_script)
             return {'state': True, 'data': base_html.prettify(), 'message': 'Succeed.'}
         except Exception as e:
             return {'state': False, 'data': '', 'message': str(e)}
