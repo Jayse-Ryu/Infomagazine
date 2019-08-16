@@ -440,31 +440,31 @@
                 <label for="console_x" class="col-sm-3 col-form-label-sm mt-3">X 좌표</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_x" v-model.number="info.position.x" class="form-control"
-                         step="10" @keyup="push_landing()" @change="order_h">
+                         step="10" @change="push_landing()" @keyup="order_h">
                 </div>
 
                 <label for="console_y" class="col-sm-3 col-form-label-sm mt-3">Y 좌표</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_y" v-model.number="info.position.y" class="form-control"
-                         step="10" @keyup="push_landing()" @change="order_h">
+                         step="10" @change="push_landing()" @keyup="order_h">
                 </div>
 
                 <label for="console_w" class="col-sm-3 col-form-label-sm mt-3">너비</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_w" v-model.number="info.position.w" class="form-control"
-                         step="10" @keyup="push_landing()" @change="order_h">
+                         step="10" @change="push_landing()" @keyup="order_h">
                 </div>
 
                 <label for="console_h" class="col-sm-3 col-form-label-sm mt-3">높이</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_h" v-model.number="info.position.h" class="form-control"
-                         step="10" @keyup="push_landing()" @change="order_h">
+                         step="10" @change="push_landing()" @keyup="order_h">
                 </div>
 
                 <label for="console_z" class="col-sm-3 col-form-label-sm mt-3">우선순위</label>
                 <div class="col-sm-9 mt-sm-3">
                   <input type="number" id="console_z" v-model.number="info.position.z" class="form-control"
-                         @keyup="push_landing()" @change="order_h">
+                         @change="push_landing()" @keyup="order_h">
                 </div>
               </div>
             </div>
@@ -658,27 +658,26 @@
         // this.order_focus_flag = false
       },
       order_h() {
-        // this.object_init()
-
-        console.log('new order h method', this.order_obj[this.section_selected].length)
+        this.object_init()
 
         let compare = 0
         let sum = 0
 
-        for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
-          sum = (this.order[this.section_selected][i].position.y + this.order[this.section_selected][i].position.h) * 1
-          // Compare objects values
-          if (compare < sum) {
-            compare = sum
+        if (this.order_obj[this.section_selected].length !== undefined) {
+          for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
+            sum = (this.order[this.section_selected][i].position.y + this.order[this.section_selected][i].position.h) * 1
+            // Compare objects values
+            if (compare < sum) {
+              compare = sum
+            }
+            if (this.order_obj[this.section_selected][i].sign == this.order_selected) {
+              this.order_obj[this.section_selected][i].section_h = compare * 1
+            }
           }
-          if (this.order_obj[this.section_selected][i].sign == this.order_selected) {
-            // this.order_obj[this.section_selected][i].position.x = x * 1
-            // this.order_obj[this.section_selected][i].position.y = y * 1
-            this.order_obj[this.section_selected][i].section_h = compare * 1
-          }
+          this.field_selected = 0
+          this.$emit('update:order', this.order_obj)
         }
-        this.field_selected = 0
-        this.$emit('update:order', this.order_obj)
+
       },
       order_move(x, y) {
         this.object_init()

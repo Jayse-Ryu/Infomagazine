@@ -186,7 +186,7 @@
                   <label v-if="[1, 2, 3].includes(content.type * 1)" :for="'f_validate_8' + content.sign"
                          class="validate_label">
                     <input type="checkbox" :id="'f_validate_8' + content.sign" v-model="content.validation.duplication_check">
-                    나이제한
+                    중복체크
                   </label>
                 </div>
 
@@ -408,7 +408,8 @@
           'email',
           'age_limit',
           'value_min',
-          'value_max'
+          'value_max',
+          'duplication_check'
         ]
 
         // Get one field object
@@ -502,6 +503,7 @@
                   phone_only: false,
                   email: false,
                   age_limit: false,
+                  duplication_check: false,
                   value_min: {
                     value: 0,
                     option: 'gt'
@@ -541,6 +543,7 @@
                   phone_only: false,
                   email: false,
                   age_limit: false,
+                  duplication_check: false,
                   value_min: {
                     value: 0,
                     option: 'gt'
