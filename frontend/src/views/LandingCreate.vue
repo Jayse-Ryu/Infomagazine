@@ -176,6 +176,7 @@
         name: true,
         base_url: true,
       },
+      validation_flag: true,
       page_id: '',
       epoch_time: 0,
       form_arrow: -1,
@@ -299,6 +300,8 @@
         }
         let temp = JSON.stringify(this.dynamo_obj)
         this.dynamo_obj = JSON.parse(temp)
+
+        this.validation_flag = true
       },
       set_field_position(option) {
         if (option == 'form') {
@@ -435,6 +438,8 @@
         }
       },
       field_validation() {
+        this.validation_flag = false
+
         let type_text = ['required', 'korean_only', 'english_only', 'number_only', 'email', 'duplication_check']
         let type_num = ['required', 'number_only', 'duplication_check']
         let type_tel = ['required', 'phone_only', 'duplication_check']
@@ -628,30 +633,33 @@
               })
           }
         } else {
+          if (this.validation_flag) {
+            this.field_validation()
 
-          this.field_validation()
-
-          if (!this.page_id) {
-            axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
-              .then((response) => {
-                this.page_id = response.data.data.inserted_id
-                this.validation_back()
-              })
-              .catch((error) => {
-                console.log('Landing update fail', error)
-                this.validation_back()
-              })
+            if (!this.page_id) {
+              axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+                .then((response) => {
+                  this.page_id = response.data.data.inserted_id
+                  this.validation_back()
+                })
+                .catch((error) => {
+                  console.log('Landing update fail', error)
+                  this.validation_back()
+                })
+            }
           } else {
-            axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
-              'company_id': this.dynamo_obj.company_id,
-              'landing_info': this.dynamo_obj.landing_info
-            }, config)
-              .then(() => {
-                this.validation_back()
-              })
-              .catch((error) => {
-                console.log('Landing update fail', error)
-              })
+            if (this.validation_flag) {
+              axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
+                'company_id': this.dynamo_obj.company_id,
+                'landing_info': this.dynamo_obj.landing_info
+              }, config)
+                .then(() => {
+                  this.validation_back()
+                })
+                .catch((error) => {
+                  console.log('Landing update fail', error)
+                })
+            }
           }
 
         }

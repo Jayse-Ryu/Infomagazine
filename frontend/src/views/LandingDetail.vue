@@ -174,6 +174,7 @@
         name: true,
         base_url: true,
       },
+      validation_flag: true,
       page_id: '',
       epoch_time: 0,
       form_arrow: -1,
@@ -386,7 +387,7 @@
           let temp = JSON.stringify(this.dynamo_obj)
           this.dynamo_obj = JSON.parse(temp)
         }
-
+        this.validation_flag = true
       },
       set_field_position(option) {
         if (option == 'form') {
@@ -516,6 +517,8 @@
         }
       },
       field_validation() {
+        this.validation_flag = false
+
         let type_text = ['required', 'korean_only', 'english_only', 'number_only', 'email', 'duplication_check']
         let type_num = ['required', 'number_only', 'duplication_check']
         let type_tel = ['required', 'phone_only', 'duplication_check']
@@ -695,26 +698,24 @@
               this.validation_back()
             })
         } else {
-          // console.log('detail is not support auto save')
-          // if (!this.error_label.name && !this.error_label.base_url) {
-          // console.log('Landing pushed! ')
 
-          this.field_validation()
+          if (this.validation_flag) {
+            this.field_validation()
 
-          axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
-            'company_id': this.dynamo_obj.company_id,
-            'landing_info': this.dynamo_obj.landing_info
-          }, config)
-            .then(() => {
-              this.validation_back()
-            })
-            .catch((error) => {
-              this.validation_back()
-              console.log('Landing update fail', error)
-            })
-          // }
+            axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
+              'company_id': this.dynamo_obj.company_id,
+              'landing_info': this.dynamo_obj.landing_info
+            }, config)
+              .then(() => {
+                this.validation_back()
+              })
+              .catch((error) => {
+                this.validation_back()
+                console.log('Landing update fail', error)
+              })
+          }
+
         }
-
       },
       delete_landing() {
         if (confirm('정말 삭제하시겠습니까?')) {

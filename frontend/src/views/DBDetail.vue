@@ -30,8 +30,10 @@
                 <div class="col-3 p-0 col-sm-3">{{ landing_obj.company_id }}</div>
                 <div class="col-3 p-0 col-sm-4">{{ landing_obj.landing_info.landing.name }}</div>
                 <div class="col-3 p-0">{{ manager_name }}</div>
-                <div class="col-1 p-0 board_centre">{{ landing_obj.landing_info.views }}</div>
-                <div class="col-1 p-0 board_centre">{{ landing_obj.landing_info.views }}</div>
+                <div class="col-1 p-0 board_centre" v-if="landing_obj.landing_info.views">{{ landing_obj.landing_info.views }}</div>
+                <div class="col-1 p-0 board_centre" v-else>0</div>
+                <div class="col-1 p-0 board_centre" v-if="landing_obj.landing_info.db">{{ landing_obj.landing_info.db }}</div>
+                <div class="col-1 p-0 board_centre" v-else>0</div>
               </li>
             </ul>
           </div>
@@ -113,10 +115,10 @@
             </datepicker>
           </div>
           <div class="col-md-2">
-            <button type="button" class="btn btn-info w-100" @click="date_clear()">초기화</button>
+            <button type="button" class="btn btn-info w-100 mb-1" @click="date_clear()">초기화</button>
           </div>
           <div class="col-md-2">
-            <vue-excel type="button" class="btn btn-success w-100" :data="db_vals">
+            <vue-excel type="button" class="btn btn-outline-success w-100" :data="db_vals">
               엑셀저장
             </vue-excel>
           </div>
@@ -229,6 +231,7 @@
           })
           .then((response) => {
             console.log('db gathering', response.data.data.results)
+            this.landing_obj.landing_info.db = response.data.data.count
             this.db_list = response.data.data.results
             // Call get resources after data loaded
             this.get_resources_key()
@@ -275,8 +278,19 @@
         // // Push url and date fields to backward
         // this.db_keys.splice(this.db_keys.indexOf('url'), 1)
         // this.db_keys.push('url')
-        this.db_keys.splice(this.db_keys.indexOf('신청일'), 1)
-        this.db_keys.push('신청일')
+        if (this.db_keys.indexOf('신청일') > -1) {
+          this.db_keys.splice(this.db_keys.indexOf('신청일'), 1)
+          this.db_keys.push('신청일')
+        } else {
+          this.db_keys.push('신청일')
+        }
+
+        if (this.db_keys.indexOf('유입경로') > -1) {
+          this.db_keys.splice(this.db_keys.indexOf('유입경로'), 1)
+          this.db_keys.push('유입경로')
+        } else {
+          this.db_keys.push('유입경로')
+        }
 
         this.get_resources_val()
       },
@@ -314,6 +328,8 @@
 
                     val_obj[index][this.db_keys[i]] = date_str
                     //Date val done
+                  } else if (this.db_keys[i] === '유입경로') {
+                    val_obj[index][this.db_keys[i]] = this.db_list[index]['inflow_path']
                   } else {
                     // If db[index] dont have this key[i]
                     val_obj[index][this.db_keys[i]] = (' ')

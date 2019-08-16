@@ -329,7 +329,7 @@
 
           </div>
 
-          <div class="field_console" v-if="index == section_selected && field_selected != 0">
+          <div class="field_console" id="field_console" v-if="index == section_selected && field_selected != 0">
             <div v-for="info in object">
               <div v-for="item in info.fields" v-if="field_selected == item.sign">
 
@@ -529,7 +529,6 @@
     }),
     mounted() {
       this.order_obj = this.order
-
     },
     methods: {
       object_init() {
@@ -674,7 +673,7 @@
               this.order_obj[this.section_selected][i].section_h = compare * 1
             }
           }
-          this.field_selected = 0
+          // this.field_selected = 0
           this.$emit('update:order', this.order_obj)
         }
 
@@ -695,7 +694,7 @@
             this.order_obj[this.section_selected][i].section_h = compare * 1
           }
         }
-        this.field_selected = 0
+        // this.field_selected = 0
         this.$emit('update:order', this.order_obj)
         // this.push_landing()
       },
@@ -717,7 +716,7 @@
             this.order_obj[this.section_selected][i].section_h = compare * 1
           }
         }
-        this.field_selected = 0
+        // this.field_selected = 0
         this.$emit('update:order', this.order_obj)
         // this.push_landing()
       },
