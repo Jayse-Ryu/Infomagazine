@@ -659,22 +659,26 @@
       },
       order_h() {
         // this.object_init()
-        // let compare = 0
-        // let sum = 0
-        // for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
-        //   sum = (this.order[this.section_selected][i].position.y + this.order[this.section_selected][i].position.h) * 1
-        //   // Compare objects values
-        //   if (compare < sum) {
-        //     compare = sum
-        //   }
-        //   if (this.order_obj[this.section_selected][i].sign == this.order_selected) {
-        //     this.order_obj[this.section_selected][i].position.x = x * 1
-        //     this.order_obj[this.section_selected][i].position.y = y * 1
-        //     this.order_obj[this.section_selected][i].section_h = compare * 1
-        //   }
-        // }
-        // this.field_selected = 0
-        // this.$emit('update:order', this.order_obj)
+
+        console.log('new order h method', this.order_obj[this.section_selected].length)
+
+        let compare = 0
+        let sum = 0
+
+        for (let i = 0; i < this.order_obj[this.section_selected].length; i++) {
+          sum = (this.order[this.section_selected][i].position.y + this.order[this.section_selected][i].position.h) * 1
+          // Compare objects values
+          if (compare < sum) {
+            compare = sum
+          }
+          if (this.order_obj[this.section_selected][i].sign == this.order_selected) {
+            // this.order_obj[this.section_selected][i].position.x = x * 1
+            // this.order_obj[this.section_selected][i].position.y = y * 1
+            this.order_obj[this.section_selected][i].section_h = compare * 1
+          }
+        }
+        this.field_selected = 0
+        this.$emit('update:order', this.order_obj)
       },
       order_move(x, y) {
         this.object_init()
