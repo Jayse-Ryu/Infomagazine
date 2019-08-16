@@ -252,7 +252,7 @@
 
       },
       get_resources_key() {
-        this.db_keys = []
+        this.db_keys = ['ID']
         // this.db_vals = []
 
         // Get only obje keys for pretty list
@@ -314,6 +314,8 @@
                   if (this.db_list[index][key].hasOwnProperty(this.db_keys[i])) {
                     // If key is created date
                     val_obj[index][this.db_keys[i]] = this.db_list[index][key][this.db_keys[i]]
+                  } else if(this.db_keys[i] === 'ID') {
+                    val_obj[index][this.db_keys[i]] = this.db_list[index]['id']
                   } else if (this.db_keys[i] === '신청일') {
                     date_obj = ''
                     // Epoch time string length must be 13
