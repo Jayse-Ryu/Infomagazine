@@ -210,16 +210,47 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
                 return {'state': False, 'data': '', 'message': 'Failed.',
                         'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
 
-    @action(detail=True, methods=['DELETE'], url_path='landing_urls/(?P<landing_url>[^/.]+)')
+    @action(detail=True, methods=['PUT', 'DELETE'], url_path='landing_urls/(?P<landing_url>[^/.]+)')
     @response_decorator
     def landing_urls_detail(self, request, pk, landing_url):
-        if request.method == 'DELETE':
-            s3_client = boto3.client(
-                's3',
-                aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
-                aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
-                region_name='ap-northeast-2'
-            )
+        session = boto3.session.Session(aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+                                        aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+                                        region_name='ap-northeast-2')
+        s3_client = session.client('s3')
+        cloudfront_client = session.client('cloudfront')
+        if request.method == 'PUT':
+            get_detail = self.retrieve(request, pk)
+            response_data = self.get_landing_data(landing_detail=get_detail.data, is_generate=True)
+            landing_id = get_detail.data['data']['_id']['$oid']
+            landing_url = f'''landings/{landing_id}/{landing_url}.html'''
+            s3_response_data = s3_client.put_object(Body=response_data['data'],
+                                                    Bucket=config('AWS_STORAGE_BUCKET_NAME'),
+                                                    Key=landing_url,
+                                                    ContentType='text/html')
+            if s3_response_data['ResponseMetadata']['HTTPStatusCode'] == 200:
+                epoch_time = time.time()
+                cf_inv_response_data = cloudfront_client.create_invalidation(
+                    DistributionId=config('CF_DISTRIBUTION_ID'),
+                    InvalidationBatch={
+                        'Paths': {
+                            'Quantity': 1,
+                            'Items': [
+                                f'''/{landing_id}/{landing_url}.html''',
+                            ]
+                        },
+                        'CallerReference': str(int(epoch_time))
+                    }
+                )
+                if cf_inv_response_data['ResponseMetadata']['HTTPStatusCode'] == 201:
+                    return {'state': True, 'data': landing_url, 'message': 'Succeed.',
+                            'options': {'status': status.HTTP_201_CREATED}}
+                else:
+                    return {'state': False, 'data': '', 'message': 'Failed.',
+                            'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
+            else:
+                return {'state': False, 'data': '', 'message': 'Failed.',
+                        'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
+        elif request.method == 'DELETE':
             s3_response = s3_client.delete_object(Bucket=config('AWS_STORAGE_BUCKET_NAME'),
                                                   Key='landings/' + pk + '/' + landing_url + '.html')
             if s3_response['ResponseMetadata']['HTTPStatusCode'] == 204:
