@@ -13,24 +13,18 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 from datetime import timedelta
 
-import csv
-from decouple import config, Csv
-from corsheaders.defaults import default_headers
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from infomagazine.utils import split_env
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-# ALLOWED_HOSTS = tuple(config('ALLOWED_HOSTS', cast=Csv()))
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = split_env(os.getenv('ALLOWED_HOSTS'))
 
 # Application definition
 
@@ -97,6 +91,8 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=300)
 }
 
+CORS_ORIGIN_WHITELIST = split_env(os.getenv('CORS_ORIGIN_WHITELIST'))
+
 # SECURE_BROWSER_XSS_FILTER = True
 
 # CORS_ALLOW_CREDENTIALS = True
@@ -123,10 +119,10 @@ SIMPLE_JWT = {
 # )
 
 # TODO prod상에서 꼭 명시 - 서브도메인 지원을 위해
-# CSRF_COOKIE_DOMAIN = config('CSRF_COOKIE_DOMAIN')
+# CSRF_COOKIE_DOMAIN = os.getenv('CSRF_COOKIE_DOMAIN')
 
-CORS_ORIGIN_WHITELIST = tuple(config('CORS_ORIGIN_WHITELIST', cast=Csv()))
-# CSRF_TRUSTED_ORIGINS = tuple(config('CSRF_TRUSTED_ORIGINS', cast=Csv()))
+# CORS_ORIGIN_WHITELIST = tuple(os.getenv('CORS_ORIGIN_WHITELIST', cast=Csv()))
+# CSRF_TRUSTED_ORIGINS = tuple(os.getenv('CSRF_TRUSTED_ORIGINS', cast=Csv()))
 
 LOGIN_URL = '/admin/login/'
 LOGOUT_URL = '/admin/logout/'
@@ -171,12 +167,12 @@ WSGI_APPLICATION = 'infomagazine.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': config('DB_ENGINE'),
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
+        'ENGINE': os.getenv('DB_ENGINE'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
@@ -185,8 +181,8 @@ DATABASES = {
     }
 }
 
-MONGO_CLOUD_ACCOUNT = config('MONGO_CLOUD_ACCOUNT')
-MONGO_CLOUD_PASSWD = config('MONGO_CLOUD_PASSWD')
+MONGO_CLOUD_ACCOUNT = os.getenv('MONGO_CLOUD_ACCOUNT')
+MONGO_CLOUD_PASSWD = os.getenv('MONGO_CLOUD_PASSWD')
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -223,9 +219,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 
-AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
 AWS_DEFAULT_ACL = None
 AWS_LOCATION = 'static'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'

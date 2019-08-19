@@ -184,7 +184,7 @@
     <!-- /Container -->
   </div>
 </template>
-
+,
 <script>
 
   import * as lang from "vuejs-datepicker/src/locale"

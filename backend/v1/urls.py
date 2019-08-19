@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.urls import path, include
 
-from infomagazine.utils import DefaultRouter
+from infomagazine.custom_packages import DefaultRouter
 
 from v1.db.urls import router as db_router, companies_router
 from v1.landingpage.urls import router as landingpage_router

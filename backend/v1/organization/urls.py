@@ -1,4 +1,4 @@
-from infomagazine.utils import DefaultRouter
+from infomagazine.custom_packages import DefaultRouter
 from v1.organization.views import OrganizationViewSets
 
 router = DefaultRouter()

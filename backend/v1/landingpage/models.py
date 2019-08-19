@@ -6,7 +6,7 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django_mysql.models import JSONField
 
-from infomagazine.settings import MONGO_CLOUD_ACCOUNT, MONGO_CLOUD_PASSWD
+from infomagazine.settings.init import MONGO_CLOUD_ACCOUNT, MONGO_CLOUD_PASSWD
 
 
 class LandingPage:
