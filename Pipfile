@@ -10,7 +10,6 @@ coverage = "*"
 
 [packages]
 django = "*"
-python-decouple = "*"
 django-cors-headers = "*"
 django-storages = "*"
 boto3 = "*"
