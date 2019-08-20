@@ -17,9 +17,9 @@
             <div class="list_header">
               <div class="list-group-item text-center d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
                    style="border-radius: 0; width:100%;">
-                <div class="col-3 p-0">업체</div>
+                <div class="col-3 p-0">업체명</div>
+                <div class="col-3 p-0">상호명</div>
                 <div class="col-4 p-0">페이지</div>
-                <div class="col-3 p-0">담당자</div>
                 <div class="col-1 p-0 board_centre">조회수</div>
                 <div class="col-1 p-0 board_centre">DB</div>
               </div>
@@ -27,9 +27,10 @@
             <ul class="list_body text-center list-group list-group-flush col-12 pr-0 text-center">
               <li
                 class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1 font-weight-bold border-0">
-                <div class="col-3 p-0 col-sm-3">{{ landing_obj.company_id }}</div>
-                <div class="col-3 p-0 col-sm-4">{{ landing_obj.landing_info.landing.name }}</div>
-                <div class="col-3 p-0">{{ manager_name }}</div>
+                <div class="col-3 p-0 col-sm-3">{{ landing_obj.company_name }}</div>
+                <div class="col-3 p-0 col-sm-3">{{ landing_obj.company_sub_name }}</div>
+                <div class="col-4 p-0 col-sm-4">{{ landing_obj.landing_info.landing.name }}</div>
+                <!--<div class="col-3 p-0">{{ manager_name }}</div>-->
                 <div class="col-1 p-0 board_centre" v-if="landing_obj.landing_info.views">
                   {{ landing_obj.landing_info.views }}
                 </div>
@@ -55,7 +56,10 @@
               <li class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1 border-0">
                 <div class="col-3 p-0">{{ landing_obj.company_id }}</div>
                 <div class="col-6 p-0">{{ landing_obj.landing_info.landing.name }}</div>
-                <div class="col-3 p-0">{{ landing_obj.landing_info.views }}</div>
+                <div v-if="landing_obj.landing_info.db" class="col-3 p-0">
+                  {{ landing_obj.landing_info.db }}
+                </div>
+                <div v-else class="col-3 p-0">0</div>
               </li>
             </ul>
           </div>
@@ -184,7 +188,7 @@
               <div class="p-2 text-center d-flex align-items-center justify-content-center" :style="db_width"
                    v-if="[0, 1].includes(user_obj.access_role) || user_obj.is_staff || user_obj.is_superuser">
                 <button type="button" class="btn btn-sm btn-outline-danger w-100 p-1" @click="db_delete(item.ID)">
-                  삭제 {{ item.ID }}
+                  삭제
                 </button>
               </div>
             </li>
@@ -250,13 +254,17 @@
           })
       },
       get_db_list() {
+
+        this.$store.state.pageOptions.loading = true
         this.landing_id = this.$route.params.landing_id
         axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.landing_id + '/')
           .then((response) => {
             this.landing_obj = response.data.data
+            this.add_landing_info()
             return axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.landing_id + '/landing_dbs/?limit=999999999&offset=0')
           })
           .catch((error) => {
+            this.$store.state.pageOptions.loading = false
             console.log('get landing', error)
           })
           .then((response) => {
@@ -271,15 +279,30 @@
             } else {
               this.manager_name = '매니저 없음'
             }
+            this.$store.state.pageOptions.loading = false
           })
           .then((response) => {
             // console.log('get user res ', response)
             // this.manager_name = response.data.data.username
+            this.$store.state.pageOptions.loading = false
           })
           .catch((error) => {
+            this.$store.state.pageOptions.loading = false
             console.log('get db', error)
           })
 
+      },
+      add_landing_info () {
+        axios.get(this.$store.state.endpoints.baseUrl + 'companies/' + this.landing_obj.company_id + '/')
+          .then((response) => {
+            this.landing_obj['company_name'] = response.data.data.corp_name
+            this.landing_obj['company_sub_name'] = response.data.data.corp_sub_name
+            let temp = JSON.stringify(this.landing_obj)
+            this.landing_obj = JSON.parse(temp)
+          })
+          .catch((error) => {
+            console.log('get comp', error)
+          })
       },
       get_resources_key() {
         this.db_keys = ['ID']
@@ -483,7 +506,15 @@
         this.db_inspect['ip'] = ip_inspect.length
       },
       db_delete(id) {
-        console.log('db id is', id)
+        this.$store.state.pageOptions.loading = true
+        axios.delete(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.landing_id + '/landing_dbs/' + id + '/')
+          .then(() => {
+            this.get_db_list()
+          })
+          .catch((error) => {
+            this.$store.state.pageOptions.loading = false
+            console.log(error)
+          })
       }
     },
     computed: {
@@ -532,7 +563,6 @@
       db_width() {
         let percent = 0
         if (this.user_obj) {
-          console.log('access role', this.user_obj.access_role)
           if ([0, 1].includes(this.user_obj.access_role)) {
             percent = 100 / (this.db_keys.length + 1)
           } else if (this.user_obj.is_staff || this.user_obj.is_superuser) {
