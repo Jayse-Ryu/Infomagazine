@@ -1,6 +1,6 @@
 <template>
-  <div class="main">
-    <div class="text_navigation">
+  <div class="main" style="max-width: 2560px !important;">
+    <div class="text_navigation" style="margin: 1% 0 15px 15px !important;">
       <router-link to="/">홈</router-link>
       <span>></span>
       <router-link to="/landing">랜딩 리스트</router-link>
@@ -8,7 +8,7 @@
       <router-link to="/db/detail">DB 정보</router-link>
     </div>
 
-    <div class="container">
+    <div class="whole_wrap">
       <!-- Selected page -->
       <section class="section">
         <div class="landing_info">
@@ -30,9 +30,13 @@
                 <div class="col-3 p-0 col-sm-3">{{ landing_obj.company_id }}</div>
                 <div class="col-3 p-0 col-sm-4">{{ landing_obj.landing_info.landing.name }}</div>
                 <div class="col-3 p-0">{{ manager_name }}</div>
-                <div class="col-1 p-0 board_centre" v-if="landing_obj.landing_info.views">{{ landing_obj.landing_info.views }}</div>
+                <div class="col-1 p-0 board_centre" v-if="landing_obj.landing_info.views">
+                  {{ landing_obj.landing_info.views }}
+                </div>
                 <div class="col-1 p-0 board_centre" v-else>0</div>
-                <div class="col-1 p-0 board_centre" v-if="landing_obj.landing_info.db">{{ landing_obj.landing_info.db }}</div>
+                <div class="col-1 p-0 board_centre" v-if="landing_obj.landing_info.db">
+                  {{ landing_obj.landing_info.db }}
+                </div>
                 <div class="col-1 p-0 board_centre" v-else>0</div>
               </li>
             </ul>
@@ -66,7 +70,7 @@
       </section>
       <!-- /Selected page -->
 
-      <hr>
+      <!--<hr>
 
       <section class="section section_box">
         <h5>DB 개요</h5>
@@ -87,7 +91,7 @@
           </ul>
         </div>
 
-      </section>
+      </section>-->
 
       <hr>
 
@@ -152,24 +156,37 @@
       <section class="section section_box">
         <h5>DB 리스트</h5>
 
-        <div class="list_area">
+        <div class="list_area db_list_wrap">
 
-          <div class="list_header">
+          <div class="list_header db_list_header">
             <div
               class="list-group-item text-center d-inline-flex justify-content-around p-1 pt-2 pb-2 text-center border-bottom-0"
               style="border-radius: 0; width:100%;">
-              <div v-for="key in db_keys" :style="db_width" class="p-0">{{ key }}</div>
+              <div v-for="key in db_keys" :style="db_width" class="p-0 d-flex align-items-center justify-content-center">{{ key }}</div>
+              <div v-if="[0, 1].includes(user_obj.access_role) || user_obj.is_staff || user_obj.is_superuser" :style="db_width" class="p-0 d-flex align-items-center justify-content-center">
+                삭제
+              </div>
             </div>
           </div>
 
-          <ul class="text-center list-group list-group-flush text-center">
+          <ul class="db_list_body text-center list-group list-group-flush text-center">
             <li class="list-group-item list-group-item-action d-inline-flex justify-content-around p-1"
                 v-if="db_vals.length == 0">
               <div class="p-0">데이터가 없습니다.</div>
             </li>
             <li class="list-group-item list-group-item-action d-inline-flex justify-content-around p-1"
                 v-else v-for="item in db_vals">
-              <div class="p-0" v-for="val in item" :style="db_width">{{ val }}</div>
+              <div class="p-2 text-center" v-for="val in item" :style="db_width">
+                <div class="d-flex align-items-center justify-content-center" style="width: 100%; height: 100%;">
+                  {{ val }}
+                </div>
+              </div>
+              <div class="p-2 text-center d-flex align-items-center justify-content-center" :style="db_width"
+                   v-if="[0, 1].includes(user_obj.access_role) || user_obj.is_staff || user_obj.is_superuser">
+                <button type="button" class="btn btn-sm btn-outline-danger w-100 p-1" @click="db_delete(item.ID)">
+                  삭제 {{ item.ID }}
+                </button>
+              </div>
             </li>
           </ul>
 
@@ -219,6 +236,19 @@
       this.get_db_list()
     },
     methods: {
+      info_update(id) {
+        axios.get(this.$store.state.endpoints.baseUrl + 'users/' + id + '/')
+          .then((response) => {
+            if (response.data.data.info.organization) {
+              this.$store.state.user_campaign.organization = response.data.data.info.organization
+            } else if (response.data.data.info.company) {
+              this.$store.state.user_campaign.company = response.data.data.info.company
+            }
+          })
+          .catch((error) => {
+            console.log('Get user info error', error)
+          })
+      },
       get_db_list() {
         this.landing_id = this.$route.params.landing_id
         axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.landing_id + '/')
@@ -284,12 +314,35 @@
         } else {
           this.db_keys.push('신청일')
         }
-
-        if (this.db_keys.indexOf('유입경로') > -1) {
-          this.db_keys.splice(this.db_keys.indexOf('유입경로'), 1)
-          this.db_keys.push('유입경로')
+        if (this.db_keys.indexOf('모델타입') > -1) {
+          this.db_keys.splice(this.db_keys.indexOf('모델타입'), 1)
+          this.db_keys.push('모델타입')
         } else {
-          this.db_keys.push('유입경로')
+          this.db_keys.push('모델타입')
+        }
+        if (this.db_keys.indexOf('브라우저') > -1) {
+          this.db_keys.splice(this.db_keys.indexOf('브라우저'), 1)
+          this.db_keys.push('브라우저')
+        } else {
+          this.db_keys.push('브라우저')
+        }
+        if (this.db_keys.indexOf('모델제조사') > -1) {
+          this.db_keys.splice(this.db_keys.indexOf('모델제조사'), 1)
+          this.db_keys.push('모델제조사')
+        } else {
+          this.db_keys.push('모델제조사')
+        }
+        if (this.db_keys.indexOf('모델명') > -1) {
+          this.db_keys.splice(this.db_keys.indexOf('모델명'), 1)
+          this.db_keys.push('모델명')
+        } else {
+          this.db_keys.push('모델명')
+        }
+        if (this.db_keys.indexOf('OS') > -1) {
+          this.db_keys.splice(this.db_keys.indexOf('OS'), 1)
+          this.db_keys.push('OS')
+        } else {
+          this.db_keys.push('OS')
         }
 
         this.get_resources_val()
@@ -314,7 +367,7 @@
                   if (this.db_list[index][key].hasOwnProperty(this.db_keys[i])) {
                     // If key is created date
                     val_obj[index][this.db_keys[i]] = this.db_list[index][key][this.db_keys[i]]
-                  } else if(this.db_keys[i] === 'ID') {
+                  } else if (this.db_keys[i] === 'ID') {
                     val_obj[index][this.db_keys[i]] = this.db_list[index]['id']
                   } else if (this.db_keys[i] === '신청일') {
                     date_obj = ''
@@ -330,8 +383,16 @@
 
                     val_obj[index][this.db_keys[i]] = date_str
                     //Date val done
-                  } else if (this.db_keys[i] === '유입경로') {
-                    val_obj[index][this.db_keys[i]] = this.db_list[index]['inflow_path']
+                  } else if (this.db_keys[i] === '모델타입') {
+                    val_obj[index][this.db_keys[i]] = this.db_list[index]['user_agent']['viewer_type']
+                  } else if (this.db_keys[i] === '브라우저') {
+                    val_obj[index][this.db_keys[i]] = this.db_list[index]['user_agent']['browser_family']
+                  } else if (this.db_keys[i] === '모델제조사') {
+                    val_obj[index][this.db_keys[i]] = this.db_list[index]['user_agent']['device_brand']
+                  } else if (this.db_keys[i] === '모델명') {
+                    val_obj[index][this.db_keys[i]] = this.db_list[index]['user_agent']['device_model']
+                  } else if (this.db_keys[i] === 'OS') {
+                    val_obj[index][this.db_keys[i]] = this.db_list[index]['user_agent']['os_family']
                   } else {
                     // If db[index] dont have this key[i]
                     val_obj[index][this.db_keys[i]] = (' ')
@@ -420,9 +481,32 @@
         // console.log('inspect', ip_inspect)
         this.db_inspect['agent'] = agent_inspect.length
         this.db_inspect['ip'] = ip_inspect.length
+      },
+      db_delete(id) {
+        console.log('db id is', id)
       }
     },
     computed: {
+      user_obj() {
+        // Get user information
+        let local_user = localStorage.getItem('authUser')
+        let user_json = {}
+
+        if (!local_user) {
+          // dummy block access auth
+          user_json = {
+            'is_staff': false,
+            'is_superuser': false,
+            'access_role': 3,
+            'failed': true
+          }
+        } else {
+          user_json = JSON.parse(local_user)
+          this.info_update(user_json.id)
+        }
+
+        return user_json
+      },
       range() {
         let range = {
           from: this.start_time,
@@ -446,8 +530,19 @@
         return range
       },
       db_width() {
+        let percent = 0
+        if (this.user_obj) {
+          console.log('access role', this.user_obj.access_role)
+          if ([0, 1].includes(this.user_obj.access_role)) {
+            percent = 100 / (this.db_keys.length + 1)
+          } else if (this.user_obj.is_staff || this.user_obj.is_superuser) {
+            percent = 100 / (this.db_keys.length + 1)
+          } else {
+            percent = 100 / this.db_keys.length
+          }
+
+        }
         // Set field width by field counts
-        let percent = 100 / this.db_keys.length
         return 'width:' + percent + '%; word-break: break-all;'
       }
     }
@@ -455,6 +550,10 @@
 </script>
 
 <style lang="scss">
+  .whole_wrap {
+    margin: 0 2%;
+  }
+
   .section {
     margin: 3% auto;
   }
@@ -466,6 +565,14 @@
   .list_body {
     margin-top: 10px;
     border: 0;
+  }
+
+  .db_list_wrap {
+    overflow-x: auto;
+  }
+
+  .db_list_header, .db_list_body {
+    min-width: 1024px;
   }
 
   .section_box {
