@@ -166,8 +166,11 @@
             <div
               class="list-group-item text-center d-inline-flex justify-content-around p-1 pt-2 pb-2 text-center border-bottom-0"
               style="border-radius: 0; width:100%;">
-              <div v-for="key in db_keys" :style="db_width" class="p-0 d-flex align-items-center justify-content-center">{{ key }}</div>
-              <div v-if="[0, 1].includes(user_obj.access_role) || user_obj.is_staff || user_obj.is_superuser" :style="db_width" class="p-0 d-flex align-items-center justify-content-center">
+              <div v-for="key in db_keys" :style="db_width"
+                   class="p-0 d-flex align-items-center justify-content-center">{{ key }}
+              </div>
+              <div v-if="[0, 1].includes(user_obj.access_role) || user_obj.is_staff || user_obj.is_superuser"
+                   :style="db_width" class="p-0 d-flex align-items-center justify-content-center">
                 삭제
               </div>
             </div>
@@ -203,6 +206,23 @@
 
     </div>
     <!-- /Container -->
+
+    <paginate class="pagination"
+              v-model="page_current"
+              :page-count="page_max"
+              :page-range="10"
+              :margin-pages="1"
+              :click-handler="pagination"
+              :prev-text="'<'"
+              :next-text="'>'"
+              :container-class="'page-item'"
+              :page-class="'page-link'"
+              :prev-class="'page-link prev'"
+              :next-class="'page-link next'"
+              :active-class="'active'"
+              :disabled-class="'disabled'">
+    </paginate>
+
   </div>
 </template>
 
@@ -214,6 +234,9 @@
     name: "db_detail",
     data: () => ({
       window_width: window.innerWidth,
+      page_current: 1,
+      page_max: 0,
+      page_chunk: 10,
       landing_id: '0',
       landing_obj: {
         landing_info: {
@@ -253,7 +276,20 @@
             console.log('Get user info error', error)
           })
       },
-      get_db_list() {
+      pagination(pageNum) {
+        // when page is first, max ~ max-(chunk*current)+1
+        // when page is max, max-(chunk*(current-1)) ~ 1
+        // when page is middle, max-(chunk*(current-1)) ~ max-(chunk*current)+1
+        let offset = (pageNum - 1) * this.page_chunk
+        this.get_db_list(offset)
+      },
+      get_db_list(offset) {
+
+        let pagination = ''
+
+        if (offset) {
+          pagination = '?offset=' + offset
+        }
 
         this.$store.state.pageOptions.loading = true
         this.landing_id = this.$route.params.landing_id
@@ -261,7 +297,7 @@
           .then((response) => {
             this.landing_obj = response.data.data
             this.add_landing_info()
-            return axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.landing_id + '/landing_dbs/?limit=999999999&offset=0')
+            return axios.get(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.landing_id + '/landing_dbs/' + pagination)
           })
           .catch((error) => {
             this.$store.state.pageOptions.loading = false
@@ -271,6 +307,12 @@
             console.log('db gathering', response.data.data.results)
             this.landing_obj.landing_info.db = response.data.data.count
             this.db_list = response.data.data.results
+            if (response.data.data.count % this.page_chunk === 0) {
+              console.log(response.data.data.count)
+              this.page_max = Math.floor(response.data.data.count / this.page_chunk)
+            } else {
+              this.page_max = Math.floor(response.data.data.count / this.page_chunk) + 1
+            }
             // Call get resources after data loaded
             this.get_resources_key()
             this.db_analytics()
@@ -292,7 +334,7 @@
           })
 
       },
-      add_landing_info () {
+      add_landing_info() {
         axios.get(this.$store.state.endpoints.baseUrl + 'companies/' + this.landing_obj.company_id + '/')
           .then((response) => {
             this.landing_obj['company_name'] = response.data.data.corp_name
