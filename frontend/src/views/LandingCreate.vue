@@ -76,6 +76,7 @@
           :title.sync="dynamo_obj.landing_info.landing.title"
           :header_script.sync="dynamo_obj.landing_info.landing.header_script"
           :body_script.sync="dynamo_obj.landing_info.landing.body_script"
+          :tracking_info.sync="dynamo_obj.landing_info.landing.tracking_info"
           :push_landing="push_landing"
         />
 
@@ -195,6 +196,11 @@
             title: null,
             header_script: null,
             body_script: null,
+            tracking_info: {
+              facebook: null,
+              kakao: null,
+              google: null
+            },
             base_url: '',
             is_hijack: false,
             hijack_url: null,

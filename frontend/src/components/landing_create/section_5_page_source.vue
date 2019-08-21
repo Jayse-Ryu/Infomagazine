@@ -44,6 +44,30 @@
                       @change="push_landing()"></textarea>
     </div>
 
+
+    <label class="col-sm-12 col-form-label-sm mt-3" for="body_script">
+      <span>추적 스크립트 아이디</span>
+    </label>
+    <div class="col-sm-4">
+      <input type="text" class="form-control" id="facebook" maxlength="50"
+             v-model="tracking_info.facebook"
+             placeholder="페이스북"
+             @change="push_landing()">
+    </div>
+    <div class="col-sm-4">
+      <input type="text" class="form-control" id="kakao" maxlength="50"
+             v-model="tracking_info.kakao"
+             placeholder="카카오"
+             @change="push_landing()">
+    </div>
+    <div class="col-sm-4">
+      <input type="text" class="form-control" id="google" maxlength="50"
+             v-model="tracking_info.google"
+             placeholder="구글"
+             @change="push_landing()">
+    </div>
+
+
   </div>
 </template>
 
@@ -55,6 +79,7 @@
       'title',
       'header_script',
       'body_script',
+      'tracking_info',
       'push_landing'
     ],
     data: () => ({

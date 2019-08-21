@@ -79,6 +79,7 @@
           :title.sync="dynamo_obj.landing_info.landing.title"
           :header_script.sync="dynamo_obj.landing_info.landing.header_script"
           :body_script.sync="dynamo_obj.landing_info.landing.body_script"
+          :tracking_info.sync="dynamo_obj.landing_info.landing.tracking_info"
           :push_landing="push_landing"
         />
 
@@ -194,6 +195,11 @@
             title: null,
             header_script: null,
             body_script: null,
+            tracking_info: {
+              facebook: null,
+              kakao: null,
+              google: null
+            },
             base_url: '',
             is_hijack: false,
             hijack_url: null,
@@ -261,6 +267,9 @@
               this.back_up = response.data.data
               this.temp_obj = response.data.data
               this.epoch_time = response.data.data.landing_info.landing.base_url
+              if(!response.data.data.landing_info.landing.tracking_info) {
+                this.temp_obj.landing_info.landing['tracking_info'] = {facebook:null, kakao:null, google:null}
+              }
               this.validation_back('first')
               this.get_url_list()
             })
@@ -273,6 +282,9 @@
             .then((response) => {
               this.temp_obj = response.data.data
               this.epoch_time = response.data.data.landing_info.landing.base_url
+              if(!response.data.data.landing_info.landing.tracking_info) {
+                this.temp_obj.landing_info.landing['tracking_info'] = {facebook:null, kakao:null, google:null}
+              }
               this.validation_back()
               this.get_url_list()
             })
