@@ -71,8 +71,14 @@
                 <div v-if="form.sign === item.form_group_id"
                      :style="'background: rgba('+hex_to_decimal(form.bg_color)+','+form.opacity*0.1+');' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
 
+                  <!--@mousedown="test($event, area.position)"-->
                   <!-- V-for follow section field list -->
-                  <div class="form_layout_cont" v-for="area in item.fields" @click="field_console(area.sign)"
+                  <div class="form_layout_cont" v-for="area in item.fields" :name="'form_field'"
+                       :id="'form_field_'+area.sign" @click="field_console(area.sign)"
+                       @mousedown="field_activate($event, area.position, 'move')"
+                       @mousemove="field_move($event, area.position)"
+                       @mouseup="field_deactive($event, area.position)"
+                       @mouseleave="field_deactive($event, area.position)"
                        :style="{
                         'left': area.position.x + 'px',
                         'top': area.position.y + 'px',
@@ -82,7 +88,8 @@
                         }">
 
                     <!-- Actual field objects follow section objects sign -->
-                    <div class="order_stretch" v-for="field in field" v-if="field.sign == area.sign">
+                    <div class="order_stretch" name="field_pointer" v-for="field in field"
+                         v-if="field.sign == area.sign">
 
                       <!-- input form area -->
                       <div class="order_stretch" v-if="field.type != 8">
@@ -255,9 +262,13 @@
                         </div>
                       </div>
                       <!-- /button area -->
+
                     </div>
                     <!-- /big form -->
-
+                    <div class="field_resize"
+                         @mousedown="field_activate($event, area.position, 'resize')"
+                         @mousemove="field_move($event, area.position)"
+                         @mouseup="field_deactive($event, area.position)"></div>
                   </div>
 
                 </div>
@@ -525,7 +536,19 @@
       order_selected: 0,
       field_selected: 0,
       preview_flag: false,
-      html_element: '<p>Not yet!</p>'
+      html_element: '<p>Not yet!</p>',
+      field_move_flag: false,
+      field_resize_flag: false,
+      drag_offset: {
+        option: 'none',
+        x: 0,
+        y: 0,
+        client_x: 0,
+        client_y: 0
+      },
+      original_position: {
+        x: 0, y: 0, w: 0, h: 0, z: 0
+      }
     }),
     mounted() {
       this.order_obj = this.order
@@ -719,6 +742,56 @@
         // this.field_selected = 0
         this.$emit('update:order', this.order_obj)
         // this.push_landing()
+      },
+      field_activate(event, position, option) {
+        event.stopPropagation()
+        this.drag_offset.option = option
+
+        const original = JSON.stringify(position)
+
+        if (this.original_position.w == 0) {
+          this.original_position = JSON.parse(original)
+        }
+
+        this.object_init()
+        this.drag_offset.x = event.offsetX
+        this.drag_offset.y = event.offsetY
+        this.drag_offset.client_x = event.clientX
+        this.drag_offset.client_y = event.clientY
+
+        if (option == 'resize') {
+          this.field_resize_flag = true
+          this.field_move_flag = false
+        } else if (option == 'move') {
+          this.field_resize_flag = false
+          this.field_move_flag = true
+        }
+      },
+      field_move(event, position) {
+        event.stopPropagation()
+        this.object_init()
+
+        if (this.field_move_flag == true) {
+          position.x = Math.round((position.x + event.layerX - this.drag_offset.x) / 10) * 10
+          position.y = Math.round((position.y + event.layerY - this.drag_offset.y) / 10) * 10
+        } else if (this.field_resize_flag) {
+          let result_w = this.original_position.w + (Math.round((event.clientX - this.drag_offset.client_x) / 10) * 10)
+          let result_h = this.original_position.h + (Math.round((event.clientY - this.drag_offset.client_y) / 10) * 10)
+          position.w = result_w
+          position.h = result_h
+        }
+      },
+      field_deactive(e, p) {
+        this.object_init()
+        this.field_move_flag = false
+        this.field_resize_flag = false
+        this.drag_offset.x = null
+        this.drag_offset.y = null
+        this.drag_offset.client_x = null
+        this.drag_offset.client_y = null
+        this.original_position = {x: 0, y: 0, w: 0, h: 0, z: 0}
+        this.drag_offset.option = 'none'
+        this.$emit('update:order', this.order_obj)
       },
       order_image_change(sign, file) {
         this.object_init()
@@ -949,6 +1022,7 @@
     overflow: visible;
     font-size: 1rem;
     border: 1px solid rgba(100, 100, 100, 0.1);
+    cursor: move;
   }
 
   .etc_layout_cont {
@@ -1035,4 +1109,18 @@
     border-right: 1px solid #515151;
   }
 
+  [name='field_pointer'] {
+    pointer-events: none;
+  }
+
+  .field_resize {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.4);
+    cursor: nwse-resize;
+    z-index: 20;
+  }
 </style>
