@@ -129,6 +129,7 @@
           <div class="col-12">
             <button type="submit" class="btn btn-primary col-12">저장</button>
             <button type="button" class="btn btn-info col-12 mt-2" @click="generate">파일 생성하기</button>
+            <button type="button" class="btn btn-secondary col-12 mt-2" @click="just_back">목록으로</button>
             <button type="button" class="btn btn-danger col-12 mt-2" @click="delete_landing">삭제</button>
             <button type="button" class="btn btn-dark col-12 mt-2" @click="back_to_list">되돌리기</button>
           </div>
@@ -742,6 +743,12 @@
               console.log(error.message)
               alert('삭제 중 에러가 발생하였습니다. 다시 시도해주세요.')
             })
+        }
+      },
+      just_back() {
+        if(confirm('목록으로 돌아가시겠습니까?')) {
+          this.$router.currentRoute.meta.protect_leave = 'no'
+          this.$router.push({name: 'landing_list'})
         }
       },
       back_to_list() {

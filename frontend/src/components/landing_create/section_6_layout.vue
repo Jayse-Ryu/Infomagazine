@@ -491,7 +491,11 @@
 
     </div>
 
-    <div class="col-12 mt-3" v-if="page_id">
+    <div class="col-12 col-form-label mt-3" v-if="order.length > 0">
+      <button type="button" class="btn btn-primary p-1 w-100" @click="section_add">섹션추가</button>
+    </div>
+
+    <div class="col-12 mt-1" v-if="page_id">
       <button type="button" class="btn btn-info w-100" @click="preview">미리보기</button>
     </div>
 
