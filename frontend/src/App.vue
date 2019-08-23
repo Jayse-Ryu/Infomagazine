@@ -571,6 +571,11 @@
 
   .search_group {
     text-align: right;
+    &:after {
+      display: block;
+      content: '';
+      clear: both;
+    }
   }
 
   .search_option {
@@ -587,6 +592,7 @@
     background-color: #ffffff;
     vertical-align: top;
     padding: 0 0 0 10px;
+    float: left;
   }
 
   .search_text {
@@ -597,9 +603,11 @@
     font-size: 0.8em;
     line-height: 0.8em;
     vertical-align: top;
+    border-radius: 0 !important;
     border: 1px solid #c1c1c1;
-    padding: 10px;
+    padding: 0 10px;
     margin-left: -6px;
+    float: left;
     &:focus {
       outline: none !important;
     }
@@ -615,7 +623,7 @@
     border: 1px solid #c1c1c1;
     border-radius: 0 5px 5px 0;
     margin-left: -6px;
-
+    float: left;
     img {
       width: 55%;
       height: 60%;
