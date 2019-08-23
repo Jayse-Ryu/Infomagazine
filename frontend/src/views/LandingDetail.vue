@@ -271,7 +271,7 @@
               this.temp_obj = response.data.data
               this.epoch_time = response.data.data.landing_info.landing.base_url
               if(!response.data.data.landing_info.landing.tracking_info) {
-                this.temp_obj.landing_info.landing['tracking_info'] = {facebook:null, kakao:null, google:null}
+                this.temp_obj.landing_info.landing['tracking_info'] = {fb:'', ka:'', ga:'', gtm: '', gdn: ''}
               }
               this.validation_back('first')
               this.get_url_list()
@@ -286,7 +286,7 @@
               this.temp_obj = response.data.data
               this.epoch_time = response.data.data.landing_info.landing.base_url
               if(!response.data.data.landing_info.landing.tracking_info) {
-                this.temp_obj.landing_info.landing['tracking_info'] = {facebook:null, kakao:null, google:null}
+                this.temp_obj.landing_info.landing['tracking_info'] = {fb:'', ka:'', ga:'', gtm: '', gdn: ''}
               }
               this.validation_back()
               this.get_url_list()
