@@ -197,9 +197,9 @@
             header_script: null,
             body_script: null,
             tracking_info: {
-              facebook: null,
-              kakao: null,
-              google: null
+              facebook: '',
+              kakao: '',
+              google: ''
             },
             base_url: '',
             is_hijack: false,
