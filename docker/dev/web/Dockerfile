@@ -1,4 +1,5 @@
 FROM python:3.7
+MAINTAINER skkim <ikks06luck@gmail.com>
 
 COPY ./Pipfile /home
 COPY ./Pipfile.lock /home

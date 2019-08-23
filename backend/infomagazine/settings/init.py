@@ -1,10 +1,8 @@
-import os
-
 from .base import *
 
-# you need to set "myproject = 'prod'" as an environment variable
-# in your OS (on which your website is hosted)
-if os.getenv('SERVER_TYPE') == 'prod':
+if os.getenv('SERVER_TYPE') == "prod":
     from .prod import *
-else:
+elif os.getenv('SERVER_TYPE') == "dev":
     from .dev import *
+else:
+    from .local import *

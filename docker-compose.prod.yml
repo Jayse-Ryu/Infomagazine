@@ -16,6 +16,8 @@ services:
       dockerfile: docker/prod/web/Dockerfile
     volumes:
       - tmp_data:/tmp
+    env_file:
+      - api.prod.env
 
 volumes:
   tmp_data:

@@ -9,15 +9,12 @@ services:
       - '80:8080'
     depends_on:
       - APIServer
-    env_file:
-      - docker.env
 
   APIServer:
     networks:
       - backend
     tty: true
     env_file:
-      - docker.env
       - api.base.env
 networks:
   backend:

@@ -13,18 +13,17 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 from datetime import timedelta
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from infomagazine.utils import split_env
 
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+ALLOWED_HOSTS = split_env(os.getenv('ALLOWED_HOSTS'))
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
-
-ALLOWED_HOSTS = split_env(os.getenv('ALLOWED_HOSTS'))
 
 # Application definition
 
@@ -55,18 +54,13 @@ INSTALLED_APPS = [
     'v1.organization',
     'v1.company',
     'v1.db',
+    'v1.landingpage',
 
     # AWS Management
     'storages',
-
-    'silk',
 ]
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-
-NOSE_ARGS = [
-    '-I=slik'
-]
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',  # 3.10.x부터 swagger 이용 시 에러가 발생하여 해당 구문 추가
@@ -91,39 +85,6 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=300)
 }
 
-CORS_ORIGIN_WHITELIST = split_env(os.getenv('CORS_ORIGIN_WHITELIST'))
-
-# SECURE_BROWSER_XSS_FILTER = True
-
-# CORS_ALLOW_CREDENTIALS = True
-#
-# SESSION_COOKIE_SAMESITE = 'Strict'
-# CSRF_COOKIE_SAMESITE = 'Strict'
-
-# SESSION_COOKIE_SAMESITE = None
-
-# CSRF_COOKIE_NAME = 'XSRF-TOKEN'
-#
-# CSRF_HEADER_NAME = 'HTTP_X_XSRF_TOKEN'
-#
-# CORS_ALLOW_HEADERS = (
-#     'accept',
-#     'accept-encoding',
-#     'authorization',
-#     'content-type',
-#     'dnt',
-#     'origin',
-#     'user-agent',
-#     'x-xsrf-token',
-#     'x-requested-with',
-# )
-
-# TODO prod상에서 꼭 명시 - 서브도메인 지원을 위해
-# CSRF_COOKIE_DOMAIN = os.getenv('CSRF_COOKIE_DOMAIN')
-
-# CORS_ORIGIN_WHITELIST = tuple(os.getenv('CORS_ORIGIN_WHITELIST', cast=Csv()))
-# CSRF_TRUSTED_ORIGINS = tuple(os.getenv('CSRF_TRUSTED_ORIGINS', cast=Csv()))
-
 LOGIN_URL = '/admin/login/'
 LOGOUT_URL = '/admin/logout/'
 
@@ -139,7 +100,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'silk.middleware.SilkyMiddleware',
 ]
 
 ROOT_URLCONF = 'infomagazine.urls'
@@ -222,9 +182,3 @@ USE_TZ = True
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-AWS_DEFAULT_ACL = None
-AWS_LOCATION = 'static'
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-AWS_S3_CUSTOM_DOMAIN = 'assets.infomagazine.xyz'
-STATIC_URL = 'http://%s/%s/' % ('assets.infomagazine.xyz', 'static')
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)

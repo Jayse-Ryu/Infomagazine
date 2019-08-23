@@ -1,7 +1,40 @@
-# SECURITY WARNING: don't run with debug turned on in production!
+import requests
+from .base import *
+
 DEBUG = False
 
-# SECURE_BROWSER_XSS_FILTER = True
+# EC2_PRIVATE_IP = None
+# try:
+#     EC2_PRIVATE_IP = requests.get(
+#         'http://169.254.169.254/latest/meta-data/local-ipv4',
+#         timeout=0.01).text
+# except requests.exceptions.RequestException:
+#     pass
+#
+# if EC2_PRIVATE_IP:
+#     ALLOWED_HOSTS.append(EC2_PRIVATE_IP)
+
+CORS_ORIGIN_WHITELIST = split_env(os.getenv('CORS_ORIGIN_WHITELIST'))
+
+SECURE_BROWSER_XSS_FILTER = True
+
+SECURE_SSL_REDIRECT = True
+
+X_FRAME_OPTIONS = "DENY"
+
+SESSION_COOKIE_SECURE = True
+
+CSRF_COOKIE_SECURE = True
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+SECURE_HSTS_SECONDS = 60
+
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+SECURE_HSTS_PRELOAD = True
+
+STATIC_URL = f"""https://{os.getenv('STATIC_URL')}/static/"""
 
 # CORS_ALLOW_CREDENTIALS = True
 #

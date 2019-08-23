@@ -566,8 +566,15 @@ class LandingPage(StyleSheet, Script):
                                      'position'])
         form_group = base_html.new_tag('div', attrs={'class': 'form-group', 'data-form-filed-id': field_id})
 
-        field_id = 'form_' + str(section_id) + '_' + base64.b16encode(field_info['name'].encode('utf-8')).decode(
+        field_id = 'form_' + str(section_id) + '_' + base64.b64encode(field_info['name'].encode('utf-8')).decode(
             'utf-8')
+
+        equal_check = "=" in field_id
+        while equal_check:
+            field_id = field_id.replace('=', '')
+            if "=" not in field_id:
+                break
+
         field_type = int(field_info['type'])
 
         if field_type == 1:

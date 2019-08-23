@@ -5,8 +5,6 @@ verify_ssl = true
 
 [dev-packages]
 django-silk = "*"
-django-nose = "*"
-coverage = "*"
 
 [packages]
 django = "*"
@@ -24,6 +22,8 @@ mysqlclient = "*"
 djangorestframework = "*"
 django-mysql = "*"
 drf-nested-routers = "*"
+django-nose = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.7"

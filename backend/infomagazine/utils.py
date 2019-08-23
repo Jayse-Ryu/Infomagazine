@@ -1,2 +1,2 @@
-def split_env(env: str) -> tuple:
-    return tuple(env.split(','))
+def split_env(env: str) -> list:
+    return env.split(',')
