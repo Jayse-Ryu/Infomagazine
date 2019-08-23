@@ -760,7 +760,6 @@
           this.original_position = JSON.parse(original)
         }
 
-        console.log('field act json ', section)
         this.section_selected = section.section
         this.order_selected = section.object
         this.field_selected = section.field
