@@ -48,22 +48,36 @@
     <label class="col-sm-12 col-form-label-sm mt-3" for="body_script">
       <span>추적 스크립트 아이디</span>
     </label>
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <input type="text" class="form-control" id="facebook" maxlength="50"
-             v-model="tracking_info.facebook"
+             v-model="tracking_info.fb"
              placeholder="페이스북"
              @change="push_landing()">
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <input type="text" class="form-control" id="kakao" maxlength="50"
-             v-model="tracking_info.kakao"
+             v-model="tracking_info.ka"
              placeholder="카카오"
              @change="push_landing()">
     </div>
-    <div class="col-sm-4">
-      <input type="text" class="form-control" id="google" maxlength="50"
-             v-model="tracking_info.google"
-             placeholder="구글"
+    <div class="col-sm-2">
+      <input type="text" class="form-control" id="google_a" maxlength="50"
+             v-model="tracking_info.ga"
+             placeholder="구글 애널리틱스"
+             @change="push_landing()">
+    </div>
+
+    <div class="col-sm-2">
+      <input type="text" class="form-control" id="google_tm" maxlength="50"
+             v-model="tracking_info.gtm"
+             placeholder="구글 태그매니저"
+             @change="push_landing()">
+    </div>
+
+    <div class="col-sm-2">
+      <input type="text" class="form-control" id="google_dn" maxlength="50"
+             v-model="tracking_info.gdn"
+             placeholder="구글 디스플레이 네트워크"
              @change="push_landing()">
     </div>
 

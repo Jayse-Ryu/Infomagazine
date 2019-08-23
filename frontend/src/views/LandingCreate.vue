@@ -197,9 +197,11 @@
             header_script: null,
             body_script: null,
             tracking_info: {
-              facebook: '',
-              kakao: '',
-              google: ''
+              fb: '',
+              ka: '',
+              ga: '',
+              gtm: '',
+              gdn: ''
             },
             base_url: '',
             is_hijack: false,
