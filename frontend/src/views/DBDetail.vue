@@ -24,7 +24,7 @@
                 <div class="col-1 p-0 board_centre">DB</div>
               </div>
             </div>
-            <ul class="list_body text-center list-group list-group-flush col-12 pr-0 text-center">
+            <ul class="gap_list_body text-center list-group list-group-flush col-12 pr-0 text-center">
               <li
                 class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1 font-weight-bold border-0">
                 <div class="col-3 p-0 col-sm-3">{{ landing_obj.company_name }}</div>
@@ -52,7 +52,7 @@
                 <div class="col-3 p-0">DB</div>
               </div>
             </div>
-            <ul class="list_body text-center list-group list-group-flush col-12 pr-0">
+            <ul class="gap_list_body text-center list-group list-group-flush col-12 pr-0">
               <li class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1 border-0">
                 <div class="col-3 p-0">{{ landing_obj.company_id }}</div>
                 <div class="col-6 p-0">{{ landing_obj.landing_info.landing.name }}</div>
@@ -621,7 +621,7 @@
   }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
   .whole_wrap {
     margin: 0 2%;
   }
@@ -634,7 +634,7 @@
     box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.14);
   }
 
-  .list_body {
+  .gap_list_body {
     margin-top: 10px;
     border: 0;
   }

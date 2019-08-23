@@ -622,7 +622,7 @@
     text-align: center;
     border: 1px solid #c1c1c1;
     border-radius: 0 5px 5px 0;
-    margin-left: -6px;
+    margin-left: -1px;
     float: left;
     img {
       width: 55%;
