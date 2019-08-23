@@ -5,12 +5,9 @@ verify_ssl = true
 
 [dev-packages]
 django-silk = "*"
-django-nose = "*"
-coverage = "*"
 
 [packages]
 django = "*"
-python-decouple = "*"
 django-cors-headers = "*"
 django-storages = "*"
 boto3 = "*"
@@ -25,6 +22,8 @@ mysqlclient = "*"
 djangorestframework = "*"
 django-mysql = "*"
 drf-nested-routers = "*"
+django-nose = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.7"

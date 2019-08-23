@@ -2,18 +2,13 @@ import json
 import pymongo
 from bson import ObjectId
 from bson.json_util import dumps
-from django.core.validators import MinLengthValidator
-from django.db import models
-from django_mysql.models import JSONField
-
-from infomagazine.settings import MONGO_CLOUD_ACCOUNT, MONGO_CLOUD_PASSWD
-
+from django.conf import settings
 
 class LandingPage:
     def __init__(self, choice_db):
         client = pymongo.MongoClient(
             "mongodb+srv://%s:%s@production-vpq2e.mongodb.net/test?retryWrites=true&w=majority" % (
-                MONGO_CLOUD_ACCOUNT, MONGO_CLOUD_PASSWD))
+                getattr(settings, 'MONGO_CLOUD_ACCOUNT'), getattr(settings, 'MONGO_CLOUD_PASSWD')))
 
         self.db = client[choice_db]
 
