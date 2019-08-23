@@ -15,3 +15,4 @@ class LandingPageDB(models.Model):
 
     class Meta:
         db_table = 'landing_page_db'
+        ordering = ('-registered_date',)

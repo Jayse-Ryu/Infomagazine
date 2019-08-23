@@ -7,6 +7,10 @@ import json
 from bs4 import BeautifulSoup
 
 
+def _convert_to_html(tag_string):
+    return BeautifulSoup(tag_string, 'html.parser')
+
+
 class Default:
     def __init__(self, landing_config):
         self.default_html = f"""
@@ -275,6 +279,21 @@ class Script(Default):
     def __init__(self, landing_config):
         self.landing_config = landing_config
         super(Script, self).__init__(landing_config)
+        self.facebook_pixel_check = False
+        if landing_config['tracking_info']['fb']:
+            self.facebook_pixel_check = True
+        self.kakao_pixel_check = False
+        if landing_config['tracking_info']['ka']:
+            self.kakao_pixel_check = True
+        self.google_analytics = False
+        if landing_config['tracking_info']['ga']:
+            self.google_analytics = True
+        self.google_tag_manager = False
+        if landing_config['tracking_info']['gtm']:
+            self.google_tag_manager = True
+        self.google_display_network = False
+        if landing_config['tracking_info']['gdn']:
+            self.google_display_network = True
 
     def _js_init_datepicker(self, field_id=None):
         result = f"""
@@ -405,6 +424,14 @@ class Script(Default):
         self.landing_scripts += result
 
     def _js_call_ajax(self, section_id=None):
+        facebook_pixel_callback = ""
+        if self.facebook_pixel_check:
+            facebook_pixel_callback = "fbq('track', 'CompleteRegistration');"
+
+        kakao_pixel_callback = ""
+        if self.kakao_pixel_check:
+            kakao_pixel_callback = f"kakaoPixel('{self.landing_config['tracking_info']['ka']}').completeRegistration();"
+
         result = f"""
         function call_form_{section_id}_ajax($this,item_group) {{
             var body = {{
@@ -425,9 +452,8 @@ class Script(Default):
                 data: JSON.stringify(body),
                 success: function (data) {{
                     if (data['state']) {{
-                        if (typeof fbq != 'undefined') {{
-                            fbq('track', 'CompleteRegistration');
-                        }}
+                        {facebook_pixel_callback}
+                        {kakao_pixel_callback}
                         alert(data['message']);
                     }} else {{
                         alert(data['message']);
@@ -526,6 +552,66 @@ class Script(Default):
         """
 
         return result
+
+    def _facebook_pixel_head(self):
+        """
+        2019/08/23
+        """
+        return f"""
+        <!-- Facebook Pixel Code -->
+        <script>
+          !function(f,b,e,v,n,t,s)
+          {{if(f.fbq)return;n=f.fbq=function(){{n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)}};
+          if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+          n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t,s)}}(window, document,'script',
+          'https://connect.facebook.net/en_US/fbevents.js');
+          fbq('init', '{self.landing_config['tracking_info']['fb']}');
+          fbq('track', 'PageView');
+        </script>
+        <!-- End Facebook Pixel Code -->
+        """
+
+    def _facebook_pixel_body(self):
+        """
+        2019/08/23
+        """
+        return f"""
+        <!-- Facebook Pixel Code -->
+        <noscript><img height="1" width="1" style="display:none"
+          src="https://www.facebook.com/tr?id={self.landing_config['tracking_info']['fb']}&ev=PageView&noscript=1"
+        /></noscript>
+        <!-- End Facebook Pixel Code -->
+        """
+
+    def _kakao_pixel(self):
+        """
+        2019/08/23
+        """
+        return f"""
+        <script type="text/javascript" charset="UTF-8" src="//t1.daumcdn.net/adfit/static/kp.js"></script>
+        <script type="text/javascript">
+              kakaoPixel('{self.landing_config['tracking_info']['ka']}').pageView();
+        </script>
+        """
+
+    def _google_display_network(self):
+        """
+        2019/08/23
+        """
+        return f"""
+        <!-- Global site tag (gtag.js) - Google Ads: {self.landing_config['tracking_info']['gdn']} -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id={self.landing_config['tracking_info']['gdn']}"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){{dataLayer.push(arguments);}}
+          gtag('js', new Date());
+
+          gtag('config', '{self.landing_config['tracking_info']['gdn']}');
+        </script>
+        """
 
 
 class LandingPage(StyleSheet, Script):
@@ -704,8 +790,74 @@ class LandingPage(StyleSheet, Script):
                 'validation': list(field_info['validation'].keys())
             }
 
-    def _bs_converter(self, tag_string):
-        return BeautifulSoup(tag_string, 'html.parser')
+    def _body_generator(self, base_html):
+        main_container = base_html.new_tag('main', attrs={'class': 'section-container'})
+        base_html.body.append(main_container)
+
+        for section_index, section in enumerate(self.section_info_list):  # 섹션 생성
+            section_h = section[0]['section_h']
+            self._css_section_height(section_id=section_index,
+                                     section_h=section_h)
+            landing_section = base_html.new_tag('section',
+                                                attrs={'class': 'landing-section',
+                                                       'data-section-id': section_index})
+            main_container.append(landing_section)
+
+            for object_index, section_object_info in enumerate(section):  # 객체 생성
+                self._css_object_block_size(section_id=section_index,
+                                            object_id=object_index,
+                                            layout_info=section_object_info)
+                section_object_block = base_html.new_tag('div', attrs={'class': 'landing-object-block',
+                                                                       'data-object-id': object_index})
+                landing_section.append(section_object_block)
+                object_type = section_object_info['type']
+                self._css_object_by_type_size(object_type=object_type,
+                                              section_id=section_index,
+                                              object_id=object_index,
+                                              layout_info=section_object_info)
+                if object_type == 1:
+                    section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image'})
+                    section_object_block.append(section_object_by_type)
+
+                elif object_type == 2:
+                    form_group_id = section_object_info['form_group_id']
+                    self._css_field_label_size(section_id=section_index,
+                                               object_id=object_index,
+                                               field_info_list=self.field_info_list,
+                                               form_group_id=form_group_id)
+                    section_object_by_type = base_html.new_tag('form', attrs={'class': 'object-type-form'})
+                    section_object_block.append(section_object_by_type)
+                    generated_field_list = [self._db_form_field_generator(base_html,
+                                                                          section_id=section_index,
+                                                                          object_id=object_index,
+                                                                          object_w=section_object_info['position'][
+                                                                              'w'],
+                                                                          object_h=section_object_info['position'][
+                                                                              'h'],
+                                                                          field_id=field_index,
+                                                                          field_info=field,
+                                                                          field_position_set=next(
+                                                                              item for item in
+                                                                              section_object_info['fields']
+                                                                              if item["sign"] == field['sign']))
+                                            for field_index, field
+                                            in enumerate(self.field_info_list)
+                                            if int(field['form_group_id']) == int(form_group_id)]
+
+                    item_group = []
+                    for generated_field, item in generated_field_list:
+                        section_object_by_type.append(generated_field)
+                        if item is not None:
+                            item_group.append(item)
+
+                    self._js_submit_event(section_id=section_index,
+                                          item_group=item_group)
+                    self._js_validation(section_id=section_index)
+                    self._js_call_ajax(section_id=section_index)
+
+                elif object_type == 3:
+                    section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image'})
+                    section_object_block.append(section_object_by_type)
 
     def generate(self):
         """
@@ -714,88 +866,38 @@ class LandingPage(StyleSheet, Script):
         object_type == 3 : 비디오 객체
 ¬
         """
-        base_html = self._bs_converter(self.default_html)
+        base_html = _convert_to_html(self.default_html)
 
         main_container = base_html.new_tag('main', attrs={'class': 'section-container'})
         base_html.body.append(main_container)
 
         try:
-            for section_index, section in enumerate(self.section_info_list):  # 섹션 생성
-                section_h = section[0]['section_h']
-                self._css_section_height(section_id=section_index,
-                                         section_h=section_h)
-                landing_section = base_html.new_tag('section',
-                                                    attrs={'class': 'landing-section',
-                                                           'data-section-id': section_index})
-                main_container.append(landing_section)
+            self._body_generator(base_html)
 
-                for object_index, section_object_info in enumerate(section):  # 객체 생성
-                    self._css_object_block_size(section_id=section_index,
-                                                object_id=object_index,
-                                                layout_info=section_object_info)
-                    section_object_block = base_html.new_tag('div', attrs={'class': 'landing-object-block',
-                                                                           'data-object-id': object_index})
-                    landing_section.append(section_object_block)
-                    object_type = section_object_info['type']
-                    self._css_object_by_type_size(object_type=object_type,
-                                                  section_id=section_index,
-                                                  object_id=object_index,
-                                                  layout_info=section_object_info)
-                    if object_type == 1:
-                        section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image'})
-                        section_object_block.append(section_object_by_type)
-
-                    elif object_type == 2:
-                        form_group_id = section_object_info['form_group_id']
-                        self._css_field_label_size(section_id=section_index,
-                                                   object_id=object_index,
-                                                   field_info_list=self.field_info_list,
-                                                   form_group_id=form_group_id)
-                        section_object_by_type = base_html.new_tag('form', attrs={'class': 'object-type-form'})
-                        section_object_block.append(section_object_by_type)
-                        generated_field_list = [self._db_form_field_generator(base_html,
-                                                                              section_id=section_index,
-                                                                              object_id=object_index,
-                                                                              object_w=section_object_info['position'][
-                                                                                  'w'],
-                                                                              object_h=section_object_info['position'][
-                                                                                  'h'],
-                                                                              field_id=field_index,
-                                                                              field_info=field,
-                                                                              field_position_set=next(
-                                                                                  item for item in
-                                                                                  section_object_info['fields']
-                                                                                  if item["sign"] == field['sign']))
-                                                for field_index, field
-                                                in enumerate(self.field_info_list)
-                                                if int(field['form_group_id']) == int(form_group_id)]
-
-                        item_group = []
-                        for generated_field, item in generated_field_list:
-                            section_object_by_type.append(generated_field)
-                            if item is not None:
-                                item_group.append(item)
-
-                        self._js_submit_event(section_id=section_index,
-                                              item_group=item_group)
-                        self._js_validation(section_id=section_index)
-                        self._js_call_ajax(section_id=section_index)
-
-                    elif object_type == 3:
-                        section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image'})
-                        section_object_block.append(section_object_by_type)
-
-            header_script = self._bs_converter(
-                self.landing_config['header_script'] if self.landing_config['header_script'] else "")
-            body_script = self._bs_converter(
-                self.landing_config['body_script'] if self.landing_config['body_script'] else "")
-
-            stylesheets = BeautifulSoup(self._stylesheets_generate(), 'html.parser')
+            stylesheets = _convert_to_html(self._stylesheets_generate())
             base_html.head.append(stylesheets)
+
+            header_script = _convert_to_html(
+                self.landing_config['header_script'] if self.landing_config['header_script'] else "")
             base_html.head.append(header_script)
-            scripts = BeautifulSoup(self._scripts_generate(), 'html.parser')
+
+            if self.facebook_pixel_check:
+                base_html.head.append(_convert_to_html(self._facebook_pixel_head()))
+                base_html.body.append(_convert_to_html(self._facebook_pixel_body()))
+
+            if self.kakao_pixel_check:
+                base_html.head.append(_convert_to_html(self._kakao_pixel()))
+
+            if self.google_display_network:
+                base_html.head.append(_convert_to_html(self._google_display_network()))
+
+            scripts = _convert_to_html(self._scripts_generate())
             base_html.body.append(scripts)
+
+            body_script = _convert_to_html(
+                self.landing_config['body_script'] if self.landing_config['body_script'] else "")
             base_html.body.append(body_script)
+
             return {'state': True, 'data': base_html.prettify(), 'message': 'Succeed.'}
         except Exception as e:
             return {'state': False, 'data': '', 'message': str(e)}
