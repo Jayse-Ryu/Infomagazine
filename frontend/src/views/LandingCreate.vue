@@ -256,6 +256,7 @@
           })
       },
       validation_back() {
+        this.validation_flag = false
 
         let field = this.dynamo_obj.landing_info.field
         // console.log('temp field', field)
@@ -590,6 +591,7 @@
             field.validation = replace
           }
         }
+        this.validation_flag = false
       },
       push_landing(option) {
         // option first(mounted) or checked(button clicked)
@@ -641,7 +643,7 @@
               })
           }
         } else {
-          if (this.validation_flag) {
+          if (this.validation_flag === true) {
             this.field_validation()
 
             if (!this.page_id) {
@@ -656,7 +658,7 @@
                 })
             }
           } else {
-            if (this.validation_flag) {
+            if (this.validation_flag === true) {
               axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
                 'company_id': this.dynamo_obj.company_id,
                 'landing_info': this.dynamo_obj.landing_info
@@ -695,52 +697,53 @@
       },
       generate() {
         if (this.dynamo_obj.landing_info.landing.base_url) {
-          // this.push_landing()
-          this.$store.state.pageOptions.loading = true
-          if (this.page_id) {
-            const config = {
-              headers: {
-                'Content-Type': 'application/json'
+          if (this.validation_flag === true) {
+            this.$store.state.pageOptions.loading = true
+            if (this.page_id) {
+              const config = {
+                headers: {
+                  'Content-Type': 'application/json'
+                }
               }
+
+              this.field_validation()
+              axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
+                'company_id': this.dynamo_obj.company_id,
+                'landing_info': this.dynamo_obj.landing_info
+              }, config)
+                .then(() => {
+                  // this.validation_back()
+                  return axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/')
+                })
+                .catch((error) => {
+                  this.$store.state.pageOptions.loading = false
+                  console.log('Landing update fail', error)
+                })
+                .then(() => {
+                  this.validation_back()
+                  this.get_url_list()
+                  this.$store.state.pageOptions.loading = false
+                })
+                .catch((error) => {
+                  this.validation_back()
+                  console.log(error)
+                  this.$store.state.pageOptions.loading = false
+                })
+            } else {
+              this.$store.state.pageOptions.loading = false
             }
 
-            this.field_validation()
-            axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
-              'company_id': this.dynamo_obj.company_id,
-              'landing_info': this.dynamo_obj.landing_info
-            }, config)
-              .then(() => {
-                // this.validation_back()
-                return axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/')
-              })
-              .catch((error) => {
-                this.$store.state.pageOptions.loading = false
-                console.log('Landing update fail', error)
-              })
-              .then(() => {
-                this.validation_back()
-                this.get_url_list()
-                this.$store.state.pageOptions.loading = false
-              })
-              .catch((error) => {
-                this.validation_back()
-                console.log(error)
-                this.$store.state.pageOptions.loading = false
-              })
-          } else {
-            this.$store.state.pageOptions.loading = false
+            // axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/')
+            //   .then((response) => {
+            //     // console.log('created', response)
+            //     this.validation_back()
+            //     this.get_url_list()
+            //   })
+            //   .catch((error) => {
+            //     this.validation_back()
+            //     console.log(error)
+            //   })
           }
-
-          // axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/')
-          //   .then((response) => {
-          //     // console.log('created', response)
-          //     this.validation_back()
-          //     this.get_url_list()
-          //   })
-          //   .catch((error) => {
-          //     this.validation_back()
-          //     console.log(error)
-          //   })
         } else {
           alert('메인 Url을 먼저 입력하세요!')
           document.getElementById('base_url').focus()

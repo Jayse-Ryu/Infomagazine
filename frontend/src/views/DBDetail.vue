@@ -304,7 +304,7 @@
             console.log('get landing', error)
           })
           .then((response) => {
-            console.log('db gathering', response.data.data.results)
+            // console.log('db gathering', response.data.data.results)
             this.landing_obj.landing_info.db = response.data.data.count
             this.db_list = response.data.data.results
             if (response.data.data.count % this.page_chunk === 0) {
