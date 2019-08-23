@@ -14,7 +14,8 @@ services:
     networks:
       - backend
     tty: true
-
+    env_file:
+      - api.base.env
 networks:
   backend:
     driver: 'bridge'

@@ -17,6 +17,8 @@ services:
     volumes:
       - ./backend:/home/api
       - tmp_data:/tmp
+    env_file:
+      - api.dev.env
 
 volumes:
   tmp_data:

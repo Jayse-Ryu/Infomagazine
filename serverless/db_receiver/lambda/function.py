@@ -112,7 +112,7 @@ def lambda_handler(event, context):
                 "Access-Control-Allow-Max-Age": "86400",
                 "Content-Length": "0"
             })
-            return _response_format(status_code=200, headers=response_headers)
+            return _response_format(status_code=204, headers=response_headers)
         elif event['httpMethod'] == 'POST':
             if not event['body']:
                 return _response_format(status_code=500, headers=response_headers, message='빈 데이터')

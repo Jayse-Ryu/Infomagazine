@@ -10,7 +10,7 @@ gen
 
 docker/dev/sharing
 
-backend/settings.ini
+backend/infomagazine/settings/local.py
 
 frontend/node_modules
 frontend/dist

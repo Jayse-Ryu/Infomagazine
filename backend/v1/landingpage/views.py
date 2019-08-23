@@ -3,7 +3,7 @@ import time
 import boto3
 from functools import wraps
 
-from decouple import config
+from django.conf import settings
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action, renderer_classes
 from rest_framework.renderers import StaticHTMLRenderer
@@ -176,12 +176,12 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
     def landing_urls(self, request, pk):
         s3_client = boto3.client(
             's3',
-            aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
-            aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+            aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY'),
             region_name='ap-northeast-2'
         )
         if request.method == 'GET':
-            s3_response = s3_client.list_objects(Bucket=config('AWS_STORAGE_BUCKET_NAME'),
+            s3_response = s3_client.list_objects(Bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME'),
                                                  Prefix='landings/' + pk + '/')
             if s3_response['ResponseMetadata']['HTTPStatusCode'] == 200:
                 url_list_do_handling = [url['Key'].replace('landings/', 'https://landings.infomagazine.xyz/') for url in
@@ -200,7 +200,7 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
             epoch_time = time.time()
             landing_url = f'''landings/{landing_id}/{landing_base_url}_{str(int(epoch_time))}.html'''
             s3_response_data = s3_client.put_object(Body=response_data['data'],
-                                                    Bucket=config('AWS_STORAGE_BUCKET_NAME'),
+                                                    Bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME'),
                                                     Key=landing_url,
                                                     ContentType='text/html')
             if s3_response_data['ResponseMetadata']['HTTPStatusCode'] == 200:
@@ -213,8 +213,8 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
     @action(detail=True, methods=['PUT', 'DELETE'], url_path='landing_urls/(?P<landing_url>[^/.]+)')
     @response_decorator
     def landing_urls_detail(self, request, pk, landing_url):
-        session = boto3.session.Session(aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
-                                        aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),
+        session = boto3.session.Session(aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID'),
+                                        aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY'),
                                         region_name='ap-northeast-2')
         s3_client = session.client('s3')
         cloudfront_client = session.client('cloudfront')
@@ -224,13 +224,13 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
             landing_id = get_detail.data['data']['_id']['$oid']
             landing_url = f'''landings/{landing_id}/{landing_url}.html'''
             s3_response_data = s3_client.put_object(Body=response_data['data'],
-                                                    Bucket=config('AWS_STORAGE_BUCKET_NAME'),
+                                                    Bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME'),
                                                     Key=landing_url,
                                                     ContentType='text/html')
             if s3_response_data['ResponseMetadata']['HTTPStatusCode'] == 200:
                 epoch_time = time.time()
                 cf_inv_response_data = cloudfront_client.create_invalidation(
-                    DistributionId=config('CF_DISTRIBUTION_ID'),
+                    DistributionId=getattr(settings, 'CF_DISTRIBUTION_ID'),
                     InvalidationBatch={
                         'Paths': {
                             'Quantity': 1,
@@ -251,7 +251,7 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
                 return {'state': False, 'data': '', 'message': 'Failed.',
                         'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
         elif request.method == 'DELETE':
-            s3_response = s3_client.delete_object(Bucket=config('AWS_STORAGE_BUCKET_NAME'),
+            s3_response = s3_client.delete_object(Bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME'),
                                                   Key='landings/' + pk + '/' + landing_url + '.html')
             if s3_response['ResponseMetadata']['HTTPStatusCode'] == 204:
                 return {'state': True, 'data': landing_url, 'message': 'Succeed.',

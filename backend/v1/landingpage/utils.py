@@ -566,8 +566,15 @@ class LandingPage(StyleSheet, Script):
                                      'position'])
         form_group = base_html.new_tag('div', attrs={'class': 'form-group', 'data-form-filed-id': field_id})
 
-        field_id = 'form_' + str(section_id) + '_' + base64.b16encode(field_info['name'].encode('utf-8')).decode(
+        field_id = 'form_' + str(section_id) + '_' + base64.b64encode(field_info['name'].encode('utf-8')).decode(
             'utf-8')
+
+        equal_check = "=" in field_id
+        while equal_check:
+            field_id = field_id.replace('=', '')
+            if "=" not in field_id:
+                break
+
         field_type = int(field_info['type'])
 
         if field_type == 1:
@@ -615,10 +622,10 @@ class LandingPage(StyleSheet, Script):
             label_tag.string = field_info['name']
             label_wrap_tag.append(label_tag)
             form_group.append(label_wrap_tag)
-            for radio_value in field_info['list']:
+            for index, radio_value in enumerate(field_info['list']):
                 radio_attrs = {
                     'type': 'radio',
-                    'id': field_id,
+                    'id': field_id + "_" + str(index),
                     'name': field_id,
                     'value': radio_value,
                     'data-label-name': field_info['name']
@@ -627,7 +634,7 @@ class LandingPage(StyleSheet, Script):
                     radio_attrs['checked'] = ""
                 radio_wrap_tag = base_html.new_tag('div', attrs={'class': 'form-control'})
                 input_tag = base_html.new_tag('input', attrs=radio_attrs)
-                label_tag = base_html.new_tag('label', attrs={'for': field_id,
+                label_tag = base_html.new_tag('label', attrs={'for': field_id + "_" + str(index),
                                                               'class': 'form-group-label'})
                 label_tag.string = radio_value
                 radio_wrap_tag.append(input_tag)
@@ -682,6 +689,13 @@ class LandingPage(StyleSheet, Script):
 
         if field_type in [8, 9]:
             return form_group, None
+        elif field_type in [5]:
+            return form_group, {
+                'name': field_id,
+                'type': field_info['type'],
+                'target': f"""$('input[name={field_id}]:checked')""",
+                'validation': list(field_info['validation'].keys())
+            }
         else:
             return form_group, {
                 'name': field_id,
