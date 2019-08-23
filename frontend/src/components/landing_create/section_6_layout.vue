@@ -72,10 +72,11 @@
                      :style="'background: rgba('+hex_to_decimal(form.bg_color)+','+form.opacity*0.1+');' + 'color:'+form.tx_color+';'+'z-index:10;'+'min-height: 100%;'">
 
                   <!--@mousedown="test($event, area.position)"-->
+                  <!--@mouseleave="field_deactive($event, area.position)"-->
                   <!-- V-for follow section field list -->
                   <div class="form_layout_cont" v-for="area in item.fields" :name="'form_field'"
                        :id="'form_field_'+area.sign" @click="field_console(area.sign)"
-                       @mousedown="field_activate($event, area.position, 'move')"
+                       @mousedown="field_activate($event, area.position, 'move', {field: area.sign,section: index, object: item.sign})"
                        @mousemove="field_move($event, area.position)"
                        @mouseup="field_deactive($event, area.position)"
                        @mouseleave="field_deactive($event, area.position)"
@@ -266,7 +267,7 @@
                     </div>
                     <!-- /big form -->
                     <div class="field_resize"
-                         @mousedown="field_activate($event, area.position, 'resize')"
+                         @mousedown="field_activate($event, area.position, 'resize', {field: area.sign, section: index, object: item.sign})"
                          @mousemove="field_move($event, area.position)"
                          @mouseup="field_deactive($event, area.position)"></div>
                   </div>
@@ -579,11 +580,13 @@
         this.push_landing()
       },
       section_delete(index) {
-        this.object_init()
-        this.order_obj.splice(index, 1)
-        this.$emit('update:order', this.order_obj)
-        this.set_field('form')
-        this.push_landing()
+        if (confirm('해당 섹션을 삭제할까요?')) {
+          this.object_init()
+          this.order_obj.splice(index, 1)
+          this.$emit('update:order', this.order_obj)
+          this.set_field('form')
+          this.push_landing()
+        }
       },
       object_add(index) {
         this.object_init()
@@ -747,7 +750,7 @@
         this.$emit('update:order', this.order_obj)
         // this.push_landing()
       },
-      field_activate(event, position, option) {
+      field_activate(event, position, option, section) {
         event.stopPropagation()
         this.drag_offset.option = option
 
@@ -756,6 +759,12 @@
         if (this.original_position.w == 0) {
           this.original_position = JSON.parse(original)
         }
+
+        console.log('field act json ', section)
+        this.section_selected = section.section
+        this.order_selected = section.object
+        this.field_selected = section.field
+        this.order_focus_flag = true
 
         this.object_init()
         this.drag_offset.x = event.offsetX

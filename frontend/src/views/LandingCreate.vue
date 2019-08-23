@@ -625,7 +625,7 @@
           } else {
             axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
               'company_id': this.dynamo_obj.company_id,
-              'landing_pages': this.dynamo_obj.landing_info
+              'landing_info': this.dynamo_obj.landing_info
             }, config)
               .then(() => {
                 alert('랜딩이 생성되었습니다.')
@@ -675,8 +675,8 @@
       back_to_list() {
         if (confirm('정말 취소하시겠습니까?')) {
           // let axios = this.$axios
-          let landing_num = this.epoch_time
-          axios.delete(this.$store.state.endpoints.baseUrl + 'landings/api/' + landing_num)
+          // let landing_num = this.epoch_time
+          axios.delete(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/')
             .then(() => {
               alert('목록으로 돌아갑니다.')
               this.$router.currentRoute.meta.protect_leave = 'no'
