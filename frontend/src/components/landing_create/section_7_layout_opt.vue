@@ -1,7 +1,7 @@
 <template>
   <div class="form-group row mb-0">
 
-    <label class="col-sm-3 col-form-label-sm mt-3" for="layout_font">
+    <!--<label class="col-sm-3 col-form-label-sm mt-3" for="layout_font">
       <span>레이아웃 폰트</span>
     </label>
     <div class="col-sm-9 mt-sm-3 row ml-0">
@@ -13,7 +13,7 @@
         <option value="3">나눔명조 (Nanum Myeongjo)</option>
         <option value="4">제주고딕 (Jeju Gothic)</option>
       </select>
-    </div>
+    </div>-->
 
     <!--<label class="col-sm-3 col-form-label-sm mt-3" for="in_db">
       <span>레이아웃 내 DB</span>

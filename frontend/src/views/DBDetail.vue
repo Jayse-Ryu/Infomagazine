@@ -444,7 +444,9 @@
                       date_obj = new Date(this.db_list[index]['registered_date'] * (1000 / double))
                     }
                     // Make date string
-                    let date_str = date_obj.getFullYear() + '-' + month_array[date_obj.getMonth()] + '-' + date_obj.getDate()
+                    let date_str = date_obj.getFullYear() + '-' + month_array[date_obj.getMonth()]
+                      + '-' + date_obj.getDate() + ' ' + date_obj.getHours() + ':'
+                      + date_obj.getMinutes() + ':' + date_obj.getSeconds()
 
                     val_obj[index][this.db_keys[i]] = date_str
                     //Date val done

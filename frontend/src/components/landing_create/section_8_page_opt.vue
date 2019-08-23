@@ -1,13 +1,13 @@
 <template>
   <div class="form-group row">
 
-    <label class="col-sm-3 col-form-label-sm mt-3" for="status">활성상태</label>
+    <!--<label class="col-sm-3 col-form-label-sm mt-3" for="status">활성상태</label>
     <div class="col-sm-9 mt-sm-3">
       <label class="switch" for="status">
         <input type="checkbox" id="status" v-model="landing.is_active">
         <span class="slider round"></span>
       </label>
-    </div>
+    </div>-->
 
     <label class="col-sm-3 col-form-label-sm mt-3" for="mobile">모바일 전용</label>
     <div class="col-sm-9 mt-sm-3">
