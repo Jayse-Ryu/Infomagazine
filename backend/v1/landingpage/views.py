@@ -1,7 +1,5 @@
-import collections
 import time
 import boto3
-from functools import wraps
 
 from django.conf import settings
 from rest_framework import viewsets, status, permissions
@@ -11,95 +9,36 @@ from rest_framework.response import Response
 from rest_framework.utils import json
 
 import v1.permissions as custom_permissions
+from infomagazine.utils import response_decorator
+
 from v1.company.models import Company
 from v1.landingpage.models import LandingPage as LandingModel
 from v1.landingpage.utils import LandingPage as LandingGenerator
-
-# def response_decorator():
-#     def wrapper(func):
-#         @wraps(func)
-#         def decorator(*args, **kwargs):
-#             data = func(*args, **kwargs)
-#             response_formatter = ReturnValuesFormatter()
-#
-#             response_formatter.values_to_return = {
-#                 'state': data['state'],
-#                 'data': data['data'],
-#                 'message': data['message'],
-#                 'options': data['options']
-#             }
-#             return Response(**response_formatter.generate())
-#
-#         return decorator
-#
-#     return wrapper
 from v1.user.models import AccessRole
-
-
-def response_decorator(func):
-    @wraps(func)
-    def decorator(*args, **kwargs):
-        data = func(*args, **kwargs)
-        response_formatter = ReturnValuesFormatter()
-
-        response_formatter.values_to_return = {
-            'state': data['state'],
-            'data': data['data'],
-            'message': data['message'],
-            'options': data['options']
-        }
-        return Response(**response_formatter.generate())
-
-    return decorator
-
-
-class ReturnValuesFormatter:
-    def __init__(self):
-        self._values_to_return = None
-
-    @property
-    def values_to_return(self):
-        return self._values_to_return
-
-    @values_to_return.setter
-    def values_to_return(self, set_values):
-        values_to_return_named_tuple = collections.namedtuple('values_to_return',
-                                                              ['state',
-                                                               'data',
-                                                               'message',
-                                                               'options'])
-        self._values_to_return = values_to_return_named_tuple(**set_values)
-
-    def generate(self):
-        formatted_values = {
-            'data':
-                {
-                    'state': self._values_to_return.state,
-                    'data': self._values_to_return.data,
-                    'message': self._values_to_return.message
-                }
-        }
-        formatted_values.update(self._values_to_return.options)
-        return formatted_values
 
 
 class _LandingPageViewSetsUtils(viewsets.ViewSet):
     landing_pages_model = LandingModel(choice_db='infomagazine')
     permission_classes = (custom_permissions.IsMarketer,)
-    return_value_formatter = ReturnValuesFormatter
 
-    def get_landing_data(self, landing_detail=None, is_generate=False):
+    def _get_landing_data(self, landing_detail=None, is_generate=False):
         if landing_detail['state']:
             landing_pages = LandingGenerator(landing_detail['data']['landing_info'], is_generate=is_generate)
             lading_page_generated = landing_pages.generate()
             lading_page_generated.update(
                 {'options': {'status': status.HTTP_200_OK} if landing_detail['state'] else {
                     'status': status.HTTP_500_INTERNAL_SERVER_ERROR}})
+
             return lading_page_generated
         else:
             landing_detail.update({'options': {'status': status.HTTP_200_OK} if landing_detail['state'] else {
                 'status': status.HTTP_404_NOT_FOUND}})
+
             return landing_detail
+
+    def get_permissions(self):
+        permission_classes = [custom_permissions.IsClient]
+        return [permission() for permission in permission_classes]
 
 
 class LandingPageViewSets(_LandingPageViewSetsUtils):
@@ -162,13 +101,13 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
     @response_decorator
     def preview(self, request, pk):
         get_detail = self.retrieve(request, pk)
-        response_data = self.get_landing_data(landing_detail=get_detail.data)
+        response_data = self._get_landing_data(landing_detail=get_detail.data)
         return response_data
 
     @action(detail=True, renderer_classes=[StaticHTMLRenderer], permission_classes=[permissions.AllowAny])
     def test_preview(self, request, pk):
         get_detail = self.retrieve(request, pk)
-        response_data = self.get_landing_data(landing_detail=get_detail.data)
+        response_data = self._get_landing_data(landing_detail=get_detail.data)
         return Response(response_data['data'])
 
     @action(detail=True, methods=['GET', 'POST'])
@@ -194,7 +133,7 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
 
         elif request.method == 'POST':
             get_detail = self.retrieve(request, pk)
-            response_data = self.get_landing_data(landing_detail=get_detail.data, is_generate=True)
+            response_data = self._get_landing_data(landing_detail=get_detail.data, is_generate=True)
             landing_id = get_detail.data['data']['_id']['$oid']
             landing_base_url = get_detail.data['data']['landing_info']['landing']['base_url']
             epoch_time = time.time()
@@ -220,7 +159,7 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
         cloudfront_client = session.client('cloudfront')
         if request.method == 'PUT':
             get_detail = self.retrieve(request, pk)
-            response_data = self.get_landing_data(landing_detail=get_detail.data, is_generate=True)
+            response_data = self._get_landing_data(landing_detail=get_detail.data, is_generate=True)
             landing_id = get_detail.data['data']['_id']['$oid']
             landing_url = f'''landings/{landing_id}/{landing_url}.html'''
             s3_response_data = s3_client.put_object(Body=response_data['data'],
@@ -259,7 +198,3 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
             else:
                 return {'state': False, 'data': '', 'message': 'Failed.',
                         'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
-
-    def get_permissions(self):
-        permission_classes = [custom_permissions.IsClient]
-        return [permission() for permission in permission_classes]
