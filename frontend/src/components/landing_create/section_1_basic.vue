@@ -22,7 +22,8 @@
     </label>
     <div class="col-sm-9 mt-sm-3">
       <input type="text" :class="error_label.class.name" id="landing" maxlength="50"
-             :value="name" @change="check_duplication('name')" @keyup="$emit('update:name', $event.target.value)">
+             :value="name" placeholder="랜딩페이지 이름"
+             @change="check_duplication('name')" @keyup="$emit('update:name', $event.target.value)">
     </div>
 
     <label class="col-sm-3 col-form-label-sm mt-3" for="base_url">
@@ -45,6 +46,7 @@
     <div class="col-sm-9 mt-sm-3">
       <input type="text" :class="error_label.class.base_url" id="base_url" maxlength="30"
              :value="base_url" @change="check_duplication('url')"
+             placeholder="URL, 파일 이름"
              @keyup="$emit('update:base_url', $event.target.value)">
     </div>
 

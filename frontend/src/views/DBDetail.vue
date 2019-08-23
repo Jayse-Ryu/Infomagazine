@@ -621,7 +621,7 @@
   }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   .whole_wrap {
     margin: 0 2%;
   }

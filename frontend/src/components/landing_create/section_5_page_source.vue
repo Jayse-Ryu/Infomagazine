@@ -21,6 +21,7 @@
     <div class="col-sm-12">
       <input type="text" class="form-control" id="page_title" maxlength="50"
              :value="title" @keyup="$emit('update:title', $event.target.value)"
+             placeholder="페이지 이름"
              @change="push_landing()">
     </div>
 
@@ -30,6 +31,7 @@
     <div class="col-sm-12">
             <textarea type="text" class="form-control" id="header_script" rows="4"
                       :value="header_script"
+                      placeholder="스크립트 내용"
                       @keyup="$emit('update:header_script', $event.target.value)"
                       @change="push_landing()"></textarea>
     </div>
@@ -38,8 +40,9 @@
       <span>바디 스크립트</span>
     </label>
     <div class="col-sm-12">
-            <textarea type="text" class="form-control" id="body_script" rows="4"
+            <textarea type="text" class="form-control mb-sm-4" id="body_script" rows="4"
                       :value="body_script"
+                      placeholder="스크립트 내용"
                       @keyup="$emit('update:body_script', $event.target.value)"
                       @change="push_landing()"></textarea>
     </div>

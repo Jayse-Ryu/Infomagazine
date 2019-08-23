@@ -579,7 +579,7 @@
     width: calc(75px);
     height: 30px;
     text-align: center;
-    font-size: 0.8em;
+    font-size: 0.7em;
     line-height: 1em;
     outline: 0;
     border: 1px solid #c1c1c1;
