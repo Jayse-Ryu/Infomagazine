@@ -45,39 +45,53 @@
     </div>
 
 
-    <label class="col-sm-12 col-form-label-sm mt-3" for="body_script">
-      <span>추적 스크립트 아이디</span>
+    <label class="col-sm-3 col-form-label-sm mt-3" for="body_script">
+      <span>페이스북 픽셀</span>
     </label>
-    <div class="col-sm-3">
+    <div class="col-sm-9">
       <input type="text" class="form-control" id="facebook" maxlength="50"
              v-model="tracking_info.fb"
-             placeholder="페이스북"
+             placeholder="아이디 코드"
              @change="push_landing()">
     </div>
-    <div class="col-sm-3">
+
+    <label class="col-sm-3 col-form-label-sm mt-3" for="body_script">
+      <span>카카오 픽셀</span>
+    </label>
+    <div class="col-sm-9">
       <input type="text" class="form-control" id="kakao" maxlength="50"
              v-model="tracking_info.ka"
-             placeholder="카카오"
+             placeholder="아이디 코드"
              @change="push_landing()">
     </div>
-    <div class="col-sm-2">
+
+    <label class="col-sm-3 col-form-label-sm mt-3" for="body_script">
+      <span>구글 애널리틱스</span>
+    </label>
+    <div class="col-sm-9">
       <input type="text" class="form-control" id="google_a" maxlength="50"
              v-model="tracking_info.ga"
-             placeholder="구글 애널리틱스"
+             placeholder="아이디 코드"
              @change="push_landing()">
     </div>
 
-    <div class="col-sm-2">
+    <label class="col-sm-3 col-form-label-sm mt-3" for="body_script">
+      <span>구글 태그매니저</span>
+    </label>
+    <div class="col-sm-9">
       <input type="text" class="form-control" id="google_tm" maxlength="50"
              v-model="tracking_info.gtm"
-             placeholder="구글 태그매니저"
+             placeholder="아이디 코드"
              @change="push_landing()">
     </div>
 
-    <div class="col-sm-2">
+    <label class="col-sm-3 col-form-label-sm mt-3" for="body_script">
+      <span>구글 디스플레이 네트워크</span>
+    </label>
+    <div class="col-sm-9">
       <input type="text" class="form-control" id="google_dn" maxlength="50"
              v-model="tracking_info.gdn"
-             placeholder="구글 디스플레이 네트워크"
+             placeholder="아이디 코드"
              @change="push_landing()">
     </div>
 
