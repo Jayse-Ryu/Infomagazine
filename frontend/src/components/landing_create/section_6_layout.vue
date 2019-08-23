@@ -283,8 +283,8 @@
                 <span class="video_handler">비디오 드래그</span>
                 <span class="video_handler_2">비디오 드래그</span>
                 <div
-                  style="position: absolute; width: 100%; max-width: 1000px; margin: auto; left: 0; top: 50%; transform: translateY(-50%)">
-                  <div style=" position: relative; padding-bottom: 56.25%; height:0;">
+                  style="position: absolute; width: 100%; height:100%; margin: auto; left: 0;">
+                  <div style=" position: relative; width:100%; height: 100%;">
                     <iframe v-if="item.video_type == 1"
                             style="width: 100%; height: 100%; top:0; left:0; position: absolute;" type="text/html"
                             :src="'https://www.youtube.com/embed/'
