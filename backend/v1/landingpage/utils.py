@@ -613,6 +613,24 @@ class Script(Default):
         </script>
         """
 
+    def _hijack(self):
+        return f"""
+        <!--Backward catch that called 후팝업 -->
+        <script>
+        history.replaceState(null, document.title, location.pathname+"#!/stealingyourhistory");
+        history.pushState(null, document.title, location.pathname);
+
+        window.addEventListener("popstate", function() {{
+            if(location.hash === "#!/stealingyourhistory") {{
+                history.replaceState(null, document.title, location.pathname);
+                setTimeout(function(){{
+                    location.replace('{self.landing_config['hijack_url']}');
+                }},0);
+            }}
+        }}, false);
+        </script>
+        """
+
 
 class LandingPage(StyleSheet, Script):
     def __init__(self, landing_info, is_generate=False):
@@ -791,6 +809,13 @@ class LandingPage(StyleSheet, Script):
             }
 
     def _body_generator(self, base_html):
+        """
+        2019/08/23
+
+        object_type == 1 : 이미지 객체
+        object_type == 2 : 폼 객체
+        object_type == 3 : 비디오 객체
+        """
         main_container = base_html.new_tag('main', attrs={'class': 'section-container'})
         base_html.body.append(main_container)
 
@@ -860,12 +885,6 @@ class LandingPage(StyleSheet, Script):
                     section_object_block.append(section_object_by_type)
 
     def generate(self):
-        """
-        object_type == 1 : 이미지 객체
-        object_type == 2 : 폼 객체
-        object_type == 3 : 비디오 객체
-¬
-        """
         base_html = _convert_to_html(self.default_html)
 
         main_container = base_html.new_tag('main', attrs={'class': 'section-container'})
@@ -897,6 +916,9 @@ class LandingPage(StyleSheet, Script):
             body_script = _convert_to_html(
                 self.landing_config['body_script'] if self.landing_config['body_script'] else "")
             base_html.body.append(body_script)
+
+            if self.landing_config['is_hijack']:
+                base_html.body.append(_convert_to_html(self._hijack()))
 
             return {'state': True, 'data': base_html.prettify(), 'message': 'Succeed.'}
         except Exception as e:
