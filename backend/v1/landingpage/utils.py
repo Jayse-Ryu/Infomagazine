@@ -130,6 +130,14 @@ class Default:
                     padding: 0.5vw;
                     border-radius: 0.5vw;
                 }
+                
+                .video-box {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    top: 0;
+                    left: 0;
+                }
 
                 @media (min-width: 1000px) {
                     body {
@@ -150,7 +158,8 @@ class Default:
             </style>
                 """
         self.default_scripts = """
-                <script src="https://assets.infomagazine.xyz/vendor/js/jquery-3.4.1.js"></script>
+                <script src="https://assets.infomagazine.xyz/vendor/js/jquery-3.4.1.min.js"></script>
+                <script src="https://assets.infomagazine.xyz/vendor/js/lazyload.min.js"></script>
                 """
         self.layout_stylesheets = ""
         self.landing_scripts = ""
@@ -188,30 +197,51 @@ class StyleSheet(Default):
         self.layout_stylesheets += result
 
     def _css_object_by_type_size(self, object_type=None, section_id=None, object_id=None, layout_info=None):
+        """
+        2019/08/25
+
+        :param object_type:
+        :param section_id:
+        :param object_id:
+        :param layout_info:
+        """
         object_w = layout_info['position']['w']
         object_h = layout_info['position']['h']
 
-        object_image_url = ""
-        if layout_info['image_data']:
-            object_image_url = layout_info['image_data']
+        # object_image_url = ""
+        # if layout_info['image_data']:
+        #     object_image_url = layout_info['image_data']
 
         result = f""""""
         if object_type == 1:
             result += f"""
             section[data-section-id="{section_id}"] > div[data-object-id="{object_id}"] > .object-type-image {{
                 padding-top: calc({object_h} / {object_w} * 100%);
-                background: url('{object_image_url}') center / 100% no-repeat;
+                background-position : center;
+                background-size: 100%;
+                background-repeat: no-repeat;
             }}
             """
+            # result += f"""
+            # section[data-section-id="{section_id}"] > div[data-object-id="{object_id}"] > .object-type-image {{
+            #     padding-top: calc({object_h} / {object_w} * 100%);
+            #     background: url('{object_image_url}') center / 100% no-repeat;
+            # }}
+            # """
         elif object_type == 2:
             result += f"""
             section[data-section-id="{section_id}"] > div[data-object-id="{object_id}"] > .object-type-form {{
                 padding-top: calc({object_h} / {object_w} * 100%);
             }}
             """
-        # TODO 비디오타입 추 후 추가
+
         elif object_type == 3:
-            result += """"""
+            result += f"""
+            section[data-section-id="{section_id}"] > div[data-object-id="{object_id}"] > .object-type-video {{
+                position: relative; 
+                padding-top: calc({object_h} / {object_w} * 100%);
+            }}
+            """
         self.layout_stylesheets += result
 
     def _css_field_position(self, section_id=None, object_id=None, object_w=None, object_h=None, field_id=None,
@@ -546,6 +576,7 @@ class Script(Default):
         result += f"""
         <script>
         (function ($) {{
+            $('.lazyload').lazyload();
             {self.landing_scripts}
         }})(jQuery)
         </script>
@@ -808,9 +839,32 @@ class LandingPage(StyleSheet, Script):
                 'validation': list(field_info['validation'].keys())
             }
 
+    def _video_box_generator(self, base_html, layout_info=None):
+        """
+        2019/08/25
+
+        :param base_html:
+        :param layout_info:
+
+        autoplay: 자동 재생
+        mute: 음소거
+        loop: 영상 반복
+        fs: 풀스크린
+        disablekb: 키보드 컨트롤
+        """
+        # TODO 비메오 추후 추가
+        video_url = layout_info['video_url']
+        iframe_tag = base_html.new_tag('iframe', attrs={
+            'class':'video-box',
+            'src': f'https://www.youtube.com/embed/{video_url}',
+            'allowfullscreen': 'allowfullscreen',
+            'frameBorder': '0'})
+        return iframe_tag
+
     def _body_generator(self, base_html):
         """
         2019/08/23
+        :param base_html:
 
         object_type == 1 : 이미지 객체
         object_type == 2 : 폼 객체
@@ -841,7 +895,9 @@ class LandingPage(StyleSheet, Script):
                                               object_id=object_index,
                                               layout_info=section_object_info)
                 if object_type == 1:
-                    section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image'})
+                    object_image_url = section_object_info['image_data']
+                    section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image lazyload',
+                                                                             'data-src': object_image_url})
                     section_object_block.append(section_object_by_type)
 
                 elif object_type == 2:
@@ -881,7 +937,9 @@ class LandingPage(StyleSheet, Script):
                     self._js_call_ajax(section_id=section_index)
 
                 elif object_type == 3:
-                    section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-image'})
+                    section_object_by_type = base_html.new_tag('div', attrs={'class': 'object-type-video'})
+                    iframe_tag = self._video_box_generator(base_html, layout_info=section_object_info)
+                    section_object_by_type.append(iframe_tag)
                     section_object_block.append(section_object_by_type)
 
     def generate(self):
