@@ -12,6 +12,10 @@ def _convert_to_html(tag_string):
 
 
 class Default:
+    """
+    2019/08/26
+
+    """
     def __init__(self, landing_config):
         self.default_html = f"""
                         <!DOCTYPE html>
@@ -467,6 +471,11 @@ class Script(Default):
         self.landing_scripts += result
 
     def _js_call_ajax(self, section_id=None):
+        """
+        2019/08/26
+
+        :param section_id:
+        """
         facebook_pixel_callback = ""
         if self.facebook_pixel_check:
             facebook_pixel_callback = "fbq('track', 'CompleteRegistration');"
