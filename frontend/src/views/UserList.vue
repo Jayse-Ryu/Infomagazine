@@ -286,6 +286,12 @@
           } else {
             search_param = '?username=' + this.search_text
           }
+        } else if (this.search_option == 2) {
+          if (pagination) {
+            search_param = '&email=' + this.search_text
+          } else {
+            search_param = '?email=' + this.search_text
+          }
         }
 
         // if (this.user_obj.is_staff || this.user_obj.is_superuser) {
