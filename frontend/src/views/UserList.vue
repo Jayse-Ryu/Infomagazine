@@ -282,9 +282,9 @@
         // Set search option
         if (this.search_option == 1) {
           if (pagination) {
-            search_param = '&name=' + this.search_text
+            search_param = '&username=' + this.search_text
           } else {
-            search_param = '?name=' + this.search_text
+            search_param = '?username=' + this.search_text
           }
         }
 
