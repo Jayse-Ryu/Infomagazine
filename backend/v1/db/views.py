@@ -1,11 +1,12 @@
 import v1.permissions as custom_permissions
 from infomagazine.custom_packages import CustomModelViewSet
+from v1.db.filters import DBFilter
 from v1.db.models import LandingPageDB
 from v1.db.serializers import LandingPageDBSerializer
 
 
 class LandingPageDBViewSets(CustomModelViewSet):
-    # queryset = LandingPageDB.objects.all()
+    filterset_class = DBFilter
     serializer_class = LandingPageDBSerializer
 
     def get_queryset(self):
