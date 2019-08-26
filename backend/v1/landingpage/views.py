@@ -36,6 +36,34 @@ class _LandingPageViewSetsUtils(viewsets.ViewSet):
 
             return landing_detail
 
+    def _cf_inv_request(self, session, url):
+        """
+        2019/08/26
+
+        :param session:
+        :param url:
+        :return:
+        """
+        epoch_time = time.time()
+        cf_inv_response_data = session.create_invalidation(
+            DistributionId=getattr(settings, 'CF_DISTRIBUTION_ID'),
+            InvalidationBatch={
+                'Paths': {
+                    'Quantity': 1,
+                    'Items': [
+                        url,
+                    ]
+                },
+                'CallerReference': str(int(epoch_time))
+            }
+        )
+        if cf_inv_response_data['ResponseMetadata']['HTTPStatusCode'] == 201:
+            return {'state': True, 'data': url, 'message': 'Succeed.',
+                    'options': {'status': status.HTTP_201_CREATED}}
+        else:
+            return {'state': False, 'data': '', 'message': 'Failed.',
+                    'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
+
     def get_permissions(self):
         permission_classes = [custom_permissions.IsClient]
         return [permission() for permission in permission_classes]
@@ -110,15 +138,22 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
         response_data = self._get_landing_data(landing_detail=get_detail.data)
         return Response(response_data['data'])
 
-    @action(detail=True, methods=['GET', 'POST'])
+    @action(detail=True, methods=['GET', 'POST', 'PUT'])
     @response_decorator
     def landing_urls(self, request, pk):
-        s3_client = boto3.client(
-            's3',
-            aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID'),
-            aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY'),
-            region_name='ap-northeast-2'
-        )
+        """
+        2019/08/26
+
+        :param request:
+        :param pk:
+
+        """
+        session = boto3.session.Session(aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID'),
+                                        aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY'),
+                                        region_name='ap-northeast-2')
+        s3_client = session.client('s3')
+        cloudfront_client = session.client('cloudfront')
+
         if request.method == 'GET':
             s3_response = s3_client.list_objects(Bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME'),
                                                  Prefix='landings/' + pk + '/')
@@ -134,24 +169,39 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
         elif request.method == 'POST':
             get_detail = self.retrieve(request, pk)
             response_data = self._get_landing_data(landing_detail=get_detail.data, is_generate=True)
-            landing_id = get_detail.data['data']['_id']['$oid']
-            landing_base_url = get_detail.data['data']['landing_info']['landing']['base_url']
-            epoch_time = time.time()
-            landing_url = f'''landings/{landing_id}/{landing_base_url}_{str(int(epoch_time))}.html'''
-            s3_response_data = s3_client.put_object(Body=response_data['data'],
-                                                    Bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME'),
-                                                    Key=landing_url,
-                                                    ContentType='text/html')
-            if s3_response_data['ResponseMetadata']['HTTPStatusCode'] == 200:
-                return {'state': True, 'data': landing_url, 'message': 'Succeed.',
-                        'options': {'status': status.HTTP_201_CREATED}}
+
+            if response_data['state']:
+                landing_base_url = get_detail.data['data']['landing_info']['landing']['base_url']
+                epoch_time = time.time()
+                landing_url = f'''landings/{pk}/{landing_base_url}_{str(int(epoch_time))}.html'''
+                s3_response_data = s3_client.put_object(Body=response_data['data'],
+                                                        Bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME'),
+                                                        Key=landing_url,
+                                                        ContentType='text/html')
+                if s3_response_data['ResponseMetadata']['HTTPStatusCode'] == 200:
+                    return {'state': True, 'data': landing_url, 'message': 'Succeed.',
+                            'options': {'status': status.HTTP_201_CREATED}}
+                else:
+                    return {'state': False, 'data': '', 'message': 'Failed.',
+                            'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
             else:
-                return {'state': False, 'data': '', 'message': 'Failed.',
+                return {'state': response_data['state'], 'data': response_data['data'],
+                        'message': response_data['message'],
                         'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
+        elif request.method == 'PUT':
+            return self._cf_inv_request(session=cloudfront_client, url=f'''/{pk}/''')
 
     @action(detail=True, methods=['PUT', 'DELETE'], url_path='landing_urls/(?P<landing_url>[^/.]+)')
     @response_decorator
     def landing_urls_detail(self, request, pk, landing_url):
+        """
+        2019/08/26
+
+        :param request:
+        :param pk:
+        :param landing_url:
+
+        """
         session = boto3.session.Session(aws_access_key_id=getattr(settings, 'AWS_ACCESS_KEY_ID'),
                                         aws_secret_access_key=getattr(settings, 'AWS_SECRET_ACCESS_KEY'),
                                         region_name='ap-northeast-2')
@@ -160,34 +210,19 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
         if request.method == 'PUT':
             get_detail = self.retrieve(request, pk)
             response_data = self._get_landing_data(landing_detail=get_detail.data, is_generate=True)
-            landing_id = get_detail.data['data']['_id']['$oid']
-            landing_url = f'''landings/{landing_id}/{landing_url}.html'''
-            s3_response_data = s3_client.put_object(Body=response_data['data'],
-                                                    Bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME'),
-                                                    Key=landing_url,
-                                                    ContentType='text/html')
-            if s3_response_data['ResponseMetadata']['HTTPStatusCode'] == 200:
-                epoch_time = time.time()
-                cf_inv_response_data = cloudfront_client.create_invalidation(
-                    DistributionId=getattr(settings, 'CF_DISTRIBUTION_ID'),
-                    InvalidationBatch={
-                        'Paths': {
-                            'Quantity': 1,
-                            'Items': [
-                                f'''/{landing_id}/{landing_url}.html''',
-                            ]
-                        },
-                        'CallerReference': str(int(epoch_time))
-                    }
-                )
-                if cf_inv_response_data['ResponseMetadata']['HTTPStatusCode'] == 201:
-                    return {'state': True, 'data': landing_url, 'message': 'Succeed.',
-                            'options': {'status': status.HTTP_201_CREATED}}
+            if response_data['state']:
+                s3_response_data = s3_client.put_object(Body=response_data['data'],
+                                                        Bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME'),
+                                                        Key=f'''landings/{pk}/{landing_url}.html''',
+                                                        ContentType='text/html')
+                if s3_response_data['ResponseMetadata']['HTTPStatusCode'] == 200:
+                    return self._cf_inv_request(session=cloudfront_client, url=f'''/{pk}/{landing_url}.html''')
                 else:
                     return {'state': False, 'data': '', 'message': 'Failed.',
                             'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
             else:
-                return {'state': False, 'data': '', 'message': 'Failed.',
+                return {'state': response_data['state'], 'data': response_data['data'],
+                        'message': response_data['message'],
                         'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}
         elif request.method == 'DELETE':
             s3_response = s3_client.delete_object(Bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME'),

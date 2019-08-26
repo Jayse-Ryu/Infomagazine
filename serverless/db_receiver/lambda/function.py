@@ -67,6 +67,7 @@ def _send_to_sqs(event, response_headers):
     body_to_send = {
         "landing_id": body['landing_id'],
         "registered_date": body['registered_date'],
+        "stay_time": body['stay_time'],
         "data": body['data'],
         "schema": body['schema'],
         "user_agent": user_agent,
@@ -110,6 +111,7 @@ def lambda_handler(event, context):
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type",
                 "Access-Control-Allow-Max-Age": "86400",
+                "Content-Type" : "text/plain; charset=utf-8",
                 "Content-Length": "0"
             })
             return _response_format(status_code=204, headers=response_headers)
