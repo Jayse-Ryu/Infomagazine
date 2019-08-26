@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -13,6 +14,11 @@ class UserViewSets(CustomModelViewSet):
     queryset = User.objects.select_related('info').all()
     serializer_class = UserSerializer
     filterset_class = UserFilter
+
+    @csrf_exempt
+    def create(self, request, *args, **kwargs):
+        get_create = super().create(request, *args, **kwargs)
+        return get_create
 
     @action(detail=False, methods=['POST'])
     def create_client(self, request):

@@ -66,6 +66,7 @@ class CustomLimitOffsetPagination(LimitOffsetPagination):
             'message': 'success'
         })
 
+
 class DefaultRouter(routers.DefaultRouter):
     """
     Extends `DefaultRouter` class to add a method for extending url routes from another router.
@@ -147,3 +148,6 @@ class CustomModelViewSet(viewsets.ModelViewSet):
         }
 
         return Response(result)
+
+
+

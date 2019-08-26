@@ -16,4 +16,4 @@ class UserFilter(filters.FilterSet):
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'organization', 'access_role']
+        fields = ['email', 'username', 'company', 'organization', 'access_role']
