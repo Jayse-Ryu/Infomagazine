@@ -625,24 +625,28 @@
           this.start_time = new Date(from)
           this.finish_time = new Date(to)
           this.get_only_db()
+          this.page_current = 1
         } else if (option == 'recent2') {
           let from = new Date(new Date().setDate(new Date().getDate() - 2)).setHours(0, 0, 0, 0)
           let to = new Date().setHours(0, 0, 0, 0)
           this.start_time = new Date(from)
           this.finish_time = new Date(to)
           this.get_only_db()
+          this.page_current = 1
         } else if (option == 'yesterday') {
           let from = new Date(new Date().setDate(new Date().getDate() - 1)).setHours(0, 0, 0, 0)
           let to = new Date(new Date().setDate(new Date().getDate() - 1)).setHours(0, 0, 0, 0)
           this.start_time = new Date(from)
           this.finish_time = new Date(to)
           this.get_only_db()
+          this.page_current = 1
         } else if (option == 'today') {
           let from = new Date().setHours(0, 0, 0, 0)
           let to = new Date().setHours(0, 0, 0, 0)
           this.start_time = new Date(from)
           this.finish_time = new Date(to)
           this.get_only_db()
+          this.page_current = 1
         }
       },
       db_delete(id) {
@@ -685,7 +689,9 @@
         }
         if (range.from != '' && range.to != '') {
           // this.get_resources_key()
-          this.get_only_db()
+          this.pagination(0)
+          this.page_current = 1
+          // this.get_only_db()
           // let one = new Date(range.from).valueOf()
           // let two = new Date(range.to).valueOf()
           // console.log(one, two)
