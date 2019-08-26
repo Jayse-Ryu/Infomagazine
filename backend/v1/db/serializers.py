@@ -20,6 +20,8 @@ class LandingPageDBSerializer(serializers.ModelSerializer):
                   'db',
                   'user_agent',
                   'ip_v4_address',
+                  'inflow_path',
+                  'stay_time',
                   'registered_date',
                   )
         extra_kwargs = {

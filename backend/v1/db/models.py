@@ -10,6 +10,7 @@ class LandingPageDB(models.Model):
     user_agent = JSONField()
     ip_v4_address = models.CharField(blank=True, max_length=19, validators=[MinLengthValidator(19)])
     inflow_path = models.CharField(blank=True, max_length=256)
+    stay_time = models.CharField(blank=True, max_length=10)
     registered_date = models.CharField(max_length=13)
     created_date = models.DateTimeField(auto_now_add=True)
 

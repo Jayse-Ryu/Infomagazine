@@ -160,6 +160,21 @@ class Default:
         self.default_scripts = """
                 <script src="https://assets.infomagazine.xyz/vendor/js/jquery-3.4.1.min.js"></script>
                 <script src="https://assets.infomagazine.xyz/vendor/js/lazyload.min.js"></script>
+                <script>
+                (function ($) {{
+                    var isIE = /*@cc_on!@*/false || !!document.documentMode;
+                    
+                    if(!sessionStorage.getItem('current_epoch_time')){
+                        sessionStorage.setItem('current_epoch_time', Date.now());    
+                    }
+
+                    if(isIE){
+                        $('body').attr('class','ie-check');
+                    }else{
+                        $('.lazyload').lazyload();
+                    }
+                }})(jQuery)
+                </script>
                 """
         self.layout_stylesheets = ""
         self.landing_scripts = ""
@@ -208,9 +223,9 @@ class StyleSheet(Default):
         object_w = layout_info['position']['w']
         object_h = layout_info['position']['h']
 
-        # object_image_url = ""
-        # if layout_info['image_data']:
-        #     object_image_url = layout_info['image_data']
+        object_image_url = ""
+        if layout_info['image_data']:
+            object_image_url = layout_info['image_data']
 
         result = f""""""
         if object_type == 1:
@@ -221,13 +236,11 @@ class StyleSheet(Default):
                 background-size: 100%;
                 background-repeat: no-repeat;
             }}
+            .ie-check section[data-section-id="{section_id}"] > div[data-object-id="{object_id}"] > .object-type-image {{
+                padding-top: calc({object_h} / {object_w} * 100%);
+                background: url('{object_image_url}') center / 100% no-repeat;
+            }}
             """
-            # result += f"""
-            # section[data-section-id="{section_id}"] > div[data-object-id="{object_id}"] > .object-type-image {{
-            #     padding-top: calc({object_h} / {object_w} * 100%);
-            #     background: url('{object_image_url}') center / 100% no-repeat;
-            # }}
-            # """
         elif object_type == 2:
             result += f"""
             section[data-section-id="{section_id}"] > div[data-object-id="{object_id}"] > .object-type-form {{
@@ -468,6 +481,7 @@ class Script(Default):
                 'data': {{}},
                 'schema': {{}}
             }};
+            var stay_time = Math.round((Date.now() - sessionStorage.getItem('current_epoch_time'))/1000);
             $.each(item_group,function(key,value){{
                 var _target = eval(value['target']);
                 body['data'][key] = _target.val();
@@ -475,6 +489,7 @@ class Script(Default):
             }});
             body['landing_id'] = window.location.pathname.split('/')[1];
             body['registered_date'] = String(Date.now());
+            body['stay_time'] = stay_time;
             $.ajax({{
                 method: 'POST',
                 contentType: "application/json;", // MIME type to request
@@ -484,6 +499,7 @@ class Script(Default):
                     if (data['state']) {{
                         {facebook_pixel_callback}
                         {kakao_pixel_callback}
+                        sessionStorage.setItem('current_epoch_time', Date.now());
                         alert(data['message']);
                     }} else {{
                         alert(data['message']);
@@ -572,11 +588,15 @@ class Script(Default):
         self.landing_scripts += result
 
     def _scripts_generate(self):
+        """
+        2019/08/25
+
+        """
+
         result = self.default_scripts
         result += f"""
         <script>
         (function ($) {{
-            $('.lazyload').lazyload();
             {self.landing_scripts}
         }})(jQuery)
         </script>
@@ -588,6 +608,7 @@ class Script(Default):
         """
         2019/08/23
         """
+
         return f"""
         <!-- Facebook Pixel Code -->
         <script>
@@ -609,6 +630,7 @@ class Script(Default):
         """
         2019/08/23
         """
+
         return f"""
         <!-- Facebook Pixel Code -->
         <noscript><img height="1" width="1" style="display:none"
@@ -621,6 +643,7 @@ class Script(Default):
         """
         2019/08/23
         """
+
         return f"""
         <script type="text/javascript" charset="UTF-8" src="//t1.daumcdn.net/adfit/static/kp.js"></script>
         <script type="text/javascript">
@@ -632,6 +655,7 @@ class Script(Default):
         """
         2019/08/23
         """
+
         return f"""
         <!-- Global site tag (gtag.js) - Google Ads: {self.landing_config['tracking_info']['gdn']} -->
         <script async src="https://www.googletagmanager.com/gtag/js?id={self.landing_config['tracking_info']['gdn']}"></script>
@@ -944,10 +968,6 @@ class LandingPage(StyleSheet, Script):
 
     def generate(self):
         base_html = _convert_to_html(self.default_html)
-
-        main_container = base_html.new_tag('main', attrs={'class': 'section-container'})
-        base_html.body.append(main_container)
-
         try:
             self._body_generator(base_html)
 

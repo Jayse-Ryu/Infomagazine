@@ -16,6 +16,7 @@ def _insert_db_to_rds(event):
     user_agent = body['user_agent']
     ip_v4_address = body['ip_v4_address']
     inflow_path = body['referer']
+    stay_time = body['stay_time']
     registered_date = body['registered_date']
 
     user_agent_group = {}
@@ -49,10 +50,11 @@ def _insert_db_to_rds(event):
     try:
         with rds_connection.cursor(pymysql.cursors.DictCursor) as cursor:
 
-            insert_sql_command = "INSERT INTO `landing_page_db` (`landing_id`, `data`, `schema`, `user_agent`, `ip_v4_address`, `inflow_path`, `registered_date`, `created_date`) " \
-                                 "VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())"
+            insert_sql_command = "INSERT INTO `landing_page_db` (`landing_id`, `data`, `schema`, `user_agent`, `ip_v4_address`, `inflow_path`, `stay_time`, `registered_date`, `created_date`) " \
+                                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())"
             cursor.execute(insert_sql_command,
-                           (landing_id, data, schema, user_agent_group, ip_v4_address, inflow_path, registered_date))
+                           (landing_id, data, schema, user_agent_group, ip_v4_address, inflow_path, stay_time,
+                            registered_date))
             rds_connection.commit()
     except Exception as e:
         logger.warning(str(e))
