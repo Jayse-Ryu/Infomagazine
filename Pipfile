@@ -7,7 +7,6 @@ verify_ssl = true
 django-silk = "*"
 
 [packages]
-django = "*"
 django-cors-headers = "*"
 django-storages = "*"
 boto3 = "*"
@@ -15,15 +14,17 @@ pymongo = "*"
 django-enumfield = "*"
 django-rest-swagger = "*"
 djangorestframework-simplejwt = "*"
-django-filter = "*"
 dnspython = "*"
 beautifulsoup4 = "*"
 mysqlclient = "*"
-djangorestframework = "*"
 django-mysql = "*"
 drf-nested-routers = "*"
 django-nose = "*"
 coverage = "*"
+django-filter = "*"
+drf-jwt = "*"
+djangorestframework = "*"
+django = "*"
 
 [requires]
 python_version = "3.7"

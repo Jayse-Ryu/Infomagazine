@@ -11,4 +11,4 @@ class DBFilter(filters.FilterSet):
 
     class Meta:
         model = LandingPageDB
-        fields = ['ip_v4_address', 'inflow_path', 'registered_date']
+        fields = ['ip_v4_address', 'inflow_path', 'registered_date_gte', 'registered_date_lte']

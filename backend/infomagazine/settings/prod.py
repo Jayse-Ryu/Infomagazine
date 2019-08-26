@@ -1,5 +1,11 @@
 import requests
+
+from infomagazine.utils import split_env
 from .base import *
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+ALLOWED_HOSTS = split_env(os.getenv('ALLOWED_HOSTS'))
 
 DEBUG = False
 
@@ -35,6 +41,8 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
 STATIC_URL = f"""https://{os.getenv('STATIC_URL')}/static/"""
+
+CSRF_COOKIE_HTTPONLY = True
 
 # CORS_ALLOW_CREDENTIALS = True
 #
