@@ -486,6 +486,7 @@
 
         <div class="preview">
           <button type="button" class="btn btn-danger w-100" @click="section_delete(index)">섹션 삭제</button>
+          <button type="button" class="btn btn-success w-100 mt-2" @click="section_insert(index)">섹션추가</button>
         </div>
 
       </div>
@@ -493,7 +494,7 @@
     </div>
 
     <div class="col-12 col-form-label mt-3" v-if="order.length > 0">
-      <button type="button" class="btn btn-primary p-1 w-100" @click="section_add">섹션추가</button>
+      <!--<button type="button" class="btn btn-primary p-1 w-100" @click="section_add">섹션추가</button>-->
     </div>
 
     <div class="col-12 mt-1" v-if="page_id">
@@ -575,6 +576,14 @@
       section_add() {
         this.object_init()
         this.order_obj.push([])
+        this.$emit('update:order', this.order_obj)
+        this.set_field('form')
+        this.push_landing()
+      },
+      section_insert(index) {
+        let set = index + 1
+        this.object_init()
+        this.order_obj.splice(set, 0, [])
         this.$emit('update:order', this.order_obj)
         this.set_field('form')
         this.push_landing()

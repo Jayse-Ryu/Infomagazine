@@ -115,6 +115,7 @@
         <hr>
 
         <section_url_list
+          :window_width="window_width"
           :page_id.sync="page_id"
           :url_list.sync="url_list"
           :del_url="del_url_list"
@@ -177,7 +178,7 @@
         name: true,
         base_url: true,
       },
-      validation_flag: true,
+      validation_flag: false,
       page_id: '',
       epoch_time: 0,
       form_arrow: -1,
@@ -606,46 +607,48 @@
           this.dynamo_obj.updated_date = (Date.now()).toString()
           this.$store.state.pageOptions.loading = true
 
-          this.field_validation()
-
           // console.log('landing create object is? ', this.dynamo_obj)
 
-          if (!this.page_id) {
-            axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
-              .then((response) => {
-                this.$store.state.pageOptions.loading = false
-                this.page_id = response.data.data.inserted_id
-                alert('랜딩이 생성되었습니다.')
-                this.bye()
-              })
-              .catch((error) => {
-                alert('랜딩 생성 중 오류가 발생하였습니다.')
-                this.$store.state.pageOptions.loading = false
-                this.validation_back()
-                console.log(error)
-              })
-          } else {
-            axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
-              'company_id': this.dynamo_obj.company_id,
-              'landing_info': this.dynamo_obj.landing_info
-            }, config)
-              .then(() => {
-                alert('랜딩이 생성되었습니다.')
-                this.$store.state.pageOptions.loading = false
-                this.validation_back()
-                this.bye()
-              })
-              .catch((error) => {
-                alert('랜딩 생성 중 오류가 발생하였습니다.')
-                console.log('Landing update fail', error)
-                this.validation_back()
-                this.$store.state.pageOptions.loading = false
-              })
+          if (this.validation_flag === true) {
+            this.field_validation()
+            if (!this.page_id) {
+              axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+                .then((response) => {
+                  this.$store.state.pageOptions.loading = false
+                  this.page_id = response.data.data.inserted_id
+                  this.validation_back()
+                  alert('랜딩이 생성되었습니다.')
+                  this.bye()
+                })
+                .catch((error) => {
+                  alert('랜딩 생성 중 오류가 발생하였습니다.')
+                  this.$store.state.pageOptions.loading = false
+                  this.validation_back()
+                  console.log(error)
+                })
+            } else {
+              axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
+                'company_id': this.dynamo_obj.company_id,
+                'landing_info': this.dynamo_obj.landing_info
+              }, config)
+                .then(() => {
+                  alert('랜딩이 생성되었습니다.')
+                  this.$store.state.pageOptions.loading = false
+                  this.validation_back()
+                  this.bye()
+                })
+                .catch((error) => {
+                  alert('랜딩 생성 중 오류가 발생하였습니다.')
+                  console.log('Landing update fail', error)
+                  this.validation_back()
+                  this.$store.state.pageOptions.loading = false
+                })
+            }
           }
+
         } else {
           if (this.validation_flag === true) {
             this.field_validation()
-
             if (!this.page_id) {
               axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
                 .then((response) => {
@@ -656,9 +659,7 @@
                   console.log('Landing update fail', error)
                   this.validation_back()
                 })
-            }
-          } else {
-            if (this.validation_flag === true) {
+            } else {
               axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
                 'company_id': this.dynamo_obj.company_id,
                 'landing_info': this.dynamo_obj.landing_info
@@ -667,6 +668,7 @@
                   this.validation_back()
                 })
                 .catch((error) => {
+                  this.validation_back()
                   console.log('Landing update fail', error)
                 })
             }
@@ -698,15 +700,15 @@
       generate() {
         if (this.dynamo_obj.landing_info.landing.base_url) {
           if (this.validation_flag === true) {
+            this.field_validation()
             this.$store.state.pageOptions.loading = true
-            if (this.page_id) {
-              const config = {
-                headers: {
-                  'Content-Type': 'application/json'
-                }
+            const config = {
+              headers: {
+                'Content-Type': 'application/json'
               }
+            }
 
-              this.field_validation()
+            if (this.page_id) {
               axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
                 'company_id': this.dynamo_obj.company_id,
                 'landing_info': this.dynamo_obj.landing_info
@@ -718,6 +720,7 @@
                 .catch((error) => {
                   this.$store.state.pageOptions.loading = false
                   console.log('Landing update fail', error)
+                  this.validation_back()
                 })
                 .then(() => {
                   this.validation_back()

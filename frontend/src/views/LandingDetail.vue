@@ -118,6 +118,7 @@
         <hr>
 
         <section_url_list
+          :window_width="window_width"
           :page_id.sync="page_id"
           :url_list.sync="url_list"
           :del_url="del_url_list"
@@ -176,7 +177,7 @@
         name: true,
         base_url: true,
       },
-      validation_flag: true,
+      validation_flag: false,
       page_id: '',
       epoch_time: 0,
       form_arrow: -1,
@@ -691,28 +692,29 @@
           this.dynamo_obj.updated_date = (Date.now()).toString()
           this.$store.state.pageOptions.loading = true
 
-          this.field_validation()
-
-          // console.log('landing create object is? ', this.dynamo_obj)
-          axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
-            'company_id': this.dynamo_obj.company_id,
-            'landing_info': this.dynamo_obj.landing_info
-          }, config)
-            .then(() => {
-              this.$store.state.pageOptions.loading = false
-              // this.make_file()
-              // if (confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
-              //   this.bye()
-              // }
-              this.validation_back()
-              alert('랜딩이 수정되었습니다.')
-            })
-            .catch((error) => {
-              alert('랜딩 수정이 실패하였습니다.')
-              this.$store.state.pageOptions.loading = false
-              console.log(error)
-              this.validation_back()
-            })
+          if (this.validation_flag === true) {
+            this.field_validation()
+            // console.log('landing create object is? ', this.dynamo_obj)
+            axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
+              'company_id': this.dynamo_obj.company_id,
+              'landing_info': this.dynamo_obj.landing_info
+            }, config)
+              .then(() => {
+                this.$store.state.pageOptions.loading = false
+                // this.make_file()
+                // if (confirm('랜딩이 수정되었습니다. 목록으로 돌아가시겠습니까?')) {
+                //   this.bye()
+                // }
+                this.validation_back()
+                alert('랜딩이 수정되었습니다.')
+              })
+              .catch((error) => {
+                alert('랜딩 수정이 실패하였습니다.')
+                this.$store.state.pageOptions.loading = false
+                console.log(error)
+                this.validation_back()
+              })
+          }
         } else {
 
           if (this.validation_flag === true) {
