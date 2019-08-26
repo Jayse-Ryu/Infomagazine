@@ -57,7 +57,7 @@
     ],
     data: () => ({
       msg: {
-        file_list: '서버상에 이미 등록되어있는 파일들은 수정, 삭제가 24시간 뒤에 이루어집니다. 파일대로 서버를 즉시 갱신 시키려면 새로고침 해주세요.'
+        file_list: '서버상에 이미 등록되어있는 파일들은 수정, 삭제가 24시간 뒤에 이루어집니다. 파일대로 서버를 즉시 갱신하도록 요청하려면 새로고침 해주세요.'
       }
     }),
     mounted() {
@@ -70,12 +70,14 @@
       overwrite_url(key) {
         let set = key.replace('https://landings.infomagazine.xyz/' + this.page_id + '/', '')
         let set_2 = set.replace('.html', '')
+        this.$store.state.pageOptions.loading = true
         axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/landing_urls/' + set_2 + '/')
           .then((response) => {
-            console.log('over write test ', response)
+            this.$store.state.pageOptions.loading = false
           })
           .catch((error) => {
             alert('덮어쓰기 중 오류가 발생하였습니다.')
+            this.$store.state.pageOptions.loading = false
             console.log(error)
           })
       },
