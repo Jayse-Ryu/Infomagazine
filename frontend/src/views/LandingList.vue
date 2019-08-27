@@ -27,8 +27,8 @@
                 class="search_option" id="src_gbn" v-model="temp_option">
           <option value="0" selected>검색 옵션</option>
           <option value="1">랜딩 이름</option>
-          <option value="2">업체</option>
-          <option value="3">마케터</option>
+          <!--<option value="2">업체</option>
+          <option value="3">마케터</option>-->
         </select>
 
         <select v-else-if="user_obj.access_role == 2"
@@ -56,11 +56,11 @@
         <div class="list_header">
           <div class="list-group-item text-center d-inline-flex justify-content-between p-1 pt-2 pb-2 text-center"
                style="border-radius: 0; border-bottom: 0; width:100%;">
-            <div class="col-3 p-0">업체</div>
-            <div class="col-4 p-0">페이지</div>
-            <div class="col-3 p-0">마케터</div>
-            <div class="col-1 p-0 board_centre">조회수</div>
-            <div class="col-1 p-0 board_centre">DB</div>
+            <!--<div class="col-3 p-0">업체</div>-->
+            <div class="col-12 p-0">페이지</div>
+            <!--<div class="col-3 p-0">마케터</div>-->
+            <!--<div class="col-1 p-0 board_centre">조회수</div>-->
+            <!--<div class="col-1 p-0 board_centre">DB</div>-->
           </div>
         </div>
         <!-- /List table header -->
@@ -75,27 +75,27 @@
 
           <li v-else v-for="content in content_obj"
               class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1">
-            <div class="col-3 p-0 col-sm-3">{{ content.landing_info.landing.company_name }}</div>
+            <!--<div class="col-3 p-0 col-sm-3">{{ content.landing_info.landing.company_name }}</div>-->
             <div v-if="[0, 1].includes(user_obj.access_role) || user_obj.is_staff || user_obj.is_superuser"
-                 class="col-3 p-0 col-sm-4">
+                 class="col-12 p-0 col-sm-12">
               <router-link :to="'/landing/detail/' + content._id.$oid">
                 <span v-if="content.landing_info.landing.name">{{ content.landing_info.landing.name }}</span>
                 <span v-else>이름 없음</span>
               </router-link>
             </div>
-            <div v-else class="col-3 p-0 col-sm-4">
+            <div v-else class="col-12 p-0 col-sm-12">
               <router-link :to="'/db/detail/' + content._id.$oid">
                 <span v-if="content.landing_info.landing.name">{{ content.landing_info.landing.name }}</span>
                 <span v-else>이름 없음</span>
               </router-link>
             </div>
-            <div class="col-3 p-0">{{ content.landing_info.landing.manager_name }}</div>
-            <div class="col-1 p-0 board_centre">{{ content.landing_info.views }}</div>
-            <div class="col-1 p-0 board_centre">
+            <!--<div class="col-3 p-0">{{ content.landing_info.landing.manager_name }}</div>-->
+            <!--<div class="col-1 p-0 board_centre">{{ content.landing_info.views }}</div>-->
+            <!--<div class="col-1 p-0 board_centre">
               <router-link :to="'/db/detail/' + content._id.$oid">
                 {{ content.landing_info.landing.collection_amount }}
               </router-link>
-            </div>
+            </div>-->
           </li>
         </ul>
         <!-- /List table body -->
@@ -109,10 +109,10 @@
         <div class="list_header">
           <div class="list-group-item text-center d-inline-flex justify-content-between p-1 pt-2 pb-2"
                style="border-radius: 0; border-bottom: 0; width:100%;">
-            <div class="col-2 p-0">업체</div>
-            <div class="col-5 p-0">페이지</div>
-            <div class="col-3 p-0">마케터</div>
-            <div class="col-2 p-0">DB</div>
+            <!--<div class="col-2 p-0">업체</div>-->
+            <div class="col-12 p-0">페이지</div>
+            <!--<div class="col-3 p-0">마케터</div>-->
+            <!--<div class="col-2 p-0">DB</div>-->
           </div>
         </div>
         <!-- /List table header -->
@@ -127,26 +127,26 @@
 
           <li v-else class="list-group-item list-group-item-action d-inline-flex justify-content-between p-1"
               v-for="content in content_obj">
-            <div class="col-2 p-0">{{ content.landing_info.landing.company_name }}</div>
+            <!--<div class="col-2 p-0">{{ content.landing_info.landing.company_name }}</div>-->
             <div v-if="[0, 1].includes(user_obj.access_role) || user_obj.is_staff || user_obj.is_superuser"
-                 class="col-5 p-0">
+                 class="col-12 p-0">
               <router-link :to="'/landing/detail/' + content._id.$oid">
                 <span v-if="content.landing_info.landing.name">{{ content.landing_info.landing.name }}</span>
                 <span v-else>이름 없음</span>
               </router-link>
             </div>
-            <div v-else class="col-5 p-0">
+            <div v-else class="col-12 p-0">
               <router-link :to="'/landing/detail/' + content._id.$oid">
                 <span v-if="content.landing_info.landing.name">{{ content.landing_info.landing.name }}</span>
                 <span v-else>이름 없음</span>
               </router-link>
             </div>
-            <div class="col-3 p-0">{{ content.landing_info.landing.manager_name }}</div>
-            <div class="col-2 p-0">
+            <!--<div class="col-3 p-0">{{ content.landing_info.landing.manager_name }}</div>-->
+            <!--<div class="col-2 p-0">
               <router-link :to="'/db/detail/' + content._id.$oid">
                 {{ content.landing_info.landing.collection_amount }}
               </router-link>
-            </div>
+            </div>-->
           </li>
 
         </ul>
