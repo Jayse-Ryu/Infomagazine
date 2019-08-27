@@ -610,24 +610,25 @@
 
           // console.log('landing create object is? ', this.dynamo_obj)
 
-          if (this.validation_flag === true) {
+          if (!this.page_id) {
             this.field_validation()
-            if (!this.page_id) {
-              axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
-                .then((response) => {
-                  this.$store.state.pageOptions.loading = false
-                  this.page_id = response.data.data.inserted_id
-                  this.validation_back()
-                  alert('랜딩이 생성되었습니다.')
-                  this.bye()
-                })
-                .catch((error) => {
-                  alert('랜딩 생성 중 오류가 발생하였습니다.')
-                  this.$store.state.pageOptions.loading = false
-                  this.validation_back()
-                  console.log(error)
-                })
-            } else {
+            axios.post(this.$store.state.endpoints.baseUrl + 'landing_pages/', this.dynamo_obj, config)
+              .then((response) => {
+                this.$store.state.pageOptions.loading = false
+                this.page_id = response.data.data.inserted_id
+                this.validation_back()
+                alert('랜딩이 생성되었습니다.')
+                this.bye()
+              })
+              .catch((error) => {
+                alert('랜딩 생성 중 오류가 발생하였습니다.')
+                this.$store.state.pageOptions.loading = false
+                this.validation_back()
+                console.log(error)
+              })
+          } else {
+            if (this.validation_flag === true) {
+              this.field_validation()
               axios.put(this.$store.state.endpoints.baseUrl + 'landing_pages/' + this.page_id + '/', {
                 'company_id': this.dynamo_obj.company_id,
                 'landing_info': this.dynamo_obj.landing_info
@@ -646,7 +647,6 @@
                 })
             }
           }
-
         } else {
           if (this.validation_flag === true) {
             this.field_validation()
@@ -674,7 +674,6 @@
                 })
             }
           }
-
         }
       },
       back_to_list() {
