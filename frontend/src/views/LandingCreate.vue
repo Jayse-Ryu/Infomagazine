@@ -604,6 +604,7 @@
         }
         // Empty objects make as Null
         if (option === 'checked') {
+          this.validation_flag = true
           this.dynamo_obj.updated_date = (Date.now()).toString()
           this.$store.state.pageOptions.loading = true
 
