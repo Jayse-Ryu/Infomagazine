@@ -279,7 +279,7 @@ router.beforeEach((to, from, next) => {
         Store.dispatch('inspectToken')
           .then((response) => {
             if (response === true) {
-              next({name: 'gateway'})
+              next({name: 'landing_list'})
             } else {
               next()
             }
