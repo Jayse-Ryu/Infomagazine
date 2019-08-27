@@ -3,8 +3,8 @@
 
     <!-- Header component -->
     <transition name="fade">
-      <div v-if="header_flag === 0" key="no_header"></div>
-      <app-header v-else-if="header_flag === 1" key="header"/>
+      <!--<div v-if="header_flag === 0" key="no_header"></div>-->
+      <app-header v-if="$store.state.pageOptions.header"/>
     </transition>
 
     <!-- Router component -->
@@ -18,6 +18,7 @@
       </div>
     </transition>
 
+    <div v-if="header_flag"></div>
   </div>
 </template>
 
@@ -26,13 +27,29 @@
     name: 'App',
     data: () => ({
       // Header options
-      header_flag: 1,
+      // header_flag: 1,
       auth_user: ''
     }),
     computed: {
       loading() {
         let loading = this.$store.state.pageOptions.loading
         return loading
+      },
+      header_flag() {
+        let block = [
+          '',
+          null,
+          'A404',
+          'page',
+          'sign_in',
+          'sign_up'
+        ]
+
+        if (block.includes(this.$route.name)) {
+          this.$store.state.pageOptions.header = false
+        } else {
+          this.$store.state.pageOptions.header = true
+        }
       }
     }
   }
@@ -571,6 +588,7 @@
 
   .search_group {
     text-align: right;
+
     &:after {
       display: block;
       content: '';
@@ -608,6 +626,7 @@
     padding: 0 10px;
     margin-left: -6px;
     float: left;
+
     &:focus {
       outline: none !important;
     }
@@ -624,6 +643,7 @@
     border-radius: 0 5px 5px 0;
     margin-left: -1px;
     float: left;
+
     img {
       width: 55%;
       height: 60%;

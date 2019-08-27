@@ -26,6 +26,7 @@ export default new Vuex.Store({
       id: 0
     },
     pageOptions: {
+      header: false,
       loading: false,
       landing: {
         page: 1,

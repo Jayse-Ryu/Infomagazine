@@ -172,9 +172,11 @@
         if (block.includes(this.$route.name)) {
           // document.getElementById('nav_king').style.display = 'none'
           document.getElementById('nav_king').setAttribute('style', 'display: none;')
+          this.$store.state.pageOptions.header = false
         } else {
           // document.getElementById('nav_king').style.display = 'block'
           document.getElementById('nav_king').setAttribute('style', 'display: block;')
+          this.$store.state.pageOptions.header = true
         }
       })
       let dev = this.contribute

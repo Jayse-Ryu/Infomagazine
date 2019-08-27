@@ -277,10 +277,10 @@
       }
     },
     mounted() {
-      this.$parent.$data.header_flag = 0
+      this.$store.state.pageOptions.header = false
     },
     destroyed() {
-      this.$parent.$data.header_flag = 1
+      this.$store.state.pageOptions.header = true
     }
   }
 </script>

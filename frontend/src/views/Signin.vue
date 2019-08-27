@@ -71,11 +71,11 @@
       password: ''
     }),
     mounted() {
-      this.$parent.$data.header_flag = 0
+      this.$store.state.pageOptions.header = false
       // get id from url
     },
     destroyed() {
-      this.$parent.$data.header_flag = 1
+      this.$store.state.pageOptions.header = true
     },
     methods: {
       login() {
