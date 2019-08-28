@@ -186,19 +186,6 @@
         })
     },
     methods: {
-      info_update(id) {
-        axios.get(this.$store.state.endpoints.baseUrl + 'users/' + id + '/')
-          .then((response) => {
-            if (response.data.data.info.organization) {
-              this.$store.state.user_campaign.organization = response.data.data.info.organization
-            } else if (response.data.data.info.company) {
-              this.$store.state.user_campaign.company = response.data.data.info.company
-            }
-          })
-          .catch((error) => {
-            console.log('Get user info error', error)
-          })
-      },
       // Real-Time custom validation
       error_check(param) {
         if (param === 'phone') {
@@ -369,7 +356,6 @@
           }
         } else {
           user_json = JSON.parse(local_user)
-          this.info_update(user_json.id)
         }
 
         return user_json

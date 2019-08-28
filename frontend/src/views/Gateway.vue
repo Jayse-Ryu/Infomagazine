@@ -77,22 +77,6 @@
 
     },
     methods: {
-      info_update(id) {
-        axios.get(this.$store.state.endpoints.baseUrl + 'users/' + id + '/')
-          .then((response) => {
-            if (response.data.data.info.organization && response.data.data.info.organization != null) {
-              this.$store.state.user_campaign.organization = response.data.data.info.organization
-            } else if (response.data.data.info.company) {
-              this.$store.state.user_campaign.company = response.data.data.info.company
-            } else {
-              this.$store.state.user_campaign.organization = -1
-              this.$store.state.user_campaign.company = -1
-            }
-          })
-          .catch((error) => {
-            console.log('Get user info error', error)
-          })
-      },
       check_access() {
         if (!this.user_obj.failed) {
           if (this.user_obj.is_staff || this.user_obj.is_superuser) {
@@ -193,7 +177,6 @@
           }
         } else {
           user_json = JSON.parse(local_user)
-          this.info_update(user_json.id)
         }
 
         return user_json
