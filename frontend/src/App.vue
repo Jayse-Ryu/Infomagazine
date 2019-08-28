@@ -652,7 +652,6 @@
 
   /* Search box ended */
 
-
   /* Pagination */
   .pagination {
     display: block;
@@ -754,7 +753,6 @@
       }
     }
   }
-
 
   // Navigation
   .text_navigation {

@@ -16,8 +16,7 @@ NOSE_ARGS = [
     '-I=slik'
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
-
+# CORS_ORIGIN_ALLOW_ALL = True
 
 
 STATIC_URL = 'https://%s/%s/' % ('assets.infomagazine.xyz', 'static')

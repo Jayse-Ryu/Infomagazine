@@ -13,7 +13,6 @@ class CustomTokenObtainSlidingSerializer(TokenObtainSlidingSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-
         user_info = user.info
         user_info_dict = model_to_dict(user_info)
         user_organization = user_info.organization
@@ -28,7 +27,6 @@ class CustomTokenObtainSlidingSerializer(TokenObtainSlidingSerializer):
         # token['phone_num'] = user_info_dict['phone_num']
         if user_organization:
             pass
-
         return token
 
     def validate(self, attrs):
@@ -36,6 +34,18 @@ class CustomTokenObtainSlidingSerializer(TokenObtainSlidingSerializer):
 
         token = self.get_token(self.user)
 
+        user_info_dict = model_to_dict(self.user.info)
+
         data['token'] = str(token)
+
+        user_data = {
+            "id": self.user.id,
+            "email": self.user.email,
+            "username": self.user.username,
+            "is_superuser": self.user.is_superuser,
+            "is_staff": self.user.is_staff,
+            "access_role": user_info_dict['access_role']
+        }
+        data.update(user_data)
 
         return data
