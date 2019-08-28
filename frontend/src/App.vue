@@ -571,6 +571,7 @@
 
   .search_group {
     text-align: right;
+
     &:after {
       display: block;
       content: '';
@@ -608,6 +609,7 @@
     padding: 0 10px;
     margin-left: -6px;
     float: left;
+
     &:focus {
       outline: none !important;
     }
@@ -624,6 +626,7 @@
     border-radius: 0 5px 5px 0;
     margin-left: -1px;
     float: left;
+
     img {
       width: 55%;
       height: 60%;
@@ -631,7 +634,6 @@
   }
 
   /* Search box ended */
-
 
   /* Pagination */
   .pagination {
@@ -734,7 +736,6 @@
       }
     }
   }
-
 
   // Navigation
   .text_navigation {
