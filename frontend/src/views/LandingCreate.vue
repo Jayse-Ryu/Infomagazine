@@ -44,7 +44,7 @@
           :push_landing="push_landing"
         />
 
-        <hr>
+        <!--<hr>
 
         <h5>기타 폼</h5>
         <section_form_control_etc
@@ -54,7 +54,7 @@
           :epoch_time="epoch_time"
           :updated_date="dynamo_obj.updated_date"
           :push_landing="push_landing"
-        />
+        />-->
 
         <hr>
 
