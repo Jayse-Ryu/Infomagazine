@@ -278,7 +278,7 @@ router.beforeEach((to, from, next) => {
         // Inspect return is set True or false
         Store.dispatch('inspectToken')
           .then((response) => {
-            // console.log('inspect 1 res ', response)
+            console.log('inspect 1 res ', response)
             if (response === true) {
               next({name: 'landing_list'})
             } else {
@@ -304,7 +304,7 @@ router.beforeEach((to, from, next) => {
       // Remained router is Cookie check
       Store.dispatch('inspectToken')
         .then((response) => {
-          // console.log('inspect 2 res ', response)
+          console.log('inspect 2 res ', response)
           if (response === true) {
             work()
           } else {
