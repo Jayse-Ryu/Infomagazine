@@ -29,7 +29,7 @@ def _session_token_generator(user_info=None, exp=None):
         payload['is_staff'] = user_info.is_staff
         user_info_dict = model_to_dict(user_info.info)
         payload['access_role'] = user_info_dict['access_role']
-        payload['rand_id'] = randint(0, 1000)
+    payload['rand_id'] = randint(0, 1000)
 
     session_token = jwt.encode(payload=payload, key=settings.SECRET_KEY, algorithm='HS256')
     return session_token.decode('utf-8')
