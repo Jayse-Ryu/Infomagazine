@@ -136,7 +136,7 @@ export default new Vuex.Store({
         let decoded = Decoder(token)
         let exp = decoded.exp
         let two_hours = 2 * 60 * 60
-        let five_and_fifty_nine = 5 * 60 * 60 + 59 * 60 + 30
+        // let five_and_fifty_nine = 5 * 60 * 60 + 59 * 60 + 30
 
         if ((Date.now() / 1000) > exp) {
           // If token is expired
@@ -144,7 +144,7 @@ export default new Vuex.Store({
           this.commit('removeToken')
 
           return false
-        } else if ((Date.now() / 1000) < exp && (Date.now() / 1000) > exp - five_and_fifty_nine) {
+        } else if ((Date.now() / 1000) < exp && (Date.now() / 1000) > exp - two_hours) {
 
           return axios.post(this.state.endpoints.refreshJWT, token)
             .then(() => {
