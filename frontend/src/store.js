@@ -65,10 +65,12 @@ export default new Vuex.Store({
   actions: {
     obtainToken(self, data) {
 
-      const token = Vue.cookie.get('SESSION')
-      const decoded = Decoder(token)
+      let token = Vue.cookie.get('SESSION')
+      let decoded = Decoder(token)
 
-      const information = {
+      console.log('obtain decoder')
+
+      let information = {
         id: decoded.id,
         email: decoded.email,
         username: decoded.username,
@@ -92,51 +94,53 @@ export default new Vuex.Store({
       return true
     },
     refreshToken() {
-      console.log('refreshToken')
-
-      // // Refresh endpoint
-      axios.post(this.state.endpoints.refreshJWT)
-        .then((response) => {
-          // this.dispatch('obtainToken', response.data.token)
-
-          const token = Vue.cookie.get('SESSION')
-          const decoded = Decoder(token)
-
-          const information = {
-            id: decoded.id,
-            email: decoded.email,
-            username: decoded.username,
-            is_superuser: decoded.is_superuser,
-            is_staff: decoded.is_staff,
-            access_role: decoded.access_role,
-          }
-
-          console.log('refr information', information)
-
-          this.commit('setAuthUser', {
-            authUser: information,
-            isAuthenticated: true
-          })
-
-          this.dispatch('get_additional_info', information.id)
-
-          return true
-        })
-        .catch((error) => {
-          console.log('Refresh token error.', error)
-          this.commit('removeToken')
-          return false
-        })
+      // console.log('refreshToken')
+      //
+      // // // Refresh endpoint
+      // axios.post(this.state.endpoints.refreshJWT)
+      //   .then((response) => {
+      //     // this.dispatch('obtainToken', response.data.token)
+      //
+      //     const token = Vue.cookie.get('SESSION')
+      //     const decoded = Decoder(token)
+      //
+      //     const information = {
+      //       id: decoded.id,
+      //       email: decoded.email,
+      //       username: decoded.username,
+      //       is_superuser: decoded.is_superuser,
+      //       is_staff: decoded.is_staff,
+      //       access_role: decoded.access_role,
+      //     }
+      //
+      //     console.log('refr information', information)
+      //
+      //     this.commit('setAuthUser', {
+      //       authUser: information,
+      //       isAuthenticated: true
+      //     })
+      //
+      //     this.dispatch('get_additional_info', information.id)
+      //
+      //     return true
+      //   })
+      //   .catch((error) => {
+      //     console.log('Refresh token error.', error)
+      //     this.commit('removeToken')
+      //     return false
+      //   })
     },
     inspectToken() {
-      const token = Vue.cookie.get('SESSION')
+      let token = Vue.cookie.get('SESSION')
 
       if (token !== null) {
         // Token is existed
         let decoded = Decoder(token)
         let exp = decoded.exp
         let two_hours = 2 * 60 * 60
-        // let five_and_fifty_nine = 5 * 60 * 60 + 59 * 60 + 30
+        let five_and_fifty_nine = 5 * 60 * 60 + 59 * 60 + 30
+
+        console.log('inspect exp? ', exp)
 
         if ((Date.now() / 1000) > exp) {
           // If token is expired
@@ -144,21 +148,24 @@ export default new Vuex.Store({
           this.commit('removeToken')
 
           return false
-        } else if ((Date.now() / 1000) < exp && (Date.now() / 1000) > exp - two_hours) {
+        } else if ((Date.now() / 1000) < exp && (Date.now() / 1000) > exp - five_and_fifty_nine) {
 
           return axios.post(this.state.endpoints.refreshJWT, token)
             .then(() => {
 
-              const token = Vue.cookie.get('SESSION')
-              const decoded = Decoder(token)
 
-              const information = {
-                id: decoded.id,
-                email: decoded.email,
-                username: decoded.username,
-                is_superuser: decoded.is_superuser,
-                is_staff: decoded.is_staff,
-                access_role: decoded.access_role,
+              let token_ref = Vue.cookie.get('SESSION')
+              let decoded_ref = Decoder(token_ref)
+
+              console.log('axios ref token ', decoded_ref)
+
+              let information = {
+                id: decoded_ref.id,
+                email: decoded_ref.email,
+                username: decoded_ref.username,
+                is_superuser: decoded_ref.is_superuser,
+                is_staff: decoded_ref.is_staff,
+                access_role: decoded_ref.access_role,
               }
 
               this.commit('setAuthUser', {
@@ -181,7 +188,7 @@ export default new Vuex.Store({
           // Token is not expired
           // console.log('If token is nice')
           // Forced push user data by token
-          const information = {
+          let information = {
             id: decoded.id,
             email: decoded.email,
             username: decoded.username,
