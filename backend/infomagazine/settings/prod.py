@@ -42,7 +42,8 @@ SECURE_HSTS_PRELOAD = True
 
 STATIC_URL = f"""https://{os.getenv('STATIC_URL')}/static/"""
 
-# CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True
+
 #
 # SESSION_COOKIE_SAMESITE = 'Strict'
 # CSRF_COOKIE_SAMESITE = 'Strict'
