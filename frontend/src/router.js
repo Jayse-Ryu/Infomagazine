@@ -217,11 +217,11 @@ router.beforeEach((to, from, next) => {
       alert('권한이 없는 페이지입니다.')
       from.meta.protect_leave = 'no'
       next({name: 'gateway'})
-      router.push({name: dummy})
+      router.push({name: 'sign_in'})
     } else {
       alert('권한이 없는 페이지입니다.')
       next({name: 'gateway'})
-      router.push({name: dummy})
+      router.push({name: 'sign_in'})
     }
   }
 
@@ -278,6 +278,7 @@ router.beforeEach((to, from, next) => {
         // Inspect return is set True or false
         Store.dispatch('inspectToken')
           .then((response) => {
+            // console.log('inspect 1 res ', response)
             if (response === true) {
               next({name: 'landing_list'})
             } else {
@@ -303,6 +304,7 @@ router.beforeEach((to, from, next) => {
       // Remained router is Cookie check
       Store.dispatch('inspectToken')
         .then((response) => {
+          // console.log('inspect 2 res ', response)
           if (response === true) {
             work()
           } else {
