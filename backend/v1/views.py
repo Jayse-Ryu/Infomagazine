@@ -10,7 +10,7 @@ from rest_framework_simplejwt.serializers import TokenObtainSlidingSerializer, T
 from rest_framework_simplejwt.views import TokenObtainSlidingView, TokenRefreshSlidingView, TokenObtainPairView, \
     TokenRefreshView, TokenViewBase
 
-from v1.serializers import CustomTokenObtainSlidingSerializer
+from v1.serializers import CustomTokenObtainSlidingSerializer, CustomTokenRefreshSlidingSerializer
 
 
 class _CommonSlidingTokenView(TokenViewBase):
@@ -26,7 +26,7 @@ class _CommonSlidingTokenView(TokenViewBase):
 
         response_data = serializer.validated_data
 
-        response = Response({"token": response_data.get('session_token')})
+        response = Response({"token": response_data.get('token')})
 
         expiration = (
                 datetime.utcnow() + settings.SIMPLE_JWT['SLIDING_TOKEN_LIFETIME']
@@ -41,6 +41,8 @@ class _CommonSlidingTokenView(TokenViewBase):
 
         return response
 
+    # def get_serializer_context(self):
+
 
 class CustomTokenObtainSlidingView(_CommonSlidingTokenView, TokenObtainSlidingView):
     serializer_class = CustomTokenObtainSlidingSerializer
@@ -50,7 +52,7 @@ custom_token_obtain_sliding = CustomTokenObtainSlidingView.as_view()
 
 
 class CustomTokenRefreshSlidingView(_CommonSlidingTokenView, TokenRefreshSlidingView):
-    pass
+    serializer_class = CustomTokenRefreshSlidingSerializer
 
 
 custom_token_refresh_sliding = CustomTokenRefreshSlidingView.as_view()
