@@ -26,7 +26,7 @@ class _CommonSlidingTokenView(TokenViewBase):
 
         response_data = serializer.validated_data
 
-        response = Response({"token": response_data.get('session_token')})
+        response = Response({"token": response_data.get('token')})
 
         expiration = (
                 datetime.utcnow() + settings.SIMPLE_JWT['SLIDING_TOKEN_LIFETIME']
