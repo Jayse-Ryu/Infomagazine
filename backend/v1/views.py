@@ -28,11 +28,15 @@ class _CommonSlidingTokenView(TokenViewBase):
 
         response = Response({"token": response_data.get('session_token')})
 
+        expiration = (
+                datetime.utcnow() + settings.SIMPLE_JWT['SLIDING_TOKEN_LIFETIME']
+        )
+
         response.set_cookie(
-            'JWT', response_data.get('token'), expires=response_data['expired_data'], httponly=True, samesite='Lax'
+            'JWT', response_data.get('token'), expires=expiration, httponly=True, samesite='Lax'
         )
         response.set_cookie(
-            'SESSION', response_data.get('session_token'), expires=response_data['expired_data'], samesite='Lax'
+            'SESSION', response_data.get('session_token'), expires=expiration, samesite='Lax'
         )
 
         return response

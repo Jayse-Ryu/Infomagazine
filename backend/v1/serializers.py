@@ -27,11 +27,7 @@ class CustomTokenObtainSlidingSerializer(TokenObtainSlidingSerializer):
         session_token['is_superuser'] = self.user.is_superuser
         session_token['is_staff'] = self.user.is_staff
         session_token['access_role'] = user_info_dict['access_role']
-        expiration = str(datetime.utcnow() + settings.SIMPLE_JWT['SLIDING_TOKEN_LIFETIME'])
-        session_token['expired_data'] = expiration
 
         data['session_token'] = str(session_token)
-
-        data['expired_data'] = expiration
 
         return data
