@@ -55,43 +55,18 @@ export default new Vuex.Store({
       // Vue.set(state, 'authUser', JSON.stringify(authUser))
       localStorage.setItem('authUser', JSON.stringify(authUser))
     },
-    // setToken(state, newToken) {
-    //   // localStorage.setItem('token', newToken)
-    //   // state.jwt = newToken
-    //   try {
-    //     Vue.cookie.set('token', newToken, {expires: '300m'})
-    //   } catch (error) {
-    //     console.log('Set token cookie error', error)
-    //   }
-    // },
     removeToken(state) {
       localStorage.removeItem('authUser')
-      // state.authUser = {}
-      // state.jwt = null
       state.isAuthenticated = false
-      // Vue.cookie.delete('JWT')
-      // Vue.cookie.delete('csrftoken')
-      // Vue.cookie.delete('token')
-      // Vue.cookie.delete('authUser')
       Vue.cookie.delete('SESSION')
+      Vue.cookie.delete('csrftoken')
     }
   },
   actions: {
     obtainToken(self, data) {
 
-      const decoded = Decoder(data.token)
-
-      // this.commit('removeToken')
-
-      // const information = {
-      //   id: data.id,
-      //   email: data.email,
-      //   username: data.username,
-      //   is_superuser: data.is_superuser,
-      //   is_staff: data.is_staff,
-      //   access_role: data.access_role,
-      //   expire: data.expired_data
-      // }
+      const token = Vue.cookie.get('SESSION')
+      const decoded = Decoder(token)
 
       const information = {
         id: decoded.id,
@@ -102,12 +77,13 @@ export default new Vuex.Store({
         access_role: decoded.access_role,
       }
 
+      console.log('obtain information', information)
+
       this.commit('setAuthUser', {
         authUser: information,
         isAuthenticated: true
       })
 
-      // this.get_additional_info(data.id)
       this.dispatch('get_additional_info', information.id)
 
       // axios.defaults.headers.common['Authorization'] = `JWT ${this.state.jwt}`
@@ -115,84 +91,47 @@ export default new Vuex.Store({
 
       return true
     },
-    refreshToken(self, token) {
+    refreshToken() {
       console.log('refreshToken')
 
       // // Refresh endpoint
       axios.post(this.state.endpoints.refreshJWT)
         .then((response) => {
-          console.log('refresh response', response)
           // this.dispatch('obtainToken', response.data.token)
+
+          const token = Vue.cookie.get('SESSION')
+          const decoded = Decoder(token)
+
+          const information = {
+            id: decoded.id,
+            email: decoded.email,
+            username: decoded.username,
+            is_superuser: decoded.is_superuser,
+            is_staff: decoded.is_staff,
+            access_role: decoded.access_role,
+          }
+
+          console.log('refr information', information)
+
+          this.commit('setAuthUser', {
+            authUser: information,
+            isAuthenticated: true
+          })
+
+          this.dispatch('get_additional_info', information.id)
 
           return true
         })
         .catch((error) => {
           console.log('Refresh token error.', error)
-
+          this.commit('removeToken')
           return false
         })
     },
     inspectToken() {
       const token = Vue.cookie.get('SESSION')
 
-      // let decoded = Decoder(token)
-      // let exp = decoded.exp
-      // console.log('jwt exp is?', exp)
-      // console.log(token)
-
-      const user_storage = localStorage.getItem('authUser')
-
-      // if (user_storage !== null) {
-      //
-      //   // console.log('construc', user_storage.constructor)
-      //   // console.log('length', Object.keys(user_storage).length)
-      //
-      //   if (Object.keys(user_storage).length !== 0 && user_storage.constructor === Object) {
-      //     // console.log('starage is not null? ')
-      //     let user = JSON.parse(user_storage)
-      //     this.commit('setAuthUser', {
-      //       authUser: user,
-      //       isAuthenticated: true
-      //     })
-      //
-      //     if (this.state.user_campaign.organization === -1 && this.state.user_campaign.company === -1) {
-      //       this.dispatch('get_additional_info', user.id)
-      //     }
-      //     return true
-      //   } else {
-      //     // console.log('starage is null? ')
-      //     this.commit('removeToken')
-      //     return false
-      //   }
-      // } else {
-      //   // console.log('starage is null? ')
-      //   this.commit('removeToken')
-      //   return false
-      // }
-
-
-      // // Object.keys(obj).length === 0 && obj.constructor === Object
-      // if (Object.keys(user_storage).length !== 0 && user_storage.constructor === Object) {
-      //   console.log('starage is not null? ')
-      //   let user = JSON.parse(user_storage)
-      //   this.commit('setAuthUser', {
-      //     authUser: user,
-      //     isAuthenticated: true
-      //   })
-      //
-      //   if (this.state.user_campaign.organization === -1 && this.state.user_campaign.company === -1) {
-      //     this.dispatch('get_additional_info', user.id)
-      //   }
-      //   return true
-      // } else {
-      //   console.log('starage is null? ')
-      //   this.commit('removeToken')
-      //   return false
-      // }
-
-
       if (token !== null) {
-        console.log('token is not null?', token)
         // Token is existed
         let decoded = Decoder(token)
         let exp = decoded.exp
@@ -206,43 +145,37 @@ export default new Vuex.Store({
 
           return false
         } else if ((Date.now() / 1000) < exp && (Date.now() / 1000) > exp - five_and_fifty_nine) {
-          // console.log('If token is refresh period')
-          // this.dispatch('refreshToken', token)
 
-          const information = {
-            id: decoded.id,
-            email: decoded.email,
-            username: decoded.username,
-            is_superuser: decoded.is_superuser,
-            is_staff: decoded.is_staff,
-            access_role: decoded.access_role,
-          }
+          return axios.post(this.state.endpoints.refreshJWT, token)
+            .then(() => {
 
-          this.commit('setAuthUser', {
-            authUser: information,
-            isAuthenticated: true
-          })
+              const token = Vue.cookie.get('SESSION')
+              const decoded = Decoder(token)
 
-          this.dispatch('get_additional_info', information.id)
+              const information = {
+                id: decoded.id,
+                email: decoded.email,
+                username: decoded.username,
+                is_superuser: decoded.is_superuser,
+                is_staff: decoded.is_staff,
+                access_role: decoded.access_role,
+              }
 
-          axios.post(this.state.endpoints.refreshJWT, token)
-            .then((response) => {
-              console.log('refresh is done?', response)
+              this.commit('setAuthUser', {
+                authUser: information,
+                isAuthenticated: true
+              })
+
+              this.dispatch('get_additional_info', information.id)
+              console.log('return axios true')
               return true
             })
             .catch((error) => {
               console.log('refresh is error?', error)
+              this.commit('removeToken')
+              console.log('return axios false')
               return false
             })
-
-          // this.dispatch('refreshToken', token)
-          //   .then((response) => {
-          //     console.log('refresh response', response)
-          //   })
-          //   .catch((error) => {
-          //     console.log('refresh call fail', error)
-          //     return false
-          //   })
 
         } else {
           // Token is not expired
@@ -271,7 +204,6 @@ export default new Vuex.Store({
         }
 
       } else {
-        console.log('token is null?', token)
         // Token is null
         this.commit('removeToken')
 
@@ -279,6 +211,7 @@ export default new Vuex.Store({
       }
     },
     get_additional_info(self, user_id) {
+      // console.log('get addi?', user_id)
       if (user_id !== null) {
         axios.get(this.state.endpoints.baseUrl + 'users/' + user_id + '/')
           .then((response) => {
