@@ -24,16 +24,15 @@ class _CommonSlidingTokenView(TokenViewBase):
 
         csrf.get_token(request)
 
-        expiration = (
-                datetime.utcnow() + settings.SIMPLE_JWT['SLIDING_TOKEN_LIFETIME']
-        )
-
         response_data = serializer.validated_data
-        response_data.update({'expired_data': expiration})
-        response = Response(response_data)
+
+        response = Response({"token": response_data.get('session_token')})
+
         response.set_cookie(
-            'JWT', serializer.validated_data.get('token'), expires=expiration,
-            httponly=True, samesite='Lax'
+            'JWT', response_data.get('token'), expires=response_data['expired_data'], httponly=True, samesite='Lax'
+        )
+        response.set_cookie(
+            'SESSION', response_data.get('session_token'), expires=response_data['expired_data'], samesite='Lax'
         )
 
         return response
