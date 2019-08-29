@@ -5,16 +5,15 @@ from django.middleware import csrf
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
-from rest_framework_simplejwt.serializers import TokenObtainSlidingSerializer
-from rest_framework_simplejwt.views import TokenObtainSlidingView, TokenRefreshSlidingView
+from rest_framework_simplejwt.serializers import TokenObtainSlidingSerializer, TokenObtainPairSerializer, \
+    TokenRefreshSerializer
+from rest_framework_simplejwt.views import TokenObtainSlidingView, TokenRefreshSlidingView, TokenObtainPairView, \
+    TokenRefreshView, TokenViewBase
 
 from v1.serializers import CustomTokenObtainSlidingSerializer
 
 
-class CustomTokenObtainSlidingView(TokenObtainSlidingView):
-    serializer_class = CustomTokenObtainSlidingSerializer
-    # serializer_class = TokenObtainSlidingSerializer
-
+class _CommonSlidingTokenView(TokenViewBase):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
@@ -26,10 +25,11 @@ class CustomTokenObtainSlidingView(TokenObtainSlidingView):
         csrf.get_token(request)
 
         expiration = (
-                datetime.now() + settings.SIMPLE_JWT['SLIDING_TOKEN_LIFETIME']
+                datetime.utcnow() + settings.SIMPLE_JWT['SLIDING_TOKEN_LIFETIME']
         )
 
         response_data = serializer.validated_data
+        response_data.update({'expired_data': expiration})
         response = Response(response_data)
         response.set_cookie(
             'JWT', serializer.validated_data.get('token'), expires=expiration,
@@ -39,11 +39,37 @@ class CustomTokenObtainSlidingView(TokenObtainSlidingView):
         return response
 
 
+class CustomTokenObtainSlidingView(_CommonSlidingTokenView, TokenObtainSlidingView):
+    serializer_class = CustomTokenObtainSlidingSerializer
+
+
 custom_token_obtain_sliding = CustomTokenObtainSlidingView.as_view()
 
 
-class CustomTokenRefreshSlidingView(TokenRefreshSlidingView):
-    permission_classes = (permissions.IsAuthenticated,)
+class CustomTokenRefreshSlidingView(_CommonSlidingTokenView, TokenRefreshSlidingView):
+    pass
 
 
 custom_token_refresh_sliding = CustomTokenRefreshSlidingView.as_view()
+
+
+class CumstomTokenObtainPairView(TokenObtainPairView):
+    """
+    Takes a set of user credentials and returns an access and refresh JSON web
+    token pair to prove the authentication of those credentials.
+    """
+    serializer_class = TokenObtainPairSerializer
+
+
+custom_token_obtain_pair = TokenObtainPairView.as_view()
+
+
+class CustomTokenRefreshView(TokenRefreshView):
+    """
+    Takes a refresh type JSON web token and returns an access type JSON web
+    token if the refresh token is valid.
+    """
+    serializer_class = TokenRefreshSerializer
+
+
+custom_token_refresh = TokenRefreshView.as_view()
