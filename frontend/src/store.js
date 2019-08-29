@@ -192,6 +192,7 @@ export default new Vuex.Store({
 
 
       if (token !== null) {
+        console.log('token is not null?', token)
         // Token is existed
         let decoded = Decoder(token)
         let exp = decoded.exp
@@ -207,15 +208,6 @@ export default new Vuex.Store({
         } else if ((Date.now() / 1000) < exp && (Date.now() / 1000) > exp - five_and_fifty_nine) {
           // console.log('If token is refresh period')
           // this.dispatch('refreshToken', token)
-          // axios.post(this.state.endpoints.refreshJWT, token)
-          //   .then((response) => {
-          //     console.log('refresh is done?', response)
-          //     return true
-          //   })
-          //   .catch((error) => {
-          //     console.log('refresh is error?', error)
-          //     return false
-          //   })
 
           const information = {
             id: decoded.id,
@@ -233,18 +225,24 @@ export default new Vuex.Store({
 
           this.dispatch('get_additional_info', information.id)
 
-          this.dispatch('refreshToken', token)
+          axios.post(this.state.endpoints.refreshJWT, token)
             .then((response) => {
-              if (response === true) {
-                return true
-              } else {
-                return false
-              }
+              console.log('refresh is done?', response)
+              return true
             })
             .catch((error) => {
-              console.log('refresh call fail', error)
+              console.log('refresh is error?', error)
               return false
             })
+
+          // this.dispatch('refreshToken', token)
+          //   .then((response) => {
+          //     console.log('refresh response', response)
+          //   })
+          //   .catch((error) => {
+          //     console.log('refresh call fail', error)
+          //     return false
+          //   })
 
         } else {
           // Token is not expired
@@ -273,6 +271,7 @@ export default new Vuex.Store({
         }
 
       } else {
+        console.log('token is null?', token)
         // Token is null
         this.commit('removeToken')
 
