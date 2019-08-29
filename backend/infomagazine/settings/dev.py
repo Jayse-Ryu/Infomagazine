@@ -21,8 +21,6 @@ NOSE_ARGS = [
 
 STATIC_URL = 'https://%s/%s/' % ('assets.infomagazine.xyz', 'static')
 
-CSRF_COOKIE_HTTPONLY = True
-
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_WHITELIST = [
