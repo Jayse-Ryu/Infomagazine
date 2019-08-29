@@ -29,7 +29,7 @@ def _session_token_generator(user_info=None, exp=None):
         payload['access_role'] = user_info_dict['access_role']
 
     session_token = jwt.encode(payload=payload, key=settings.SECRET_KEY, algorithm='HS256')
-    return session_token
+    return session_token.decode('utf-8')
 
 
 class CustomTokenObtainSlidingSerializer(TokenObtainSlidingSerializer):
@@ -48,7 +48,7 @@ class CustomTokenObtainSlidingSerializer(TokenObtainSlidingSerializer):
 
         generated_token = jwt.decode(str(token).encode('utf-8'), settings.SECRET_KEY)
 
-        data['session_token'] = str(_session_token_generator(self.user, exp=generated_token['exp']).decode('utf-8'))
+        data['session_token'] = str(_session_token_generator(self.user, exp=generated_token['exp']))
 
         return data
 
