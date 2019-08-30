@@ -1,3 +1,4 @@
+from django.middleware import csrf
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions, status
 from rest_framework.decorators import action
@@ -15,10 +16,10 @@ class UserViewSets(CustomModelViewSet):
     serializer_class = UserSerializer
     filterset_class = UserFilter
 
-    @csrf_exempt
-    def create(self, request, *args, **kwargs):
-        get_create = super().create(request, *args, **kwargs)
-        return get_create
+    @action(detail=False, methods=['GET'])
+    def csrf(self, request):
+        csrf.get_token(request)
+        return Response(status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['POST'])
     def create_client(self, request):
@@ -66,7 +67,7 @@ class UserViewSets(CustomModelViewSet):
             permission_classes = [custom_permissions.IsMarketer]
         elif self.action in ['retrieve', 'update', 'partial_update']:
             permission_classes = [permissions.IsAuthenticated]
-        elif self.action in ['create', 'email_check']:
+        elif self.action in ['create', 'email_check', 'csrf']:
             permission_classes = [permissions.AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
