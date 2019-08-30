@@ -10,6 +10,13 @@ from rest_framework_simplejwt.tokens import SlidingToken
 
 
 def _session_token_generator(user_info=None, exp=None):
+    """
+    2019/08/30
+
+    :param user_info:
+    :param exp:
+    :return:
+    """
     payload = {}
 
     if isinstance(user_info, dict):
@@ -43,6 +50,12 @@ class CustomTokenObtainSlidingSerializer(TokenObtainSlidingSerializer):
         pass
 
     def validate(self, attrs):
+        """
+        2019/08/30
+
+        :param attrs:
+        :return:
+        """
         data = super().validate(attrs)
 
         token = self.get_token(self.user)
@@ -64,6 +77,12 @@ class CustomTokenRefreshSlidingSerializer(serializers.Serializer):
         pass
 
     def validate(self, attrs):
+        """
+        2019/08/30
+
+        :param attrs:
+        :return:
+        """
         requested_cookies = self.context['request'].COOKIES
 
         try:
@@ -79,7 +98,8 @@ class CustomTokenRefreshSlidingSerializer(serializers.Serializer):
         token.set_exp()
 
         refreshed_token = jwt.decode(str(token).encode('utf-8'), settings.SECRET_KEY)
+
         requested_refresh_token = jwt.decode(requested_cookies['SESSION'].encode('utf-8'), settings.SECRET_KEY)
 
         return {'token': str(token), 'session_token': str(
-            _session_token_generator(user_info=requested_refresh_token, exp=refreshed_token['refresh_exp']))}
+            _session_token_generator(user_info=requested_refresh_token, exp=refreshed_token['exp']))}

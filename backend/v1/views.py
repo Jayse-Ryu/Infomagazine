@@ -35,13 +35,12 @@ class _CommonSlidingTokenView(TokenViewBase):
         response.set_cookie(
             'JWT', response_data.get('token'), expires=expiration, httponly=True, samesite='Lax'
         )
+
         response.set_cookie(
             'SESSION', response_data.get('session_token'), expires=expiration, samesite='Lax'
         )
 
         return response
-
-    # def get_serializer_context(self):
 
 
 class CustomTokenObtainSlidingView(_CommonSlidingTokenView, TokenObtainSlidingView):
