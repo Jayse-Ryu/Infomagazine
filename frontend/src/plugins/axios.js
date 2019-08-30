@@ -19,6 +19,9 @@ const _axios = axios.create(config);
 _axios.interceptors.request.use(
   function (config) {
     // Do something before request is sent
+    // HTTP_X_CSRFTOKEN
+    config.xsrfCookieName = 'csrftoken';
+    config.xsrfHeaderName = 'x-csrftoken';
     config.withCredentials = true;
     return config;
   },

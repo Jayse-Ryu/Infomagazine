@@ -2,7 +2,6 @@ from datetime import datetime
 
 from django.conf import settings
 from django.middleware import csrf
-from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.serializers import TokenObtainSlidingSerializer, TokenObtainPairSerializer, \

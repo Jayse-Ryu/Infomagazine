@@ -1,3 +1,5 @@
+from corsheaders.defaults import default_headers
+
 from .base import *
 
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -16,13 +18,14 @@ NOSE_ARGS = [
     '-I=slik'
 ]
 
-# CORS_ORIGIN_ALLOW_ALL = True
-
-
 STATIC_URL = 'https://%s/%s/' % ('assets.infomagazine.xyz', 'static')
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8080'
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'localhost:8080'
 ]
