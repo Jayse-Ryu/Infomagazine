@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from django.conf import settings
@@ -31,13 +32,29 @@ class _CommonSlidingTokenView(TokenViewBase):
                 datetime.utcnow() + settings.SIMPLE_JWT['SLIDING_TOKEN_LIFETIME']
         )
 
-        response.set_cookie(
-            'JWT', response_data.get('token'), expires=expiration, httponly=True, samesite='Lax'
-        )
+        if os.getenv('SERVER_TYPE') == "dev":
+            response.set_cookie(
+                'JWT', response_data.get('token'), expires=expiration, httponly=True
+            )
 
-        response.set_cookie(
-            'SESSION', response_data.get('session_token'), expires=expiration, samesite='Lax'
-        )
+            response.set_cookie(
+                'SESSION', response_data.get('session_token'), expires=expiration
+            )
+        else:
+            response.set_cookie(
+                'JWT', response_data.get('token'),
+                expires=expiration,
+                httponly=True,
+                domain=settings.CSRF_COOKIE_DOMAIN,
+                secure=True
+            )
+
+            response.set_cookie(
+                'SESSION', response_data.get('session_token'),
+                expires=expiration,
+                domain=settings.CSRF_COOKIE_DOMAIN,
+                secure=True
+            )
 
         return response
 

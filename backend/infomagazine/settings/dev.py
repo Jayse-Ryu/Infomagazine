@@ -18,8 +18,6 @@ NOSE_ARGS = [
     '-I=slik'
 ]
 
-STATIC_URL = 'https://%s/%s/' % ('assets.infomagazine.xyz', 'static')
-
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_WHITELIST = [
