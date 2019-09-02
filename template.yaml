@@ -208,7 +208,7 @@ Resources:
       Family: !Ref "AppName"
       ContainerDefinitions:
         - Name: "WebServer"
-          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/infomagazine-web-server:v0.22.8"
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/infomagazine-web-server:v0.22.11"
           Cpu: "500"
           Memory: "40"
           PortMappings:
@@ -225,7 +225,7 @@ Resources:
               awslogs-region: !Ref "AWS::Region"
               awslogs-stream-prefix: "ecs"
         - Name: "APIServer"
-          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/infomagazine-api-server:v0.22.8"
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/infomagazine-api-server:v0.22.11"
           Cpu: "1500"
           Memory: "400"
           MemoryReservation: "300"
@@ -277,6 +277,8 @@ Resources:
               ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/INFOMAGAZINE_CORS_ORIGIN_WHITELIST"
             - Name: "CSRF_TRUSTED_ORIGINS"
               ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/INFOMAGAZINE_CSRF_TRUSTED_ORIGINS"
+            - Name: "CSRF_COOKIE_DOMAIN"
+              ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/INFOMAGAZINE_CSRF_COOKIE_DOMAIN"
       Volumes:
         - Name: "tmp_data"
           DockerVolumeConfiguration:

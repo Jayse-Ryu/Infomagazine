@@ -6,7 +6,6 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action, renderer_classes
 from rest_framework.renderers import StaticHTMLRenderer
 from rest_framework.response import Response
-from rest_framework.utils import json
 
 import v1.permissions as custom_permissions
 from infomagazine.utils import response_decorator
@@ -92,15 +91,15 @@ class LandingPageViewSets(_LandingPageViewSetsUtils):
 
     @response_decorator
     def create(self, request):
-        body = json.loads(request.body)
         document = {
-            "company_id": body['company_id'],
-            "landing_info": body['landing_info'],
-            "updated_date": body['updated_date']
+            "company_id": request.data['company_id'],
+            "landing_info": request.data['landing_info'],
+            "updated_date": request.data['updated_date']
         }
         response_data = self.landing_pages_model.create(choice_collection='landing_pages', document=document)
         response_data.update({"options": {'status': status.HTTP_201_CREATED} if response_data['state'] else {
-            'status': status.HTTP_503_SERVICE_UNAVAILABLE}})
+            'status': status.HTTP_500_INTERNAL_SERVER_ERROR}})
+
         return response_data
 
     @response_decorator
