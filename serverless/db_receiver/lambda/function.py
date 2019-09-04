@@ -46,7 +46,7 @@ def _send_to_sqs(event, response_headers):
     exist_check = False
     with rds_connection.cursor(pymysql.cursors.DictCursor) as cursor:
         for key, item in body['schema'].items():
-            if item in ['전화번호', '핸드폰번호']:
+            if item in ['전화번호', '핸드폰번호', '연락처']:
                 key_to_search = key
                 value_to_search = body['data'][key_to_search]
                 json_exist_sql_command = f"""

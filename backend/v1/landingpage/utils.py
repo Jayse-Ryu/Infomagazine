@@ -1,5 +1,5 @@
 """
-요청 정보로 랜딩 페이지 html을 구성하는 작업을 담당하는 클래스
+요청 정보로 랜딩 페이지 소스코드를 구성하는 작업을 담당
 """
 import base64
 import json
@@ -12,11 +12,14 @@ def _convert_to_html(tag_string):
 
 
 class Default:
-    """
-    2019/08/26
+    """랜딩 페이지의 기본 HTML, CSS, JS"""
 
-    """
     def __init__(self, landing_config):
+        """
+        2019/09/03
+
+        :param landing_config:
+        """
         self.default_html = f"""
                         <!DOCTYPE html>
                 <html lang="ko-kr">
@@ -26,8 +29,7 @@ class Default:
                     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
                     <title>{landing_config['title']}</title>
 
-                    <!-- Control the behavior of search engine crawling and indexing -->
-                    <meta name="robots" content="index,follow"><!-- All Search Engines -->
+                    <meta name="robots" content="index,follow">
                     <link rel="shortcut icon" href="https://landings.infomagazine.xyz/favicon.ico" type="image/x-icon">
                     <link rel="icon" href="https://landings.infomagazine.xyz/favicon.ico" type="image/x-icon">
                 </head>
@@ -106,6 +108,15 @@ class Default:
                     display: flex;
                     align-items: center;
                 }
+                
+                .form-group.terms{
+                    font-size: 1.7vw;
+                }
+                
+                .form-group.terms a{
+                    color: #007bff;
+                    cursor: pointer;
+                }
 
                 .form-group-prepend {
                     display: flex;
@@ -113,7 +124,6 @@ class Default:
 
                 .form-group-label {
                     display: flex;
-                    width: 100%;
                     align-items: center;
                 }
 
@@ -135,6 +145,14 @@ class Default:
                     border-radius: 0.5vw;
                 }
                 
+                input.form-button {
+                    border: none;
+                    border-radius: unset;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    background-size: 100%;
+                }
+                
                 .video-box {
                     position: absolute;
                     width: 100%;
@@ -152,12 +170,58 @@ class Default:
                         height: 50px;
                         border-radius: 5px
                     }
+                    
+                    .form-group.terms{
+                        font-size: 1.3rem;
+                    }
 
                     .form-button {
                         height: 50px;
                         padding: 5px;
                         border-radius: 5px
                     }
+                }
+                
+                .dim-layer {
+                  display: none;
+                  position: fixed;
+                  _position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  z-index: 100;
+                }
+                
+                .dim-layer .dim-background {
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  background: #000;
+                  opacity: .5;
+                  filter: alpha(opacity=50);
+                }
+                
+                .pop-layer .pop-container {
+                  padding: 10px;
+                }
+                
+                .pop-layer {
+                  display: none;
+                  position: absolute;
+                  top: 5%;
+                  left: 5%;
+                  width: 90%;
+                  height: auto;
+                  background-color: #fff;
+                  border: 5px solid #3571B5;
+                  z-index: 10;
+                }
+                
+                .dim-layer .pop-layer {
+                  display: block;
                 }
             </style>
                 """
@@ -185,11 +249,22 @@ class Default:
 
 
 class StyleSheet(Default):
+    """랜딩페이지의 스타일시트 생성"""
+
     def __init__(self, landing_config):
         self.landing_config = landing_config
         super(StyleSheet, self).__init__(landing_config)
 
     def _css_section_height(self, section_id=None, section_h=None):
+        """
+        2019/09/03
+
+        섹션의 전체 높이를 설정한다.
+        margin을 이용하여 다이나믹한 높이를 설정.
+
+        :param section_id: 섹션 번호
+        :param section_h: 섹션 전체 높이
+        """
         height = section_h / 10
         result = f"""
         section[data-section-id="{section_id}"] {{
@@ -199,6 +274,16 @@ class StyleSheet(Default):
         self.layout_stylesheets += result
 
     def _css_object_block_size(self, section_id=None, object_id=None, layout_info=None):
+        """
+        2019/09/03
+
+        섹션안의 객체 블록 사이즈를 설정.
+        객체 블록은 이미지, DB폼, 동영상을 감싸고 있다.
+
+        :param section_id: 섹션 번호
+        :param object_id: 객체 번호
+        :param layout_info: 객체의 사이즈 정보 딕셔너리
+        """
         object_x = layout_info['position']['x']
         object_y = layout_info['position']['y']
         object_w = layout_info['position']['w']
@@ -217,12 +302,18 @@ class StyleSheet(Default):
 
     def _css_object_by_type_size(self, object_type=None, section_id=None, object_id=None, layout_info=None):
         """
-        2019/08/25
+        2019/09/03
 
-        :param object_type:
-        :param section_id:
-        :param object_id:
-        :param layout_info:
+        객체의 타입별 사이즈 설정.
+
+        :param object_type: 객체 타입
+        :param section_id: 섹션 번호
+        :param object_id: 객체 번호
+        :param layout_info: 객체 정보 딕셔너리
+
+        object_type == 1 : 이미지 객체
+        object_type == 2 : 폼 객체
+        object_type == 3 : 비디오 객체
         """
         object_w = layout_info['position']['w']
         object_h = layout_info['position']['h']
@@ -263,6 +354,19 @@ class StyleSheet(Default):
 
     def _css_field_position(self, section_id=None, object_id=None, object_w=None, object_h=None, field_id=None,
                             field_info=None, field_position_set=None):
+        """
+        2019/09/03
+
+        DB폼 내의 각 필드의 블록 사이즈와 위치를 설정.
+
+        :param section_id: 섹션 번호
+        :param object_id: 객체 번호
+        :param object_w: 객체 가로 길이
+        :param object_h: 객체 높이
+        :param field_id: 필드 번호
+        :param field_info: 필드 인포
+        :param field_position_set: 필드 위치 정보
+        """
         field_x = field_position_set['x']
         field_y = field_position_set['y']
         field_w = field_position_set['w']
@@ -282,6 +386,17 @@ class StyleSheet(Default):
         self.layout_stylesheets += result
 
     def _css_field_label_size(self, section_id=None, object_id=None, field_info_list=None, form_group_id=None):
+        """
+        2019/09/03
+
+        필드의 라벨 가로 길이를 설정.
+
+        :param section_id: 섹션 번호
+        :param object_id: 객체 번호
+        :param field_info_list: 필드 정보 리스트
+        :param form_group_id: 폼 그룹 번호
+        :return:
+        """
         field_name_list = [len(field['name'])
                            for field_index, field
                            in enumerate(field_info_list)
@@ -317,15 +432,25 @@ class StyleSheet(Default):
         self.layout_stylesheets += result
 
     def _stylesheets_generate(self):
+        """
+        2019/09/03
+
+        생성된 모든 스타일시트를 반환
+
+        :return: 모든 스타일시트
+        """
         result = self.default_stylesheets
         result += f"""<style>{self.layout_stylesheets}</style>"""
         return result
 
 
 class Script(Default):
+    """랜딩페이지의 스크립트 작성"""
+
     def __init__(self, landing_config):
         self.landing_config = landing_config
         super(Script, self).__init__(landing_config)
+
         self.facebook_pixel_check = False
         if landing_config['tracking_info']['fb']:
             self.facebook_pixel_check = True
@@ -343,6 +468,13 @@ class Script(Default):
             self.google_display_network = True
 
     def _js_init_datepicker(self, field_id=None):
+        """
+        2019/09/03
+
+        캘린더 설정 초기화
+
+        :param field_id: 필드 번호
+        """
         result = f"""
         $('#{field_id}').datepicker({{
             format: 'yyyy-mm-dd',
@@ -355,6 +487,14 @@ class Script(Default):
         self.landing_scripts += result
 
     def _js_submit_event(self, section_id=None, item_group=None):
+        """
+        2019/09/03
+
+        DB등록 이벤트 생성
+
+        :param section_id: 섹션 번호
+        :param item_group: 보낼 DB들의 정보 묶음
+        """
         converted_item_group = {}
         for item in item_group:
             if item['type'] == 9 and 'required' in item['validation']:
@@ -373,6 +513,13 @@ class Script(Default):
         self.landing_scripts += result
 
     def _js_validation(self, section_id=None):
+        """
+        2019/09/03
+
+        DB폼 벨리데이션 생성
+
+        :param section_id: 섹션 번호
+        """
         result = f"""
         function form_{section_id}_validation($this, item_group) {{
             // required
@@ -472,9 +619,11 @@ class Script(Default):
 
     def _js_call_ajax(self, section_id=None):
         """
-        2019/08/26
+        2019/09/03
 
-        :param section_id:
+        DB입력 AJAX
+
+        :param section_id: 섹션 번호
         """
         facebook_pixel_callback = ""
         if self.facebook_pixel_check:
@@ -508,11 +657,11 @@ class Script(Default):
                     if (data['state']) {{
                         {facebook_pixel_callback}
                         {kakao_pixel_callback}
-                        sessionStorage.setItem('current_epoch_time', Date.now());
                         alert(data['message']);
                     }} else {{
                         alert(data['message']);
                     }}
+                    sessionStorage.setItem('current_epoch_time', Date.now());
                 }},
                 error: function (data) {{
                     var response = data.responseText;
@@ -527,6 +676,13 @@ class Script(Default):
         self.landing_scripts += result
 
     def _js_call_ajax_by_phone_auth(self, section_id=None):
+        """
+        2019/09/03
+
+        번호 인증이 추가된 DB입력 AJAX
+
+        :param section_id: 섹션 번호
+        """
         result = f"""
                 function call_form_{section_id}_ajax(item_group) {{
                     var IMP = window.IMP;
@@ -596,10 +752,30 @@ class Script(Default):
                 """
         self.landing_scripts += result
 
+    # TODO 업그레이드 필요
+    def _js_terms_trigger(self):
+        """
+        2019/09/03
+
+        :return: 약관 트리거 이벤트
+        """
+        result = """
+        $('.terms-button').click(function(){
+            $('#popup-layer').fadeIn();
+            $('.dim-background, .terms-close-button').click(function(){
+                $('#popup-layer').fadeOut();
+            })
+        })
+        """
+        self.landing_scripts += result
+
     def _scripts_generate(self):
         """
-        2019/08/25
+        2019/09/03
 
+        생성된 모든 스크립트 반환
+
+        :return: 모든 스크립트
         """
 
         result = self.default_scripts
@@ -616,6 +792,8 @@ class Script(Default):
     def _facebook_pixel_head(self):
         """
         2019/08/23
+
+        :return: 페이스북 픽셀 공통 스크립트
         """
 
         return f"""
@@ -638,6 +816,8 @@ class Script(Default):
     def _facebook_pixel_body(self):
         """
         2019/08/23
+
+        :return: 페이스북 픽셀 노스크립트
         """
 
         return f"""
@@ -651,6 +831,8 @@ class Script(Default):
     def _kakao_pixel(self):
         """
         2019/08/23
+
+        :return: 카카오 픽셀 공통 스크립트
         """
 
         return f"""
@@ -663,6 +845,8 @@ class Script(Default):
     def _google_display_network(self):
         """
         2019/08/23
+
+        :return: GDN 공통 스크립트
         """
 
         return f"""
@@ -678,6 +862,11 @@ class Script(Default):
         """
 
     def _hijack(self):
+        """
+        2019/09/03
+
+        :return: 후팝업 스크립트
+        """
         return f"""
         <!--Backward catch that called 후팝업 -->
         <script>
@@ -697,6 +886,8 @@ class Script(Default):
 
 
 class LandingPage(StyleSheet, Script):
+    """주어진 랜딩 정보로 랜딩 페이지를 생성"""
+
     def __init__(self, landing_info, is_generate=False):
         self.landing_config = landing_info['landing']
         super(LandingPage, self).__init__(landing_config=self.landing_config)
@@ -714,6 +905,10 @@ class LandingPage(StyleSheet, Script):
                                  object_h=None, field_id=None,
                                  field_info=None, field_position_set=None):
         """
+        2019/09/03
+
+        DB폼 필드 생성
+
         1: 텍스트 - input text
         2: 숫자 - input number
         3: 전화번호 - input number
@@ -723,6 +918,8 @@ class LandingPage(StyleSheet, Script):
         7: 날짜 - date
         8: 완료버튼 - script
         9: 약관동의 - chk
+
+        :return: 필드 번호, 필드 타입, jQuery객체, 벨리데이션
         """
         self._css_field_position(section_id=section_id,
                                  object_id=object_id,
@@ -837,15 +1034,24 @@ class LandingPage(StyleSheet, Script):
                     """
                 self.is_datepicker_to_add = True
         elif field_type == 8:
-            button_tag = base_html.new_tag('button', attrs={'type': 'button',
-                                                            'class': 'form-button',
-                                                            'id': "form_" + str(section_id) + "_submit_button"})
-            button_tag.string = field_info['name']
+            if field_info['image_data'] == '':
+                button_tag = base_html.new_tag('button', attrs={'type': 'button',
+                                                                'class': 'form-button',
+                                                                'id': "form_" + str(section_id) + "_submit_button"})
+                button_tag.string = field_info['name']
+            else:
+                button_tag = base_html.new_tag('input', attrs={'type': 'button',
+                                                               'class': 'form-button',
+                                                               'id': "form_" + str(section_id) + "_submit_button",
+                                                               'style': 'background-image: url(' + field_info[
+                                                                   'image_data'] + ')'})
             form_group.append(button_tag)
         elif field_type == 9:
+            form_group.attrs.update({'class': 'form-group terms'})
             label_tag = base_html.new_tag('label', attrs={'for': field_id,
                                                           'class': 'form-group-label'})
             label_tag.string = field_info['holder']
+
             checkbox_option = {'type': 'checkbox',
                                'id': field_id,
                                'data-label-name': field_info['name']}
@@ -854,6 +1060,32 @@ class LandingPage(StyleSheet, Script):
             input_tag = base_html.new_tag('input', attrs=checkbox_option)
             form_group.append(input_tag)
             form_group.append(label_tag)
+            if self.landing_config['is_term']:
+                a_tag_to_terms_detail = base_html.new_tag('a', attrs={'class': 'terms-button'})
+                a_tag_to_terms_detail.string = "[보기]"
+                form_group.append(a_tag_to_terms_detail)
+
+                div_to_dim_layer = base_html.new_tag('div', attrs={'id': 'popup-layer', 'class': 'dim-layer'})
+                div_to_dim_background = base_html.new_tag('div', attrs={'class': 'dim-background'})
+                div_to_popup_layer = base_html.new_tag('div', attrs={'class': 'pop-layer'})
+                div_to_popup_container = base_html.new_tag('div', attrs={'class': 'pop-container'})
+                div_to_popup_contents = base_html.new_tag('div', attrs={'class': 'pop-contents'})
+                div_to_terms_title = base_html.new_tag('h4', attrs={'class': 'terms-title'})
+                div_to_terms_title.string = self.term_config['title']
+                div_to_terms_contents = base_html.new_tag('div', attrs={'class': 'terms-contents'})
+                div_to_terms_contents.string = self.term_config['content']
+                div_to_close_button = base_html.new_tag('button', attrs={'class': 'terms-close-button'})
+                div_to_close_button.string = "닫기"
+                div_to_popup_contents.append(div_to_close_button)
+                div_to_popup_contents.append(div_to_terms_title)
+                div_to_popup_contents.append(div_to_terms_contents)
+                div_to_popup_container.append(div_to_popup_contents)
+                div_to_popup_layer.append(div_to_popup_container)
+                div_to_dim_layer.append(div_to_dim_background)
+                div_to_dim_layer.append(div_to_popup_layer)
+                base_html.append(div_to_dim_layer)
+
+                self._js_terms_trigger()
 
         if field_type in [8, 9]:
             return form_group, None
@@ -884,11 +1116,13 @@ class LandingPage(StyleSheet, Script):
         loop: 영상 반복
         fs: 풀스크린
         disablekb: 키보드 컨트롤
+
+        :return: iframe 태그
         """
         # TODO 비메오 추후 추가
         video_url = layout_info['video_url']
         iframe_tag = base_html.new_tag('iframe', attrs={
-            'class':'video-box',
+            'class': 'video-box',
             'src': f'https://www.youtube.com/embed/{video_url}',
             'allowfullscreen': 'allowfullscreen',
             'frameBorder': '0'})

@@ -50,6 +50,7 @@ def response_decorator(func):
             'message': data['message'],
             'options': data['options']
         }
+
         return Response(**response_formatter.generate())
 
     return decorator
