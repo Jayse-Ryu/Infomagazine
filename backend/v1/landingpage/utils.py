@@ -13,6 +13,7 @@ def _convert_to_html(tag_string):
 
 class Default:
     """랜딩 페이지의 기본 HTML, CSS, JS"""
+
     def __init__(self, landing_config):
         """
         2019/09/03
@@ -107,6 +108,15 @@ class Default:
                     display: flex;
                     align-items: center;
                 }
+                
+                .form-group.terms{
+                    font-size: 1.7vw;
+                }
+                
+                .form-group.terms a{
+                    color: #007bff;
+                    cursor: pointer;
+                }
 
                 .form-group-prepend {
                     display: flex;
@@ -114,7 +124,6 @@ class Default:
 
                 .form-group-label {
                     display: flex;
-                    width: 100%;
                     align-items: center;
                 }
 
@@ -136,6 +145,14 @@ class Default:
                     border-radius: 0.5vw;
                 }
                 
+                input.form-button {
+                    border: none;
+                    border-radius: unset;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    background-size: 100%;
+                }
+                
                 .video-box {
                     position: absolute;
                     width: 100%;
@@ -153,12 +170,58 @@ class Default:
                         height: 50px;
                         border-radius: 5px
                     }
+                    
+                    .form-group.terms{
+                        font-size: 1.3rem;
+                    }
 
                     .form-button {
                         height: 50px;
                         padding: 5px;
                         border-radius: 5px
                     }
+                }
+                
+                .dim-layer {
+                  display: none;
+                  position: fixed;
+                  _position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  z-index: 100;
+                }
+                
+                .dim-layer .dim-background {
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  background: #000;
+                  opacity: .5;
+                  filter: alpha(opacity=50);
+                }
+                
+                .pop-layer .pop-container {
+                  padding: 10px;
+                }
+                
+                .pop-layer {
+                  display: none;
+                  position: absolute;
+                  top: 5%;
+                  left: 5%;
+                  width: 90%;
+                  height: auto;
+                  background-color: #fff;
+                  border: 5px solid #3571B5;
+                  z-index: 10;
+                }
+                
+                .dim-layer .pop-layer {
+                  display: block;
                 }
             </style>
                 """
@@ -383,6 +446,7 @@ class StyleSheet(Default):
 
 class Script(Default):
     """랜딩페이지의 스크립트 작성"""
+
     def __init__(self, landing_config):
         self.landing_config = landing_config
         super(Script, self).__init__(landing_config)
@@ -688,6 +752,23 @@ class Script(Default):
                 """
         self.landing_scripts += result
 
+    # TODO 업그레이드 필요
+    def _js_terms_trigger(self):
+        """
+        2019/09/03
+
+        :return: 약관 트리거 이벤트
+        """
+        result = """
+        $('.terms-button').click(function(){
+            $('#popup-layer').fadeIn();
+            $('.dim-background, .terms-close-button').click(function(){
+                $('#popup-layer').fadeOut();
+            })
+        })
+        """
+        self.landing_scripts += result
+
     def _scripts_generate(self):
         """
         2019/09/03
@@ -806,6 +887,7 @@ class Script(Default):
 
 class LandingPage(StyleSheet, Script):
     """주어진 랜딩 정보로 랜딩 페이지를 생성"""
+
     def __init__(self, landing_info, is_generate=False):
         self.landing_config = landing_info['landing']
         super(LandingPage, self).__init__(landing_config=self.landing_config)
@@ -952,15 +1034,24 @@ class LandingPage(StyleSheet, Script):
                     """
                 self.is_datepicker_to_add = True
         elif field_type == 8:
-            button_tag = base_html.new_tag('button', attrs={'type': 'button',
-                                                            'class': 'form-button',
-                                                            'id': "form_" + str(section_id) + "_submit_button"})
-            button_tag.string = field_info['name']
+            if field_info['image_data'] == '':
+                button_tag = base_html.new_tag('button', attrs={'type': 'button',
+                                                                'class': 'form-button',
+                                                                'id': "form_" + str(section_id) + "_submit_button"})
+                button_tag.string = field_info['name']
+            else:
+                button_tag = base_html.new_tag('input', attrs={'type': 'button',
+                                                               'class': 'form-button',
+                                                               'id': "form_" + str(section_id) + "_submit_button",
+                                                               'style': 'background-image: url(' + field_info[
+                                                                   'image_data'] + ')'})
             form_group.append(button_tag)
         elif field_type == 9:
+            form_group.attrs.update({'class': 'form-group terms'})
             label_tag = base_html.new_tag('label', attrs={'for': field_id,
                                                           'class': 'form-group-label'})
             label_tag.string = field_info['holder']
+
             checkbox_option = {'type': 'checkbox',
                                'id': field_id,
                                'data-label-name': field_info['name']}
@@ -969,6 +1060,32 @@ class LandingPage(StyleSheet, Script):
             input_tag = base_html.new_tag('input', attrs=checkbox_option)
             form_group.append(input_tag)
             form_group.append(label_tag)
+            if self.landing_config['is_term']:
+                a_tag_to_terms_detail = base_html.new_tag('a', attrs={'class': 'terms-button'})
+                a_tag_to_terms_detail.string = "[보기]"
+                form_group.append(a_tag_to_terms_detail)
+
+                div_to_dim_layer = base_html.new_tag('div', attrs={'id': 'popup-layer', 'class': 'dim-layer'})
+                div_to_dim_background = base_html.new_tag('div', attrs={'class': 'dim-background'})
+                div_to_popup_layer = base_html.new_tag('div', attrs={'class': 'pop-layer'})
+                div_to_popup_container = base_html.new_tag('div', attrs={'class': 'pop-container'})
+                div_to_popup_contents = base_html.new_tag('div', attrs={'class': 'pop-contents'})
+                div_to_terms_title = base_html.new_tag('h4', attrs={'class': 'terms-title'})
+                div_to_terms_title.string = self.term_config['title']
+                div_to_terms_contents = base_html.new_tag('div', attrs={'class': 'terms-contents'})
+                div_to_terms_contents.string = self.term_config['content']
+                div_to_close_button = base_html.new_tag('button', attrs={'class': 'terms-close-button'})
+                div_to_close_button.string = "닫기"
+                div_to_popup_contents.append(div_to_close_button)
+                div_to_popup_contents.append(div_to_terms_title)
+                div_to_popup_contents.append(div_to_terms_contents)
+                div_to_popup_container.append(div_to_popup_contents)
+                div_to_popup_layer.append(div_to_popup_container)
+                div_to_dim_layer.append(div_to_dim_background)
+                div_to_dim_layer.append(div_to_popup_layer)
+                base_html.append(div_to_dim_layer)
+
+                self._js_terms_trigger()
 
         if field_type in [8, 9]:
             return form_group, None
@@ -1005,7 +1122,7 @@ class LandingPage(StyleSheet, Script):
         # TODO 비메오 추후 추가
         video_url = layout_info['video_url']
         iframe_tag = base_html.new_tag('iframe', attrs={
-            'class':'video-box',
+            'class': 'video-box',
             'src': f'https://www.youtube.com/embed/{video_url}',
             'allowfullscreen': 'allowfullscreen',
             'frameBorder': '0'})

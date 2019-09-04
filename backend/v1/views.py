@@ -46,6 +46,7 @@ class _CommonSlidingTokenView(TokenViewBase):
                 expires=expiration,
                 httponly=True,
                 domain=settings.CSRF_COOKIE_DOMAIN,
+                samesite='Lax',
                 secure=True
             )
 
@@ -53,6 +54,7 @@ class _CommonSlidingTokenView(TokenViewBase):
                 'SESSION', response_data.get('session_token'),
                 expires=expiration,
                 domain=settings.CSRF_COOKIE_DOMAIN,
+                samesite='Lax',
                 secure=True
             )
 
