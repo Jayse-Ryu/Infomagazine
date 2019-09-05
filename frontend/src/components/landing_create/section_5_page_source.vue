@@ -47,6 +47,15 @@
                       @change="push_landing()"></textarea>
     </div>
 
+    <label class="col-sm-3 col-form-label-sm mt-3" for="tnk">TNK(script방식)</label>
+
+    <div class="col-sm-9 mt-sm-3">
+      <label class="switch" for="tnk">
+        <input type="checkbox" id="tnk" v-model="tracking_info.tnk">
+        <span class="slider round"></span>
+      </label>
+    </div>
+
 
     <label class="col-sm-3 col-form-label-sm mt-3" for="facebook">
       <span>페이스북 픽셀</span>
@@ -102,22 +111,22 @@
 </template>
 
 <script>
-  export default {
-    name: "section_5_page_source",
-    props: [
-      'window_width',
-      'title',
-      'header_script',
-      'body_script',
-      'tracking_info',
-      'push_landing'
-    ],
-    data: () => ({
-      msg: {
-        title: '사이트 내부 제목입니다.',
-      }
-    }),
-  }
+    export default {
+        name: "section_5_page_source",
+        props: [
+            'window_width',
+            'title',
+            'header_script',
+            'body_script',
+            'tracking_info',
+            'push_landing'
+        ],
+        data: () => ({
+            msg: {
+                title: '사이트 내부 제목입니다.',
+            }
+        }),
+    }
 </script>
 
 <style scoped>

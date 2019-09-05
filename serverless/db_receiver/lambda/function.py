@@ -1,8 +1,8 @@
 import os
 import logging
 import json
-import boto3
 import pymysql
+from user_agents import parse
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -33,6 +33,7 @@ def _send_to_sqs(event, response_headers):
     ip_v4_address = headers['x-forwarded-for'].split(",")[0]
     event_body = event['body']
     body = json.loads(event_body)
+    inflow_path = referer.split("/")[4]
 
     db_key_list = body.keys()
     if 'data' not in db_key_list or 'schema' not in db_key_list:
@@ -44,59 +45,65 @@ def _send_to_sqs(event, response_headers):
                                      charset='utf8mb4')
 
     exist_check = False
+
     with rds_connection.cursor(pymysql.cursors.DictCursor) as cursor:
-        for key, item in body['schema'].items():
-            if item in ['전화번호', '핸드폰번호', '연락처']:
-                key_to_search = key
-                value_to_search = body['data'][key_to_search]
-                json_exist_sql_command = f"""
-                                SELECT COUNT(*) AS '__count'
-                                FROM `landing_page_db` db
-                                WHERE landing_id = '{body['landing_id']}' 
-                                AND JSON_EXTRACT(db.data, "$.{key_to_search}") = '{value_to_search}'
-                            """
-                cursor.execute(json_exist_sql_command)
-                get_count = cursor.fetchone()
-                if get_count['__count'] > 0:
-                    exist_check = True
-                break
+        try:
+            for key, item in body['schema'].items():
+                if item in ['전화번호', '핸드폰번호', '연락처']:
+                    key_to_search = key
+                    value_to_search = body['data'][key_to_search]
+                    json_exist_sql_command = f"""
+                                    SELECT COUNT(*) AS '__count'
+                                    FROM `landing_page_db` db
+                                    WHERE landing_id = '{body['landing_id']}' 
+                                    AND JSON_EXTRACT(db.data, "$.{key_to_search}") = '{value_to_search}'
+                                """
+                    cursor.execute(json_exist_sql_command)
+                    get_count = cursor.fetchone()
+                    if get_count['__count'] > 0:
+                        exist_check = True
+                    break
 
-    if exist_check:
-        return _response_format(status_code=200, headers=response_headers, state=False, message='이미 등록됐습니다')
+            if exist_check:
+                return _response_format(status_code=200, headers=response_headers, state=False, message='이미 등록됐습니다')
 
-    body_to_send = {
-        "landing_id": body['landing_id'],
-        "registered_date": body['registered_date'],
-        "stay_time": body['stay_time'],
-        "data": body['data'],
-        "schema": body['schema'],
-        "user_agent": user_agent,
-        "ip_v4_address": ip_v4_address,
-        "cloudfront-is-desktop-viewer": headers['cloudfront-is-desktop-viewer'],
-        "cloudfront-is-mobile-viewer": headers['cloudfront-is-mobile-viewer'],
-        "cloudfront-is-smarttv-viewer": headers['cloudfront-is-smarttv-viewer'],
-        "cloudfront-is-tablet-viewer": headers['cloudfront-is-tablet-viewer']
-    }
+            user_agent_group = {}
 
-    try:
-        body_to_send.update({"referer": referer.split("/")[4]})
-    except Exception as e:
-        logger.warning(str(e))
+            try:
+                convert_user_agent = parse(user_agent)
+                if headers['cloudfront-is-desktop-viewer'] == "true":
+                    user_agent_group['viewer_type'] = "desktop"
+                elif headers['cloudfront-is-mobile-viewer'] == "true":
+                    user_agent_group['viewer_type'] = "mobile"
+                elif headers['cloudfront-is-smarttv-viewer'] == "true":
+                    user_agent_group['viewer_type'] = "smarttv"
+                elif headers['cloudfront-is-tablet-viewer'] == "true":
+                    user_agent_group['viewer_type'] = "tablet"
 
-    session = boto3.session.Session(aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-                                    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-                                    aws_session_token=os.getenv('AWS_SESSION_TOKEN'),
-                                    region_name='ap-northeast-2')
-    sqs_client = session.client('sqs')
-    response = sqs_client.send_message(
-        QueueUrl=os.getenv('SQL_URL'),
-        DelaySeconds=0,
-        MessageBody=json.dumps(body_to_send)
-    )
-    if response['ResponseMetadata']['HTTPStatusCode'] == 200:
-        return _response_format(status_code=200, headers=response_headers, state=True, message='신청이 완료됐습니다')
-    else:
-        return _response_format(status_code=500, headers=response_headers, message='신청 실패')
+                user_agent_group['browser_family'] = convert_user_agent.browser.family
+                user_agent_group['browser_family_version_string'] = convert_user_agent.browser.version_string
+                user_agent_group['os_family'] = convert_user_agent.os.family
+                user_agent_group['os_family_version_string'] = convert_user_agent.os.version_string
+                user_agent_group['device_brand'] = convert_user_agent.device.brand
+                user_agent_group['device_model'] = convert_user_agent.device.model
+            except Exception as e:
+                logger.warning(str(e))
+
+            insert_sql_command = "INSERT INTO `landing_page_db` (`landing_id`, `data`, `schema`, `user_agent`, `ip_v4_address`, `inflow_path`, `stay_time`, `registered_date`, `created_date`) " \
+                                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())"
+
+            cursor.execute(insert_sql_command,
+                           (body['landing_id'], json.dumps(body['data']), json.dumps(body['schema']), json.dumps(user_agent_group), ip_v4_address,
+                            inflow_path, body['stay_time'],
+                            body['registered_date']))
+            rds_connection.commit()
+        except Exception as e:
+            logger.warning(str(e))
+            logger.warning("DB insertion failed.")
+            return _response_format(status_code=500, headers=response_headers, message='신청 실패')
+        else:
+            logger.info("DB insertion was successful.")
+            return _response_format(status_code=200, headers=response_headers, state=True, message='신청이 완료됐습니다')
 
 
 def lambda_handler(event, context):
@@ -106,12 +113,10 @@ def lambda_handler(event, context):
     }
     try:
         if event['httpMethod'] == 'OPTIONS':
-            del response_headers['Content-Type']
             response_headers.update({
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Allow-Max-Age": "86400",
-                "Content-Type" : "text/plain; charset=utf-8",
+                "Content-Type": "text/plain; charset=utf-8",
                 "Content-Length": "0"
             })
             return _response_format(status_code=204, headers=response_headers)

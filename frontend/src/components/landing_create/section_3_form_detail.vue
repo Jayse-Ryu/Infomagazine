@@ -3,7 +3,8 @@
   <div class="form-group row mb-0" v-if="arrow != -1">
     <label class="col-sm-3 col-form-label-sm mt-3" for="db_field">DB 필드</label>
     <form class="col-sm-9 mt-sm-3 row ml-0" v-on:submit.prevent="field_add">
-      <select class="form-control col-sm-5 col-md-5" name="company" id="db_field" v-model.number="field_selected">
+      <select class="form-control col-sm-5 col-md-5" name="company" id="db_field"
+              v-model.number="field_selected">
         <option value="-1">타입을 선택하세요</option>
         <option value="1">텍스트 입력</option>
         <option value="2">숫자 입력</option>
@@ -42,7 +43,8 @@
           <div class="col-3 p-2 text-center" v-if="content.type == 8">완료 버튼</div>
           <div class="col-3 p-2 text-center" v-if="content.type == 9">약관 동의</div>
           <div class="col-3 p-2 text-center">{{ content.name }}</div>
-          <button type="button" class="btn btn-outline-info p-0 col-3 col-sm-2 m-auto" data-toggle="collapse"
+          <button type="button" class="btn btn-outline-info p-0 col-3 col-sm-2 m-auto"
+                  data-toggle="collapse"
                   v-bind:href="'#collapse_option'+ content.sign" aria-expanded="false">
             설정
           </button>
@@ -55,10 +57,11 @@
             <form v-on:submit.prevent="field_option_close">
               <div class="form-group row p-4 mb-0">
 
-                <label v-if="[1, 2, 3, 4, 5, 6, 7, 9].includes(content.type * 1)"
+                <label v-if="[1, 2, 3, 4, 5, 6, 7].includes(content.type * 1)"
                        class="col-sm-3 col-form-label-sm mt-3"
                        :for="'la_switch'+content.sign">라벨 켜기</label>
-                <div v-if="[1, 2, 3, 4, 5, 6, 7, 9].includes(content.type * 1)" class="col-sm-9 mt-sm-3">
+                <div v-if="[1, 2, 3, 4, 5, 6, 7].includes(content.type * 1)"
+                     class="col-sm-9 mt-sm-3">
                   <label class="switch" :for="'la_switch'+content.sign">
                     <input type="checkbox" :id="'la_switch'+content.sign" v-model="content.label">
                     <span class="slider round"></span>
@@ -82,13 +85,15 @@
 
                 <label class="col-sm-3 col-form-label-sm mt-3" for="f_name">필드 이름*</label>
                 <div class="col-sm-9 mt-sm-3">
-                  <input type="text" class="form-control" id="f_name" maxlength="1000" v-model="content.name">
+                  <input type="text" class="form-control" id="f_name" maxlength="1000"
+                         v-model="content.name">
                 </div>
 
                 <label v-if="content.type != 5 && content.type != 6 && content.type != 8"
                        class="col-sm-3 col-form-label-sm mt-3" for="f_holder">
                   <span>안내문</span>
-                  <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
+                  <span class="question badge btn-secondary p-1 align-middle"
+                        v-if="window_width > 768"
                         v-tooltip="{
                               content: msg.holder,
                               placement: 'right',
@@ -103,8 +108,10 @@
                               trigger: 'click',
                               }">?</span>
                 </label>
-                <div v-if="content.type != 5 && content.type != 6 && content.type != 8" class="col-sm-9 mt-sm-3">
-                  <input type="text" class="form-control" id="f_holder" maxlength="1000" v-model="content.holder">
+                <div v-if="content.type != 5 && content.type != 6 && content.type != 8"
+                     class="col-sm-9 mt-sm-3">
+                  <input type="text" class="form-control" id="f_holder" maxlength="1000"
+                         v-model="content.holder">
                 </div>
 
                 <!---->
@@ -115,12 +122,12 @@
                 <!---->
                 <!---->
 
-
                 <label v-if="[3].includes(content.type * 1)"
                        class="col-sm-3 col-form-label-sm mt-3"
                        :for="'phone_switch'+content.sign">
                   <span>통신사 본인인증</span>
-                  <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
+                  <span class="question badge btn-secondary p-1 align-middle"
+                        v-if="window_width > 768"
                         v-tooltip="{
                               content: msg.phone_auth,
                               placement: 'right',
@@ -137,24 +144,27 @@
                 </label>
                 <div v-if="[3].includes(content.type * 1)" class="col-sm-9 mt-sm-3">
                   <label class="switch" :for="'phone_switch'+content.sign">
-                    <input type="checkbox" :id="'phone_switch'+content.sign" v-model="content.phone_auth">
+                    <input type="checkbox" :id="'phone_switch'+content.sign"
+                           v-model="content.phone_auth">
                     <span class="slider round"></span>
                   </label>
                 </div>
-
-
-                <label v-if="[1, 2, 3, 6, 7, 9].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3"
+                <label v-if="[1, 2, 3, 6, 7, 9].includes(content.type * 1)"
+                       class="col-sm-3 col-form-label-sm mt-3"
                        for="f_validate">
                   <span>유효성 검사</span>
                 </label>
-                <div v-if="[1, 2, 3, 6, 7, 9].includes(content.type * 1)" class="col-sm-9 mt-sm-3 pt-2" id="f_validate">
+                <div v-if="[1, 2, 3, 6, 7, 9].includes(content.type * 1)"
+                     class="col-sm-9 mt-sm-3 pt-2" id="f_validate">
                   <label :for="'f_validate_1' + content.sign" class="validate_label">
-                    <input type="checkbox" :id="'f_validate_1' + content.sign" v-model="content.validation.required">
+                    <input type="checkbox" :id="'f_validate_1' + content.sign"
+                           v-model="content.validation.required">
                     필수
                   </label>
                   <label v-if="[1].includes(content.type * 1)" :for="'f_validate_2' + content.sign"
                          class="validate_label">
-                    <input type="checkbox" :id="'f_validate_2' + content.sign" v-model="content.validation.korean_only">
+                    <input type="checkbox" :id="'f_validate_2' + content.sign"
+                           v-model="content.validation.korean_only">
                     한글만
                   </label>
                   <label v-if="[1].includes(content.type * 1)" :for="'f_validate_3' + content.sign"
@@ -163,40 +173,49 @@
                            v-model="content.validation.english_only">
                     영어만
                   </label>
-                  <label v-if="[1, 2].includes(content.type * 1)" :for="'f_validate_4' + content.sign"
+                  <label v-if="[1, 2].includes(content.type * 1)"
+                         :for="'f_validate_4' + content.sign"
                          class="validate_label">
-                    <input type="checkbox" :id="'f_validate_4' + content.sign" v-model="content.validation.number_only">
+                    <input type="checkbox" :id="'f_validate_4' + content.sign"
+                           v-model="content.validation.number_only">
                     숫자만
                   </label>
                   <label v-if="[3].includes(content.type * 1)" :for="'f_validate_5' + content.sign"
                          class="validate_label">
-                    <input type="checkbox" :id="'f_validate_5' + content.sign" v-model="content.validation.phone_only">
+                    <input type="checkbox" :id="'f_validate_5' + content.sign"
+                           v-model="content.validation.phone_only">
                     전화번호만
                   </label>
                   <label v-if="[1].includes(content.type * 1)" :for="'f_validate_6' + content.sign"
                          class="validate_label">
-                    <input type="checkbox" :id="'f_validate_6' + content.sign" v-model="content.validation.email">
+                    <input type="checkbox" :id="'f_validate_6' + content.sign"
+                           v-model="content.validation.email">
                     이메일
                   </label>
                   <label v-if="[7].includes(content.type * 1)" :for="'f_validate_7' + content.sign"
                          class="validate_label">
-                    <input type="checkbox" :id="'f_validate_7' + content.sign" v-model="content.validation.age_limit">
+                    <input type="checkbox" :id="'f_validate_7' + content.sign"
+                           v-model="content.validation.age_limit">
                     나이제한
                   </label>
-                  <label v-if="[1, 2, 3].includes(content.type * 1)" :for="'f_validate_8' + content.sign"
-                         class="validate_label">
-                    <input type="checkbox" :id="'f_validate_8' + content.sign" v-model="content.validation.duplication_check">
-                    중복체크
-                  </label>
+<!--                  <label v-if="[1, 2, 3].includes(content.type * 1)"-->
+<!--                         :for="'f_validate_8' + content.sign"-->
+<!--                         class="validate_label">-->
+<!--                    <input type="checkbox" :id="'f_validate_8' + content.sign"-->
+<!--                           v-model="content.validation.duplication_check">-->
+<!--                    중복체크-->
+<!--                  </label>-->
                 </div>
 
                 <div v-if="[7].includes(content.type * 1)" class="w-100">
-                  <label v-if="content.validation.age_limit" class="col-sm-3 col-form-label-sm mt-3 float-left"
+                  <label v-if="content.validation.age_limit"
+                         class="col-sm-3 col-form-label-sm mt-3 float-left"
                          for="limit_option">
                     <span>나이제한 옵션</span>
                   </label>
 
-                  <div v-if="content.validation.age_limit" class="col-sm-9 mt-sm-3 float-left" id="limit_option">
+                  <div v-if="content.validation.age_limit" class="col-sm-9 mt-sm-3 float-left"
+                       id="limit_option">
                     <input type="number" class="form-control"
                            v-model.number="content.validation.value_min.value">
                     <div class="mt-2">
@@ -213,7 +232,8 @@
                     </div>
                   </div>
 
-                  <div v-if="content.validation.age_limit" class="col-sm-3 col-form-label-sm mt-3 float-left"></div>
+                  <div v-if="content.validation.age_limit"
+                       class="col-sm-3 col-form-label-sm mt-3 float-left"></div>
                   <div v-if="content.validation.age_limit" class="col-sm-9 mt-sm-3 float-left">
                     <input type="number" class="form-control"
                            v-model.number="content.validation.value_max.value">
@@ -234,7 +254,8 @@
 
                 <label v-if="content.type == 4 || content.type == 5 || content.type == 6"
                        class="col-sm-3 col-form-label-sm mt-3" for="f_list"><span>리스트</span>
-                  <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
+                  <span class="question badge btn-secondary p-1 align-middle"
+                        v-if="window_width > 768"
                         v-tooltip="{
                               content: msg.list,
                               placement: 'right',
@@ -249,12 +270,14 @@
                               trigger: 'click',
                               }">?</span>
                 </label>
-                <div v-if="content.type == 4 || content.type == 5 || content.type == 6" class="col-sm-9 mt-sm-3">
+                <div v-if="content.type == 4 || content.type == 5 || content.type == 6"
+                     class="col-sm-9 mt-sm-3">
                   <button type="button" @click.prevent="field_list_add(content.sign)"
                           class="btn btn-primary pl-3 pr-3 pt-1 pb-1">추가
                   </button>
                   <div v-for="(item, index) in content.list" class="row pl-3 pr-3 pt-2 pb-2">
-                    <input type="text" class="form-control col-10" v-model="content.list[index]" id="f_list">
+                    <input type="text" class="form-control col-10" v-model="content.list[index]"
+                           id="f_list">
                     <button type="button" @click.prevent="field_list_delete(content.sign, index)"
                             class="btn btn-danger col-2 p-0">삭제
                     </button>
@@ -262,7 +285,8 @@
                 </div>
 
                 <!-- Scroll -->
-                <label v-if="[4].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3">
+                <label v-if="[4].includes(content.type * 1)"
+                       class="col-sm-3 col-form-label-sm mt-3">
                   <span>리스트 기본값</span>
                 </label>
                 <div v-if="[4].includes(content.type * 1)" class="col-sm-9 mt-sm-3">
@@ -273,7 +297,8 @@
                 </div>
 
                 <!-- Radio -->
-                <label v-if="[5].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3">
+                <label v-if="[5].includes(content.type * 1)"
+                       class="col-sm-3 col-form-label-sm mt-3">
                   <span>체크 기본값</span>
                 </label>
                 <div v-if="[5].includes(content.type * 1)" class="col-sm-9 mt-sm-3">
@@ -282,7 +307,8 @@
                   </select>
                 </div>
 
-                <label v-if="[9].includes(content.type * 1)" class="col-sm-3 col-form-label-sm mt-3">
+                <label v-if="[9].includes(content.type * 1)"
+                       class="col-sm-3 col-form-label-sm mt-3">
                   <span>미리체크 여부</span>
                 </label>
                 <div v-if="[9].includes(content.type * 1)" class="col-sm-9 mt-sm-3">
@@ -304,7 +330,8 @@
                   <div class="color_wrap form-control col">
                     <input type="color" v-model="content.back_color" class="color_picker">
                   </div>
-                  <input type="text" class="form-control" id="f_back" maxlength="10" v-model="content.back_color">
+                  <input type="text" class="form-control" id="f_back" maxlength="10"
+                         v-model="content.back_color">
                 </div>
 
                 <label class="col-sm-3 col-form-label-sm mt-3"
@@ -361,439 +388,439 @@
 </template>
 
 <script>
-  export default {
-    name: "section_3_form_detail",
-    props: [
-      'window_width',
-      'page_id',
-      'epoch_time',
-      'updated_date',
-      'form_arrow',
-      'field',
-      'file_manage',
-      'set_field',
-      'push_landing'
-    ],
-    data: () => ({
-      msg: {
-        holder: 'Place holder입니다. 텍스트 입력 전 설명 혹은, 약관의 라벨에 기입됩니다.',
-        list: '선택 옵션을 선택하고 제공할 수 있습니다.',
-        phone_auth: '통신사가 제공하는 본인인증 서비스의 사용여부를 결정합니다. 본인인증을 할 경우 이름, 성별, 생일정보의 기입이 자동으로 이루어집니다.'
-      },
-      field_obj: [],
-      filtered_fields: [],
-      field_selected: -1,
-      field_temp_name: ''
-    }),
-    mounted() {
-      this.init_component()
-      // this.validation_back()
-    },
-    methods: {
-      init_component() {
-        // Set component object as parent's object
-        this.field_obj = []
-        this.field_obj = this.field
-      },
-      validation_back() {
-        let field = this.field_obj
-        // console.log(field.length)
-        // Preparing validation list
-        let vali = [
-          'required',
-          'korean_only',
-          'english_only',
-          'number_only',
-          'phone_only',
-          'email',
-          'age_limit',
-          'value_min',
-          'value_max',
-          'duplication_check'
-        ]
+    export default {
+        name: 'section_3_form_detail',
+        props: [
+            'window_width',
+            'page_id',
+            'epoch_time',
+            'updated_date',
+            'form_arrow',
+            'field',
+            'file_manage',
+            'set_field',
+            'push_landing'
+        ],
+        data: () => ({
+            msg: {
+                holder: 'Place holder입니다. 텍스트 입력 전 설명 혹은, 약관의 라벨에 기입됩니다.',
+                list: '선택 옵션을 선택하고 제공할 수 있습니다.',
+                phone_auth: '통신사가 제공하는 본인인증 서비스의 사용여부를 결정합니다. 본인인증을 할 경우 이름, 성별, 생일정보의 기입이 자동으로 이루어집니다.'
+            },
+            field_obj: [],
+            filtered_fields: [],
+            field_selected: -1,
+            field_temp_name: ''
+        }),
+        mounted() {
+            this.init_component()
+            // this.validation_back()
+        },
+        methods: {
+            init_component() {
+                // Set component object as parent's object
+                this.field_obj = []
+                this.field_obj = this.field
+            },
+            validation_back() {
+                let field = this.field_obj
+                // console.log(field.length)
+                // Preparing validation list
+                let vali = [
+                    'required',
+                    'korean_only',
+                    'english_only',
+                    'number_only',
+                    'phone_only',
+                    'email',
+                    'age_limit',
+                    'value_min',
+                    'value_max',
+                    'duplication_check'
+                ]
 
-        // Get one field object
-        for (let i in field) {
-          // Inspect by validation list
-          for (let key in vali) {
-            // Inspect object by a key
-            if (field[i].validation.hasOwnProperty(vali[key])) {
-              // If not value obj, push key true
-              console.log(field[i].validation)
-              if (vali[key] != 'value_min' && vali[key] != 'value_max') {
-                field[i].validation[vali[key]] = true
-              } else {
-                field[i].validation[vali[key]] = field[i].validation[vali[key]]
-              }
-            } else {
-              // Distinguish object default value by keys
-              let form = {}
-              if (vali[key] == 'value_min') {
-                form = {
-                  value: 0,
-                  option: 'gt'
+                // Get one field object
+                for (let i in field) {
+                    // Inspect by validation list
+                    for (let key in vali) {
+                        // Inspect object by a key
+                        if (field[i].validation.hasOwnProperty(vali[key])) {
+                            // If not value obj, push key true
+                            console.log(field[i].validation)
+                            if (vali[key] !== 'value_min' && vali[key] !== 'value_max') {
+                                field[i].validation[vali[key]] = true
+                            } else {
+                                field[i].validation[vali[key]] = field[i].validation[vali[key]]
+                            }
+                        } else {
+                            // Distinguish object default value by keys
+                            let form = {}
+                            if (vali[key] === 'value_min') {
+                                form = {
+                                    value: 0,
+                                    option: 'gt'
+                                }
+                                field[i].validation[vali[key]] = form
+                            } else if (vali[key] === 'value_max') {
+                                form = {
+                                    value: 120,
+                                    option: 'lt'
+                                }
+                                field[i].validation[vali[key]] = form
+                            } else {
+                                field[i].validation[vali[key]] = false
+                            }
+                        }
+                    }
+                    // this.dynamo_obj = this.temp_obj
+                    // console.log('console field ', field[i])
+                    this.$emit('update:field', this.field_obj)
+                    this.filter_change()
                 }
-                field[i].validation[vali[key]] = form
-              } else if (vali[key] == 'value_max') {
-                form = {
-                  value: 120,
-                  option: 'lt'
-                }
-                field[i].validation[vali[key]] = form
-              } else {
-                field[i].validation[vali[key]] = false
-              }
-            }
-          }
-          // this.dynamo_obj = this.temp_obj
-          // console.log('console field ', field[i])
-          this.$emit('update:field', this.field_obj)
-          this.filter_change()
-        }
-      },
-      filter_change() {
-        this.filtered_fields = []
-        for (let i = 0; i < this.field_obj.length; i++) {
-          if (this.field_obj[i].form_group_id == this.form_arrow) {
-            this.filtered_fields.push(this.field_obj[i])
-          }
-        }
-      },
-      field_add() {
-        this.init_component()
-
-        // get form group sign
-        if (this.form_arrow != -1) {
-          // get field type and field name
-          if (this.field_selected != -1 && this.field_temp_name) {
-            // if field object is not empty
-            if (this.field_obj.length != 0) {
-              let highest = 0
-              let flag = true
-              for (let i = 0; i < this.field_obj.length; i++) {
-                if (this.form_arrow == this.field_obj[i].form_group_id) {
-                  if (this.field_temp_name == this.field_obj[i].name) {
-                    alert('이미 존재하는 필드 이름입니다.')
-                    flag = false
-                    return flag
-                  }
-                }
-              }
-              if (flag) {
+            },
+            filter_change() {
+                this.filtered_fields = []
                 for (let i = 0; i < this.field_obj.length; i++) {
-                  if (this.field_obj[i].sign > highest) {
-                    highest = this.field_obj[i].sign
-                  }
+                    if (this.field_obj[i].form_group_id === this.form_arrow) {
+                        this.filtered_fields.push(this.field_obj[i])
+                    }
                 }
-              }
-              this.field_obj.push({
-                sign: highest + 1,
-                type: this.field_selected * 1,
-                label: true,
-                name: this.field_temp_name,
-                holder: this.field_temp_name,
-                form_group_id: this.form_arrow * 1,
-                back_color: '#287BFF',
-                text_color: '#f0f0f0',
-                validation: {
-                  required: true,
-                  korean_only: false,
-                  english_only: false,
-                  number_only: false,
-                  phone_only: false,
-                  email: false,
-                  age_limit: false,
-                  duplication_check: false,
-                  value_min: {
-                    value: 0,
-                    option: 'gt'
-                  },
-                  value_max: {
-                    value: 120,
-                    option: 'lt'
-                  }
-                },
-                opacity: '10',
-                list: [],
-                default: '',
-                phone_auth: false,
-                image_data: null
-              })
-              this.$emit('update:field', this.field_obj)
-              this.field_temp_name = ''
-              this.filter_change()
-              this.set_field('form')
-              this.push_landing()
-            } else {
-              // if field_obj length is 0
-              this.field_obj.push({
-                sign: 1,
-                type: this.field_selected * 1,
-                label: true,
-                name: this.field_temp_name,
-                holder: this.field_temp_name,
-                form_group_id: this.form_arrow * 1,
-                back_color: '#287BFF',
-                text_color: '#fafafa',
-                validation: {
-                  required: true,
-                  korean_only: false,
-                  english_only: false,
-                  number_only: false,
-                  phone_only: false,
-                  email: false,
-                  age_limit: false,
-                  duplication_check: false,
-                  value_min: {
-                    value: 0,
-                    option: 'gt'
-                  },
-                  value_max: {
-                    value: 120,
-                    option: 'lt'
-                  }
-                },
-                opacity: '10',
-                list: [],
-                default: '',
-                phone_auth: false,
-                image_data: null
-              })
-              this.$emit('update:field', this.field_obj)
-              this.field_temp_name = ''
-              this.filter_change()
-              this.set_field('form')
-              this.push_landing()
-            }
-          } else {
-            alert('필드 타입과 내용을 입력하세요.')
-            document.getElementById('db_field').focus()
-          }
-        } else {
-          alert('폼 그룹을 먼저 선택하세요.')
-          document.getElementById('form_group_list').focus()
-        }
-      },
-      field_delete(id) {
-        this.init_component()
-        for (let i = 0; i < this.field_obj.length; i++) {
-          if (this.field_obj[i].sign == id) {
-            // console.log(this.field_obj.splice(i, 1))
-            this.field_obj.splice(i, 1)
-            this.$emit('update:field', this.field_obj)
-            this.filter_change()
-            this.set_field('form')
-            this.push_landing()
-            break
-          }
-        }
-      },
-      field_list_add(id) {
-        this.init_component()
-        for (let i = 0; i < this.field.length; i++) {
-          if (this.field_obj[i].sign == id) {
-            this.field_obj[i].list.push("")
-            this.$emit('update:field', this.field_obj)
-            this.filter_change()
-            this.push_landing()
-            break
-          }
-        }
-      },
-      field_list_delete(id, index) {
-        this.init_component()
-        for (let i = 0; i < this.field_obj.length; i++) {
-          if (this.field_obj[i].sign == id) {
-            this.field_obj[i].list.splice(index, 1)
-            this.$emit('update:field', this.field_obj)
-            this.filter_change()
-            this.push_landing()
-            break
-          }
-        }
-      },
-      field_option_close(that) {
-        //
-      },
-      field_file_add(sign, file) {
-        this.init_component()
+            },
+            field_add() {
+                this.init_component()
 
-        AWS.config.update({
-          region: process.env.VUE_APP_ENV_BucketRegion,
-          credentials: new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: process.env.VUE_APP_ENV_IdentityPoolId
-          })
-        })
+                // get form group sign
+                if (this.form_arrow !== -1) {
+                    // get field type and field name
+                    if (this.field_selected !== -1 && this.field_temp_name) {
+                        // if field object is not empty
+                        if (this.field_obj.length !== 0) {
+                            let highest = 0
+                            let flag = true
+                            for (let i = 0; i < this.field_obj.length; i++) {
+                                if (this.form_arrow === this.field_obj[i].form_group_id) {
+                                    if (this.field_temp_name === this.field_obj[i].name) {
+                                        alert('이미 존재하는 필드 이름입니다.')
+                                        flag = false
+                                        return flag
+                                    }
+                                }
+                            }
+                            if (flag) {
+                                for (let i = 0; i < this.field_obj.length; i++) {
+                                    if (this.field_obj[i].sign > highest) {
+                                        highest = this.field_obj[i].sign
+                                    }
+                                }
+                            }
+                            this.field_obj.push({
+                                sign: highest + 1,
+                                type: this.field_selected * 1,
+                                label: true,
+                                name: this.field_temp_name,
+                                holder: this.field_temp_name,
+                                form_group_id: this.form_arrow * 1,
+                                back_color: '#287BFF',
+                                text_color: '#f0f0f0',
+                                validation: {
+                                    required: true,
+                                    korean_only: false,
+                                    english_only: false,
+                                    number_only: false,
+                                    phone_only: false,
+                                    email: false,
+                                    age_limit: false,
+                                    duplication_check: false,
+                                    value_min: {
+                                        value: 0,
+                                        option: 'gt'
+                                    },
+                                    value_max: {
+                                        value: 120,
+                                        option: 'lt'
+                                    }
+                                },
+                                opacity: '10',
+                                list: [],
+                                default: '',
+                                phone_auth: false,
+                                image_data: null
+                            })
+                            this.$emit('update:field', this.field_obj)
+                            this.field_temp_name = ''
+                            this.filter_change()
+                            this.set_field('form')
+                            this.push_landing()
+                        } else {
+                            // if field_obj length is 0
+                            this.field_obj.push({
+                                sign: 1,
+                                type: this.field_selected * 1,
+                                label: true,
+                                name: this.field_temp_name,
+                                holder: this.field_temp_name,
+                                form_group_id: this.form_arrow * 1,
+                                back_color: '#287BFF',
+                                text_color: '#fafafa',
+                                validation: {
+                                    required: true,
+                                    korean_only: false,
+                                    english_only: false,
+                                    number_only: false,
+                                    phone_only: false,
+                                    email: false,
+                                    age_limit: false,
+                                    duplication_check: false,
+                                    value_min: {
+                                        value: 0,
+                                        option: 'gt'
+                                    },
+                                    value_max: {
+                                        value: 120,
+                                        option: 'lt'
+                                    }
+                                },
+                                opacity: '10',
+                                list: [],
+                                default: '',
+                                phone_auth: false,
+                                image_data: null
+                            })
+                            this.$emit('update:field', this.field_obj)
+                            this.field_temp_name = ''
+                            this.filter_change()
+                            this.set_field('form')
+                            this.push_landing()
+                        }
+                    } else {
+                        alert('필드 타입과 내용을 입력하세요.')
+                        document.getElementById('db_field').focus()
+                    }
+                } else {
+                    alert('폼 그룹을 먼저 선택하세요.')
+                    document.getElementById('form_group_list').focus()
+                }
+            },
+            field_delete(id) {
+                this.init_component()
+                for (let i = 0; i < this.field_obj.length; i++) {
+                    if (this.field_obj[i].sign === id) {
+                        // console.log(this.field_obj.splice(i, 1))
+                        this.field_obj.splice(i, 1)
+                        this.$emit('update:field', this.field_obj)
+                        this.filter_change()
+                        this.set_field('form')
+                        this.push_landing()
+                        break
+                    }
+                }
+            },
+            field_list_add(id) {
+                this.init_component()
+                for (let i = 0; i < this.field.length; i++) {
+                    if (this.field_obj[i].sign === id) {
+                        this.field_obj[i].list.push("")
+                        this.$emit('update:field', this.field_obj)
+                        this.filter_change()
+                        this.push_landing()
+                        break
+                    }
+                }
+            },
+            field_list_delete(id, index) {
+                this.init_component()
+                for (let i = 0; i < this.field_obj.length; i++) {
+                    if (this.field_obj[i].sign === id) {
+                        this.field_obj[i].list.splice(index, 1)
+                        this.$emit('update:field', this.field_obj)
+                        this.filter_change()
+                        this.push_landing()
+                        break
+                    }
+                }
+            },
+            field_option_close(that) {
+                //
+            },
+            field_file_add(sign, file) {
+                this.init_component()
 
-        let s3 = new AWS.S3(
-          {
-            apiVersion: '2008-10-17',
-            params: {
-              Bucket: process.env.VUE_APP_ENV_AWS_STORAGE_BUCKET_NAME
-            }
-          }
-        )
+                AWS.config.update({
+                    region: process.env.VUE_APP_ENV_BucketRegion,
+                    credentials: new AWS.CognitoIdentityCredentials({
+                        IdentityPoolId: process.env.VUE_APP_ENV_IdentityPoolId
+                    })
+                })
 
-        for (let i = 0; i < this.field_obj.length; i++) {
-          if (this.field_obj[i].sign == sign && this.field_obj[i].image_data) {
+                let s3 = new AWS.S3(
+                    {
+                        apiVersion: '2008-10-17',
+                        params: {
+                            Bucket: process.env.VUE_APP_ENV_AWS_STORAGE_BUCKET_NAME
+                        }
+                    }
+                )
 
-            let photokey = this.field_obj[i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
-            s3.deleteObject({Key: photokey}, (err, data) => {
-              if (err) {
-                alert('There was an error deleting your photo: ', err.message)
-              } else {
-                this.field_obj[i].image_data = null
-              }
-            })
+                for (let i = 0; i < this.field_obj.length; i++) {
+                    if (this.field_obj[i].sign === sign && this.field_obj[i].image_data) {
 
-            // let photokey = this.field_obj[i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
-            // this.file_manage('delete', 'field', photokey)
-            // async function sync_file() {
-            //   try {
-            //     const do = await this.file_manage('delete', 'field', photokey)
-            //     console.log('async aa')
-            //     console.log(do)
-            //     return do
-            //   } catch (error) {
-            //     console.log("Error occurred", error)
+                        let photokey = this.field_obj[i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
+                        s3.deleteObject({Key: photokey}, (err, data) => {
+                            if (err) {
+                                alert('There was an error deleting your photo: ', err.message)
+                            } else {
+                                this.field_obj[i].image_data = null
+                            }
+                        })
+
+                        // let photokey = this.field_obj[i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
+                        // this.file_manage('delete', 'field', photokey)
+                        // async function sync_file() {
+                        //   try {
+                        //     const do = await this.file_manage('delete', 'field', photokey)
+                        //     console.log('async aa')
+                        //     console.log(do)
+                        //     return do
+                        //   } catch (error) {
+                        //     console.log("Error occurred", error)
+                        //   }
+                        // }
+                        // sync_file()
+
+                        // if (this.file_manage('delete', 'field', photokey)) {
+                        //   this.field_obj[i].image_data = null
+                        // } else {
+                        //   alert('There was an error deleting your photo: ')
+                        // }
+
+                    }
+                }
+
+                let params = {}
+
+                let fileName = file.name.split('.')[0] + '_' + Date.now() + '.' + file.name.split('.')[1]
+                params = {
+                    Key: 'assets/images/landing/' + this.page_id + '/field/' + fileName,
+                    ContentType: file.type,
+                    Body: file
+                }
+
+                s3.upload(params, (error, data) => {
+                    if (error) {
+                        console.log('S3 upload error occurred', error)
+                    } else {
+                        for (let i = 0; i < this.field_obj.length; i++) {
+                            if (this.field_obj[i].sign === sign) {
+                                this.field_obj[i].image_data = params.Key.replace('assets/', 'https://assets.infomagazine.xyz/')
+                            }
+                        }
+                        this.$emit('update:field', this.field_obj)
+                        this.push_landing()
+                    }
+                })
+
+                // if (this.file_manage('upload', 'field', file)) {
+                //   for (let i = 0; i < this.field_obj.length; i++) {
+                //     if (this.field_obj[i].sign == sign) {
+                //       this.field_obj[i].image_data = params.Key.replace('assets/', 'https://assets.infomagazine.xyz/')
+                //     }
+                //   }
+                //   this.$emit('update:field', this.field_obj)
+                //   this.push_landing()
+                // }
+
+            },
+            field_file_delete(sign) {
+                this.init_component()
+
+                AWS.config.update({
+                    region: process.env.VUE_APP_ENV_BucketRegion,
+                    credentials: new AWS.CognitoIdentityCredentials({
+                        IdentityPoolId: process.env.VUE_APP_ENV_IdentityPoolId
+                    })
+                })
+
+                let s3 = new AWS.S3(
+                    {
+                        apiVersion: '2008-10-17',
+                        params: {
+                            Bucket: process.env.VUE_APP_ENV_AWS_STORAGE_BUCKET_NAME
+                        }
+                    }
+                )
+
+                for (let i = 0; i < this.field_obj.length; i++) {
+                    if (this.field_obj[i].sign === sign) {
+
+                        let photoKey = this.field_obj[i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
+
+                        s3.deleteObject({Key: photoKey}, (err, data) => {
+                            if (err) {
+                                alert('There was an error deleting your photo: ', err.message)
+                            } else {
+                                // alert('Successfully deleted photo.', data)
+
+                                document.getElementById('field_file_input_' + sign).value = ''
+                                this.field_obj[i].image_data = null
+                                this.$emit('update:field', this.field_obj)
+                                this.push_landing()
+                            }
+                        })
+
+                    }
+                }
+            },
+            // key_to_url(key) {
+            //   if (key != null) {
+            //     if (key.indexOf('assets') > -1) {
+            //       let divided = key.split('/')
+            //       let url = 'https://'
+            //
+            //       if (this.updated_date == '') {
+            //         url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
+            //       } else {
+            //         for (let i = 0; i < divided.length; i++) {
+            //           if (i == 0) {
+            //             url += (divided[i] + '.infomagazine.xyz')
+            //             // url += ('assets' + '.infomagazine.xyz')
+            //           } else {
+            //             url += ('/' + divided[i])
+            //           }
+            //         }
+            //       }
+            //       return url
+            //     } else {
+            //       let divided = key.split('/')
+            //       let url = 'https://'
+            //
+            //       if (this.updated_date == '') {
+            //         url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
+            //       } else {
+            //         for (let i = 0; i < divided.length; i++) {
+            //           if (i == 0) {
+            //             // url += (divided[i] + '.infomagazine.xyz')
+            //             url += ('assets' + '.infomagazine.xyz')
+            //           } else {
+            //             url += ('/' + divided[i])
+            //           }
+            //         }
+            //       }
+            //       return url
+            //     }
+            //   } else {
+            //     return ''
             //   }
+            //
             // }
-            // sync_file()
-
-            // if (this.file_manage('delete', 'field', photokey)) {
-            //   this.field_obj[i].image_data = null
-            // } else {
-            //   alert('There was an error deleting your photo: ')
-            // }
-
-          }
-        }
-
-        let params = {}
-
-        let file_name = file.name.split('.')[0] + '_' + Date.now() + '.' + file.name.split('.')[1]
-        params = {
-          Key: 'assets/images/landing/' + this.page_id + '/field/' + file_name,
-          ContentType: file.type,
-          Body: file
-        }
-
-        s3.upload(params, (error, data) => {
-          if (error) {
-            console.log('S3 upload error occurred', error)
-          } else {
-            for (let i = 0; i < this.field_obj.length; i++) {
-              if (this.field_obj[i].sign == sign) {
-                this.field_obj[i].image_data = params.Key.replace('assets/', 'https://assets.infomagazine.xyz/')
-              }
+        },
+        computed: {
+            arrow() {
+                let arrow = this.form_arrow
+                this.init_component()
+                return arrow
             }
-            this.$emit('update:field', this.field_obj)
-            this.push_landing()
-          }
-        })
-
-        // if (this.file_manage('upload', 'field', file)) {
-        //   for (let i = 0; i < this.field_obj.length; i++) {
-        //     if (this.field_obj[i].sign == sign) {
-        //       this.field_obj[i].image_data = params.Key.replace('assets/', 'https://assets.infomagazine.xyz/')
-        //     }
-        //   }
-        //   this.$emit('update:field', this.field_obj)
-        //   this.push_landing()
-        // }
-
-      },
-      field_file_delete(sign) {
-        this.init_component()
-
-        AWS.config.update({
-          region: process.env.VUE_APP_ENV_BucketRegion,
-          credentials: new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: process.env.VUE_APP_ENV_IdentityPoolId
-          })
-        })
-
-        let s3 = new AWS.S3(
-          {
-            apiVersion: '2008-10-17',
-            params: {
-              Bucket: process.env.VUE_APP_ENV_AWS_STORAGE_BUCKET_NAME
-            }
-          }
-        )
-
-        for (let i = 0; i < this.field_obj.length; i++) {
-          if (this.field_obj[i].sign == sign) {
-
-            let photoKey = this.field_obj[i].image_data.replace('https://assets.infomagazine.xyz', 'assets')
-
-            s3.deleteObject({Key: photoKey}, (err, data) => {
-              if (err) {
-                alert('There was an error deleting your photo: ', err.message)
-              } else {
-                // alert('Successfully deleted photo.', data)
-
-                document.getElementById('field_file_input_' + sign).value = ''
-                this.field_obj[i].image_data = null
-                this.$emit('update:field', this.field_obj)
-                this.push_landing()
-              }
-            })
-
-          }
         }
-      },
-      // key_to_url(key) {
-      //   if (key != null) {
-      //     if (key.indexOf('assets') > -1) {
-      //       let divided = key.split('/')
-      //       let url = 'https://'
-      //
-      //       if (this.updated_date == '') {
-      //         url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/' + key
-      //       } else {
-      //         for (let i = 0; i < divided.length; i++) {
-      //           if (i == 0) {
-      //             url += (divided[i] + '.infomagazine.xyz')
-      //             // url += ('assets' + '.infomagazine.xyz')
-      //           } else {
-      //             url += ('/' + divided[i])
-      //           }
-      //         }
-      //       }
-      //       return url
-      //     } else {
-      //       let divided = key.split('/')
-      //       let url = 'https://'
-      //
-      //       if (this.updated_date == '') {
-      //         url += 'infomagazine.s3.ap-northeast-2.amazonaws.com/assets' + key
-      //       } else {
-      //         for (let i = 0; i < divided.length; i++) {
-      //           if (i == 0) {
-      //             // url += (divided[i] + '.infomagazine.xyz')
-      //             url += ('assets' + '.infomagazine.xyz')
-      //           } else {
-      //             url += ('/' + divided[i])
-      //           }
-      //         }
-      //       }
-      //       return url
-      //     }
-      //   } else {
-      //     return ''
-      //   }
-      //
-      // }
-    },
-    computed: {
-      arrow() {
-        let arrow = this.form_arrow
-        this.init_component()
-        return arrow
-      }
     }
-  }
 </script>
 
 <style lang="scss" scoped>

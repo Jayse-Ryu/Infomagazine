@@ -198,6 +198,7 @@
             header_script: null,
             body_script: null,
             tracking_info: {
+              tnk: false,
               fb: '',
               ka: '',
               ga: '',
