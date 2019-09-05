@@ -185,7 +185,6 @@ class Default:
                 .dim-layer {
                   display: none;
                   position: fixed;
-                  _position: absolute;
                   top: 0;
                   left: 0;
                   width: 100%;
@@ -209,19 +208,16 @@ class Default:
                 }
                 
                 .pop-layer {
-                  display: none;
                   position: absolute;
                   top: 5%;
                   left: 5%;
+                  right: 5%;
+                  bottom: 5%;
                   width: 90%;
-                  height: auto;
+                  overflow: scroll;
                   background-color: #fff;
                   border: 5px solid #3571B5;
                   z-index: 10;
-                }
-                
-                .dim-layer .pop-layer {
-                  display: block;
                 }
             </style>
                 """
@@ -451,6 +447,9 @@ class Script(Default):
         self.landing_config = landing_config
         super(Script, self).__init__(landing_config)
 
+        self.tnk_script_check = False
+        if landing_config['tracking_info']['tnk']:
+            self.tnk_script_check = True
         self.facebook_pixel_check = False
         if landing_config['tracking_info']['fb']:
             self.facebook_pixel_check = True
@@ -625,6 +624,10 @@ class Script(Default):
 
         :param section_id: 섹션 번호
         """
+        tnk_script_callback = ""
+        if self.tnk_script_check:
+            tnk_script_callback = "TnkSession.actionCompleted();"
+
         facebook_pixel_callback = ""
         if self.facebook_pixel_check:
             facebook_pixel_callback = "fbq('track', 'CompleteRegistration');"
@@ -654,13 +657,12 @@ class Script(Default):
                 url: 'https://serverlessapi.infomagazine.xyz/db/',
                 data: JSON.stringify(body),
                 success: function (data) {{
-                    if (data['state']) {{
+                    if (data['state'] === true) {{
+                        {tnk_script_callback}
                         {facebook_pixel_callback}
                         {kakao_pixel_callback}
-                        alert(data['message']);
-                    }} else {{
-                        alert(data['message']);
                     }}
+                    alert(data['message']);
                     sessionStorage.setItem('current_epoch_time', Date.now());
                 }},
                 error: function (data) {{
@@ -813,6 +815,16 @@ class Script(Default):
         <!-- End Facebook Pixel Code -->
         """
 
+    def _tnk_script(self):
+        """
+        2019/09/05
+
+        :return: tnk script 공통 스크립트
+        """
+        return """
+        <script src="//api3.tnkfactory.com/tnk/js/tnk-webapi-cpatrack.1.3.js"></script>
+        """
+
     def _facebook_pixel_body(self):
         """
         2019/08/23
@@ -899,6 +911,7 @@ class LandingPage(StyleSheet, Script):
 
         self.is_datepicker_to_add = False
         self.is_phone_auth_to_add = False
+        self.is_terms_to_add = False
 
     def _db_form_field_generator(self, base_html, section_id=None,
                                  object_id=None, object_w=None,
@@ -1065,27 +1078,31 @@ class LandingPage(StyleSheet, Script):
                 a_tag_to_terms_detail.string = "[보기]"
                 form_group.append(a_tag_to_terms_detail)
 
-                div_to_dim_layer = base_html.new_tag('div', attrs={'id': 'popup-layer', 'class': 'dim-layer'})
-                div_to_dim_background = base_html.new_tag('div', attrs={'class': 'dim-background'})
-                div_to_popup_layer = base_html.new_tag('div', attrs={'class': 'pop-layer'})
-                div_to_popup_container = base_html.new_tag('div', attrs={'class': 'pop-container'})
-                div_to_popup_contents = base_html.new_tag('div', attrs={'class': 'pop-contents'})
-                div_to_terms_title = base_html.new_tag('h4', attrs={'class': 'terms-title'})
-                div_to_terms_title.string = self.term_config['title']
-                div_to_terms_contents = base_html.new_tag('div', attrs={'class': 'terms-contents'})
-                div_to_terms_contents.string = self.term_config['content']
-                div_to_close_button = base_html.new_tag('button', attrs={'class': 'terms-close-button'})
-                div_to_close_button.string = "닫기"
-                div_to_popup_contents.append(div_to_close_button)
-                div_to_popup_contents.append(div_to_terms_title)
-                div_to_popup_contents.append(div_to_terms_contents)
-                div_to_popup_container.append(div_to_popup_contents)
-                div_to_popup_layer.append(div_to_popup_container)
-                div_to_dim_layer.append(div_to_dim_background)
-                div_to_dim_layer.append(div_to_popup_layer)
-                base_html.append(div_to_dim_layer)
+                if not self.is_terms_to_add:
+                    div_to_dim_layer = base_html.new_tag('div', attrs={'id': 'popup-layer', 'class': 'dim-layer'})
+                    div_to_dim_background = base_html.new_tag('div', attrs={'class': 'dim-background'})
+                    div_to_popup_layer = base_html.new_tag('div', attrs={'class': 'pop-layer'})
+                    div_to_popup_container = base_html.new_tag('div', attrs={'class': 'pop-container'})
+                    div_to_popup_contents = base_html.new_tag('div', attrs={'class': 'pop-contents'})
+                    div_to_terms_title = base_html.new_tag('h4', attrs={'class': 'terms-title'})
+                    div_to_terms_title.string = self.term_config['title']
+                    div_to_terms_contents = base_html.new_tag('div', attrs={'class': 'terms-contents'})
+                    div_to_terms_contents.append(
+                        _convert_to_html('<br/>'.join(self.term_config['content'].splitlines())))
+                    div_to_close_button = base_html.new_tag('button', attrs={'class': 'terms-close-button'})
+                    div_to_close_button.string = "닫기"
+                    div_to_popup_contents.append(div_to_close_button)
+                    div_to_popup_contents.append(div_to_terms_title)
+                    div_to_popup_contents.append(div_to_terms_contents)
+                    div_to_popup_container.append(div_to_popup_contents)
+                    div_to_popup_layer.append(div_to_popup_container)
+                    div_to_dim_layer.append(div_to_dim_background)
+                    div_to_dim_layer.append(div_to_popup_layer)
+                    base_html.append(div_to_dim_layer)
 
-                self._js_terms_trigger()
+                    self._js_terms_trigger()
+
+                    self.is_terms_to_add = True
 
         if field_type in [8, 9]:
             return form_group, None
@@ -1220,6 +1237,9 @@ class LandingPage(StyleSheet, Script):
             header_script = _convert_to_html(
                 self.landing_config['header_script'] if self.landing_config['header_script'] else "")
             base_html.head.append(header_script)
+
+            if self.tnk_script_check:
+                base_html.head.append(_convert_to_html(self._tnk_script()))
 
             if self.facebook_pixel_check:
                 base_html.head.append(_convert_to_html(self._facebook_pixel_head()))

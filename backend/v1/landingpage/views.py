@@ -58,7 +58,7 @@ class _LandingPageViewSetsUtils(viewsets.ViewSet):
         )
         if cf_inv_response_data['ResponseMetadata']['HTTPStatusCode'] == 201:
             return {'state': True, 'data': url, 'message': 'Succeed.',
-                    'options': {'status': status.HTTP_201_CREATED}}
+                    'options': {'status': status.HTTP_200_OK}}
         else:
             return {'state': False, 'data': '', 'message': 'Failed.',
                     'options': {'status': status.HTTP_500_INTERNAL_SERVER_ERROR}}

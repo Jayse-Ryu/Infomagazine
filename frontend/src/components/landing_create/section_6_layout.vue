@@ -149,7 +149,7 @@
                               </label>
                               <button type="button" v-if="is_term"
                                       class="btn-sm btn-link p-0 border-0"
-                                      style="line-height: 15px;">[{{ field.name }}]
+                                      style="line-height: 15px;">&#x0005B;보기&#x0005D;
                               </button>
                             </div>
                           </div>
@@ -207,7 +207,7 @@
                               </label>
                               <button type="button" v-if="is_term"
                                       class="btn-sm btn-link p-0 border-0"
-                                      style="line-height: 15px;">[{{ field.name }}]
+                                      style="line-height: 15px;">&#x0005B;보기&#x0005D;
                               </button>
                             </div>
                           </div>
