@@ -49,6 +49,11 @@
 
     <div class="form-group row"
          v-if="landing.is_term && !landing.image_term">
+      <label class="col-sm-3 col-form-label-sm mt-3" for="term_title">약관 url</label>
+      <div class="col-sm-9 mt-sm-3">
+        <input type="text" class="form-control" id="term_url" placeholder="약관 url"
+               v-model="term.url" @change="push_landing()">
+      </div>
       <label class="col-sm-3 col-form-label-sm mt-3" for="term_title">약관 제목</label>
       <div class="col-sm-9 mt-sm-3">
         <input type="text" class="form-control" id="term_title" placeholder="약관 제목"
@@ -59,11 +64,7 @@
           <textarea type="text" class="form-control" id="term_cont" rows="4" placeholder="약관 내용"
                     v-model="term.content" @change="push_landing()"></textarea>
       </div>
-
-
     </div>
-
-
   </div>
 </template>
 

@@ -9,13 +9,13 @@
       </label>
     </div>-->
 
-    <label class="col-sm-3 col-form-label-sm mt-3" for="mobile">모바일 전용</label>
-    <div class="col-sm-9 mt-sm-3">
-      <label class="switch" for="mobile">
-        <input type="checkbox" id="mobile" v-model="landing.is_mobile">
-        <span class="slider round"></span>
-      </label>
-    </div>
+<!--    <label class="col-sm-3 col-form-label-sm mt-3" for="mobile">모바일 전용</label>-->
+<!--    <div class="col-sm-9 mt-sm-3">-->
+<!--      <label class="switch" for="mobile">-->
+<!--        <input type="checkbox" id="mobile" v-model="landing.is_mobile">-->
+<!--        <span class="slider round"></span>-->
+<!--      </label>-->
+<!--    </div>-->
 
   </div>
 </template>

@@ -964,6 +964,7 @@ class LandingPage(StyleSheet, Script):
             input_tag = base_html.new_tag('input', attrs={'type': 'text',
                                                           'id': field_id,
                                                           'class': 'form-control',
+                                                          'placeholder': field_info['holder'],
                                                           'data-label-name': field_info['name']})
             form_group.append(label_wrap_tag)
             form_group.append(input_tag)
@@ -976,6 +977,7 @@ class LandingPage(StyleSheet, Script):
             input_tag = base_html.new_tag('input', attrs={'type': 'number',
                                                           'id': field_id,
                                                           'class': 'form-control',
+                                                          'placeholder': field_info['holder'],
                                                           'data-label-name': field_info['name']})
             form_group.append(label_wrap_tag)
             form_group.append(input_tag)
@@ -988,6 +990,7 @@ class LandingPage(StyleSheet, Script):
             input_tag = base_html.new_tag('input', attrs={'type': 'tel',
                                                           'id': field_id,
                                                           'class': 'form-control',
+                                                          'placeholder': field_info['holder'],
                                                           'data-label-name': field_info['name']})
             form_group.append(label_wrap_tag)
             form_group.append(input_tag)
@@ -1031,6 +1034,7 @@ class LandingPage(StyleSheet, Script):
             input_tag = base_html.new_tag('input', attrs={'type': 'text',
                                                           'id': field_id,
                                                           'class': 'form-control',
+                                                          'placeholder': field_info['holder'],
                                                           'data-label-name': field_info['name'],
                                                           'data-toggle': 'datepicker',
                                                           'readonly': ''})
@@ -1047,7 +1051,7 @@ class LandingPage(StyleSheet, Script):
                     """
                 self.is_datepicker_to_add = True
         elif field_type == 8:
-            if field_info['image_data'] == '':
+            if not field_info['image_data']:
                 button_tag = base_html.new_tag('button', attrs={'type': 'button',
                                                                 'class': 'form-button',
                                                                 'id': "form_" + str(section_id) + "_submit_button"})
@@ -1074,35 +1078,40 @@ class LandingPage(StyleSheet, Script):
             form_group.append(input_tag)
             form_group.append(label_tag)
             if self.landing_config['is_term']:
-                a_tag_to_terms_detail = base_html.new_tag('a', attrs={'class': 'terms-button'})
+                a_tag_to_terms_attr_option = {'class': 'terms-button'}
+
+                if self.term_config['url']:
+                    a_tag_to_terms_attr_option.update({'href': self.term_config['url'], 'target': '_blank'})
+                else:
+                    if not self.is_terms_to_add:
+                        div_to_dim_layer = base_html.new_tag('div', attrs={'id': 'popup-layer', 'class': 'dim-layer'})
+                        div_to_dim_background = base_html.new_tag('div', attrs={'class': 'dim-background'})
+                        div_to_popup_layer = base_html.new_tag('div', attrs={'class': 'pop-layer'})
+                        div_to_popup_container = base_html.new_tag('div', attrs={'class': 'pop-container'})
+                        div_to_popup_contents = base_html.new_tag('div', attrs={'class': 'pop-contents'})
+                        div_to_terms_title = base_html.new_tag('h4', attrs={'class': 'terms-title'})
+                        div_to_terms_title.string = self.term_config['title']
+                        div_to_terms_contents = base_html.new_tag('div', attrs={'class': 'terms-contents'})
+                        div_to_terms_contents.append(
+                            _convert_to_html('<br/>'.join(self.term_config['content'].splitlines())))
+                        div_to_close_button = base_html.new_tag('button', attrs={'class': 'terms-close-button'})
+                        div_to_close_button.string = "닫기"
+                        div_to_popup_contents.append(div_to_close_button)
+                        div_to_popup_contents.append(div_to_terms_title)
+                        div_to_popup_contents.append(div_to_terms_contents)
+                        div_to_popup_container.append(div_to_popup_contents)
+                        div_to_popup_layer.append(div_to_popup_container)
+                        div_to_dim_layer.append(div_to_dim_background)
+                        div_to_dim_layer.append(div_to_popup_layer)
+                        base_html.append(div_to_dim_layer)
+
+                        self._js_terms_trigger()
+
+                        self.is_terms_to_add = True
+
+                a_tag_to_terms_detail = base_html.new_tag('a', attrs=a_tag_to_terms_attr_option)
                 a_tag_to_terms_detail.string = "[보기]"
                 form_group.append(a_tag_to_terms_detail)
-
-                if not self.is_terms_to_add:
-                    div_to_dim_layer = base_html.new_tag('div', attrs={'id': 'popup-layer', 'class': 'dim-layer'})
-                    div_to_dim_background = base_html.new_tag('div', attrs={'class': 'dim-background'})
-                    div_to_popup_layer = base_html.new_tag('div', attrs={'class': 'pop-layer'})
-                    div_to_popup_container = base_html.new_tag('div', attrs={'class': 'pop-container'})
-                    div_to_popup_contents = base_html.new_tag('div', attrs={'class': 'pop-contents'})
-                    div_to_terms_title = base_html.new_tag('h4', attrs={'class': 'terms-title'})
-                    div_to_terms_title.string = self.term_config['title']
-                    div_to_terms_contents = base_html.new_tag('div', attrs={'class': 'terms-contents'})
-                    div_to_terms_contents.append(
-                        _convert_to_html('<br/>'.join(self.term_config['content'].splitlines())))
-                    div_to_close_button = base_html.new_tag('button', attrs={'class': 'terms-close-button'})
-                    div_to_close_button.string = "닫기"
-                    div_to_popup_contents.append(div_to_close_button)
-                    div_to_popup_contents.append(div_to_terms_title)
-                    div_to_popup_contents.append(div_to_terms_contents)
-                    div_to_popup_container.append(div_to_popup_contents)
-                    div_to_popup_layer.append(div_to_popup_container)
-                    div_to_dim_layer.append(div_to_dim_background)
-                    div_to_dim_layer.append(div_to_popup_layer)
-                    base_html.append(div_to_dim_layer)
-
-                    self._js_terms_trigger()
-
-                    self.is_terms_to_add = True
 
         if field_type in [8, 9]:
             return form_group, None
@@ -1110,7 +1119,7 @@ class LandingPage(StyleSheet, Script):
             return form_group, {
                 'name': field_id,
                 'type': field_info['type'],
-                'target': f"""$('input[name={field_id}]:checked')""",
+                'target': f"""$('input[name="{field_id}"]:checked')""",
                 'validation': list(field_info['validation'].keys())
             }
         else:
@@ -1208,7 +1217,6 @@ class LandingPage(StyleSheet, Script):
                                             for field_index, field
                                             in enumerate(self.field_info_list)
                                             if int(field['form_group_id']) == int(form_group_id)]
-
                     item_group = []
                     for generated_field, item in generated_field_list:
                         section_object_by_type.append(generated_field)

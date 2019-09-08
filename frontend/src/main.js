@@ -14,7 +14,6 @@ import VueDraggableResizable from 'vue-draggable-resizable'
 import './plugins/axios'
 import './plugins/vue-cookie'
 import './plugins/date-picker'
-import './plugins/vue-json-excel'
 
 // Custom plugins
 import Header from './Header'

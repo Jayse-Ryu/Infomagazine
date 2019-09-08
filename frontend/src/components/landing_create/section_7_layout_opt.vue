@@ -96,54 +96,54 @@
       <hr>
     </div>
 
-    <label class="col-sm-3 col-form-label-sm mt-3" for="in_banner">
-      <span>띠배너</span>
-      <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"
-            v-tooltip="{content: msg.in_banner,
-                      placement: 'right',
-                      offset: 5,
-                      trigger: 'hover',
-                      }">?</span>
-      <span class="question badge btn-secondary p-1 align-middle" v-else
-            v-tooltip="{content: msg.in_banner,
-                      placement: 'right',
-                      offset: 5,
-                      trigger: 'click',
-                      }">?</span>
-    </label>
-    <div class="col-sm-9 mt-sm-3">
-      <label class="switch" for="in_banner">
-        <input type="checkbox" id="in_banner" v-model="landing.is_banner">
-        <span class="slider round"></span>
-      </label>
-    </div>
+<!--    <label class="col-sm-3 col-form-label-sm mt-3" for="in_banner">-->
+<!--      <span>띠배너</span>-->
+<!--      <span class="question badge btn-secondary p-1 align-middle" v-if="window_width > 768"-->
+<!--            v-tooltip="{content: msg.in_banner,-->
+<!--                      placement: 'right',-->
+<!--                      offset: 5,-->
+<!--                      trigger: 'hover',-->
+<!--                      }">?</span>-->
+<!--      <span class="question badge btn-secondary p-1 align-middle" v-else-->
+<!--            v-tooltip="{content: msg.in_banner,-->
+<!--                      placement: 'right',-->
+<!--                      offset: 5,-->
+<!--                      trigger: 'click',-->
+<!--                      }">?</span>-->
+<!--    </label>-->
+<!--    <div class="col-sm-9 mt-sm-3">-->
+<!--      <label class="switch" for="in_banner">-->
+<!--        <input type="checkbox" id="in_banner" v-model="landing.is_banner">-->
+<!--        <span class="slider round"></span>-->
+<!--      </label>-->
+<!--    </div>-->
 
-    <label v-if="landing.is_banner" class="col-sm-3 col-form-label-sm mt-3"
-           for="in_banner_img">
-      <span>띠배너 옵션</span>
-    </label>
-    <div v-if="landing.is_banner" class="col-sm-9 mt-sm-3 row ml-0">
+<!--    <label v-if="landing.is_banner" class="col-sm-3 col-form-label-sm mt-3"-->
+<!--           for="in_banner_img">-->
+<!--      <span>띠배너 옵션</span>-->
+<!--    </label>-->
+<!--    <div v-if="landing.is_banner" class="col-sm-9 mt-sm-3 row ml-0">-->
 
-      <input type="file" class="form-control col-sm-5 col-md-5 pt-1" id="in_banner_img" placeholder="이미지"
-             ref="in_banner_file_input" @change="in_banner_file_add($event.target.files[0])" accept="image/*">
-      <div class="margin_div"></div>
-      <input type="text" class="form-control col-sm-7 col-md-5" id="in_banner_desc" placeholder="띠배너 주소"
-             v-model="landing.banner_url">
-      <div class="margin_div"></div>
-      <!--<button type="button" class="btn btn-primary col-md-1 p-0">추가</button>-->
-      <button type="button" class="btn btn-danger col-md-1 p-0" @click.prevent="in_banner_file_delete()">
-        <span>삭제</span>
-      </button>
-    </div>
-    <label v-if="landing.is_banner" class="col-sm-3 col-form-label-sm mt-3" for="term_img_preview">미리보기</label>
-    <div v-if="landing.is_banner" class="col-sm-9 mt-sm-3 row ml-0" id="term_img_preview">
-      <div v-if="landing.banner_image" class="term_preview_wrap">
-        <img class="term_preview" :src="landing.banner_image" alt="배너 이미지 미리보기">
-      </div>
-      <div v-else class="form-control">
-        <div>등록된 파일이 없습니다</div>
-      </div>
-    </div>
+<!--      <input type="file" class="form-control col-sm-5 col-md-5 pt-1" id="in_banner_img" placeholder="이미지"-->
+<!--             ref="in_banner_file_input" @change="in_banner_file_add($event.target.files[0])" accept="image/*">-->
+<!--      <div class="margin_div"></div>-->
+<!--      <input type="text" class="form-control col-sm-7 col-md-5" id="in_banner_desc" placeholder="띠배너 주소"-->
+<!--             v-model="landing.banner_url">-->
+<!--      <div class="margin_div"></div>-->
+<!--      &lt;!&ndash;<button type="button" class="btn btn-primary col-md-1 p-0">추가</button>&ndash;&gt;-->
+<!--      <button type="button" class="btn btn-danger col-md-1 p-0" @click.prevent="in_banner_file_delete()">-->
+<!--        <span>삭제</span>-->
+<!--      </button>-->
+<!--    </div>-->
+<!--    <label v-if="landing.is_banner" class="col-sm-3 col-form-label-sm mt-3" for="term_img_preview">미리보기</label>-->
+<!--    <div v-if="landing.is_banner" class="col-sm-9 mt-sm-3 row ml-0" id="term_img_preview">-->
+<!--      <div v-if="landing.banner_image" class="term_preview_wrap">-->
+<!--        <img class="term_preview" :src="landing.banner_image" alt="배너 이미지 미리보기">-->
+<!--      </div>-->
+<!--      <div v-else class="form-control">-->
+<!--        <div>등록된 파일이 없습니다</div>-->
+<!--      </div>-->
+<!--    </div>-->
   </div>
 </template>
 

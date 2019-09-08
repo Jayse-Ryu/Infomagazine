@@ -94,7 +94,7 @@
 
                       <!-- input form area -->
                       <div class="order_stretch" v-if="field.type != 8">
-                        <label v-if="field.form_group_id == item.form_group_id && field.label == true"
+                        <label v-if="field.type != 9 && field.form_group_id == item.form_group_id && field.label == true"
                                class="order_form_label" :for="'label'+field.name">
                           <div class="order_form_label_child">{{ field.name }}</div>
                         </label>
