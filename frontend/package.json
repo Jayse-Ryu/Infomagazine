@@ -41,7 +41,7 @@
     "babel-jest": "^23.6.0",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.2.3",
-    "node-sass": "^4.9.0",
+    "node-sass": "^7.0.0",
     "sass-loader": "^7.1.0",
     "vue-cli-plugin-axios": "0.0.4",
     "vue-cookie": "^1.1.4",
